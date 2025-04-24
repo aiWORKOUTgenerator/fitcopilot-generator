@@ -3,6 +3,23 @@
  * Manages storing and retrieving workout data from localStorage
  */
 
+// Define a proper type for workout data
+export interface WorkoutData {
+  title: string;
+  sections: Array<{
+    name: string;
+    duration: number;
+    exercises: Array<{
+      name: string;
+      duration?: string;
+      sets?: number;
+      reps?: number;
+      description: string;
+    }>;
+  }>;
+  [key: string]: unknown; // Allow for additional fields
+}
+
 const CACHE_KEY_PREFIX = 'fitcopilot_workout_';
 const RECENT_WORKOUT_ID_KEY = 'fitcopilot_recent_workout_id';
 
@@ -12,7 +29,7 @@ const RECENT_WORKOUT_ID_KEY = 'fitcopilot_recent_workout_id';
  * @param postId - The workout post ID
  * @param workout - The workout data to cache
  */
-export function cacheWorkout(postId: number, workout: any): void {
+export function cacheWorkout(postId: number, workout: WorkoutData): void {
   try {
     localStorage.setItem(`${CACHE_KEY_PREFIX}${postId}`, JSON.stringify(workout));
     localStorage.setItem(RECENT_WORKOUT_ID_KEY, String(postId));
@@ -27,10 +44,10 @@ export function cacheWorkout(postId: number, workout: any): void {
  * @param postId - The workout post ID
  * @returns The cached workout data or null if not found
  */
-export function getCachedWorkout(postId: number): any | null {
+export function getCachedWorkout(postId: number): WorkoutData | null {
   try {
     const cachedData = localStorage.getItem(`${CACHE_KEY_PREFIX}${postId}`);
-    return cachedData ? JSON.parse(cachedData) : null;
+    return cachedData ? JSON.parse(cachedData) as WorkoutData : null;
   } catch (e) {
     console.warn('Failed to retrieve cached workout:', e);
     return null;

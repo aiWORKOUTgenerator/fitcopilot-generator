@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { generateWorkoutDirect, WorkoutResponse } from '../../api/workoutApi';
+import { generateWorkoutDirect } from '../../api/workoutApi';
 import { 
   cacheWorkout, 
   getCachedWorkout, 
-  getRecentWorkoutId 
+  getRecentWorkoutId,
+  WorkoutData
 } from '../../utils/workoutCache';
 
 type GenerationStatus = 'idle' | 'starting' | 'completed' | 'error';
@@ -12,8 +13,8 @@ interface UseWorkoutGeneratorReturn {
   status: GenerationStatus;
   error: string | null;
   postId: number | null;
-  workout: any | null;
-  startGeneration: (request: string, options?: Record<string, any>) => Promise<void>;
+  workout: WorkoutData | null;
+  startGeneration: (request: string, options?: Record<string, unknown>) => Promise<void>;
   resetGenerator: () => void;
 }
 
@@ -24,7 +25,7 @@ export function useWorkoutGenerator(): UseWorkoutGeneratorReturn {
   const [status, setStatus] = useState<GenerationStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [postId, setPostId] = useState<number | null>(null);
-  const [workout, setWorkout] = useState<any | null>(null);
+  const [workout, setWorkout] = useState<WorkoutData | null>(null);
 
   // Check for cached workout on initial load
   useEffect(() => {
@@ -45,7 +46,7 @@ export function useWorkoutGenerator(): UseWorkoutGeneratorReturn {
    * @param request - The specific workout request
    * @param options - Additional options for the generation
    */
-  async function startGeneration(request: string, options: Record<string, any> = {}): Promise<void> {
+  async function startGeneration(request: string, options: Record<string, unknown> = {}): Promise<void> {
     // Reset state
     setError(null);
     setStatus('starting');
@@ -77,15 +78,15 @@ export function useWorkoutGenerator(): UseWorkoutGeneratorReturn {
           post_id: result.data.post_id
         });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Update state with the error
       setStatus('error');
-      setError(err.message || 'An unexpected error occurred');
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       
       // Log error if tracking is available
       if (typeof window.trackEvent === 'function') {
         window.trackEvent('workout_generation_error', {
-          error_message: err.message || 'Unknown error',
+          error_message: err instanceof Error ? err.message : 'Unknown error',
           generation_time_ms: Date.now() - startTime
         });
       }

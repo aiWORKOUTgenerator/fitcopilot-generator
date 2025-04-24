@@ -10,7 +10,6 @@ import { useWorkoutForm } from '../../hooks/useWorkoutForm';
 import { useWorkoutGeneration } from '../../hooks/useWorkoutGeneration';
 import { useWorkoutGenerator } from '../GenerationProcess/useWorkoutGenerator';
 import { useAnalytics } from '../../../analytics/hooks/useAnalytics';
-import { clearAllCachedWorkouts } from '../../utils/workoutCache';
 import FormFeedback from './FormFeedback';
 import { AdvancedOptionsPanel } from './AdvancedOptionsPanel';
 import { Select } from '../../../../components/ui/Select';
@@ -83,7 +82,6 @@ export const WorkoutRequestForm: React.FC = () => {
   
   // Legacy workout generation 
   const { 
-    startGeneration: startLegacyGeneration, 
     generationStatus, 
     isError: isLegacyError, 
     isSuccess: isLegacySuccess, 

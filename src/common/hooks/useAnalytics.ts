@@ -20,6 +20,16 @@ export interface AnalyticsEventProperties {
 }
 
 /**
+ * Debug-only logger function
+ */
+const debugLog = (...args: unknown[]): void => {
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.info(...args);
+  }
+};
+
+/**
  * Hook for tracking analytics events
  */
 export function useAnalytics() {
@@ -40,9 +50,7 @@ export function useAnalytics() {
     };
     
     // In development, log to console
-    if (process.env.NODE_ENV !== 'production') {
-      console.info(`Analytics Event: ${eventType}`, eventWithMeta);
-    }
+    debugLog(`Analytics Event: ${eventType}`, eventWithMeta);
     
     // Send to WordPress via the DOM
     if (window.dispatchEvent) {
@@ -71,7 +79,7 @@ export function useAnalytics() {
  * @param value The value to convert
  * @returns The converted value
  */
-export function sanitizeAnalyticsValue(value: any): string | number | boolean | null {
+export function sanitizeAnalyticsValue(value: unknown): string | number | boolean | null {
   if (value === null || value === undefined) {
     return null;
   }
@@ -90,5 +98,5 @@ export function sanitizeAnalyticsValue(value: any): string | number | boolean | 
     return value;
   }
   
-  return value;
+  return value as string | number | boolean | null;
 } 

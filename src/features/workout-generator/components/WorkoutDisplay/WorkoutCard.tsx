@@ -1,27 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { apiFetch } from '../../../../common/api/client';
-import { getCachedWorkout } from '../../utils/workoutCache';
+import { getCachedWorkout, WorkoutData } from '../../utils/workoutCache';
 
 interface WorkoutCardProps {
   postId: number;
-  workout?: any;
-}
-
-interface WorkoutSection {
-  name: string;
-  duration: number;
-  exercises: Array<{
-    name: string;
-    duration?: string;
-    sets?: number;
-    reps?: number;
-    description: string;
-  }>;
-}
-
-interface WorkoutData {
-  title: string;
-  sections: WorkoutSection[];
+  workout?: WorkoutData;
 }
 
 interface WorkoutResponse {
@@ -29,6 +12,14 @@ interface WorkoutResponse {
   data: WorkoutData;
   workout_data?: WorkoutData;
   message?: string;
+}
+
+// Type for the window with workoutGenerator extension
+interface WorkoutGeneratorWindow extends Window {
+  workoutGenerator?: {
+    baseUrl: string;
+    [key: string]: unknown;
+  };
 }
 
 /**
@@ -40,7 +31,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ postId, workout: initi
   const [error, setError] = useState<string | null>(null);
   
   // Get the site base URL for creating workout links
-  const baseUrl = (window as any).workoutGenerator?.baseUrl || '';
+  const baseUrl = ((window as WorkoutGeneratorWindow).workoutGenerator?.baseUrl) || '';
 
   // Fetch workout data if not provided
   useEffect(() => {
@@ -63,8 +54,9 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ postId, workout: initi
           const workoutData = response.workout_data || response.data;
           setWorkout(workoutData);
           setLoading(false);
-        } catch (err: any) {
-          setError(err.message || 'Failed to load workout');
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'Failed to load workout';
+          setError(errorMessage);
           setLoading(false);
         }
       };

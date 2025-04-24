@@ -7,7 +7,6 @@ import { useWorkoutGenerator } from '../context/WorkoutGeneratorContext';
 import { useWorkoutForm } from './useWorkoutForm';
 import { generateWorkout } from '../api/workoutApi';
 import { ApiError, ApiErrorType } from '@common/api/client';
-import { GenerationStatus } from '../context/WorkoutGeneratorContext';
 
 /**
  * Hook for workout generation process
@@ -42,9 +41,9 @@ export function useWorkoutGeneration() {
       
       // Call the API to generate the workout
       const workout = await generateWorkout({
-        duration: formValues.duration!,
-        difficulty: formValues.difficulty!,
-        goals: formValues.goals!,
+        duration: formValues.duration || 30,
+        difficulty: formValues.difficulty || 'beginner',
+        goals: formValues.goals || 'general-fitness',
         equipment: formValues.equipment || [],
         restrictions: formValues.restrictions,
       });

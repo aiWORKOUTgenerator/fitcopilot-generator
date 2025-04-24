@@ -9,22 +9,6 @@ import { WorkoutGeneratorProvider } from './context/WorkoutGeneratorContext';
 import { WorkoutRequestForm } from './components/Form/WorkoutRequestForm';
 
 /**
- * Temporary placeholder component - will be replaced with actual feature components
- */
-const FeaturePlaceholder: React.FC = () => {
-  return (
-    <div className="fitcopilot-card">
-      <h2 className="fitcopilot-card-title">Workout Generator</h2>
-      <p className="mb-4">
-        Welcome to the FitCopilot Workout Generator! The feature is being scaffolded and will be
-        fully implemented soon.
-      </p>
-      <button className="fitcopilot-button">Generate Workout</button>
-    </div>
-  );
-};
-
-/**
  * Main feature component that wraps everything in the provider
  */
 export const WorkoutGeneratorFeature: React.FC = () => {

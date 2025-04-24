@@ -70,8 +70,8 @@ export function useWorkoutForm() {
   }, [dispatch, formValues]);
   
   // Update individual form field
-  const updateField = useCallback((field: keyof WorkoutFormParams, value: any) => {
-    const update = { [field]: value };
+  const updateField = useCallback(<K extends keyof WorkoutFormParams>(field: K, value: WorkoutFormParams[K]) => {
+    const update = { [field]: value } as Partial<WorkoutFormParams>;
     dispatch({ type: 'UPDATE_FORM', payload: update });
     
     // Save to session storage

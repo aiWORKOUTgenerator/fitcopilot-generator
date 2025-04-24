@@ -3,6 +3,7 @@
  */
 import { apiFetch } from '../../../common/api/client';
 import { WorkoutFormParams, GeneratedWorkout } from '../types/workout';
+import { WorkoutData } from '../utils/workoutCache';
 
 // API endpoints
 const ENDPOINTS = {
@@ -34,12 +35,20 @@ export async function generateWorkout(params: WorkoutFormParams): Promise<Genera
 export type WorkoutResponse = {
   success: boolean;
   data: {
-    workout: any;
+    workout: WorkoutData;
     post_id: number;
     job_id?: string;
   };
   message?: string;
 };
+
+// Type for the window with fitcopilot data
+interface FitcopilotWindow extends Window {
+  fitcopilotData?: {
+    nonce: string;
+    [key: string]: unknown;
+  };
+}
 
 /**
  * Generate a workout directly using OpenAI (synchronous)
@@ -50,7 +59,7 @@ export type WorkoutResponse = {
  */
 export async function generateWorkoutDirect(
   specificRequest: string,
-  options: Record<string, any> = {}
+  options: Record<string, unknown> = {}
 ): Promise<WorkoutResponse> {
   const body = {
     specific_request: specificRequest,
@@ -61,7 +70,7 @@ export async function generateWorkoutDirect(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-WP-Nonce': (window as any).fitcopilotData?.nonce || ''
+      'X-WP-Nonce': ((window as FitcopilotWindow).fitcopilotData?.nonce) || ''
     },
     body: JSON.stringify(body)
   });
