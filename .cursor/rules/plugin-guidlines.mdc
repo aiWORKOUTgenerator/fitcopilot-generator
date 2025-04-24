@@ -1,0 +1,128 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AI Workout Generator – React/TypeScript WordPress Plugin Guidelines
+
+## Architecture Principles
+
+### 1. Feature-First Approach
+- Organize plugin code by features, grouping components, hooks, context, services, and domain logic together.
+- Example: `/src/features/workout-generator/Form/`
+
+### 2. Synchronous Direct Fetch Workflow
+- Implement real-time synchronous API interactions with OpenAI.
+- Eliminate asynchronous processes and background tasks (e.g., WP-Cron).
+- Provide immediate user feedback for enhanced UX.
+- Centralize error handling and API management for simplified integration and robust debugging.
+
+### 3. Component Classification
+- **Feature Components**: Encapsulate application logic specific to the plugin feature.
+- **UI Components**: Reusable, purely presentational components without embedded logic.
+- **Domain Modules**: Pure TypeScript logic independent of React.
+- **API Modules**: Dedicated API interaction and standardized response/error handling.
+
+### 4. SOLID Principles
+- **Single Responsibility**: Components/modules have one clear purpose.
+- **Open/Closed**: Extend through props or composition.
+- **Liskov Substitution**: Child components interchangeable with parent.
+- **Interface Segregation**: Small, highly specific interfaces.
+- **Dependency Inversion**: Abstract via contexts and interfaces.
+
+## Core Plugin Architecture
+
+### 1. API Design
+- **Namespace**: `/wp-json/my-wg/v1/`
+- Endpoints:
+  - **POST** `/generate` → synchronous workout generation
+  - **GET** `/workouts` → retrieve workouts list
+  - **GET** `/workouts/{id}` → fetch single workout
+  - **PUT** `/workouts/{id}` → update metadata
+  - **POST** `/workouts/{id}/complete` → log completion
+  - **GET/PUT** `/profile` → manage user profile
+- Responses standardized:
+```jsonc
+{
+  "success": true|false,
+  "data": { /* payload */ },
+  "message": "Optional human-readable info",
+  "code": "optional_error_code"
+}
+```
+
+### 2. Service Layer
+- Utilize dependency injection container:
+  - `WorkoutService`, `PromptBuilder`, `AIProviderFactory`, `ResponseParser`, `ProfileService`
+
+### 3. AI Integration
+- Abstract provider interface with built-in (OpenAI, Anthropic) and custom provider support.
+- Utilize standardized `PromptBuilder` and `ResponseParser`.
+
+### 4. Data Model
+- Custom post type `wg_workout` for workouts.
+- Use postmeta for details like duration, equipment, raw AI prompts/responses.
+- Store user profiles in user meta or dedicated custom tables.
+- Optional custom table `wg_workout_log` for tracking completions.
+
+## Frontend Integration
+
+### 1. React and Shortcodes
+- Embed React frontend via shortcode-created DOM nodes.
+- Conditionally enqueue bundled React assets (`frontend.js`).
+- Mount React components using `ReactDOM.render`.
+
+### 2. Frontend State Management
+- Direct synchronous API calls via hooks (`useProfile`, `useWorkouts`, `useWorkoutGenerator`).
+- Standardized `apiFetch` for handling security tokens and errors.
+
+## Extensibility and Customization
+
+### 1. WordPress Hooks
+- Actions: `wg_before_generate`, `wg_after_generate`, `wg_generate_error`, `wg_profile_updated`, `wg_workout_saved`
+- Filters: `wg_ai_prompt`, `wg_ai_response`, `wg_parsed_workout`, `wg_workout_content`, `wg_dashboard_sections`, `wg_profile_fields`
+
+## Maintainability & Scaling
+- Modularized folders (API, AI, UI).
+- Extensive automated tests: PHPUnit, Jest, Cypress.
+- Continuous Integration/Continuous Deployment (CI/CD) on PRs.
+- Versioning strictly following Semantic Versioning (SemVer).
+
+## Documentation
+
+### Component-Level
+- Clearly documented usage, props, state, and performance.
+
+### JSDoc Standards
+```typescript
+/**
+ * WorkoutCard displays detailed workout information.
+ *
+ * @param {WorkoutCardProps} props - Properties for WorkoutCard
+ * @returns {JSX.Element} Rendered WorkoutCard
+ * @example
+ * <WorkoutCard workout={workoutData} />
+ */
+```
+
+### Commit Standards
+- Conventional commits:
+  - `feat:` Feature implementation
+  - `fix:` Bug fixes
+  - `refactor:` Code cleanup
+  - `docs:` Documentation updates
+  - `style:` Formatting and style
+  - `test:` Tests update
+
+## Testing Philosophy
+- Focus on user behavior, edge cases, and error handling.
+- Tests alongside relevant components, clearly named.
+
+## Accessibility
+- Follow WCAG 2.1 AA guidelines.
+- Semantically structured, keyboard and screen reader navigable.
+
+---
+
+These guidelines enforce a consistent, maintainable, scalable, and robust AI Workout Generator plugin architecture aligned with strategic synchronous direct-fetch workflows for enhanced user experience and system reliability.
+
