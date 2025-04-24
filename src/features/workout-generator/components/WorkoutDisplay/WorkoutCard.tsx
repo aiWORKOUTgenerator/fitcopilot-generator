@@ -14,14 +14,6 @@ interface WorkoutResponse {
   message?: string;
 }
 
-// Type for the window with workoutGenerator extension
-interface WorkoutGeneratorWindow extends Window {
-  workoutGenerator?: {
-    baseUrl: string;
-    [key: string]: unknown;
-  };
-}
-
 /**
  * Component for displaying a workout
  */
@@ -31,7 +23,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ postId, workout: initi
   const [error, setError] = useState<string | null>(null);
   
   // Get the site base URL for creating workout links
-  const baseUrl = ((window as WorkoutGeneratorWindow).workoutGenerator?.baseUrl) || '';
+  const baseUrl = window.workoutGenerator?.baseUrl || '';
 
   // Fetch workout data if not provided
   useEffect(() => {

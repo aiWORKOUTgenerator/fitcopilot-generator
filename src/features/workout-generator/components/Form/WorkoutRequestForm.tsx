@@ -15,6 +15,7 @@ import { AdvancedOptionsPanel } from './AdvancedOptionsPanel';
 import { Select } from '../../../../components/ui/Select';
 import { Button } from '../../../../components/ui/Button';
 import { WorkoutCard } from '../WorkoutDisplay/WorkoutCard';
+import { WorkoutDifficulty } from '../../types/workout';
 
 // Equipment options available for workouts
 const EQUIPMENT_OPTIONS = [
@@ -246,7 +247,7 @@ export const WorkoutRequestForm: React.FC = () => {
                         className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
                         value={level.value}
                         checked={formValues.difficulty === level.value}
-                        onChange={(e) => updateField('difficulty', e.target.value)}
+                        onChange={(e) => updateField('difficulty', e.target.value as WorkoutDifficulty)}
                         required
                       />
                       <label htmlFor={`experience-${level.value}`} className="ml-3 text-gray-700">
@@ -302,7 +303,7 @@ export const WorkoutRequestForm: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Custom Workout</h2>
             <WorkoutCard 
               postId={postId} 
-              workout={workout}
+              workout={workout || undefined}
             />
             <div className="mt-6">
               <Button
