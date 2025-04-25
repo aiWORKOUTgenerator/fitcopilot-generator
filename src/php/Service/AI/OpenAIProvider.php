@@ -113,6 +113,8 @@ class OpenAIProvider {
      * @throws \Exception If API call fails
      */
     private function makeOpenAIRequest($prompt) {
+        $start_time = microtime(true);
+        
         $args = [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->api_key,
@@ -137,6 +139,9 @@ class OpenAIProvider {
         ];
 
         $response = wp_remote_post($this->api_endpoint, $args);
+        
+        $end_time = microtime(true);
+        $duration_ms = round(($end_time - $start_time) * 1000, 2);
 
         if (is_wp_error($response)) {
             throw new \Exception('OpenAI API request failed: ' . $response->get_error_message());
@@ -156,6 +161,9 @@ class OpenAIProvider {
         if (!isset($data['choices'][0]['message']['content'])) {
             throw new \Exception('Invalid response from OpenAI API');
         }
+        
+        // Track the API request for analytics
+        do_action('fitcopilot_api_request_complete', $data, $duration_ms, $this->api_endpoint);
 
         return $data['choices'][0]['message']['content'];
     }

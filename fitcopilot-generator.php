@@ -13,18 +13,19 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Define global constants
 define('FITCOPILOT_VERSION', '1.0.0');
-define('FITCOPILOT_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('FITCOPILOT_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('FITCOPILOT_PLUGIN_FILE', __FILE__);
+define('FITCOPILOT_FILE', __FILE__);
+define('FITCOPILOT_DIR', plugin_dir_path(__FILE__));
+define('FITCOPILOT_URL', plugin_dir_url(__FILE__));
 
 // Load autoloader if it exists
-if (file_exists(FITCOPILOT_PLUGIN_DIR . 'vendor/autoload.php')) {
-    require_once FITCOPILOT_PLUGIN_DIR . 'vendor/autoload.php';
+if (file_exists(FITCOPILOT_DIR . 'vendor/autoload.php')) {
+    require_once FITCOPILOT_DIR . 'vendor/autoload.php';
 }
 
 // Bootstrap the plugin
-require_once FITCOPILOT_PLUGIN_DIR . 'src/php/bootstrap.php';
+require_once FITCOPILOT_DIR . 'src/php/bootstrap.php';
 
 // Initialize plugin
 function fitcopilot_init() {

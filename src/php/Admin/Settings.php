@@ -11,33 +11,6 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Initialize admin menu and settings
- */
-function register_admin_menu() {
-    // Top-level FitCopilot menu
-    add_menu_page(
-        'FitCopilot',                // page title
-        'FitCopilot',                // menu title
-        'manage_options',            // capability
-        'fitcopilot',                // menu slug
-        'FitCopilot\\Admin\\render_settings',// callback to render the page
-        'dashicons-heart',           // icon (heart icon for fitness)
-        80                           // position
-    );
-
-    // Settings submenu (under FitCopilot)
-    add_submenu_page(
-        'fitcopilot',                // parent slug
-        'Settings',                  // page title
-        'Settings',                  // submenu title
-        'manage_options',            // capability
-        'fitcopilot',                // menu slug (same as parent to avoid duplicate)
-        'FitCopilot\\Admin\\render_settings' // same render callback
-    );
-}
-add_action('admin_menu', 'FitCopilot\\Admin\\register_admin_menu');
-
-/**
  * Register settings
  */
 function register_settings() {

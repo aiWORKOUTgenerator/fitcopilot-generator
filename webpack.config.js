@@ -5,10 +5,14 @@ module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
   
   return {
-    entry: './src/index.tsx',
+    entry: {
+      frontend: './src/index.tsx',
+      'api-tracker': './src/features/api-tracker/index.tsx',
+      'token-usage': './src/features/token-usage/index.tsx',
+    },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'frontend.js',
+      filename: 'js/[name].js',
       clean: true,
     },
     devtool: isProduction ? 'source-map' : 'inline-source-map',
@@ -50,11 +54,25 @@ module.exports = (env, argv) => {
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: 'frontend.css',
+        filename: 'css/[name].css',
       }),
     ],
     optimization: {
       minimize: isProduction,
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+          common: {
+            test: /[\\/]src[\\/]common[\\/]/,
+            name: 'common',
+            chunks: 'all',
+          },
+        },
+      },
     },
   };
 }; 
