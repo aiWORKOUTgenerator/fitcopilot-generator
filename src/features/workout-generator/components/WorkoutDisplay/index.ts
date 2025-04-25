@@ -1,5 +1,9 @@
 /**
- * WorkoutDisplay components for rendering workout data
+ * Workout Display Components
+ * 
+ * This barrel file exports all components related to displaying workouts
+ * and workout previews for easier importing.
  */
 
-export { WorkoutCard } from './WorkoutCard'; 
+export * from './WorkoutCard';
+export * from './WorkoutPreview'; 

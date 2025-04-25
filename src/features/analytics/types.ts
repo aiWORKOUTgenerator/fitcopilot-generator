@@ -7,6 +7,7 @@
  */
 export type AnalyticsEventType =
   | 'view_form'
+  | 'view_preview'
   | 'form_submit'
   | 'form_error'
   | 'workout_generated'

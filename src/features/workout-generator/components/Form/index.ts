@@ -1,7 +1,10 @@
 /**
- * Form component exports
+ * Form Components
+ * 
+ * This barrel file exports all components related to the workout request form
+ * for easier importing.
  */
 
 export * from './WorkoutRequestForm';
-export * from './AdvancedOptions';
+export * from './AdvancedOptionsPanel';
 export * from './FormFeedback'; 
