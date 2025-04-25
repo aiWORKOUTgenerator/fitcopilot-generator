@@ -66,6 +66,13 @@ class APITrackerEndpoints {
             'permission_callback' => [$this, 'admin_permissions_check'],
         ]);
         
+        // Get API endpoints
+        register_rest_route(self::API_NAMESPACE, '/api-tracker/endpoints', [
+            'methods'             => 'GET',
+            'callback'            => [$this, 'get_api_endpoints'],
+            'permission_callback' => [$this, 'admin_permissions_check'],
+        ]);
+        
         // Update token cost
         register_rest_route(self::API_NAMESPACE, '/api-tracker/token-cost', [
             'methods'             => 'POST',
@@ -206,6 +213,86 @@ class APITrackerEndpoints {
             'success' => true,
             'message' => 'Statistics reset successfully',
         ]);
+    }
+    
+    /**
+     * Get all registered REST API endpoints
+     *
+     * @return \WP_REST_Response REST response
+     */
+    public function get_api_endpoints() {
+        global $wp_rest_server;
+        
+        if (empty($wp_rest_server)) {
+            $wp_rest_server = new \WP_REST_Server;
+            do_action('rest_api_init');
+        }
+        
+        $namespaces = $wp_rest_server->get_namespaces();
+        $endpoints = [];
+        
+        // Filter to just our API namespaces
+        $plugin_namespaces = array_filter($namespaces, function($namespace) {
+            return strpos($namespace, 'fitcopilot') === 0 || strpos($namespace, 'wp/v2') === 0;
+        });
+        
+        foreach ($plugin_namespaces as $namespace) {
+            $routes = $wp_rest_server->get_routes($namespace);
+            
+            foreach ($routes as $route => $route_handlers) {
+                foreach ($route_handlers as $handler) {
+                    $endpoint = [
+                        'route' => $route,
+                        'namespace' => $namespace,
+                        'methods' => $handler['methods'],
+                        'callback' => $this->get_callback_name($handler['callback']),
+                        'permission' => $this->get_callback_name($handler['permission_callback']),
+                        'args' => !empty($handler['args']) ? count($handler['args']) . ' args' : 'None',
+                    ];
+                    
+                    $endpoints[] = $endpoint;
+                }
+            }
+        }
+        
+        return rest_ensure_response([
+            'success' => true,
+            'data' => $endpoints,
+        ]);
+    }
+    
+    /**
+     * Get a human-readable name for a callback
+     *
+     * @param mixed $callback The callback to get a name for
+     * @return string The callback name
+     */
+    private function get_callback_name($callback) {
+        if (empty($callback)) {
+            return 'none';
+        }
+        
+        if (is_string($callback)) {
+            return $callback;
+        }
+        
+        if (is_array($callback)) {
+            if (is_object($callback[0])) {
+                return get_class($callback[0]) . '->' . $callback[1];
+            } else {
+                return $callback[0] . '::' . $callback[1];
+            }
+        }
+        
+        if (is_object($callback)) {
+            if ($callback instanceof \Closure) {
+                return 'Closure';
+            } else {
+                return get_class($callback);
+            }
+        }
+        
+        return 'Unknown';
     }
 }
 

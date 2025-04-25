@@ -52,6 +52,27 @@ export interface MonthlyStats extends BaseStats {
 }
 
 /**
+ * Endpoint statistics information
+ */
+export interface EndpointStat {
+  route: string;
+  namespace: string;
+  method: string;
+  calls: number;
+  health: number;
+  responseTime: number;
+  lastCalled: string;
+  errors?: {
+    count: number;
+    lastError?: {
+      code: string;
+      message: string;
+      time: string;
+    }
+  };
+}
+
+/**
  * Props for the SummaryCard component
  */
 export interface SummaryCardProps {
@@ -84,6 +105,36 @@ export interface UsageChartProps {
  */
 export interface ResetStatsProps {
   onResetStats: () => Promise<boolean>;
+}
+
+/**
+ * API Endpoint information
+ */
+export interface ApiEndpoint {
+  route: string;
+  namespace: string;
+  methods: Record<string, boolean>;
+  callback: string;
+  permission: string;
+  args: string;
+}
+
+/**
+ * Props for the EndpointsTable component
+ */
+export interface EndpointsTableProps {
+  endpoints: ApiEndpoint[];
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * Props for the EndpointStatsTable component
+ */
+export interface EndpointStatsTableProps {
+  stats: EndpointStat[];
+  isLoading: boolean;
+  error: string | null;
 }
 
 /**

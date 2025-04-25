@@ -169,7 +169,8 @@ class APITrackerPage {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html__('API Tracker', 'fitcopilot'); ?></h1>
-            <div id="fitcopilot-api-tracker-root"></div>
+            <!-- Isolated container with higher z-index for event handling -->
+            <div id="fitcopilot-api-tracker-root" class="api-tracker-container"></div>
             
             <?php 
             // Directly include scripts as a fallback
@@ -199,7 +200,10 @@ class APITrackerPage {
                             if (typeof window.fitcopilotApiTracker !== 'undefined' && 
                                 typeof window.fitcopilotApiTracker.initAPITracker === 'function') {
                                 console.log('Initializing API Tracker after direct load');
-                                window.fitcopilotApiTracker.initAPITracker('fitcopilot-api-tracker-root');
+                                // Add a slight delay to ensure WordPress scripts have initialized
+                                setTimeout(function() {
+                                    window.fitcopilotApiTracker.initAPITracker('fitcopilot-api-tracker-root');
+                                }, 100);
                             }
                         };
                         document.body.appendChild(apiTrackerScript);
@@ -208,7 +212,7 @@ class APITrackerPage {
                 }
             </script>
             
-            <div class="debug-info" style="margin-top: 20px; padding: 10px; background: #f8f8f8; border: 1px solid #ddd;">
+            <div class="debug-info" style="display: none; margin-top: 20px; padding: 10px; background: #f8f8f8; border: 1px solid #ddd;">
                 <h2>Debug Information</h2>
                 <p>If you're seeing this message, the React app hasn't initialized properly.</p>
                 <p>Verify that the following JavaScript files are loaded:</p>
@@ -245,19 +249,12 @@ class APITrackerPage {
                         if (typeof window.fitcopilotApiTracker !== 'undefined' && 
                             typeof window.fitcopilotApiTracker.initAPITracker === 'function') {
                             console.log('Manually initializing API Tracker');
-                            window.fitcopilotApiTracker.initAPITracker('fitcopilot-api-tracker-root');
+                            // Add a slight delay to ensure WordPress scripts have initialized
+                            setTimeout(function() {
+                                window.fitcopilotApiTracker.initAPITracker('fitcopilot-api-tracker-root');
+                            }, 100);
                         } else {
                             console.error('window.fitcopilotApiTracker.initAPITracker function not found');
-                            // Try again after a short delay
-                            setTimeout(function() {
-                                console.log('Retrying initialization after delay');
-                                console.log('fitcopilotApiTracker object:', window.fitcopilotApiTracker);
-                                if (typeof window.fitcopilotApiTracker !== 'undefined' && 
-                                    typeof window.fitcopilotApiTracker.initAPITracker === 'function') {
-                                    console.log('Manually initializing API Tracker after delay');
-                                    window.fitcopilotApiTracker.initAPITracker('fitcopilot-api-tracker-root');
-                                }
-                            }, 1000);
                         }
                     });
                 </script>

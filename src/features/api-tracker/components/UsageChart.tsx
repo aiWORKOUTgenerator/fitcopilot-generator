@@ -1,11 +1,37 @@
 import React, { useEffect, useRef } from 'react';
 import { __ } from '../utils/wordpress-polyfills';
 import { UsageChartProps } from '../types';
+import { Chart, ChartConfiguration, ChartTypeRegistry } from 'chart.js/auto';
 
-// Check if Chart.js is available in WordPress
+// Register required Chart.js components
+import {
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
+// Declare global Chart type
 declare global {
   interface Window {
-    Chart: any;
+    Chart: typeof Chart;
   }
 }
 
@@ -36,17 +62,18 @@ const UsageChart: React.FC<UsageChartProps> = ({
   title
 }) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
-  const chartInstance = useRef<any>(null);
+  const chartInstance = useRef<Chart | null>(null);
+
+  // Set Chart.js globally for other components
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.Chart = Chart;
+    }
+  }, []);
 
   useEffect(() => {
     // Don't render chart during loading or if there's an error
     if (isLoading || error || !data.length) {
-      return;
-    }
-
-    // Check if Chart.js is available
-    if (!window.Chart) {
-      console.error('Chart.js is not available. Make sure it is loaded.');
       return;
     }
 
@@ -68,9 +95,9 @@ const UsageChart: React.FC<UsageChartProps> = ({
     // Prepare chart data
     const labels = sortedData.map(item => formatDate(String(item[dateKey as keyof typeof item]), dateKey));
     
-    // Create chart
-    chartInstance.current = new window.Chart(ctx, {
-      type: 'bar',
+    // Create chart configuration
+    const config = {
+      type: 'bar' as const,
       data: {
         labels,
         datasets: [
@@ -86,7 +113,7 @@ const UsageChart: React.FC<UsageChartProps> = ({
           {
             label: __('Tokens', 'fitcopilot'),
             data: sortedData.map(item => item.total_tokens),
-            type: 'line',
+            type: 'line' as const,
             borderColor: 'rgba(255, 99, 132, 1)',
             backgroundColor: 'rgba(255, 99, 132, 0.1)',
             borderWidth: 2,
@@ -111,10 +138,10 @@ const UsageChart: React.FC<UsageChartProps> = ({
             },
           },
           legend: {
-            position: 'top',
+            position: 'top' as const,
           },
           tooltip: {
-            mode: 'index',
+            mode: 'index' as const,
             intersect: false,
           },
         },
@@ -125,8 +152,9 @@ const UsageChart: React.FC<UsageChartProps> = ({
             },
           },
           y: {
-            type: 'linear',
-            position: 'left',
+            type: 'linear' as const,
+            display: true,
+            position: 'left' as const,
             title: {
               display: true,
               text: __('Requests', 'fitcopilot'),
@@ -140,8 +168,9 @@ const UsageChart: React.FC<UsageChartProps> = ({
             },
           },
           y1: {
-            type: 'linear',
-            position: 'right',
+            type: 'linear' as const,
+            display: true,
+            position: 'right' as const,
             title: {
               display: true,
               text: __('Tokens', 'fitcopilot'),
@@ -152,7 +181,8 @@ const UsageChart: React.FC<UsageChartProps> = ({
             min: 0,
             ticks: {
               precision: 0,
-              callback: function(value: number): string {
+              callback: function(tickValue: number | string): string {
+                const value = Number(tickValue);
                 if (value >= 1000) {
                   return `${(value / 1000).toFixed(1)}K`;
                 }
@@ -162,7 +192,14 @@ const UsageChart: React.FC<UsageChartProps> = ({
           },
         },
       },
-    });
+    };
+    
+    try {
+      chartInstance.current = new Chart(ctx, config);
+      console.log('Chart created successfully!');
+    } catch (e) {
+      console.error('Error creating chart:', e);
+    }
 
     // Clean up chart instance on component unmount
     return () => {
