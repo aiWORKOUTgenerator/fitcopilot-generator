@@ -5,40 +5,11 @@
 import { useCallback, useEffect } from 'react';
 import { WorkoutFormParams, WorkoutDifficulty } from '../types/workout';
 import { useWorkoutGenerator } from '../context/WorkoutGeneratorContext';
-import { validateWorkoutForm, isWorkoutFormValid } from '../domain/validators';
+import { useFormValidation } from './useFormValidation';
+import { useFormPersistence } from './useFormPersistence';
 
 // Storage key for form values
 const FORM_STORAGE_KEY = 'fitcopilot_workout_form';
-
-/**
- * Save form values to session storage
- */
-function saveFormToStorage(formValues: Partial<WorkoutFormParams>) {
-  if (typeof window === 'undefined') return;
-  
-  try {
-    sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formValues));
-  } catch (e) {
-    console.warn('Failed to save form state to session storage:', e);
-  }
-}
-
-/**
- * Load form values from session storage
- */
-function loadFormFromStorage(): Partial<WorkoutFormParams> | null {
-  if (typeof window === 'undefined') return null;
-  
-  try {
-    const stored = sessionStorage.getItem(FORM_STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (e) {
-    console.warn('Failed to load form state from session storage:', e);
-  }
-  return null;
-}
 
 /**
  * Hook for form state management
@@ -48,38 +19,44 @@ export function useWorkoutForm() {
   const { formValues, generatedWorkout } = state.domain;
   const { formErrors, status, loading } = state.ui;
   
+  // Form validation
+  const validation = useFormValidation(formValues);
+  
+  // Form persistence
+  const persistence = useFormPersistence<Partial<WorkoutFormParams>>(FORM_STORAGE_KEY, formValues);
+  
   // On mount, load form values from session storage
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const storedValues = loadFormFromStorage();
+    const storedValues = persistence.loadData();
     if (storedValues) {
       dispatch({ type: 'UPDATE_FORM', payload: storedValues });
     }
-  }, [dispatch]);
+  }, [dispatch, persistence]);
   
   // Update form values
   const updateForm = useCallback((values: Partial<WorkoutFormParams>) => {
     dispatch({ type: 'UPDATE_FORM', payload: values });
     
     // Save to session storage
-    saveFormToStorage({
+    persistence.saveData({
       ...formValues,
       ...values
     });
-  }, [dispatch, formValues]);
+  }, [dispatch, formValues, persistence]);
   
   // Update individual form field
   const updateField = useCallback(<K extends keyof WorkoutFormParams>(field: K, value: WorkoutFormParams[K]) => {
     const update = { [field]: value } as Partial<WorkoutFormParams>;
     dispatch({ type: 'UPDATE_FORM', payload: update });
     
+    validation.touchField(field);
+    
     // Save to session storage
-    saveFormToStorage({
+    persistence.saveData({
       ...formValues,
       ...update
     });
-  }, [dispatch, formValues]);
+  }, [dispatch, formValues, persistence, validation]);
   
   // Set duration
   const setDuration = useCallback((duration: number) => {
@@ -108,26 +85,21 @@ export function useWorkoutForm() {
   
   // Validate the form
   const validateForm = useCallback(() => {
-    const errors = validateWorkoutForm(formValues);
-    dispatch({ type: 'SET_FORM_ERRORS', payload: errors });
-    return errors === null;
-  }, [formValues, dispatch]);
+    const isValid = validation.validateForm(formValues);
+    dispatch({ type: 'SET_FORM_ERRORS', payload: validation.errors });
+    return isValid;
+  }, [formValues, dispatch, validation]);
   
   // Reset form errors
   const resetFormErrors = useCallback(() => {
+    validation.resetErrors();
     dispatch({ type: 'SET_FORM_ERRORS', payload: null });
-  }, [dispatch]);
+  }, [dispatch, validation]);
   
   // Clear form storage
   const clearFormStorage = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      sessionStorage.removeItem(FORM_STORAGE_KEY);
-    } catch (e) {
-      console.warn('Failed to clear form storage:', e);
-    }
-  }, []);
+    persistence.clearData();
+  }, [persistence]);
   
   return {
     // Form values
@@ -137,8 +109,11 @@ export function useWorkoutForm() {
     loading,
     generatedWorkout,
     
+    // Validation state from validation hook
+    ...validation,
+    
     // Form validation
-    isValid: isWorkoutFormValid(formValues),
+    isValid: validation.isFormValid(formValues),
     validateForm,
     resetFormErrors,
     
@@ -152,6 +127,7 @@ export function useWorkoutForm() {
     setRestrictions,
     
     // Storage
-    clearFormStorage
+    clearFormStorage,
+    hasStoredData: persistence.hasStoredData
   };
 } 

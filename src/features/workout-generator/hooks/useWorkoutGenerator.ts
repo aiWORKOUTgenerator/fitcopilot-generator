@@ -1,103 +1,87 @@
 /**
  * Hook for generating workout plans
+ * 
+ * This hook provides a simplified interface to the workout generator context
+ * and adds additional functionality specifically for the workout generation process.
  */
-import { useState } from 'react';
-import { apiFetch } from '../../../utils/api';
-
-export interface WorkoutRequest {
-  /** User's fitness goal */
-  goal: string;
-  /** User's experience level */
-  experienceLevel: string;
-  /** Desired workout duration in minutes */
-  duration: string;
-  /** Equipment available to the user */
-  equipment: string[];
-  /** Any restrictions or limitations */
-  restrictions?: string;
-}
-
-export interface Workout {
-  /** Unique identifier for the workout */
-  id: string;
-  /** Title of the workout */
-  title: string;
-  /** Brief description of the workout */
-  description: string;
-  /** When the workout was created */
-  createdAt: string;
-  /** Detailed content of the workout */
-  content: string;
-  /** Metadata for the workout */
-  meta: {
-    /** User's fitness goal */
-    goal: string;
-    /** User's experience level */
-    experienceLevel: string;
-    /** Duration of the workout in minutes */
-    duration: string;
-    /** Equipment used in the workout */
-    equipment: string[];
-    /** Any restrictions considered */
-    restrictions?: string;
-  };
-}
+import { useCallback } from 'react';
+import { WorkoutFormParams, GeneratedWorkout } from '../types/workout';
+import { useWorkoutGenerator as useWorkoutGeneratorContext } from '../context/WorkoutGeneratorContext';
+import { useErrorHandler } from './useErrorHandler';
 
 /**
- * Custom hook for generating workout plans
+ * Enhanced hook for workout generation that wraps the context
  * 
- * @returns {Object} Methods and state for workout generation
+ * @returns Methods and state for workout generation
  */
-export const useWorkoutGenerator = () => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [generatedWorkout, setGeneratedWorkout] = useState<Workout | null>(null);
-
+export function useWorkoutGenerator() {
+  const { state, generateWorkout, dispatch } = useWorkoutGeneratorContext();
+  const { handleError } = useErrorHandler();
+  
+  const { status, loading, errorMessage } = state.ui;
+  const { formValues, generatedWorkout } = state.domain;
+  
   /**
-   * Generate a workout plan based on user input
+   * Start the workout generation process
    * 
-   * @param {WorkoutRequest} request - Workout generation parameters
-   * @returns {Promise<Workout|null>} Generated workout or null on error
+   * @param workoutParams - Parameters for the workout generation
    */
-  const generateWorkout = async (request: WorkoutRequest): Promise<Workout | null> => {
-    setIsGenerating(true);
-    setError(null);
-    setGeneratedWorkout(null);
-    
+  const startGeneration = useCallback(async (workoutParams: Partial<WorkoutFormParams>) => {
     try {
-      const response = await apiFetch<Workout>({
-        path: '/workouts/generate',
-        method: 'POST',
-        data: request,
+      // Ensure all required fields have default values if missing
+      const completeParams: WorkoutFormParams = {
+        duration: workoutParams.duration || 30,
+        difficulty: workoutParams.difficulty || 'intermediate',
+        goals: workoutParams.goals || 'general-fitness',
+        equipment: workoutParams.equipment || [],
+        restrictions: workoutParams.restrictions || '',
+      };
+      
+      // This will return the workout data directly if successful, or throw an error if not
+      const workoutData = await generateWorkout(completeParams);
+      
+      // If we get here, generation was successful
+      console.log('Generation successful in startGeneration');
+      
+      // We don't need to do anything else as the context already updated the state
+      return workoutData;
+    } catch (error) {
+      // Use centralized error handling
+      handleError(error, {
+        componentName: 'useWorkoutGenerator',
+        action: 'startGeneration',
+        additionalData: { workoutParams }
       });
       
-      setGeneratedWorkout(response);
-      return response;
-    } catch (err) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : 'Failed to generate workout. Please try again.';
-      
-      setError(errorMessage);
-      return null;
-    } finally {
-      setIsGenerating(false);
+      // Re-throw the error for the UI component to handle if needed
+      throw error;
     }
-  };
-
+  }, [generateWorkout, handleError]);
+  
   /**
-   * Reset the workout generation state
+   * Reset the generator state
    */
-  const reset = () => {
-    setGeneratedWorkout(null);
-    setError(null);
-  };
-
+  const resetGenerator = useCallback(() => {
+    dispatch({ type: 'RESET_GENERATOR' });
+  }, [dispatch]);
+  
   return {
-    generateWorkout,
-    isGenerating,
-    generatedWorkout,
-    error,
-    reset,
+    // State
+    status,
+    loading,
+    error: errorMessage,
+    workout: generatedWorkout,
+    
+    // Form values
+    formValues,
+    
+    // Methods
+    startGeneration,
+    resetGenerator,
+    
+    // Computed states for UI
+    isGenerating: status === 'generating' || status === 'submitting',
+    isCompleted: status === 'completed',
+    hasError: status === 'error',
   };
-}; 
+} 

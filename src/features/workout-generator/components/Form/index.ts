@@ -5,6 +5,9 @@
  * for easier importing.
  */
 
-export * from './WorkoutRequestForm';
-export * from './AdvancedOptionsPanel';
+export { WorkoutRequestForm } from './WorkoutRequestForm';
+export * from './steps/InputStep';
+export * from './steps/PreviewStep';
+export * from './steps/GeneratingStep';
+export * from './steps/ResultStep';
 export * from './FormFeedback'; 

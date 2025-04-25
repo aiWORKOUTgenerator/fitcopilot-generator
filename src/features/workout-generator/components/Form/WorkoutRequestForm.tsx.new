@@ -1,0 +1,183 @@
+/**
+ * Workout Request Form Component
+ * 
+ * This component provides the main interface for users to request AI-generated workout plans.
+ * It serves as the primary entry point for the workout generation feature, handling the entire
+ * workflow from collecting user preferences to displaying the generated workout.
+ */
+import React, { useState } from 'react';
+import { useWorkoutForm } from '../../hooks/useWorkoutForm';
+import { useWorkoutGenerator } from '../../hooks/useWorkoutGenerator';
+import { InputStep } from './steps/InputStep';
+import { PreviewStep } from './steps/PreviewStep';
+import { GeneratingStep } from './steps/GeneratingStep';
+import { ResultStep } from './steps/ResultStep';
+import ErrorBoundary from '../common/ErrorBoundary';
+
+// Form steps
+type FormStep = 'input' | 'preview' | 'generating' | 'completed';
+
+/**
+ * The main form component for requesting AI-generated workout plans.
+ * 
+ * @returns {JSX.Element} The rendered form component
+ */
+export const WorkoutRequestForm: React.FC = () => {
+  // Form state management
+  const {
+    formValues,
+    formErrors,
+    isValid,
+    hasFieldError,
+    getFieldError,
+    validateForm,
+    setGoals,
+    setDifficulty,
+    setDuration,
+    setEquipment,
+    setRestrictions,
+    clearFormStorage
+  } = useWorkoutForm();
+  
+  // Workout generation with OpenAI
+  const {
+    status,
+    error,
+    workout,
+    startGeneration,
+    resetGenerator,
+    isGenerating,
+    isCompleted
+  } = useWorkoutGenerator();
+  
+  // Form step state
+  const [formStep, setFormStep] = useState<FormStep>('input');
+  
+  /**
+   * Handle moving to preview step after validation
+   */
+  const handleShowPreview = () => {
+    if (validateForm()) {
+      setFormStep('preview');
+    }
+  };
+  
+  /**
+   * Handle returning to input step for editing
+   */
+  const handleEditForm = () => {
+    setFormStep('input');
+  };
+  
+  /**
+   * Handle form submission to generate workout
+   */
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      // Set the form to generating state
+      setFormStep('generating');
+      
+      // Start the generation process
+      await startGeneration(formValues);
+      
+      // If successful, move to completed step
+      if (isCompleted) {
+        setFormStep('completed');
+      }
+    }
+  };
+  
+  /**
+   * Handle generating a new workout
+   */
+  const handleGenerateNew = () => {
+    // Reset the form and generator state
+    resetGenerator();
+    
+    // Clear form storage to start fresh
+    clearFormStorage();
+    
+    // Go back to input step
+    setFormStep('input');
+  };
+  
+  /**
+   * Handle cancelling workout generation
+   */
+  const handleCancelGeneration = () => {
+    resetGenerator();
+    setFormStep('input');
+  };
+  
+  // Render the appropriate step based on current form step
+  const renderFormStep = () => {
+    switch (formStep) {
+      case 'input':
+        return (
+          <InputStep
+            formValues={formValues}
+            formErrors={formErrors}
+            isValid={isValid}
+            hasFieldError={hasFieldError}
+            getFieldError={getFieldError}
+            setGoals={setGoals}
+            setDifficulty={setDifficulty}
+            setDuration={setDuration}
+            setEquipment={setEquipment}
+            setRestrictions={setRestrictions}
+            validateForm={validateForm}
+            onContinue={handleShowPreview}
+          />
+        );
+        
+      case 'preview':
+        return (
+          <PreviewStep
+            formValues={formValues}
+            onEditRequest={handleEditForm}
+            onGenerateWorkout={handleSubmit}
+            isLoading={isGenerating}
+          />
+        );
+        
+      case 'generating':
+        return (
+          <GeneratingStep
+            error={error}
+            onCancel={handleCancelGeneration}
+          />
+        );
+        
+      case 'completed':
+        return (
+          <ResultStep
+            workout={workout}
+            error={error}
+            onGenerateNew={handleGenerateNew}
+          />
+        );
+        
+      default:
+        return null;
+    }
+  };
+  
+  // Set the form step based on API status for synchronization
+  React.useEffect(() => {
+    if (status === 'completed' && formStep !== 'completed') {
+      setFormStep('completed');
+    } else if ((status === 'generating' || status === 'submitting') && formStep !== 'generating') {
+      setFormStep('generating');
+    } else if (status === 'error' && formStep === 'generating') {
+      // Keep the generating step but show error
+    }
+  }, [status, formStep]);
+  
+  return (
+    <ErrorBoundary>
+      <div className="workout-generator-form">
+        {renderFormStep()}
+      </div>
+    </ErrorBoundary>
+  );
+}; 

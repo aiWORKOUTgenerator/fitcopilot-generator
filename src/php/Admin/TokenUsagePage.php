@@ -159,6 +159,7 @@ class TokenUsagePage {
                 </ul>
                 <p>Also check the browser console for any JavaScript errors.</p>
                 <script>
+                /* <![CDATA[ */
                     document.addEventListener('DOMContentLoaded', function() {
                         // Hide debug info if the app loads successfully
                         window.addEventListener('token-usage-loaded', function() {
@@ -173,6 +174,7 @@ class TokenUsagePage {
                             }
                         }, 3000);
                     });
+                /* ]]> */
                 </script>
             </div>
         </div>

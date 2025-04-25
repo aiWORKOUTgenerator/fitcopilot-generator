@@ -56,8 +56,9 @@ export function useWorkoutGenerator(): UseWorkoutGeneratorReturn {
     const startTime = Date.now();
 
     try {
-      // Call the API to generate the workout
+      // Call the API to generate the workout - ensure specific_request is included
       const result = await generateWorkoutDirect(request, {
+        specific_request: request, // Explicitly set this in case it's not already in the function
         ...options,
         mode: 'sync'
       });

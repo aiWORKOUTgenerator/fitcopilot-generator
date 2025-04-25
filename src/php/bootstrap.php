@@ -123,6 +123,7 @@ function render_generator_shortcode() {
     </div>
     
     <script>
+    /* <![CDATA[ */
         // Debug logging function
         function fcDebugLog(message) {
             if (console && console.log) {
@@ -201,6 +202,7 @@ function render_generator_shortcode() {
                 }
             }, 3000);
         });
+    /* ]]> */
     </script>
     <?php
     return ob_get_clean();

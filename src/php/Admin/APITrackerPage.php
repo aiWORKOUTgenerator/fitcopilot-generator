@@ -179,6 +179,7 @@ class APITrackerPage {
             ?>
             
             <script>
+            /* <![CDATA[ */
                 // Check if scripts are already loaded
                 if (typeof window.fitcopilotApiTracker === 'undefined' || 
                     typeof window.fitcopilotApiTracker.initAPITracker === 'undefined') {
@@ -210,6 +211,7 @@ class APITrackerPage {
                     };
                     document.body.appendChild(vendorsScript);
                 }
+            /* ]]> */
             </script>
             
             <div class="debug-info" style="display: none; margin-top: 20px; padding: 10px; background: #f8f8f8; border: 1px solid #ddd;">
@@ -222,6 +224,7 @@ class APITrackerPage {
                 </ul>
                 <p>Also check the browser console for any JavaScript errors.</p>
                 <script>
+                /* <![CDATA[ */
                     document.addEventListener('DOMContentLoaded', function() {
                         console.log('DOMContentLoaded event fired');
                         
@@ -257,6 +260,7 @@ class APITrackerPage {
                             console.error('window.fitcopilotApiTracker.initAPITracker function not found');
                         }
                     });
+                /* ]]> */
                 </script>
             </div>
         </div>

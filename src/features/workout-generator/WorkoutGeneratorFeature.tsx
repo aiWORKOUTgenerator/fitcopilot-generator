@@ -1,23 +1,42 @@
 /**
  * Workout Generator Feature
  * 
- * Main component that brings together all parts of the workout generator
+ * Main entry point for the workout generator feature.
+ * Wraps the form with necessary providers and imports styles.
  */
-
 import React from 'react';
 import { WorkoutGeneratorProvider } from './context/WorkoutGeneratorContext';
 import { WorkoutRequestForm } from './components/Form/WorkoutRequestForm';
+import ErrorBoundary from './components/common/ErrorBoundary';
+
+// Import styles
+import './styles/workout-generator.css';
 
 /**
- * Main feature component that wraps everything in the provider
+ * Workout Generator feature component
+ * 
+ * This is the main entry point for the workout generator functionality
+ * and serves as the container for the entire workout generation experience.
+ * 
+ * @returns {JSX.Element} The rendered feature component
  */
 export const WorkoutGeneratorFeature: React.FC = () => {
   return (
-    <WorkoutGeneratorProvider>
-      <div className="workout-generator">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">AI Workout Generator</h1>
-        <WorkoutRequestForm />
+    <ErrorBoundary>
+      <div className="workout-generator-feature">
+        <h2 className="workout-generator-feature__title">
+          AI Workout Generator
+        </h2>
+        <p className="workout-generator-feature__description">
+          Generate personalized workout plans based on your goals, experience level, and available equipment.
+        </p>
+        
+        <WorkoutGeneratorProvider>
+          <WorkoutRequestForm />
+        </WorkoutGeneratorProvider>
       </div>
-    </WorkoutGeneratorProvider>
+    </ErrorBoundary>
   );
-}; 
+};
+
+export default WorkoutGeneratorFeature; 

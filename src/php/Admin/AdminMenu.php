@@ -69,6 +69,38 @@ class AdminMenu {
         <div class="wrap">
             <h1><?php echo esc_html__('FitCopilot Dashboard', 'fitcopilot'); ?></h1>
             
+            <style>
+                .dashboard-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                    gap: 20px;
+                    margin-top: 20px;
+                }
+                .dashboard-card {
+                    background: white;
+                    border-radius: 5px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    padding: 20px;
+                    border-left: 4px solid #2271b1;
+                }
+                .dashboard-card h2 {
+                    margin-top: 0;
+                    color: #2271b1;
+                }
+                .dashboard-card p {
+                    margin-bottom: 15px;
+                }
+                .dashboard-card .button {
+                    display: inline-block;
+                    margin-top: 5px;
+                }
+                @media (max-width: 782px) {
+                    .dashboard-container {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+            
             <div class="dashboard-container">
                 <div class="dashboard-card">
                     <h2><?php echo esc_html__('Recent Activity', 'fitcopilot'); ?></h2>
@@ -86,6 +118,18 @@ class AdminMenu {
                     <p><?php echo esc_html__('Learn how to use FitCopilot in your WordPress site.', 'fitcopilot'); ?></p>
                 </div>
             </div>
+            
+            <script>
+            /* <![CDATA[ */
+            document.addEventListener('DOMContentLoaded', function() {
+                // Any JavaScript code here will not be entity-encoded
+                var container = document.querySelector('.dashboard-container');
+                if (container && container.children.length > 0) {
+                    console.log('Dashboard loaded with ' + container.children.length + ' cards');
+                }
+            });
+            /* ]]> */
+            </script>
         </div>
         <?php
     }

@@ -4,6 +4,11 @@
 export type WorkoutDifficulty = 'beginner' | 'intermediate' | 'advanced';
 
 /**
+ * Form steps type
+ */
+export type FormSteps = 'input' | 'preview' | 'generating' | 'completed';
+
+/**
  * Exercise with duration (for warm-up/cool-down)
  */
 export interface TimedExercise {
