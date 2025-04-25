@@ -48,6 +48,10 @@ interface FitcopilotWindow extends Window {
     nonce: string;
     [key: string]: unknown;
   };
+  workoutGenerator?: {
+    nonce: string;
+    [key: string]: unknown;
+  };
 }
 
 /**
@@ -66,11 +70,16 @@ export async function generateWorkoutDirect(
     ...options
   };
 
+  // Get nonce from either fitcopilotData or workoutGenerator object
+  const nonce = ((window as FitcopilotWindow).workoutGenerator?.nonce) || 
+                ((window as FitcopilotWindow).fitcopilotData?.nonce) || 
+                '';
+
   const response = await fetch(ENDPOINTS.GENERATE_DIRECT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-WP-Nonce': ((window as FitcopilotWindow).fitcopilotData?.nonce) || ''
+      'X-WP-Nonce': nonce
     },
     body: JSON.stringify(body)
   });
