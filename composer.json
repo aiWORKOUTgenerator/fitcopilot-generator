@@ -27,11 +27,34 @@
     "scripts": {
         "test": "phpunit",
         "phpcs": "phpcs",
-        "phpcbf": "phpcbf"
+        "phpcbf": "phpcbf",
+        "docs": "echo 'Documentation is available in the docs/ directory'"
     },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "support": {
+        "docs": "https://github.com/aiWORKOUTgenerator/fitcopilot-generator/tree/main/docs",
+        "issues": "https://github.com/aiWORKOUTgenerator/fitcopilot-generator/issues",
+        "source": "https://github.com/aiWORKOUTgenerator/fitcopilot-generator"
+    },
+    "keywords": [
+        "wordpress",
+        "plugin",
+        "workout",
+        "fitness",
+        "ai",
+        "openai",
+        "react",
+        "typescript"
+    ],
+    "extra": {
+        "documentation": {
+            "user-docs": "docs/user",
+            "dev-docs": "docs/developer",
+            "api-docs": "docs/developer/api"
         }
     }
 } 

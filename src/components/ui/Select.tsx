@@ -1,34 +1,109 @@
 /**
- * Select UI component
+ * Select UI Component
+ * 
+ * A fully accessible and customizable dropdown select component with support for
+ * options, labels, helper text, and error states.
+ * 
+ * @example
+ * // Basic usage
+ * const options = [
+ *   { value: 'option1', label: 'Option 1' },
+ *   { value: 'option2', label: 'Option 2' },
+ * ];
+ * 
+ * <Select
+ *   id="example-select"
+ *   options={options}
+ *   onChange={(value) => console.log('Selected:', value)}
+ * />
+ * 
+ * @example
+ * // With label and helper text
+ * <Select
+ *   id="example-select"
+ *   label="Select an option"
+ *   helperText="This is some helpful information"
+ *   options={options}
+ *   onChange={handleChange}
+ * />
+ * 
+ * @example
+ * // With error state
+ * <Select
+ *   id="example-select"
+ *   label="Select an option"
+ *   error="This field is required"
+ *   options={options}
+ *   onChange={handleChange}
+ * />
  */
 import React from 'react';
 
+/**
+ * Represents a single option in the select dropdown
+ */
 export interface SelectOption {
-  /** Unique value for the option */
+  /** 
+   * Unique value for the option that will be passed to onChange handler 
+   */
   value: string;
-  /** Display label for the option */
+  
+  /** 
+   * Human-readable text displayed in the dropdown 
+   */
   label: string;
-  /** Whether the option is disabled */
+  
+  /** 
+   * Whether this option is selectable 
+   * @default false
+   */
   disabled?: boolean;
 }
 
 export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
-  /** Unique identifier for the select */
+  /** 
+   * Unique identifier for the select, used for label association and ARIA attributes 
+   */
   id: string;
-  /** Options to display in the select */
+  
+  /** 
+   * Array of options to display in the dropdown 
+   */
   options: SelectOption[];
-  /** Label text for the select */
+  
+  /** 
+   * Text label displayed above the select 
+   */
   label?: string;
-  /** Error message to display */
+  
+  /** 
+   * Error message displayed when the select has invalid input
+   * When provided, the select will be styled as invalid and the message shown below
+   */
   error?: string;
-  /** Helper text to display below the select */
+  
+  /** 
+   * Additional information displayed below the select 
+   * Not shown when error is present
+   */
   helperText?: string;
-  /** Handler for change events */
+  
+  /** 
+   * Handler called when the selected value changes
+   * @param value - The selected option's value
+   */
   onChange: (value: string) => void;
 }
 
 /**
- * Accessible select component with customizable styling
+ * A customizable select/dropdown component that follows accessibility best practices.
+ * 
+ * Features:
+ * - Proper label association through htmlFor/id
+ * - ARIA attributes for accessibility (aria-invalid, aria-describedby)
+ * - Visual indication of error states
+ * - Support for disabled options
+ * - Custom styling with Tailwind CSS
  *
  * @param {SelectProps} props - Component properties
  * @returns {JSX.Element} Rendered select component

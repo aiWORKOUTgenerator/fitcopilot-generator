@@ -1,28 +1,88 @@
 /**
  * Button UI component
+ * 
+ * A flexible and accessible button component that supports various visual styles,
+ * sizes, loading states, and icon placement options.
+ * 
+ * @example
+ * // Basic usage
+ * <Button>Click me</Button>
+ * 
+ * @example
+ * // With different variants
+ * <Button variant="primary">Primary Button</Button>
+ * <Button variant="secondary">Secondary Button</Button>
+ * <Button variant="outline">Outline Button</Button>
+ * <Button variant="text">Text Button</Button>
+ * 
+ * @example
+ * // With loading state
+ * <Button isLoading>Processing...</Button>
+ * 
+ * @example
+ * // With icons
+ * <Button startIcon={<SearchIcon />}>Search</Button>
+ * <Button endIcon={<ArrowRightIcon />}>Next</Button>
  */
 import React from 'react';
 
+/** Button visual style variants */
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
+
+/** Button size variants */
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Visual variant of the button */
+  /** 
+   * Visual variant of the button 
+   * - primary: Filled button with brand color, high emphasis
+   * - secondary: Filled button with gray color, medium emphasis
+   * - outline: Border-only button, low emphasis
+   * - text: Text-only button, lowest emphasis
+   * @default 'primary'
+   */
   variant?: ButtonVariant;
-  /** Size of the button */
+  
+  /** 
+   * Size of the button 
+   * - xs: Extra small, for tight spaces
+   * - sm: Small, for compact UIs
+   * - md: Medium, standard size
+   * - lg: Large, for prominent actions
+   * @default 'md'
+   */
   size?: ButtonSize;
-  /** Whether the button is in a loading state */
+  
+  /** 
+   * Whether the button is in a loading state
+   * When true, a spinner is displayed and the button is disabled
+   * @default false 
+   */
   isLoading?: boolean;
-  /** Icon to display before the button text */
+  
+  /** 
+   * Icon to display before the button text 
+   * Should be a React node/component
+   */
   startIcon?: React.ReactNode;
-  /** Icon to display after the button text */
+  
+  /** 
+   * Icon to display after the button text 
+   * Should be a React node/component
+   */
   endIcon?: React.ReactNode;
-  /** Full width button */
+  
+  /** 
+   * Whether the button should take up the full width of its container 
+   * @default false
+   */
   fullWidth?: boolean;
 }
 
 /**
- * Accessible button component with customizable styling
+ * A customizable button component with support for different variants, sizes, and states.
+ * Implements accessibility best practices including focus states, ARIA attributes for loading status,
+ * and keyboard navigation support.
  *
  * @param {ButtonProps} props - Component properties
  * @returns {JSX.Element} Rendered button component
@@ -79,6 +139,7 @@ export const Button: React.FC<ButtonProps> = ({
       type="button"
       className={buttonClasses}
       disabled={isDisabled}
+      aria-busy={isLoading ? 'true' : 'false'}
       {...props}
     >
       {isLoading && (

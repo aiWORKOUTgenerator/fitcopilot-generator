@@ -18,6 +18,16 @@ A React/TypeScript WordPress plugin for generating personalized workout plans us
 - WordPress plugin architecture
 - OpenAI API for workout generation
 
+## Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+- **[Documentation Hub](./docs/index.md)** - Main documentation entry point
+- **[Developer Documentation](./docs/developer/index.md)** - Technical documentation for developers
+- **[API Reference](./docs/developer/api/index.md)** - API endpoints and usage
+- **[User Documentation](./docs/user/index.md)** - End-user documentation
+- **[Contribution Guidelines](./docs/contribution/index.md)** - How to contribute to the project
+
 ## Installation
 
 1. Clone this repository into your WordPress plugins directory:
@@ -63,6 +73,12 @@ A React/TypeScript WordPress plugin for generating personalized workout plans us
 2. Configure your workout preferences in the form.
 3. Generate a personalized workout plan.
 4. View and track your workouts in the dashboard.
+
+For detailed usage instructions, see the [User Documentation](./docs/user/index.md).
+
+## API
+
+The plugin provides a RESTful API for generating and managing workouts. For details, see the [API Reference](./docs/developer/api/index.md).
 
 ## License
 

@@ -1,18 +1,52 @@
 /**
- * FormFeedback component for displaying success or error messages
+ * FormFeedback Component
+ * 
+ * A presentational component for displaying feedback messages to users, such as
+ * success confirmations or error notifications. The component uses appropriate
+ * colors, icons, and ARIA attributes based on the feedback type.
+ * 
+ * @example
+ * // Error message
+ * <FormFeedback 
+ *   type="error" 
+ *   message="There was a problem submitting the form." 
+ * />
+ * 
+ * @example
+ * // Success message
+ * <FormFeedback 
+ *   type="success" 
+ *   message="Your workout has been created successfully!" 
+ * />
  */
 
 import React from 'react';
 
 export interface FormFeedbackProps {
-  /** Type of feedback (error or success) */
+  /** 
+   * Type of feedback that determines the visual style
+   * - error: Red styling with X icon (used for errors and problems)
+   * - success: Green styling with checkmark icon (used for confirmations)
+   */
   type: 'error' | 'success';
-  /** Message to display to the user */
+  
+  /** 
+   * Feedback message to display to the user
+   * Should be clear, concise, and actionable when possible
+   */
   message: string;
 }
 
 /**
- * Displays user feedback messages for form operations
+ * Displays user feedback messages with appropriate visual styling and accessibility attributes.
+ * 
+ * The component automatically sets the correct:
+ * - Background, text, and border colors based on the type
+ * - Icon (checkmark for success, X for errors)
+ * - ARIA role (alert for errors, status for success messages)
+ * 
+ * This component is designed to be used within forms to provide immediate feedback
+ * about form submissions, validation errors, or successful actions.
  * 
  * @param {FormFeedbackProps} props - Component properties
  * @returns {JSX.Element} Rendered feedback component
@@ -34,7 +68,11 @@ const FormFeedback: React.FC<FormFeedbackProps> = ({ type, message }) => {
   );
   
   return (
-    <div className={`${bgColor} ${borderColor} border p-4 rounded-md`} role={type === 'error' ? 'alert' : 'status'}>
+    <div 
+      className={`${bgColor} ${borderColor} border p-4 rounded-md`} 
+      role={type === 'error' ? 'alert' : 'status'}
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+    >
       <div className="flex">
         <div className={`flex-shrink-0 ${iconColor}`}>
           {icon}
