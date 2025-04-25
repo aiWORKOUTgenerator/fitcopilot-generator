@@ -3,7 +3,151 @@ import { __ } from '../utils/wordpress-polyfills';
 import { EndpointStat, EndpointStatsTableProps } from '../types';
 import ReactDOM from 'react-dom';
 
-// Error Modal component using Portal
+// Collapsible Section Component
+const CollapsibleSection = ({ 
+  title, 
+  children, 
+  defaultExpanded = false 
+}: { 
+  title: string; 
+  children: React.ReactNode; 
+  defaultExpanded?: boolean;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  
+  return (
+    <div className="api-tracker-collapsible-section" style={{
+      marginBottom: '15px',
+      border: '1px solid #ddd',
+      borderRadius: '4px',
+      overflow: 'hidden'
+    }}>
+      <div 
+        className="api-tracker-section-header" 
+        data-expanded={isExpanded ? 'true' : 'false'}
+        onClick={() => setIsExpanded(!isExpanded)}
+        style={{
+          padding: '10px 15px',
+          backgroundColor: '#f5f5f5',
+          borderBottom: isExpanded ? '1px solid #ddd' : 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontWeight: 600
+        }}
+      >
+        {title} <span className="expand-icon" style={{ fontSize: '16px' }}>{isExpanded ? '−' : '+'}</span>
+      </div>
+      <div 
+        className={`api-tracker-section-content ${isExpanded ? '' : 'hidden'}`}
+        style={{
+          padding: isExpanded ? '15px' : '0',
+          maxHeight: isExpanded ? '500px' : '0',
+          overflow: 'auto',
+          transition: 'all 0.3s ease',
+          display: isExpanded ? 'block' : 'none'
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// JSON Formatter with syntax highlighting
+const JsonFormatter = ({ data }: { data: any }) => {
+  if (!data) return <div>No data available</div>;
+  
+  const formatJson = (json: any): string => {
+    try {
+      return JSON.stringify(json, null, 2);
+    } catch (e) {
+      return String(json);
+    }
+  };
+  
+  return (
+    <pre style={{
+      backgroundColor: '#f8f8f8',
+      padding: '10px',
+      borderRadius: '4px',
+      border: '1px solid #eee',
+      fontSize: '13px',
+      lineHeight: '1.4',
+      overflow: 'auto',
+      maxHeight: '300px',
+      color: '#333',
+      fontFamily: 'monospace'
+    }}>
+      {formatJson(data)}
+    </pre>
+  );
+};
+
+// KeyValue Component for displaying paired information
+const KeyValue = ({ 
+  label, 
+  value, 
+  valueComponent 
+}: { 
+  label: string; 
+  value?: any; 
+  valueComponent?: React.ReactNode;
+}) => (
+  <div style={{ marginBottom: '8px' }}>
+    <strong style={{ display: 'inline-block', minWidth: '140px', marginRight: '10px' }}>{label}:</strong>
+    {valueComponent || <span>{value || 'Not available'}</span>}
+  </div>
+);
+
+// Error Category Badge
+const ErrorCategoryBadge = ({ category }: { category: string }) => {
+  let backgroundColor = '#f8f8f8';
+  let textColor = '#333';
+  
+  switch (category.toLowerCase()) {
+    case 'authentication':
+      backgroundColor = '#ffe8e8';
+      textColor = '#d63638';
+      break;
+    case 'authorization':
+      backgroundColor = '#fff8e8';
+      textColor = '#996600';
+      break;
+    case 'server':
+      backgroundColor = '#e8e8ff';
+      textColor = '#3366cc';
+      break;
+    case 'client':
+      backgroundColor = '#e8fff0';
+      textColor = '#00994d';
+      break;
+    case 'validation':
+      backgroundColor = '#f0e8ff';
+      textColor = '#6600cc';
+      break;
+    default:
+      backgroundColor = '#f8f8f8';
+      textColor = '#666';
+  }
+  
+  return (
+    <span style={{
+      display: 'inline-block',
+      padding: '3px 8px',
+      borderRadius: '12px',
+      backgroundColor,
+      color: textColor,
+      fontSize: '12px',
+      fontWeight: 600
+    }}>
+      {category}
+    </span>
+  );
+};
+
+// ErrorModal component using Portal
 const ErrorModal = ({ 
   isOpen, 
   onClose, 
@@ -16,6 +160,95 @@ const ErrorModal = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const lastFocusedElement = useRef<HTMLElement | null>(null);
   
+  // Mock data for demonstration, would come from backend in real implementation
+  const mockErrorData = endpoint?.errors?.lastError ? {
+    errorId: `err-${Math.random().toString(36).substr(2, 9)}`,
+    timestamp: endpoint.errors.lastError.time,
+    endpointPath: endpoint.namespace + endpoint.route,
+    statusCode: endpoint.errors.lastError.code || '500',
+    category: getErrorCategory(endpoint.errors.lastError.code),
+    
+    requestMethod: endpoint.method,
+    requestHeaders: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': 'abc123def456',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    requestParams: {
+      query: { per_page: 10, page: 1 },
+      body: endpoint.method !== 'GET' ? { title: 'Example data', content: 'Test content' } : null
+    },
+    userContext: {
+      id: 1,
+      role: 'administrator',
+      capabilities: ['manage_options', 'edit_posts']
+    },
+    requestSource: 'admin',
+    
+    responseHeaders: {
+      'Content-Type': 'application/json',
+      'X-WP-Total': '42',
+      'X-WP-TotalPages': '5'
+    },
+    errorMessage: endpoint.errors.lastError.message,
+    rawResponse: {
+      code: endpoint.errors.lastError.code,
+      message: endpoint.errors.lastError.message,
+      data: { status: parseInt(endpoint.errors.lastError.code) || 500 }
+    },
+    processingTime: (Math.random() * 100 + 50).toFixed(2) + 'ms',
+    
+    stackTrace: [
+      `PHP Fatal error: Uncaught Exception: Invalid data format in /wp-content/plugins/fitcopilot/includes/api/class-api-handler.php:256`,
+      `Stack trace:`,
+      `#0 /wp-includes/rest-api/class-wp-rest-server.php(1182): FitCopilot\\API\\APIHandler->process_request(Array)`,
+      `#1 /wp-includes/rest-api/class-wp-rest-server.php(1029): WP_REST_Server->respond_to_request(Object(WP_REST_Request))`,
+      `#2 /wp-includes/rest-api.php(522): WP_REST_Server->dispatch(Object(WP_REST_Request))`,
+      `#3 /wp-includes/rest-api.php(1730): rest_do_request(Object(WP_REST_Request))`,
+      `#4 {main}`
+    ].join("\n"),
+    wpHooks: [
+      'rest_pre_dispatch',
+      'rest_request_before_callbacks',
+      'rest_request_after_callbacks',
+      'rest_post_dispatch'
+    ],
+    dbQueries: [
+      "SELECT * FROM wp_options WHERE option_name = 'fitcopilot_settings' LIMIT 1",
+      "SELECT ID, post_title FROM wp_posts WHERE post_type = 'workout' AND post_status = 'publish' LIMIT 10"
+    ],
+    memoryUsage: '24.5 MB / 40 MB (61.25%)',
+    
+    similarErrors: [
+      { id: 'err-abc123', endpoint: '/wp/v2/posts', timestamp: '2023-05-10 14:32:19' },
+      { id: 'err-def456', endpoint: '/fitcopilot/v1/workouts', timestamp: '2023-05-09 08:12:45' }
+    ],
+    commonSolutions: [
+      'Verify authentication credentials are properly set',
+      'Check API route permissions in REST API controller',
+      'Ensure required parameters are provided in correct format'
+    ],
+    docsLinks: [
+      { title: 'WordPress REST API Handbook', url: 'https://developer.wordpress.org/rest-api/' },
+      { title: 'FitCopilot API Documentation', url: '#docs-tab' }
+    ]
+  } : null;
+  
+  // Helper to determine error category based on code
+  function getErrorCategory(code: string | undefined): string {
+    if (!code) return 'Unknown';
+    
+    const codeNum = parseInt(code);
+    
+    if (codeNum >= 400 && codeNum < 404) return 'Authentication';
+    if (codeNum === 404) return 'Not Found';
+    if (codeNum === 403) return 'Authorization';
+    if (codeNum >= 400 && codeNum < 500) return 'Client';
+    if (codeNum >= 500) return 'Server';
+    
+    return 'Unknown';
+  }
+  
   // Format date for display
   const formatDate = (dateStr: string): string => {
     if (!dateStr) return 'Never';
@@ -27,7 +260,8 @@ const ErrorModal = ({
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        second: '2-digit'
       });
     } catch (e) {
       return dateStr || 'Never';
@@ -94,7 +328,7 @@ const ErrorModal = ({
         style={{
           background: '#fff',
           width: '90%',
-          maxWidth: '800px',
+          maxWidth: '900px',
           maxHeight: '90vh',
           borderRadius: '4px',
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
@@ -138,27 +372,238 @@ const ErrorModal = ({
         </div>
         
         <div className="error-modal-body" style={{ padding: '20px', overflow: 'auto' }}>
-          {endpoint.errors?.lastError ? (
+          {mockErrorData ? (
             <>
-              <div className="error-summary" style={{ marginBottom: '20px' }}>
-                <p><strong>{__('Total Errors', 'fitcopilot')}:</strong> {endpoint.errors.count}</p>
-                <p><strong>{__('Last Error Time', 'fitcopilot')}:</strong> {formatDate(endpoint.errors.lastError.time)}</p>
-                <p><strong>{__('Error Code', 'fitcopilot')}:</strong> {endpoint.errors.lastError.code}</p>
-              </div>
-              <div className="error-message">
-                <h4 style={{ marginTop: 0, marginBottom: '10px' }}>{__('Error Message', 'fitcopilot')}</h4>
-                <pre style={{
-                  background: '#f5f5f5',
-                  padding: '15px',
-                  borderRadius: '3px',
-                  border: '1px solid #ddd',
-                  overflowX: 'auto',
-                  maxHeight: '300px',
-                  fontSize: '13px',
-                  lineHeight: 1.4,
-                  whiteSpace: 'pre-wrap'
-                }}>{endpoint.errors.lastError.message}</pre>
-              </div>
+              {/* 1. Error Overview Section */}
+              <CollapsibleSection title={__('Error Overview', 'fitcopilot')} defaultExpanded={true}>
+                <div className="error-overview">
+                  <KeyValue label={__('Error ID', 'fitcopilot')} value={mockErrorData.errorId} />
+                  <KeyValue label={__('Timestamp', 'fitcopilot')} value={formatDate(mockErrorData.timestamp)} />
+                  <KeyValue label={__('Endpoint Path', 'fitcopilot')} value={mockErrorData.endpointPath} />
+                  <KeyValue label={__('HTTP Status Code', 'fitcopilot')} value={mockErrorData.statusCode} />
+                  <KeyValue 
+                    label={__('Error Category', 'fitcopilot')} 
+                    valueComponent={<ErrorCategoryBadge category={mockErrorData.category} />} 
+                  />
+                  <KeyValue label={__('Total Occurrences', 'fitcopilot')} value={endpoint.errors?.count || 1} />
+                </div>
+              </CollapsibleSection>
+              
+              {/* 2. Request Details Section */}
+              <CollapsibleSection title={__('Request Details', 'fitcopilot')}>
+                <div className="request-details">
+                  <KeyValue label={__('Request Method', 'fitcopilot')} value={mockErrorData.requestMethod} />
+                  <KeyValue label={__('Request Source', 'fitcopilot')} value={mockErrorData.requestSource} />
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Request Headers', 'fitcopilot')}</h4>
+                    <JsonFormatter data={mockErrorData.requestHeaders} />
+                  </div>
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Request Parameters', 'fitcopilot')}</h4>
+                    <JsonFormatter data={mockErrorData.requestParams} />
+                  </div>
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('User Context', 'fitcopilot')}</h4>
+                    <JsonFormatter data={mockErrorData.userContext} />
+                  </div>
+                </div>
+              </CollapsibleSection>
+              
+              {/* 3. Response Analysis */}
+              <CollapsibleSection title={__('Response Analysis', 'fitcopilot')}>
+                <div className="response-analysis">
+                  <KeyValue label={__('Processing Time', 'fitcopilot')} value={mockErrorData.processingTime} />
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Response Headers', 'fitcopilot')}</h4>
+                    <JsonFormatter data={mockErrorData.responseHeaders} />
+                  </div>
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Error Message', 'fitcopilot')}</h4>
+                    <div style={{ 
+                      padding: '15px', 
+                      backgroundColor: '#fff1f0', 
+                      border: '1px solid #ffccc7',
+                      borderRadius: '4px',
+                      color: '#cf1322' 
+                    }}>
+                      {mockErrorData.errorMessage}
+                    </div>
+                  </div>
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Raw Response Data', 'fitcopilot')}</h4>
+                    <JsonFormatter data={mockErrorData.rawResponse} />
+                  </div>
+                </div>
+              </CollapsibleSection>
+              
+              {/* 4. Debug Information */}
+              <CollapsibleSection title={__('Debug Information', 'fitcopilot')}>
+                <div className="debug-information">
+                  <KeyValue label={__('Memory Usage', 'fitcopilot')} value={mockErrorData.memoryUsage} />
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Stack Trace', 'fitcopilot')}</h4>
+                    <pre style={{ 
+                      backgroundColor: '#2d2d2d', 
+                      color: '#f8f8f2',
+                      padding: '15px',
+                      borderRadius: '4px',
+                      overflow: 'auto',
+                      maxHeight: '300px',
+                      fontSize: '13px',
+                      lineHeight: '1.4',
+                      fontFamily: 'monospace'
+                    }}>
+                      {mockErrorData.stackTrace}
+                    </pre>
+                  </div>
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('WordPress Hooks Fired', 'fitcopilot')}</h4>
+                    <div style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '5px',
+                      marginBottom: '10px'
+                    }}>
+                      {mockErrorData.wpHooks.map((hook, index) => (
+                        <span key={index} style={{
+                          display: 'inline-block',
+                          padding: '3px 8px',
+                          backgroundColor: '#f0f0f0',
+                          borderRadius: '3px',
+                          fontSize: '12px',
+                          color: '#555'
+                        }}>
+                          {hook}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Database Queries', 'fitcopilot')}</h4>
+                    <div style={{
+                      backgroundColor: '#f8f8f8',
+                      border: '1px solid #eee',
+                      borderRadius: '4px',
+                      padding: '10px',
+                      fontSize: '13px',
+                      fontFamily: 'monospace'
+                    }}>
+                      {mockErrorData.dbQueries.map((query, index) => (
+                        <div key={index} style={{
+                          padding: '5px 0',
+                          borderBottom: index < mockErrorData.dbQueries.length - 1 ? '1px solid #eee' : 'none'
+                        }}>
+                          {query}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CollapsibleSection>
+              
+              {/* 5. Troubleshooting Tools */}
+              <CollapsibleSection title={__('Troubleshooting Tools', 'fitcopilot')}>
+                <div className="troubleshooting-tools">
+                  <div style={{ marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Common Solutions', 'fitcopilot')}</h4>
+                    <ul style={{ marginLeft: '20px', color: '#0073aa' }}>
+                      {mockErrorData.commonSolutions.map((solution, index) => (
+                        <li key={index} style={{ marginBottom: '5px' }}>{solution}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div style={{ marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Similar Errors', 'fitcopilot')}</h4>
+                    <div style={{
+                      border: '1px solid #eee',
+                      borderRadius: '4px',
+                      overflow: 'hidden'
+                    }}>
+                      {mockErrorData.similarErrors.length > 0 ? (
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ backgroundColor: '#f5f5f5' }}>
+                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #eee' }}>{__('Error ID', 'fitcopilot')}</th>
+                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #eee' }}>{__('Endpoint', 'fitcopilot')}</th>
+                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #eee' }}>{__('Timestamp', 'fitcopilot')}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {mockErrorData.similarErrors.map((error, index) => (
+                              <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#fff' : '#f9f9f9' }}>
+                                <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{error.id}</td>
+                                <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{error.endpoint}</td>
+                                <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{error.timestamp}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <div style={{ padding: '15px', textAlign: 'center', color: '#666' }}>
+                          {__('No similar errors found', 'fitcopilot')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div style={{ marginBottom: '15px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Documentation Links', 'fitcopilot')}</h4>
+                    <ul style={{ marginLeft: '0', listStyle: 'none' }}>
+                      {mockErrorData.docsLinks.map((link, index) => (
+                        <li key={index} style={{ marginBottom: '5px' }}>
+                          <a 
+                            href={link.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              color: '#0073aa',
+                              textDecoration: 'none',
+                              padding: '5px 10px',
+                              backgroundColor: '#f0f0f0',
+                              borderRadius: '3px',
+                              fontSize: '13px'
+                            }}
+                          >
+                            <span style={{ marginRight: '5px' }}>📄</span> {link.title}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                    <button 
+                      style={{
+                        backgroundColor: '#0073aa',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '8px 16px',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <span style={{ marginRight: '5px' }}>↻</span>
+                      {__('Test Request Again', 'fitcopilot')}
+                    </button>
+                  </div>
+                </div>
+              </CollapsibleSection>
             </>
           ) : (
             <p>{__('No detailed error information available for this endpoint.', 'fitcopilot')}</p>
