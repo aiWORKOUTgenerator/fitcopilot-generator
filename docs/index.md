@@ -9,6 +9,11 @@ Documentation for developers working with or contributing to the FitCopilot code
 
 - [Architecture Overview](./developer/architecture/index.md) - System design and architecture
   - [Form Flow Architecture](./developer/architecture/form-flow.md) - Multi-step form workflow architecture
+- [Design System](./developer/design-system/index.md) - Core design language and UI components
+  - [Color System](./developer/design-system/colors.md) - Color palette and theme variables
+  - [Typography](./developer/design-system/typography.md) - Font families and text styles
+  - [Components](./developer/design-system/components.md) - UI component library
+  - [Dark Theme](./developer/design-system/dark-theme.md) - Dark mode implementation
 - [API Reference](./developer/api/index.md) - REST API documentation
 - [Component Library](./developer/components/index.md) - React component documentation
   - [Form Components](./developer/components/form.md) - Form input components

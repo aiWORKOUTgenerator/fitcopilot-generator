@@ -1,0 +1,65 @@
+@import '../../styles/design-system/colors';
+@import '../../styles/design-system/spacing';
+@import '../../styles/design-system/shadows';
+@import '../../styles/design-system/dark-theme';
+
+.card {
+  display: block;
+  background-color: var(--bg-surface, #ffffff);
+  border-radius: map-get($spacing, 'radius-md');
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+
+  // Border styles
+  &--bordered {
+    border: 1px solid var(--border-color, #e0e0e0);
+  }
+
+  // Elevation styles
+  &--elevated {
+    box-shadow: var(--shadow-sm);
+  }
+
+  // Hover effect
+  &--hoverable {
+    cursor: pointer;
+    
+    &:hover, &:focus {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  // Padding variations
+  &--padding-small {
+    padding: map-get($spacing, 'space-2');
+  }
+
+  &--padding-medium {
+    padding: map-get($spacing, 'space-4');
+  }
+
+  &--padding-large {
+    padding: map-get($spacing, 'space-6');
+  }
+
+  // Dark mode specific styles
+  .dark-mode & {
+    background-color: var(--dark-bg-surface, #1e1e1e);
+    color: var(--dark-text-primary, #f0f0f0);
+    
+    &--bordered {
+      border-color: var(--dark-border-color, #3a3a3a);
+    }
+    
+    &--elevated {
+      box-shadow: var(--dark-shadow-sm);
+    }
+    
+    &--hoverable {
+      &:hover, &:focus {
+        box-shadow: var(--dark-shadow-md);
+      }
+    }
+  }
+} 

@@ -1,0 +1,87 @@
+:root {
+  /* Primary and accent colors */
+  --color-primary: #1fad9f;  /* Teal */
+  --color-primary-dark: #007a91;  // darker teal
+  --color-primary-light: #33b1c9; // lighter teal
+  --color-accent:  #d4a017;  /* Gold */
+  --color-accent-dark: #e6b022;   // darker gold
+  --color-accent-light: #ffe19f;  // lighter gold
+
+  /* Base colors */
+  --color-bg:      #f5f7fa;  /* Light Background */
+  --color-surface: #ffffff;  /* White Surface */
+  --color-surface-accent: #f0f0f0; // slightly darker surface
+  --color-text:    #333333;  /* Dark Text */
+  --color-text-muted: #6c757d;  /* Muted Text */
+  --color-border:  #dee2e6;  /* Light Border */
+  
+  /* Feedback colors */
+  --color-success: #2bae66;  /* Green */
+  --color-error:   #d94e4e;  /* Red */
+  --color-warning: #f0ad4e;  /* Orange */
+  --color-info:    #4dabf5;  /* Blue */
+
+  /* Dark theme colors - modern vibrant UI */
+  --color-dark-bg:      #121212;    /* Deep dark background */
+  --color-dark-surface: #1e1e1e;    /* Slightly lighter surface */
+  --color-dark-card:    #252525;    /* Card background */
+  --color-dark-border:  #333333;    /* Border color */
+  
+  /* Accent colors */
+  --color-dark-primary:  #00b4d8;   /* Bright cyan */
+  --color-dark-accent:   #d4ff50;   /* Vibrant lime */
+  --color-dark-success:  #06d6a0;   /* Mint green */
+  --color-dark-info:     #0ea5e9;   /* Sky blue */
+  --color-dark-warning:  #fbbf24;   /* Amber */
+  --color-dark-error:    #ef4444;   /* Red */
+  
+  /* Text colors */
+  --color-dark-text:     #f3f4f6;   /* Almost white text */
+  --color-dark-muted:    #9ca3af;   /* Muted gray text */
+  
+  /* Interactive elements */
+  --color-dark-highlight:     #3d3d3d;   /* Highlight background */
+  --color-dark-surface-hover: #2a2a2a;   /* Hover state for surfaces */
+  --color-dark-primary-glow:  rgba(0, 180, 216, 0.5);  /* Glow effect for primary elements */
+  --color-dark-accent-glow:   rgba(212, 255, 80, 0.5); /* Glow effect for accent elements */
+  
+  /* Gradients */
+  --gradient-dark-surface: linear-gradient(145deg, var(--color-dark-surface), var(--color-dark-card));
+  --gradient-dark-glow: linear-gradient(145deg, var(--color-dark-primary), var(--color-dark-accent));
+}
+
+/* Color utilities */
+.text-primary { color: var(--color-primary); }
+.text-accent { color: var(--color-accent); }
+.text-success { color: var(--color-success); }
+.text-error { color: var(--color-error); }
+.text-info { color: var(--color-info); }
+.text-warning { color: var(--color-warning); }
+.text-muted { color: var(--color-text-muted); }
+
+.bg-primary { background-color: var(--color-primary); }
+.bg-accent { background-color: var(--color-accent); }
+.bg-success { background-color: var(--color-success); }
+.bg-error { background-color: var(--color-error); }
+.bg-info { background-color: var(--color-info); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-surface { background-color: var(--color-surface); }
+
+/* Dark theme utilities */
+.dark-theme {
+  .text-primary { color: var(--color-dark-primary); }
+  .text-accent { color: var(--color-dark-accent); }
+  .text-success { color: var(--color-dark-success); }
+  .text-error { color: var(--color-dark-error); }
+  .text-info { color: var(--color-dark-info); }
+  .text-warning { color: var(--color-dark-warning); }
+  .text-muted { color: var(--color-dark-muted); }
+  
+  .bg-primary { background-color: var(--color-dark-primary); }
+  .bg-accent { background-color: var(--color-dark-accent); }
+  .bg-success { background-color: var(--color-dark-success); }
+  .bg-error { background-color: var(--color-dark-error); }
+  .bg-info { background-color: var(--color-dark-info); }
+  .bg-warning { background-color: var(--color-dark-warning); }
+  .bg-surface { background-color: var(--color-dark-surface); }
+}

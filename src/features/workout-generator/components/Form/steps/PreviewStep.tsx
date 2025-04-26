@@ -5,11 +5,13 @@
  * to confirm or edit their selections.
  */
 import React from 'react';
+import { Card, Button } from '../../../../../components/ui';
 import { WorkoutFormParams } from '../../../types/workout';
+import './PreviewStep.scss';
 
 interface PreviewStepProps {
   /** Form values to preview */
-  formValues: Partial<WorkoutFormParams>;
+  formValues: WorkoutFormParams;
   /** Callback when the user wants to edit their selections */
   onEditRequest: () => void;
   /** Callback when the user confirms and wants to generate a workout */
@@ -20,94 +22,98 @@ interface PreviewStepProps {
 
 // Map goal keys to human-readable labels
 const GOAL_LABELS: Record<string, string> = {
-  'lose-weight': 'Lose Weight',
-  'build-muscle': 'Build Muscle',
-  'improve-endurance': 'Improve Endurance',
-  'increase-strength': 'Increase Strength',
-  'enhance-flexibility': 'Enhance Flexibility',
+  'weight-loss': 'Weight Loss',
+  'muscle-gain': 'Muscle Gain',
+  'endurance': 'Endurance',
+  'strength': 'Strength',
+  'flexibility': 'Flexibility',
   'general-fitness': 'General Fitness',
-  'sport-specific': 'Sport-Specific Training'
 };
 
 // Map difficulty keys to human-readable labels
 const DIFFICULTY_LABELS: Record<string, string> = {
   'beginner': 'Beginner',
   'intermediate': 'Intermediate',
-  'advanced': 'Advanced'
+  'advanced': 'Advanced',
 };
 
 // Map equipment keys to human-readable labels
 const EQUIPMENT_LABELS: Record<string, string> = {
+  'none': 'No Equipment',
   'dumbbells': 'Dumbbells',
-  'kettlebells': 'Kettlebells',
   'resistance-bands': 'Resistance Bands',
-  'pull-up-bar': 'Pull-up Bar',
-  'yoga-mat': 'Yoga Mat',
-  'bench': 'Bench',
+  'kettlebells': 'Kettlebells',
   'barbell': 'Barbell',
-  'trx': 'TRX/Suspension Trainer',
+  'pull-up-bar': 'Pull-up Bar',
+  'bench': 'Bench',
+  'yoga-mat': 'Yoga Mat',
   'medicine-ball': 'Medicine Ball',
-  'jump-rope': 'Jump Rope',
   'stability-ball': 'Stability Ball',
-  'none': 'None/Bodyweight Only'
+  'cable-machine': 'Cable Machine',
+  'squat-rack': 'Squat Rack',
+  'leg-press': 'Leg Press',
+  'treadmill': 'Treadmill',
+  'stationary-bike': 'Stationary Bike',
+  'elliptical': 'Elliptical',
+  'rowing-machine': 'Rowing Machine',
 };
 
 /**
  * Component for previewing workout parameters before generation
  */
-export const PreviewStep: React.FC<PreviewStepProps> = ({
+const PreviewStep: React.FC<PreviewStepProps> = ({
   formValues,
   onEditRequest,
   onGenerateWorkout,
   isLoading = false,
 }) => {
-  const { difficulty, duration, goals, equipment = [], restrictions } = formValues;
-
-  // Get display values
-  const goalLabel = goals ? GOAL_LABELS[goals] || goals : '';
-  const difficultyLabel = difficulty ? DIFFICULTY_LABELS[difficulty] || difficulty : '';
-  const durationValue = duration ? `${duration} min` : '';
+  // Format the display values for the workout preview
+  const goalDisplay = formValues.goals ? GOAL_LABELS[formValues.goals] : '';
+  const difficultyDisplay = formValues.difficulty ? DIFFICULTY_LABELS[formValues.difficulty] : '';
+  const durationDisplay = formValues.duration ? `${formValues.duration} minutes` : '';
   
-  // Format equipment list for display
-  const equipmentLabels = equipment.map(id => EQUIPMENT_LABELS[id] || id);
+  const equipmentDisplay = formValues.equipment?.map((item: string) => EQUIPMENT_LABELS[item] || item) || [];
+  
+  // Format any restrictions or preferences
+  const restrictionsPreferences = [
+    ...(formValues.restrictions ? [`Restrictions: ${formValues.restrictions}`] : []),
+  ];
 
   return (
     <div className="preview-step">
-      <h2 className="preview-step__title">Review Your Workout Request</h2>
+      <h2 className="preview-step__title">Workout Summary</h2>
       
       <div className="workout-preview">
-        <h3 className="workout-preview__title">Workout Preview</h3>
+        <h3 className="workout-preview__title">Your Workout Request</h3>
         
-        {/* Parameter Cards */}
         <div className="workout-preview__grid">
-          <div className="workout-preview__card workout-preview__card--goal">
+          <div className="workout-preview__card">
             <div className="workout-preview__card-label">Goal</div>
             <div className="workout-preview__card-value workout-preview__card-value--goal">
-              {goalLabel}
+              {goalDisplay}
             </div>
           </div>
           
-          <div className="workout-preview__card workout-preview__card--level">
-            <div className="workout-preview__card-label">Level</div>
+          <div className="workout-preview__card">
+            <div className="workout-preview__card-label">Difficulty</div>
             <div className="workout-preview__card-value workout-preview__card-value--level">
-              {difficultyLabel}
+              {difficultyDisplay}
             </div>
           </div>
           
-          <div className="workout-preview__card workout-preview__card--duration">
+          <div className="workout-preview__card">
             <div className="workout-preview__card-label">Duration</div>
             <div className="workout-preview__card-value workout-preview__card-value--duration">
-              {durationValue}
+              {durationDisplay}
             </div>
           </div>
         </div>
         
-        {/* Equipment Section */}
-        {equipment.length > 0 && (
+        {equipmentDisplay.length > 0 && (
           <div className="workout-preview__section">
-            <div className="workout-preview__section-title">Equipment</div>
+            <h4 className="workout-preview__section-title">Equipment</h4>
             <div className="workout-preview__equipment">
-              {equipmentLabels.map((item, index) => (
+              {equipmentDisplay.map((item: string, index: number) => (
                 <span key={index} className="workout-preview__equipment-tag">
                   {item}
                 </span>
@@ -116,38 +122,46 @@ export const PreviewStep: React.FC<PreviewStepProps> = ({
           </div>
         )}
         
-        {/* Restrictions Section */}
-        {restrictions && (
+        {restrictionsPreferences.length > 0 && (
           <div className="workout-preview__section">
-            <div className="workout-preview__section-title">Restrictions/Preferences</div>
-            <div className="workout-preview__restrictions">{restrictions}</div>
+            <h4 className="workout-preview__section-title">
+              Restrictions & Preferences
+            </h4>
+            <div className="workout-preview__restrictions">
+              {restrictionsPreferences.map((item: string, index: number) => (
+                <div key={index}>{item}</div>
+              ))}
+            </div>
           </div>
         )}
       </div>
       
       <div className="preview-step__message">
-        Ready to generate your custom workout? Click "Generate Workout" to continue or go back to make changes.
+        Please review your workout request details before generating your personalized workout.
       </div>
       
       <div className="preview-step__actions">
-        <button
-          type="button"
-          className="preview-step__edit-button"
+        <Button 
           onClick={onEditRequest}
+          variant="outline"
+          className="preview-step__edit-button"
           disabled={isLoading}
         >
           Edit Request
-        </button>
+        </Button>
         
-        <button
-          type="button"
-          className="preview-step__generate-button"
+        <Button 
           onClick={onGenerateWorkout}
+          variant="primary"
+          className="preview-step__generate-button"
+          isLoading={isLoading}
           disabled={isLoading}
         >
-          {isLoading ? 'Generating...' : 'Generate Workout'}
-        </button>
+          Generate Workout
+        </Button>
       </div>
     </div>
   );
-}; 
+};
+
+export default PreviewStep; 

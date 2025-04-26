@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { apiFetch, addQueryArgs, __ } from './utils/wordpress-polyfills';
 
+// Components
+import SummaryCard from './components/SummaryCard';
+import UsageChart from './components/UsageChart';
+import ModelDistribution from './components/ModelDistribution';
+import ResetStats from './components/ResetStats';
+
 // Types
 import { 
   TokenSummary, 
@@ -172,7 +178,9 @@ const TokenUsage: React.FC = () => {
     window.dispatchEvent(loadedEvent);
   }, []);
 
-  // Create placeholder content for now
+  // Check if any data is loading
+  const isAnyLoading = Object.values(isLoading).some(state => state === true);
+
   return (
     <div className="fitcopilot-token-usage">
       <div className="token-usage-header">
@@ -182,143 +190,53 @@ const TokenUsage: React.FC = () => {
 
       <div className="token-usage-container">
         <div className="token-usage-summary">
-          {isLoading.summary ? (
-            <div className="loading-indicator">Loading summary data...</div>
-          ) : error.summary ? (
-            <div className="error-message">{error.summary}</div>
-          ) : summary ? (
-            <div className="summary-panel">
-              <h2>{__('Token Usage Summary', 'fitcopilot')}</h2>
-              <div className="summary-stats">
-                <div className="stat-card">
-                  <div className="stat-value">{summary.total_tokens.toLocaleString()}</div>
-                  <div className="stat-label">{__('Total Tokens', 'fitcopilot')}</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">{summary.total_requests.toLocaleString()}</div>
-                  <div className="stat-label">{__('Total Requests', 'fitcopilot')}</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-value">${summary.total_cost.toFixed(4)}</div>
-                  <div className="stat-label">{__('Estimated Cost', 'fitcopilot')}</div>
-                </div>
-              </div>
-              
-              <h3>{__('By Model', 'fitcopilot')}</h3>
-              <table className="model-table">
-                <thead>
-                  <tr>
-                    <th>{__('Model', 'fitcopilot')}</th>
-                    <th>{__('Tokens', 'fitcopilot')}</th>
-                    <th>{__('Cost', 'fitcopilot')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {summary.models.map(model => (
-                    <tr key={model.id}>
-                      <td>{model.name}</td>
-                      <td>{model.total_tokens.toLocaleString()}</td>
-                      <td>${model.estimated_cost.toFixed(4)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="empty-state">
-              {__('No token usage data available yet.', 'fitcopilot')}
-            </div>
-          )}
+          <SummaryCard 
+            summary={summary}
+            isLoading={isLoading.summary}
+            error={error.summary}
+          />
         </div>
         
         <div className="token-usage-charts">
           <div className="chart-section">
             <h2>{__('Daily Token Usage', 'fitcopilot')}</h2>
-            {isLoading.daily ? (
-              <div className="loading-indicator">Loading daily stats...</div>
-            ) : error.daily ? (
-              <div className="error-message">{error.daily}</div>
-            ) : dailyStats.length > 0 ? (
-              <div className="chart-placeholder">
-                {/* Chart will be added in a separate component */}
-                <p>{__('Chart showing daily token usage over the last 30 days', 'fitcopilot')}</p>
-                <ul>
-                  {dailyStats.slice(0, 5).map(stat => (
-                    <li key={stat.date}>
-                      {stat.date}: {stat.total_tokens.toLocaleString()} tokens (${stat.estimated_cost.toFixed(4)})
-                    </li>
-                  ))}
-                  {dailyStats.length > 5 && <li>...</li>}
-                </ul>
-              </div>
-            ) : (
-              <div className="empty-state">
-                {__('No daily usage data available.', 'fitcopilot')}
-              </div>
-            )}
+            <UsageChart 
+              data={dailyStats}
+              isLoading={isLoading.daily}
+              error={error.daily}
+              dateKey="date" 
+              title={__('Daily Token Usage', 'fitcopilot')}
+              emptyMessage={__('No daily usage data available.', 'fitcopilot')}
+            />
           </div>
           
           <div className="chart-section">
             <h2>{__('Monthly Token Usage', 'fitcopilot')}</h2>
-            {isLoading.monthly ? (
-              <div className="loading-indicator">Loading monthly stats...</div>
-            ) : error.monthly ? (
-              <div className="error-message">{error.monthly}</div>
-            ) : monthlyStats.length > 0 ? (
-              <div className="chart-placeholder">
-                {/* Chart will be added in a separate component */}
-                <p>{__('Chart showing monthly token usage over the last 12 months', 'fitcopilot')}</p>
-                <ul>
-                  {monthlyStats.slice(0, 5).map(stat => (
-                    <li key={stat.month}>
-                      {stat.month}: {stat.total_tokens.toLocaleString()} tokens (${stat.estimated_cost.toFixed(4)})
-                    </li>
-                  ))}
-                  {monthlyStats.length > 5 && <li>...</li>}
-                </ul>
-              </div>
-            ) : (
-              <div className="empty-state">
-                {__('No monthly usage data available.', 'fitcopilot')}
-              </div>
-            )}
+            <UsageChart 
+              data={monthlyStats}
+              isLoading={isLoading.monthly}
+              error={error.monthly}
+              dateKey="month" 
+              title={__('Monthly Token Usage', 'fitcopilot')}
+              emptyMessage={__('No monthly usage data available.', 'fitcopilot')}
+            />
           </div>
           
           <div className="chart-section">
             <h2>{__('Cost Breakdown by Model', 'fitcopilot')}</h2>
-            {isLoading.breakdown ? (
-              <div className="loading-indicator">Loading cost breakdown...</div>
-            ) : error.breakdown ? (
-              <div className="error-message">{error.breakdown}</div>
-            ) : modelBreakdown.length > 0 ? (
-              <div className="breakdown-placeholder">
-                {/* Pie chart will be added in a separate component */}
-                <p>{__('Pie chart showing cost breakdown by model', 'fitcopilot')}</p>
-                <ul>
-                  {modelBreakdown.map(model => (
-                    <li key={model.model_id}>
-                      {model.model_name}: {model.tokens.toLocaleString()} tokens ({model.percentage.toFixed(1)}%) - ${model.cost.toFixed(4)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <div className="empty-state">
-                {__('No model breakdown data available.', 'fitcopilot')}
-              </div>
-            )}
+            <ModelDistribution 
+              models={modelBreakdown}
+              isLoading={isLoading.breakdown}
+              error={error.breakdown}
+              emptyMessage={__('No model breakdown data available.', 'fitcopilot')}
+            />
           </div>
         </div>
         
-        <div className="token-usage-actions">
-          <button 
-            className="reset-button" 
-            onClick={handleResetStats}
-            disabled={isLoading.summary || isLoading.daily || isLoading.monthly || isLoading.breakdown}
-          >
-            {__('Reset All Stats', 'fitcopilot')}
-          </button>
-        </div>
+        <ResetStats 
+          onResetStats={handleResetStats} 
+          isDisabled={isAnyLoading}
+        />
       </div>
     </div>
   );

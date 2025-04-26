@@ -34,17 +34,20 @@
  * };
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWorkoutForm } from '../../hooks/useWorkoutForm';
 import { useWorkoutGenerator } from '../../hooks/useWorkoutGenerator';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { WorkoutFormParams, FormSteps } from '../../types/workout';
 
 import { InputStep } from './steps/InputStep';
-import { PreviewStep } from './steps/PreviewStep';
+import PreviewStep from './steps/PreviewStep';
 import { GeneratingStep } from './steps/GeneratingStep';
 import { ResultStep } from './steps/ResultStep';
 import ErrorBoundary from '../common/ErrorBoundary';
+import { Button } from '../../../../components/ui';
+import ThemeToggle from '../../../../components/ui/ThemeToggle';
+import './form.scss';
 
 /**
  * Equipment options available for workout generation
@@ -99,18 +102,6 @@ const DURATION_OPTIONS = [
 ];
 
 /**
- * Status messages displayed during workout generation
- * These rotate to indicate progress to the user
- */
-const STATUS_MESSAGES = [
-  'Connecting to OpenAI...',
-  'Building your personalized workout plan...',
-  'Analyzing your fitness goals...',
-  'Selecting the perfect exercises...',
-  'Putting the finishing touches on your plan...'
-];
-
-/**
  * WorkoutRequestForm Component Props
  */
 interface WorkoutRequestFormProps {
@@ -162,8 +153,44 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
   // Track the preview state separately as it's not in the generation status
   const [isPreviewMode, setIsPreviewMode] = React.useState(false);
   
+  // Track generation progress for better UX
+  const [progress, setProgress] = useState(0);
+  
   // Determine the current step to display
   const currentStep: FormSteps = isPreviewMode ? 'preview' : mapStatusToStep(status);
+  
+  // Update progress during generation
+  useEffect(() => {
+    let progressInterval: NodeJS.Timeout;
+    
+    if (status === 'generating' || status === 'submitting') {
+      // Reset progress when generation starts
+      setProgress(0);
+      
+      // Simulate progress over time
+      progressInterval = setInterval(() => {
+        setProgress(prev => {
+          // Cap at 95% until complete, so users know it's not done
+          if (prev < 95) {
+            return prev + (Math.random() * 2 + 0.5); // Increments between 0.5 and 2.5
+          }
+          return prev;
+        });
+      }, 1000);
+    } else if (status === 'completed') {
+      // Set to 100% when complete
+      setProgress(100);
+    } else if (status === 'idle') {
+      // Reset when idle
+      setProgress(0);
+    }
+    
+    return () => {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+    };
+  }, [status]);
   
   /**
    * Handle form submission to preview step
@@ -199,6 +226,8 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
       const formValues = workoutForm.formValues;
       // Exit preview mode
       setIsPreviewMode(false);
+      // Reset progress for new generation
+      setProgress(0);
       // Generation status transition is handled by startGeneration
       await startGeneration(formValues);
     } catch (error) {
@@ -223,6 +252,7 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
    */
   const handleCancelGeneration = () => {
     resetGenerator();
+    setProgress(0);
   };
   
   /**
@@ -231,52 +261,78 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
   const handleRestart = () => {
     resetGenerator();
     workoutForm.resetFormErrors();
+    setProgress(0);
+  };
+
+  /**
+   * Handle workout completion (when progress reaches 100%)
+   */
+  const handleGenerationComplete = () => {
+    // If we're at 100% progress but status hasn't updated yet,
+    // this smooths the transition between steps
+    if (progress >= 100 && status === 'generating') {
+      // The status will be updated by the generator hook
+    }
   };
 
   // Render the appropriate step based on current state
   return (
     <ErrorBoundary>
-      <div className={`workout-generator-form ${className}`}>
-        {currentStep === 'input' && (
-          <InputStep 
-            formValues={workoutForm.formValues}
-            formErrors={workoutForm.formErrors || {}}
-            isValid={workoutForm.isValid}
-            hasFieldError={(field) => Boolean(workoutForm.formErrors?.[field])}
-            getFieldError={(field) => workoutForm.formErrors?.[field]}
-            setGoals={(goals) => workoutForm.updateField('goals', goals)}
-            setDifficulty={(difficulty) => workoutForm.updateField('difficulty', difficulty)}
-            setDuration={(duration) => workoutForm.updateField('duration', duration)}
-            setEquipment={(equipment) => workoutForm.updateField('equipment', equipment)}
-            setRestrictions={(restrictions) => workoutForm.updateField('restrictions', restrictions)}
-            validateForm={workoutForm.validateForm}
-            onContinue={handlePreviewStep}
-          />
-        )}
+      <div className={`workout-form-container ${className}`}>
+        <div className="theme-toggle-container">
+          <ThemeToggle className="workout-form__theme-toggle" />
+        </div>
         
-        {currentStep === 'preview' && (
-          <PreviewStep 
-            formValues={workoutForm.formValues} 
-            onEditRequest={handleEditForm}
-            onGenerateWorkout={handleSubmitForm}
-            isLoading={isGenerating}
-          />
-        )}
-        
-        {currentStep === 'generating' && (
-          <GeneratingStep 
-            error={errorMessage}
-            onCancel={handleCancelGeneration}
-          />
-        )}
-        
-        {currentStep === 'completed' && generatedWorkout && (
-          <ResultStep 
-            workout={generatedWorkout} 
-            error={errorMessage}
-            onGenerateNew={handleRestart}
-          />
-        )}
+        <div className="workout-generator-form">
+          {currentStep === 'input' && (
+            <InputStep 
+              formValues={workoutForm.formValues}
+              formErrors={workoutForm.formErrors || {}}
+              isValid={workoutForm.isValid}
+              hasFieldError={(field) => Boolean(workoutForm.formErrors?.[field])}
+              getFieldError={(field) => workoutForm.formErrors?.[field]}
+              setGoals={(goals) => workoutForm.updateField('goals', goals)}
+              setDifficulty={(difficulty) => workoutForm.updateField('difficulty', difficulty)}
+              setDuration={(duration) => workoutForm.updateField('duration', duration)}
+              setEquipment={(equipment) => workoutForm.updateField('equipment', equipment)}
+              setRestrictions={(restrictions) => workoutForm.updateField('restrictions', restrictions)}
+              validateForm={workoutForm.validateForm}
+              onContinue={handlePreviewStep}
+            />
+          )}
+          
+          {currentStep === 'preview' && (
+            <PreviewStep 
+              formValues={{
+                duration: Number(workoutForm.formValues.duration || 0),
+                difficulty: workoutForm.formValues.difficulty || 'beginner',
+                equipment: workoutForm.formValues.equipment || [],
+                goals: workoutForm.formValues.goals || '',
+                restrictions: workoutForm.formValues.restrictions
+              }} 
+              onEditRequest={handleEditForm}
+              onGenerateWorkout={handleSubmitForm}
+              isLoading={isGenerating}
+            />
+          )}
+          
+          {currentStep === 'generating' && (
+            <GeneratingStep 
+              error={errorMessage}
+              onCancel={handleCancelGeneration}
+              progress={progress}
+              onComplete={handleGenerationComplete}
+            />
+          )}
+          
+          {currentStep === 'completed' && generatedWorkout && (
+            <ResultStep 
+              workout={generatedWorkout} 
+              error={errorMessage}
+              onGenerateNew={handleRestart}
+            />
+          )}
+        </div>
       </div>
     </ErrorBoundary>
   );

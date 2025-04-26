@@ -5,9 +5,11 @@
  * or generating a new workout.
  */
 import React from 'react';
+import { Card, Button } from '../../../../../components/ui';
 import { GeneratedWorkout } from '../../../types/workout';
 import WorkoutCard from '../../WorkoutDisplay/WorkoutCard';
 import ErrorBoundary from '../../common/ErrorBoundary';
+import '../form.scss';
 
 interface ResultStepProps {
   /** The generated workout to display */
@@ -61,24 +63,26 @@ export const ResultStep: React.FC<ResultStepProps> = ({
   if (error) {
     return (
       <div className="result-step result-step--error">
-        <h3 className="result-step__title">Error Generating Workout</h3>
-        
-        <div className="result-step__error-container">
-          <p className="result-step__error-message">{error}</p>
-          <p className="result-step__error-help">
-            Please try again or adjust your workout parameters.
-          </p>
-        </div>
-        
-        <div className="result-step__actions">
-          <button 
-            type="button"
-            className="result-step__retry-button"
-            onClick={onGenerateNew}
-          >
-            Try Again
-          </button>
-        </div>
+        <Card elevated padding="large">
+          <h3 className="result-step__title">Error Generating Workout</h3>
+          
+          <div className="result-step__error-container">
+            <p className="result-step__error-message">{error}</p>
+            <p className="result-step__error-help">
+              Please try again or adjust your workout parameters.
+            </p>
+          </div>
+          
+          <div className="result-step__actions">
+            <Button 
+              variant="primary"
+              onClick={onGenerateNew}
+              className="result-step__retry-button"
+            >
+              Try Again
+            </Button>
+          </div>
+        </Card>
       </div>
     );
   }
@@ -87,21 +91,23 @@ export const ResultStep: React.FC<ResultStepProps> = ({
   if (!workout) {
     return (
       <div className="result-step result-step--empty">
-        <h3 className="result-step__title">No Workout Generated</h3>
-        
-        <p className="result-step__message">
-          There was a problem generating your workout. Please try again.
-        </p>
-        
-        <div className="result-step__actions">
-          <button 
-            type="button"
-            className="result-step__retry-button"
-            onClick={onGenerateNew}
-          >
-            Generate New Workout
-          </button>
-        </div>
+        <Card elevated padding="large">
+          <h3 className="result-step__title">No Workout Generated</h3>
+          
+          <p className="result-step__message">
+            There was a problem generating your workout. Please try again.
+          </p>
+          
+          <div className="result-step__actions">
+            <Button 
+              variant="primary"
+              onClick={onGenerateNew}
+              className="result-step__retry-button"
+            >
+              Generate New Workout
+            </Button>
+          </div>
+        </Card>
       </div>
     );
   }
@@ -110,25 +116,31 @@ export const ResultStep: React.FC<ResultStepProps> = ({
   return (
     <ErrorBoundary>
       <div className="result-step">
-        <h2 className="result-step__title">Your Custom Workout</h2>
-        
-        <div className="result-step__content">
-          <WorkoutCard workout={workout} />
-        </div>
-        
-        <button 
-          className="view-full-workout-button"
-          onClick={handleViewFullWorkout}
-        >
-          View Full Workout
-        </button>
-        
-        <button
-          className="generate-another-button"
-          onClick={onGenerateNew}
-        >
-          Generate Another Workout
-        </button>
+        <Card elevated padding="large">
+          <h2 className="result-step__title">Your Custom Workout</h2>
+          
+          <div className="result-step__content">
+            <WorkoutCard workout={workout} />
+          </div>
+          
+          <div className="result-step__actions">
+            <Button 
+              variant="primary"
+              onClick={handleViewFullWorkout}
+              className="view-full-workout-button"
+            >
+              View Full Workout
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={onGenerateNew}
+              className="generate-another-button"
+            >
+              Generate Another Workout
+            </Button>
+          </div>
+        </Card>
       </div>
     </ErrorBoundary>
   );

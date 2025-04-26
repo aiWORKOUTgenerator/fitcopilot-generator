@@ -26,28 +26,17 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.(ts|tsx)$/,
+          test: /\.tsx?$/,
+          use: 'babel-loader',
           exclude: /node_modules/,
-          use: 'ts-loader',
         },
         {
-          test: /\.css$/,
+          test: /\.(css|scss)$/,
           use: [
             MiniCssExtractPlugin.loader,
             'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                postcssOptions: {
-                  plugins: [
-                    require('tailwindcss'),
-                    require('autoprefixer'),
-                    require('postcss-nested'),
-                    ...(isProduction ? [require('cssnano')] : []),
-                  ],
-                },
-              },
-            },
+            'postcss-loader',
+            'sass-loader',
           ],
         },
       ],

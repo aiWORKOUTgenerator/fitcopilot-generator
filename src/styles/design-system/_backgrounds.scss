@@ -1,0 +1,19 @@
+:root {
+  /* Light theme backgrounds */
+  --bg-page:    var(--color-bg);
+  --bg-surface: var(--color-surface);
+  
+  /* Dark theme backgrounds */
+  --bg-dark-page:     var(--color-dark-bg);
+  --bg-dark-surface:  var(--color-dark-surface);
+  --bg-dark-elevated: var(--color-dark-surface-accent);
+}
+
+/* Apply dark theme */
+.dark-theme {
+  --bg-page:    var(--bg-dark-page);
+  --bg-surface: var(--bg-dark-surface);
+  
+  background-color: var(--bg-dark-page);
+  color: var(--color-dark-text);
+}

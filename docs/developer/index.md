@@ -10,6 +10,12 @@ This section contains technical documentation for developers working with the Fi
 - [Plugin Integration](./architecture/plugin-integration.md)
 - [OpenAI Integration](./architecture/openai-integration.md)
 
+### [Design System](./design-system/index.md)
+- [Color System](./design-system/colors.md)
+- [Typography](./design-system/typography.md)
+- [Components](./design-system/components.md)
+- [Dark Theme](./design-system/dark-theme.md)
+
 ### [API Reference](./api/index.md)
 - [REST API Endpoints](./api/endpoints.md)
 - [Authentication](./api/authentication.md)
@@ -36,6 +42,7 @@ This section contains technical documentation for developers working with the Fi
 ## Quick Links
 
 - [API Endpoints Reference](./api/endpoints.md)
+- [Design System Documentation](./design-system/index.md)
 - [Component Implementation Guide](./components/implementation.md)
 - [Development Environment Setup](../contribution/workflow/setup.md)
 
