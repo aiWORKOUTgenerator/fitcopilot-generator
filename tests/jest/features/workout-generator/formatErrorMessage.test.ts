@@ -29,82 +29,58 @@ describe('Error Formatting Utilities', () => {
   });
   
   describe('formatError', () => {
-    it('should return the error if it is already formatted', () => {
-      const formattedError = {
-        code: API_ERROR_CODES.NETWORK_ERROR,
-        message: 'Network error',
-        category: ErrorCategory.NETWORK,
-        retry: true
-      };
-      
-      const result = formatError(formattedError);
-      expect(result).toBe(formattedError);
-    });
-    
-    it('should format an Error object with unknown error code', () => {
-      const error = new Error('Something went wrong');
+    it('should return the error if it is already an Error instance', () => {
+      const error = new Error('Network error');
       const result = formatError(error);
-      
-      expect(result).toEqual({
-        code: API_ERROR_CODES.UNKNOWN_ERROR,
-        message: expect.any(String),
-        category: ErrorCategory.UNKNOWN,
-        details: {
-          name: 'Error',
-          stack: error.stack
-        },
-        retry: false
-      });
+      expect(result).toBe(error);
     });
     
-    it('should extract error code from Error message if present', () => {
-      const error = new Error(`Error occurred: ${API_ERROR_CODES.NETWORK_ERROR}`);
-      const result = formatError(error);
-      
-      expect(result).toEqual({
-        code: API_ERROR_CODES.NETWORK_ERROR,
-        message: expect.any(String),
-        category: ErrorCategory.NETWORK,
-        details: {
-          name: 'Error',
-          stack: error.stack
-        },
-        retry: true
-      });
-    });
-    
-    it('should format a string error message', () => {
+    it('should format a string into an Error object', () => {
       const result = formatError('String error message');
-      
-      expect(result).toEqual({
-        code: API_ERROR_CODES.UNKNOWN_ERROR,
-        message: expect.any(String),
-        category: ErrorCategory.UNKNOWN,
-        details: undefined,
-        retry: false
-      });
+      expect(result).toBeInstanceOf(Error);
+      expect(result.message).toBe('String error message');
     });
     
-    it('should set retry to true for retryable error categories', () => {
-      // Network error
-      let result = formatError(new Error(`Error: ${API_ERROR_CODES.NETWORK_ERROR}`));
-      expect(result.retry).toBe(true);
+    it('should format an object with message property', () => {
+      const errorObj = { message: 'Object error message' };
+      const result = formatError(errorObj);
       
-      // Server error
-      result = formatError(new Error(`Error: ${API_ERROR_CODES.SERVER_ERROR}`));
-      expect(result.retry).toBe(true);
+      expect(result).toBeInstanceOf(Error);
+      expect(result.message).toBe('Object error message');
+    });
+    
+    it('should format an object with error property', () => {
+      const errorObj = { error: 'Object error property' };
+      const result = formatError(errorObj);
       
-      // Rate limited
-      result = formatError(new Error(`Error: ${API_ERROR_CODES.RATE_LIMITED}`));
-      expect(result.retry).toBe(true);
+      expect(result).toBeInstanceOf(Error);
+      expect(result.message).toBe('Object error property');
+    });
+    
+    it('should format an object with code and message properties', () => {
+      const errorObj = { 
+        code: API_ERROR_CODES.NETWORK_ERROR, 
+        message: 'Network error with code' 
+      };
+      const result = formatError(errorObj);
       
-      // AI provider error
-      result = formatError(new Error(`Error: ${API_ERROR_CODES.AI_PROVIDER_ERROR}`));
-      expect(result.retry).toBe(true);
+      expect(result).toBeInstanceOf(Error);
+      expect(result.message).toBe('Network error with code');
+      expect((result as any).code).toBe(API_ERROR_CODES.NETWORK_ERROR);
+    });
+    
+    it('should format null to a generic error', () => {
+      const result = formatError(null);
+      expect(result).toBeInstanceOf(Error);
+      expect(result.message).toBe('An unknown error occurred');
+    });
+    
+    it('should convert an object to a JSON string in the error message', () => {
+      const obj = { foo: 'bar' };
+      const result = formatError(obj);
       
-      // Validation error (not retryable)
-      result = formatError(new Error(`Error: ${API_ERROR_CODES.INVALID_INPUT}`));
-      expect(result.retry).toBe(false);
+      expect(result).toBeInstanceOf(Error);
+      expect(result.message).toBe('Unknown error: {"foo":"bar"}');
     });
   });
   
@@ -117,7 +93,7 @@ describe('Error Formatting Utilities', () => {
         retry: true
       };
       
-      logError(error);
+      logError(error as any);
       expect(console.error).toHaveBeenCalledWith('[WorkoutGenerator]', error);
     });
   });

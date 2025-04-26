@@ -62,7 +62,7 @@ export async function apiFetch<T>({
   params,
 }: ApiRequestOptions): Promise<T> {
   // Construct the URL with query parameters if provided
-  let url = `/wp-json/my-wg/v1${path}`;
+  let url = `/wp-json/fitcopilot/v1${path}`;
   if (params) {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {

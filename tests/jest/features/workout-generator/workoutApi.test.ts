@@ -56,7 +56,7 @@ describe('workoutApi', () => {
       
       // Verify request was called with correct URL and parameters
       expect(mockRequestFn).toHaveBeenCalledWith({
-        url: '/my-wg/v1/generate',
+        url: '/wp-json/fitcopilot/v1/generate',
         options: {
           method: 'POST',
           body: JSON.stringify(params)
@@ -131,7 +131,7 @@ describe('workoutApi', () => {
       
       // Verify request was called with correct URL and parameters
       expect(mockRequestFn).toHaveBeenCalledWith({
-        url: '/my-wg/v1/workouts',
+        url: '/wp-json/fitcopilot/v1/workouts',
         options: { method: 'GET' },
         handleUnauthorized: true
       });
@@ -160,7 +160,7 @@ describe('workoutApi', () => {
       
       // Verify request was called with correct URL and parameters
       expect(mockRequestFn).toHaveBeenCalledWith({
-        url: '/my-wg/v1/workouts/1',
+        url: '/wp-json/fitcopilot/v1/workouts/1',
         options: { method: 'GET' },
         handleUnauthorized: true
       });
@@ -196,7 +196,7 @@ describe('workoutApi', () => {
       
       // Verify request was called with correct URL and parameters
       expect(mockRequestFn).toHaveBeenCalledWith({
-        url: '/my-wg/v1/workouts/1',
+        url: '/wp-json/fitcopilot/v1/workouts/1',
         options: {
           method: 'PUT',
           body: JSON.stringify(workoutData)
@@ -234,7 +234,7 @@ describe('workoutApi', () => {
       
       // Verify request was called with correct URL and parameters
       expect(mockRequestFn).toHaveBeenCalledWith({
-        url: '/my-wg/v1/workouts/1/complete',
+        url: '/wp-json/fitcopilot/v1/workouts/1/complete',
         options: {
           method: 'POST',
           body: JSON.stringify(completionData)
@@ -270,7 +270,7 @@ describe('workoutApi', () => {
       
       // Verify request was called with correct URL and parameters
       expect(mockRequestFn).toHaveBeenCalledWith({
-        url: '/my-wg/v1/profile',
+        url: '/wp-json/fitcopilot/v1/profile',
         options: { method: 'GET' },
         handleUnauthorized: true
       });
@@ -309,7 +309,7 @@ describe('workoutApi', () => {
       
       // Verify request was called with correct URL and parameters
       expect(mockRequestFn).toHaveBeenCalledWith({
-        url: '/my-wg/v1/profile',
+        url: '/wp-json/fitcopilot/v1/profile',
         options: {
           method: 'PUT',
           body: JSON.stringify(profileData)

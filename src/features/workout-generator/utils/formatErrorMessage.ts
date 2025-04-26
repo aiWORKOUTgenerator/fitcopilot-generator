@@ -79,7 +79,14 @@ export function formatError(error: unknown): Error {
   if (typeof error === 'object' && error !== null) {
     // Handle API error responses
     if ('message' in error && typeof error.message === 'string') {
-      return new Error(error.message);
+      const formattedError = new Error(error.message);
+      
+      // Copy code property if it exists
+      if ('code' in error && error.code) {
+        (formattedError as any).code = error.code;
+      }
+      
+      return formattedError;
     }
     
     // Handle server error objects
