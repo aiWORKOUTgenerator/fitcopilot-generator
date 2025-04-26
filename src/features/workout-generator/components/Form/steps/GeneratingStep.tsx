@@ -3,144 +3,106 @@
  * 
  * Displays a loading state during workout generation with progress feedback and error handling.
  */
-import React, { useState, useEffect, memo } from 'react';
-import { Card, Button } from '../../../../../components/ui';
-import { LoadingIndicator } from '../../GenerationProcess/LoadingIndicator';
-import ErrorBoundary from '../../common/ErrorBoundary';
-import '../form.scss';
+import React, { useEffect, useState } from 'react';
+import Button from '../../../../../components/ui/Button';
+import LoadingIndicator from '../../../components/ui/LoadingIndicator';
+import ErrorBoundary from '../../../components/common/ErrorBoundary';
+import { useProgressEstimator } from '../../../hooks/useProgressEstimator';
+import { GenerationError } from '../../../types/errors';
+import './styles/generating-step.scss';
 
-interface GeneratingStepProps {
-  /** Optional error message to display if generation fails */
-  error: string | null;
-  /** Callback when the user cancels generation */
+export interface GeneratingStepProps {
   onCancel: () => void;
-  /** Current generation progress (0-100) */
+  onComplete: () => void;
   progress?: number;
-  /** Callback when generation progress completes (reaches 100%) */
-  onComplete?: () => void;
+  error?: GenerationError | null;
 }
 
-const fitnessTips = [
-  "Maintain proper form throughout your workout to prevent injuries and maximize results.",
-  "Consistency beats intensity - regular moderate workouts yield better results than occasional intense sessions.",
-  "Stay hydrated before, during, and after your workout for optimal performance.",
-  "Allow 48-72 hours of recovery time for muscle groups you've trained intensively.",
-  "Proper warm-up and cool-down routines can significantly reduce injury risk."
-];
-
 /**
- * Component shown during workout generation process
+ * GeneratingStep displays a loading state during workout generation
+ *
+ * @param {GeneratingStepProps} props - Component props
+ * @returns {JSX.Element} Rendered component
  */
 export const GeneratingStep: React.FC<GeneratingStepProps> = ({
-  error,
   onCancel,
-  progress = 0,
   onComplete,
+  progress = 0,
+  error = null,
 }) => {
-  const [currentTip, setCurrentTip] = useState(0);
+  // Status messages to display during generation
+  const statusMessages = [
+    'Analyzing your workout preferences...',
+    'Creating a personalized workout for you...',
+    'Designing exercise combinations...',
+    'Finalizing your custom workout plan...',
+  ];
+
+  // Fitness tips to display during generation
+  const fitnessTips = [
+    'Hydration is key! Aim to drink water before, during, and after your workout.',
+    'Rest days are just as important as workout days for muscle recovery.',
+    'Proper form is more important than lifting heavy weights.',
+    'Consistency matters more than intensity when starting a fitness journey.',
+    'Mix cardio and strength training for optimal results.',
+    'Dynamic stretching before and static stretching after workouts is ideal.',
+    'Small, consistent progress leads to long-term success.',
+    'Listen to your body - pain is different from discomfort.',
+  ];
+
+  // Use the progress estimator to track generation progress
+  const [currentProgress, completeProgress] = useProgressEstimator({
+    initialProgress: progress,
+    totalDuration: 20000,
+    maxProgress: 95
+  });
   
-  // Rotate through fitness tips every 8 seconds
-  useEffect(() => {
-    if (error) return; // Don't rotate tips if there's an error
-    
-    const tipInterval = setInterval(() => {
-      setCurrentTip(prev => (prev + 1) % fitnessTips.length);
-    }, 8000);
-    
-    return () => clearInterval(tipInterval);
-  }, [error]);
+  // Randomly select a fitness tip
+  const [tipIndex] = useState(() => Math.floor(Math.random() * fitnessTips.length));
+  
+  // Determine which status message to show based on progress
+  const statusIndex = Math.min(
+    Math.floor((currentProgress / 100) * statusMessages.length),
+    statusMessages.length - 1
+  );
 
-  // Call onComplete when progress reaches 100%
+  // Check for completion
   useEffect(() => {
-    if (progress >= 100 && onComplete) {
-      const timer = setTimeout(() => onComplete(), 500);
-      return () => clearTimeout(timer);
+    if (progress >= 100) {
+      completeProgress(true);
+      onComplete();
     }
-  }, [progress, onComplete]);
+  }, [progress, completeProgress, onComplete]);
 
-  // Get current progress message based on progress value
-  const getProgressMessage = () => {
-    if (progress < 25) return "Analyzing your fitness goals...";
-    if (progress < 50) return "Designing your workout structure...";
-    if (progress < 75) return "Selecting optimal exercises...";
-    return "Finalizing your personalized plan...";
-  };
-
-  // Render error state if an error occurred
+  // Handle error state
   if (error) {
     return (
-      <div className="generating-step generating-step--error" role="alert" aria-live="assertive">
-        <Card elevated padding="large">
-          <h3 className="generating-step__title">Generation Error</h3>
-          
-          <div className="generating-step__error-container">
-            <p className="generating-step__error-message">{error}</p>
-            <p className="generating-step__error-help">
-              Please try again or adjust your workout parameters.
-            </p>
-          </div>
-          
-          <div className="generating-step__actions">
-            <Button 
-              variant="outline"
-              onClick={onCancel}
-              className="generating-step__cancel-button"
-            >
-              Go Back
-            </Button>
-          </div>
-        </Card>
+      <div className="generating-step">
+        <div className="generation-error">
+          <h3>Oops! Something went wrong</h3>
+          <p>{error.message}</p>
+          <Button onClick={onCancel}>Try Again</Button>
+        </div>
       </div>
     );
   }
 
-  // Render loading state
   return (
-    <ErrorBoundary
-      fallback={
-        <div className="generating-step generating-step--error" role="alert">
-          <Card elevated padding="large">
-            <h3>Something went wrong</h3>
-            <p>An error occurred while generating your workout.</p>
-            <Button 
-              onClick={onCancel}
-              variant="outline"
-              className="generating-step__cancel-button"
-            >
-              Go Back
-            </Button>
-          </Card>
+    <ErrorBoundary>
+      <div className="generating-step">
+        <LoadingIndicator message={statusMessages[statusIndex]} progress={currentProgress} />
+        <div className="status-container">
+          <h3 className="status-message">{statusMessages[statusIndex]}</h3>
+          <p className="fitness-tip">
+            <strong>Fitness Tip:</strong> {fitnessTips[tipIndex]}
+          </p>
         </div>
-      }
-    >
-      <div className="generating-step" role="region" aria-live="polite" aria-label="Workout generation in progress">
-        <Card elevated padding="large">
-          <LoadingIndicator />
-          <div className="generating-step__content">
-            <h3 className="generating-step__title">Creating Your Custom Workout</h3>
-            <p className="generating-step__message" aria-live="polite">{getProgressMessage()}</p>
-            
-            <div className="generating-step__progress-container" aria-hidden={progress < 1}>
-              <div 
-                className="generating-step__progress-bar" 
-                role="progressbar" 
-                aria-valuenow={progress} 
-                aria-valuemin={0} 
-                aria-valuemax={100}
-              >
-                <div className="generating-step__progress-fill" style={{ width: `${progress}%` }}></div>
-              </div>
-            </div>
-            
-            <div className="generating-step__tip">
-              <h4 className="generating-step__tip-title">Fitness Tip</h4>
-              <p className="generating-step__tip-content">{fitnessTips[currentTip]}</p>
-            </div>
-          </div>
-        </Card>
+        <Button variant="secondary" onClick={onCancel}>
+          Cancel
+        </Button>
       </div>
     </ErrorBoundary>
   );
 };
 
-export default memo(GeneratingStep); 
+export default GeneratingStep; 

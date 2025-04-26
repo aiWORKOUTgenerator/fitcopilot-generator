@@ -39,10 +39,11 @@ import { useWorkoutForm } from '../../hooks/useWorkoutForm';
 import { useWorkoutGenerator } from '../../hooks/useWorkoutGenerator';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
 import { WorkoutFormParams, FormSteps } from '../../types/workout';
+import { GenerationError } from '../../types/errors';
 
 import { InputStep } from './steps/InputStep';
 import PreviewStep from './steps/PreviewStep';
-import { GeneratingStep } from './steps/GeneratingStep';
+import GeneratingStep from './steps/GeneratingStep';
 import { ResultStep } from './steps/ResultStep';
 import ErrorBoundary from '../common/ErrorBoundary';
 import { Button } from '../../../../components/ui';
@@ -318,7 +319,7 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
           
           {currentStep === 'generating' && (
             <GeneratingStep 
-              error={errorMessage}
+              error={errorMessage ? { message: errorMessage } : null}
               onCancel={handleCancelGeneration}
               progress={progress}
               onComplete={handleGenerationComplete}

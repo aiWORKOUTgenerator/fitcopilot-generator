@@ -1,15 +1,21 @@
+/**
+ * useDirectWorkoutGenerator Hook
+ * 
+ * Handles direct workout generation with OpenAI, managing state for the generation process.
+ * This hook provides a simpler interface compared to the context-based useWorkoutGenerator.
+ */
 import { useState, useEffect } from 'react';
-import { generateWorkoutDirect } from '../../api/workoutApi';
+import { generateWorkoutDirect } from '../api/workoutApi';
 import { 
   cacheWorkout, 
   getCachedWorkout, 
   getRecentWorkoutId,
   WorkoutData
-} from '../../utils/workoutCache';
+} from '../utils/workoutCache';
 
 type GenerationStatus = 'idle' | 'starting' | 'completed' | 'error';
 
-interface UseWorkoutGeneratorReturn {
+interface UseDirectWorkoutGeneratorReturn {
   status: GenerationStatus;
   error: string | null;
   postId: number | null;
@@ -21,7 +27,7 @@ interface UseWorkoutGeneratorReturn {
 /**
  * Hook for handling direct workout generation with OpenAI
  */
-export function useWorkoutGenerator(): UseWorkoutGeneratorReturn {
+export function useDirectWorkoutGenerator(): UseDirectWorkoutGeneratorReturn {
   const [status, setStatus] = useState<GenerationStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [postId, setPostId] = useState<number | null>(null);

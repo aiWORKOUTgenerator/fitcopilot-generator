@@ -5,7 +5,7 @@
  * for easier importing.
  */
 
-export { WorkoutRequestForm } from './WorkoutRequestForm';
+export { default as WorkoutRequestForm } from './WorkoutRequestForm';
 export * from './steps/InputStep';
 export * from './steps/PreviewStep';
 export * from './steps/GeneratingStep';

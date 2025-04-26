@@ -23,7 +23,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { Card, Button } from '../../../../components/ui';
 import { WorkoutDifficulty } from '../../types/workout';
+import './WorkoutPreview.scss';
 
 // Map of goal values to human-readable labels
 const GOAL_LABELS: Record<string, string> = {
@@ -59,6 +61,14 @@ const EQUIPMENT_LABELS: Record<string, string> = {
   'none': 'None/Bodyweight Only'
 };
 
+// Optional exercise interface for displaying workout exercises
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: number;
+  rest: number;
+}
+
 interface WorkoutPreviewProps {
   /** The selected workout goal */
   goal: string;
@@ -74,6 +84,21 @@ interface WorkoutPreviewProps {
   
   /** Physical restrictions or preferences */
   restrictions?: string;
+
+  /** Optional title for the workout */
+  title?: string;
+  
+  /** Optional description for the workout */
+  description?: string;
+  
+  /** Optional list of exercises */
+  exercises?: Exercise[];
+  
+  /** Optional callback for saving the workout */
+  onSave?: () => void;
+  
+  /** Optional callback for regenerating the workout */
+  onRegenerate?: () => void;
 }
 
 /**
@@ -91,7 +116,12 @@ export const WorkoutPreview: React.FC<WorkoutPreviewProps> = ({
   difficulty,
   duration,
   equipment = [],
-  restrictions = ''
+  restrictions = '',
+  title,
+  description,
+  exercises = [],
+  onSave,
+  onRegenerate
 }) => {
   // Animation state
   const [isVisible, setIsVisible] = useState(false);
@@ -113,57 +143,90 @@ export const WorkoutPreview: React.FC<WorkoutPreviewProps> = ({
   const equipmentList = equipment.map(id => EQUIPMENT_LABELS[id] || id);
   const hasEquipment = equipmentList.length > 0 && !equipmentList.includes('None/Bodyweight Only');
   
+  // Determine if this is a parameter preview or a full workout preview
+  const isFullWorkout = Boolean(title && exercises.length > 0);
+
   return (
-    <div 
-      className={`bg-white border border-gray-200 rounded-lg p-4 shadow-sm transition-all duration-300 ${isVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4'}`}
-      aria-label="Workout preview"
-    >
-      <h3 className="text-lg font-medium text-gray-900 mb-3">Workout Preview</h3>
-      
-      <div className="space-y-3">
-        {/* Key workout parameters */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="bg-blue-50 p-2 rounded-md">
-            <div className="text-xs text-gray-500 mb-1">Goal</div>
-            <div className="font-medium text-blue-700">{goalLabel}</div>
-          </div>
-          
-          <div className="bg-green-50 p-2 rounded-md">
-            <div className="text-xs text-gray-500 mb-1">Level</div>
-            <div className="font-medium text-green-700">{difficultyLabel}</div>
-          </div>
-          
-          <div className="bg-purple-50 p-2 rounded-md">
-            <div className="text-xs text-gray-500 mb-1">Duration</div>
-            <div className="font-medium text-purple-700">{duration} min</div>
-          </div>
-        </div>
-        
-        {/* Equipment section */}
-        {hasEquipment && (
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-1">Equipment</h4>
-            <div className="flex flex-wrap gap-1">
-              {equipmentList.map((item, index) => (
-                <span 
-                  key={index} 
-                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                >
-                  {item}
-                </span>
+    <div className={`workout-preview ${isVisible ? 'visible' : ''}`}>
+      <Card>
+        {isFullWorkout ? (
+          // Full workout preview (with exercises)
+          <>
+            <h2>{title}</h2>
+            {description && <p className="workout-description">{description}</p>}
+            
+            <div className="exercise-list">
+              <h3>Exercises</h3>
+              {exercises.map((exercise, index) => (
+                <div key={index} className="exercise-item">
+                  <div className="exercise-name">{exercise.name}</div>
+                  <div className="exercise-details">
+                    <span>{exercise.sets} sets</span>
+                    <span>{exercise.reps} reps</span>
+                    <span>{exercise.rest}s rest</span>
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
+          </>
+        ) : (
+          // Parameter preview (before generation)
+          <>
+            <h3 className="preview-title">Workout Preview</h3>
+            
+            <div className="parameter-grid">
+              <div className="parameter-item">
+                <div className="parameter-label">Goal</div>
+                <div className="parameter-value">{goalLabel}</div>
+              </div>
+              
+              <div className="parameter-item">
+                <div className="parameter-label">Level</div>
+                <div className="parameter-value">{difficultyLabel}</div>
+              </div>
+              
+              <div className="parameter-item">
+                <div className="parameter-label">Duration</div>
+                <div className="parameter-value">{duration} min</div>
+              </div>
+            </div>
+            
+            {hasEquipment && (
+              <div className="preview-section">
+                <h4>Equipment</h4>
+                <div className="equipment-tags">
+                  {equipmentList.map((item, index) => (
+                    <span key={index} className="equipment-tag">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {restrictions && (
+              <div className="preview-section">
+                <h4>Restrictions/Preferences</h4>
+                <p className="restrictions-text">{restrictions}</p>
+              </div>
+            )}
+          </>
         )}
         
-        {/* Restrictions section */}
-        {restrictions && (
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-1">Restrictions/Preferences</h4>
-            <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded-md">{restrictions}</p>
-          </div>
-        )}
-      </div>
+        <div className="workout-actions">
+          {onRegenerate && (
+            <Button onClick={onRegenerate}>
+              Regenerate
+            </Button>
+          )}
+          
+          {onSave && (
+            <Button onClick={onSave}>
+              Save Workout
+            </Button>
+          )}
+        </div>
+      </Card>
     </div>
   );
 }; 
