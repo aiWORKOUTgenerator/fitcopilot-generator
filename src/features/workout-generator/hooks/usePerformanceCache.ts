@@ -1,170 +1,153 @@
 /**
- * usePerformanceCache hook
+ * Performance Cache Hook
  * 
- * Provides memoization and caching capabilities for expensive operations.
- * Can be used to cache API responses, computation results, or any data that
- * is expensive to compute or fetch.
+ * Provides caching functionality for expensive operations like API calls
+ * Especially valuable for workout generation which has both time and API usage costs
  */
-import { useCallback, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { WorkoutFormParams, GeneratedWorkout } from '../types/workout';
 
-/**
- * Cache entry with expiration
- */
+// Cache structure
 interface CacheEntry<T> {
-  /** The cached value */
-  value: T;
-  /** When the entry was cached */
+  data: T;
   timestamp: number;
-  /** When the entry expires */
-  expiresAt: number;
 }
 
-/**
- * Cache configuration options
- */
-interface CacheConfig {
-  /** How long entries should be cached in milliseconds */
+// Cache options
+interface CacheOptions {
+  // Time to live in milliseconds, default 1 hour
   ttl?: number;
-  /** Maximum number of entries to keep */
-  maxEntries?: number;
+  // Maximum cache size
+  maxSize?: number;
 }
 
 /**
- * Default cache configuration
+ * Generate a cache key from workout parameters
  */
-const DEFAULT_CONFIG: CacheConfig = {
-  ttl: 5 * 60 * 1000, // 5 minutes
-  maxEntries: 20,
-};
+function generateCacheKey(params: WorkoutFormParams): string {
+  // Sort equipment to ensure consistent keys regardless of order
+  const sortedEquipment = params.equipment ? [...params.equipment].sort().join(',') : '';
+  
+  // Create a deterministic key from the most important parameters
+  return `${params.goals}:${params.difficulty}:${params.duration}:${sortedEquipment}:${params.restrictions}`;
+}
 
 /**
- * Hook for caching expensive computation results or API responses
+ * Hook for caching workout generation results
  * 
- * @param config - Cache configuration
- * @returns Caching utilities
+ * @param options - Cache configuration options
+ * @returns Functions for managing the cache
  */
-export function usePerformanceCache<T = any>(config: CacheConfig = {}) {
-  // Merge provided config with defaults using destructuring with default values
-  const { 
-    ttl = DEFAULT_CONFIG.ttl ?? 5 * 60 * 1000, 
-    maxEntries = DEFAULT_CONFIG.maxEntries ?? 20 
-  } = config;
+export function usePerformanceCache(options: CacheOptions = {}) {
+  // Default options
+  const { ttl = 60 * 60 * 1000, maxSize = 10 } = options;
   
-  // Cache store
-  const cacheRef = useRef<Map<string, CacheEntry<T>>>(new Map());
+  // Internal cache state - not using useState to avoid re-renders
+  // Using a ref with a Map would be another option
+  const [cache] = useState<Map<string, CacheEntry<GeneratedWorkout>>>(new Map());
   
   /**
-   * Check if a cache entry exists and is valid
-   * 
-   * @param key - Cache key to check
-   * @returns Whether the entry exists and is valid
+   * Get a cached result if available and valid
    */
-  const has = useCallback((key: string): boolean => {
-    const entry = cacheRef.current.get(key);
-    if (!entry) return false;
+  const getCached = useCallback((params: WorkoutFormParams): GeneratedWorkout | null => {
+    const key = generateCacheKey(params);
+    const cached = cache.get(key);
     
-    const now = Date.now();
-    return entry.expiresAt > now;
-  }, []);
-  
-  /**
-   * Get a cached value
-   * 
-   * @param key - Cache key
-   * @returns The cached value or undefined if not found
-   */
-  const get = useCallback((key: string): T | undefined => {
-    const entry = cacheRef.current.get(key);
-    if (!entry) return undefined;
-    
-    const now = Date.now();
-    
-    // Check if entry has expired
-    if (entry.expiresAt <= now) {
-      cacheRef.current.delete(key);
-      return undefined;
+    if (!cached) {
+      return null;
     }
     
-    return entry.value;
-  }, []);
+    // Check if the cache is still valid
+    const now = Date.now();
+    if (now - cached.timestamp > ttl) {
+      // Cache expired, remove it
+      cache.delete(key);
+      return null;
+    }
+    
+    return cached.data;
+  }, [cache, ttl]);
   
   /**
-   * Set a value in the cache
-   * 
-   * @param key - Cache key
-   * @param value - Value to cache
-   * @param customTtl - Optional custom TTL for this entry
+   * Store a result in the cache
    */
-  const set = useCallback((key: string, value: T, customTtl?: number): void => {
-    const now = Date.now();
-    // Using non-null assertion here since we assigned a default value above
-    const entryTtl = customTtl ?? ttl;
+  const setCached = useCallback((params: WorkoutFormParams, data: GeneratedWorkout): void => {
+    const key = generateCacheKey(params);
     
-    // Create new cache entry
-    const entry: CacheEntry<T> = {
-      value,
-      timestamp: now,
-      expiresAt: now + entryTtl,
-    };
-    
-    // If we're at capacity, remove the oldest entry
-    // Using non-null assertion since we assigned a default value above
-    if (cacheRef.current.size >= maxEntries) {
-      const oldestKey = [...cacheRef.current.entries()]
-        .sort((a, b) => a[1].timestamp - b[1].timestamp)[0][0];
-      cacheRef.current.delete(oldestKey);
+    // If the cache is full, remove the oldest entry
+    if (cache.size >= maxSize) {
+      // Find the oldest entry
+      let oldestKey: string | null = null;
+      let oldestTime = Infinity;
+      
+      cache.forEach((entry, entryKey) => {
+        if (entry.timestamp < oldestTime) {
+          oldestTime = entry.timestamp;
+          oldestKey = entryKey;
+        }
+      });
+      
+      // Remove the oldest entry if found
+      if (oldestKey) {
+        cache.delete(oldestKey);
+      }
     }
     
     // Add the new entry
-    cacheRef.current.set(key, entry);
-  }, [maxEntries, ttl]);
+    cache.set(key, {
+      data,
+      timestamp: Date.now()
+    });
+  }, [cache, maxSize]);
   
   /**
-   * Remove an entry from the cache
-   * 
-   * @param key - Cache key to remove
+   * Clear the entire cache or a specific entry
    */
-  const remove = useCallback((key: string): void => {
-    cacheRef.current.delete(key);
-  }, []);
+  const clearCache = useCallback((params?: WorkoutFormParams): void => {
+    if (params) {
+      // Clear a specific entry
+      const key = generateCacheKey(params);
+      cache.delete(key);
+    } else {
+      // Clear the entire cache
+      cache.clear();
+    }
+  }, [cache]);
   
   /**
-   * Clear all entries from the cache
+   * Get cache statistics
    */
-  const clear = useCallback((): void => {
-    cacheRef.current.clear();
-  }, []);
-  
-  /**
-   * Memoize a function result
-   * 
-   * @param fn - Function to memoize
-   * @param keyFn - Function to generate a cache key
-   * @returns Memoized function
-   */
-  const memoize = useCallback(<Args extends any[], Result>(
-    fn: (...args: Args) => Result,
-    keyFn: (...args: Args) => string = (...args) => JSON.stringify(args)
-  ) => {
-    return (...args: Args): Result => {
-      const key = keyFn(...args);
-      
-      if (has(key)) {
-        return get(key) as Result;
-      }
-      
-      const result = fn(...args);
-      set(key, result as unknown as T);
-      return result;
+  const getCacheStats = useCallback(() => {
+    return {
+      size: cache.size,
+      maxSize,
+      ttl
     };
-  }, [get, has, set]);
+  }, [cache, maxSize, ttl]);
+  
+  // Clean up expired cache entries periodically
+  useEffect(() => {
+    const cleanup = () => {
+      const now = Date.now();
+      cache.forEach((entry, key) => {
+        if (now - entry.timestamp > ttl) {
+          cache.delete(key);
+        }
+      });
+    };
+    
+    // Run cleanup every 5 minutes
+    const interval = setInterval(cleanup, 5 * 60 * 1000);
+    
+    return () => {
+      clearInterval(interval);
+    };
+  }, [cache, ttl]);
   
   return {
-    has,
-    get,
-    set,
-    remove,
-    clear,
-    memoize,
+    getCached,
+    setCached,
+    clearCache,
+    getCacheStats
   };
 } 

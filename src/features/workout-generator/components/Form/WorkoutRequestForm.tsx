@@ -34,7 +34,7 @@
  * };
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useWorkoutForm } from '../../hooks/useWorkoutForm';
 import { useWorkoutGenerator } from '../../hooks/useWorkoutGenerator';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
@@ -118,6 +118,28 @@ interface WorkoutRequestFormProps {
 }
 
 /**
+ * Map context status to form step
+ * 
+ * @param status - The generation status from context
+ * @returns The corresponding form step
+ */
+function mapStatusToStep(status: string): FormSteps {
+  switch (status) {
+    case 'idle':
+      return 'input';
+    case 'submitting':
+    case 'generating':
+      return 'generating';
+    case 'completed':
+      return 'completed';
+    case 'error':
+      return 'generating'; // Error is shown in GeneratingStep
+    default:
+      return 'input';
+  }
+}
+
+/**
  * WorkoutRequestForm Component
  * 
  * @param props - Component props
@@ -126,11 +148,22 @@ interface WorkoutRequestFormProps {
 export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) {
   // Get the form management and workout generation hooks
   const workoutForm = useWorkoutForm();
-  const workoutGenerator = useWorkoutGenerator();
+  const { 
+    status, 
+    loading, 
+    error: errorMessage, 
+    workout: generatedWorkout,
+    startGeneration, 
+    resetGenerator,
+    isGenerating
+  } = useWorkoutGenerator();
   const { handleError } = useErrorHandler();
   
-  // Local state for current form step
-  const [currentStep, setCurrentStep] = useState<FormSteps>('input');
+  // Track the preview state separately as it's not in the generation status
+  const [isPreviewMode, setIsPreviewMode] = React.useState(false);
+  
+  // Determine the current step to display
+  const currentStep: FormSteps = isPreviewMode ? 'preview' : mapStatusToStep(status);
   
   /**
    * Handle form submission to preview step
@@ -142,7 +175,7 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
       
       if (isValid) {
         // No errors, proceed to preview
-        setCurrentStep('preview');
+        setIsPreviewMode(true);
       } else {
         // Handle validation errors
         handleError(new Error('Please fill in all required fields'), {
@@ -164,51 +197,40 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
   const handleSubmitForm = async () => {
     try {
       const formValues = workoutForm.formValues;
-      setCurrentStep('generating');
-      
-      await workoutGenerator.startGeneration(formValues);
-      setCurrentStep('completed');
+      // Exit preview mode
+      setIsPreviewMode(false);
+      // Generation status transition is handled by startGeneration
+      await startGeneration(formValues);
     } catch (error) {
       handleError(error, {
         componentName: 'WorkoutRequestForm',
         action: 'handleSubmitForm',
         additionalData: { formValues: workoutForm.formValues }
       });
-      
-      // Stay on generating step to show error
       // Error UI is handled by GeneratingStep component
     }
   };
   
   /**
-   * Handle back button to return to input step
+   * Handle editing form from preview
    */
-  const handleBackToInput = () => {
-    setCurrentStep('input');
+  const handleEditForm = () => {
+    setIsPreviewMode(false);
+  };
+  
+  /**
+   * Handle cancelling workout generation
+   */
+  const handleCancelGeneration = () => {
+    resetGenerator();
   };
   
   /**
    * Handle restart to generate a new workout
    */
   const handleRestart = () => {
-    workoutGenerator.resetGenerator();
+    resetGenerator();
     workoutForm.resetFormErrors();
-    setCurrentStep('input');
-  };
-
-  /**
-   * Handle editing form from preview
-   */
-  const handleEditForm = () => {
-    setCurrentStep('input');
-  };
-
-  /**
-   * Handle cancelling workout generation
-   */
-  const handleCancelGeneration = () => {
-    workoutGenerator.resetGenerator();
-    setCurrentStep('input');
   };
 
   // Render the appropriate step based on current state
@@ -237,21 +259,21 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
             formValues={workoutForm.formValues} 
             onEditRequest={handleEditForm}
             onGenerateWorkout={handleSubmitForm}
-            isLoading={workoutGenerator.isGenerating}
+            isLoading={isGenerating}
           />
         )}
         
         {currentStep === 'generating' && (
           <GeneratingStep 
-            error={workoutGenerator.error}
+            error={errorMessage}
             onCancel={handleCancelGeneration}
           />
         )}
         
-        {currentStep === 'completed' && workoutGenerator.workout && (
+        {currentStep === 'completed' && generatedWorkout && (
           <ResultStep 
-            workout={workoutGenerator.workout} 
-            error={workoutGenerator.error}
+            workout={generatedWorkout} 
+            error={errorMessage}
             onGenerateNew={handleRestart}
           />
         )}

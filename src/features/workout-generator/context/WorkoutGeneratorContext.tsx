@@ -73,7 +73,9 @@ type WorkoutGeneratorAction =
   | { type: 'GENERATION_PROCESSING' }
   | { type: 'GENERATION_SUCCESS'; payload: GeneratedWorkout }
   | { type: 'GENERATION_ERROR'; payload: string }
-  | { type: 'RESET_GENERATOR' };
+  | { type: 'RESET_GENERATOR' }
+  | { type: 'SET_RESULT'; payload: GeneratedWorkout }
+  | { type: 'SET_STEP'; payload: GenerationStatus };
 
 /**
  * Reducer for the workout generator
@@ -155,6 +157,25 @@ function workoutGeneratorReducer(
         domain: {
           ...initialState.domain,
           formValues: { ...state.domain.formValues },
+        },
+      };
+      
+    case 'SET_RESULT':
+      return {
+        ...state,
+        domain: {
+          ...state.domain,
+          generatedWorkout: action.payload,
+        },
+      };
+      
+    case 'SET_STEP':
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          status: action.payload,
+          loading: action.payload === 'submitting' || action.payload === 'generating',
         },
       };
       

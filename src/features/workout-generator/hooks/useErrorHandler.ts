@@ -25,6 +25,18 @@ export function useErrorHandler() {
    */
   const logError = useCallback((error: unknown, context: ErrorContext = {}) => {
     const { componentName, action, additionalData } = context;
+    
+    // If null is passed, this is a success log
+    if (error === null) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(
+          `[FitCopilot]${componentName ? ` ${componentName}` : ''}${action ? ` | ${action}` : ''} - Success`,
+          additionalData || {}
+        );
+      }
+      return null;
+    }
+    
     const formattedError = formatError(error);
     
     // Format context for logging
@@ -55,7 +67,7 @@ export function useErrorHandler() {
   const handleError = useCallback((
     error: unknown, 
     context: ErrorContext = {}, 
-    onError?: (formattedError: Error) => void
+    onError?: (formattedError: Error | null) => void
   ) => {
     const formattedError = logError(error, context);
     
