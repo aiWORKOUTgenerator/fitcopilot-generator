@@ -8,7 +8,8 @@ import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../common/components/UI';
 import { WorkoutFormParams, WorkoutDifficulty } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
-import '../form.scss';
+import { ChevronDown, Dumbbell } from 'lucide-react';
+import './InputStep.scss';
 
 /**
  * Equipment options available for selection
@@ -106,6 +107,8 @@ export const InputStep: React.FC<InputStepProps> = ({
   onContinue,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [intensity, setIntensity] = useState(3);
 
   /**
    * Handle form submission
@@ -120,16 +123,15 @@ export const InputStep: React.FC<InputStepProps> = ({
   /**
    * Handle equipment selection
    */
-  const handleEquipmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { checked, value } = e.target;
+  const handleEquipmentChange = (id: string) => {
     const currentEquipment = formValues.equipment || [];
     
-    if (checked) {
-      // Add to selection
-      setEquipment([...currentEquipment, value]);
-    } else {
+    if (currentEquipment.includes(id)) {
       // Remove from selection
-      setEquipment(currentEquipment.filter(item => item !== value));
+      setEquipment(currentEquipment.filter(item => item !== id));
+    } else {
+      // Add to selection
+      setEquipment([...currentEquipment, id]);
     }
   };
 
@@ -140,132 +142,176 @@ export const InputStep: React.FC<InputStepProps> = ({
     setShowAdvanced(!showAdvanced);
   };
 
+  /**
+   * Handle dropdown focus
+   */
+  const handleDropdownFocus = (id: string) => {
+    setActiveDropdown(id);
+  };
+
+  /**
+   * Handle dropdown blur
+   */
+  const handleDropdownBlur = () => {
+    setActiveDropdown(null);
+  };
+
   return (
-    <div className="workout-generator-form">
+    <div className="input-step">
       <Card padding="large">
-        <h2 className="form-title">Create Your Custom Workout</h2>
-        <form onSubmit={handleSubmit}>
+        <h2 className="input-step__title">Create Your Custom Workout</h2>
+        <form onSubmit={handleSubmit} className="input-step__form">
           {/* Goals Selection */}
-          <div className="form-group">
-            <label htmlFor="goals" className="form-label">
+          <div className="input-step__form-group">
+            <label htmlFor="goals" className="input-step__label">
               What is your fitness goal?
               {hasFieldError('goals') && (
-                <span className="form-error">{getFieldError('goals')}</span>
+                <span className="input-step__error">{getFieldError('goals')}</span>
               )}
             </label>
-            <select
-              id="goals"
-              className={`form-select ${hasFieldError('goals') ? 'form-select--error' : ''}`}
-              value={formValues.goals || ''}
-              onChange={e => setGoals(e.target.value)}
-            >
-              <option value="">Select your goal</option>
-              {GOAL_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <div className="input-step__select-container">
+              <select
+                id="goals"
+                className={`input-step__select ${activeDropdown === 'goals' ? 'input-step__select--focused' : ''}`}
+                value={formValues.goals || ''}
+                onChange={e => setGoals(e.target.value)}
+                onFocus={() => handleDropdownFocus('goals')}
+                onBlur={handleDropdownBlur}
+              >
+                <option value="">Select your goal</option>
+                {GOAL_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="input-step__select-icon" />
+            </div>
           </div>
 
           {/* Difficulty Selection */}
-          <div className="form-group">
-            <label className="form-label">
+          <div className="input-step__form-group">
+            <label className="input-step__label">
               What is your fitness experience level?
               {hasFieldError('difficulty') && (
-                <span className="form-error">{getFieldError('difficulty')}</span>
+                <span className="input-step__error">{getFieldError('difficulty')}</span>
               )}
             </label>
-            <div className="difficulty-options">
+            <div className="input-step__radio-group">
               {DIFFICULTY_OPTIONS.map(option => (
-                <div key={option.value} className="difficulty-option">
+                <label key={option.value} className="input-step__radio-label">
                   <input
                     type="radio"
-                    id={`difficulty-${option.value}`}
+                    className="input-step__radio-input"
                     name="difficulty"
                     value={option.value}
                     checked={formValues.difficulty === option.value}
                     onChange={e => setDifficulty(e.target.value as WorkoutDifficulty)}
                   />
-                  <label htmlFor={`difficulty-${option.value}`}>{option.label}</label>
-                </div>
+                  <div className="input-step__radio-button">
+                    <div className="input-step__radio-dot"></div>
+                  </div>
+                  <span className="input-step__radio-text">{option.label}</span>
+                </label>
               ))}
             </div>
           </div>
 
           {/* Duration Selection */}
-          <div className="form-group">
-            <label htmlFor="duration" className="form-label">
+          <div className="input-step__form-group">
+            <label htmlFor="duration" className="input-step__label">
               How long do you want to workout?
               {hasFieldError('duration') && (
-                <span className="form-error">{getFieldError('duration')}</span>
+                <span className="input-step__error">{getFieldError('duration')}</span>
               )}
             </label>
-            <select
-              id="duration"
-              className={`form-select ${hasFieldError('duration') ? 'form-select--error' : ''}`}
-              value={formValues.duration || ''}
-              onChange={e => setDuration(Number(e.target.value))}
-            >
-              <option value="">Select duration</option>
-              {DURATION_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <div className="input-step__select-container">
+              <select
+                id="duration"
+                className={`input-step__select ${activeDropdown === 'duration' ? 'input-step__select--focused' : ''}`}
+                value={formValues.duration || ''}
+                onChange={e => setDuration(Number(e.target.value))}
+                onFocus={() => handleDropdownFocus('duration')}
+                onBlur={handleDropdownBlur}
+              >
+                <option value="">Select duration</option>
+                {DURATION_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="input-step__select-icon" />
+            </div>
           </div>
 
           {/* Advanced Options Toggle */}
-          <div className="form-group">
-            <button 
-              type="button" 
-              className="advanced-options-toggle"
-              onClick={toggleAdvancedOptions}
-            >
-              Advanced Options
-              <span className={`advanced-options-icon ${showAdvanced ? 'advanced-options-icon--open' : ''}`}>
-                {showAdvanced ? '▲' : '▼'}
-              </span>
-            </button>
-          </div>
-
-          {/* Advanced Options Section */}
+          <button 
+            type="button" 
+            className={`input-step__advanced-toggle ${showAdvanced ? 'input-step__advanced-toggle--open' : ''}`}
+            onClick={toggleAdvancedOptions}
+          >
+            <div className="input-step__toggle-left">
+              <Dumbbell className="input-step__toggle-icon" />
+              <span className="input-step__toggle-text">Advanced Options</span>
+            </div>
+            <ChevronDown className="input-step__toggle-chevron" />
+          </button>
+          
+          {/* Advanced Options Content */}
           {showAdvanced && (
-            <div className="advanced-options">
+            <div className="input-step__advanced-content">
               {/* Equipment Selection */}
-              <div className="form-group">
-                <label className="form-label">Available Equipment</label>
-                <div className="equipment-options">
+              <div className="input-step__form-group">
+                <h3 className="input-step__label">Available Equipment</h3>
+                <div className="input-step__checkbox-grid">
                   {EQUIPMENT_OPTIONS.map(option => (
-                    <div key={option.id} className="equipment-option">
+                    <label key={option.id} className="input-step__checkbox-label">
                       <input
                         type="checkbox"
-                        id={`equipment-${option.id}`}
+                        className="input-step__checkbox-input"
                         value={option.id}
                         checked={(formValues.equipment || []).includes(option.id)}
-                        onChange={handleEquipmentChange}
+                        onChange={() => handleEquipmentChange(option.id)}
                       />
-                      <label htmlFor={`equipment-${option.id}`}>{option.label}</label>
-                    </div>
+                      <div className="input-step__checkbox-box">
+                        <div className="input-step__checkbox-indicator"></div>
+                      </div>
+                      <span className="input-step__checkbox-text">{option.label}</span>
+                    </label>
                   ))}
+                </div>
+              </div>
+              
+              {/* Workout Intensity */}
+              <div className="input-step__form-group">
+                <h3 className="input-step__label">Workout Intensity</h3>
+                <div className="input-step__slider-container">
+                  <input
+                    type="range"
+                    className="input-step__slider"
+                    min="1"
+                    max="5"
+                    value={intensity}
+                    onChange={(e) => setIntensity(parseInt(e.target.value))}
+                  />
+                  <div className="input-step__slider-labels">
+                    <span>Low</span>
+                    <span>Moderate</span>
+                    <span>High</span>
+                  </div>
                 </div>
               </div>
 
               {/* Restrictions Input */}
-              <div className="form-group">
-                <label htmlFor="restrictions" className="form-label">
-                  Restrictions or Preferences
-                  {hasFieldError('restrictions') && (
-                    <span className="form-error">{getFieldError('restrictions')}</span>
-                  )}
-                </label>
+              <div className="input-step__form-group">
+                <h3 className="input-step__label">Restrictions or Preferences</h3>
                 <textarea
                   id="restrictions"
-                  className={`form-textarea ${hasFieldError('restrictions') ? 'form-textarea--error' : ''}`}
+                  className="input-step__textarea"
                   value={formValues.restrictions || ''}
                   onChange={e => setRestrictions(e.target.value)}
-                  placeholder="E.g., knee injury, lower back pain, etc."
+                  placeholder="Enter any injuries, limitations, or preferences (e.g., knee injury, prefer machine exercises, etc.)"
                   rows={3}
                 />
               </div>
@@ -273,11 +319,11 @@ export const InputStep: React.FC<InputStepProps> = ({
           )}
 
           {/* Submit Button */}
-          <div className="form-group">
+          <div className="input-step__actions">
             <Button 
               type="submit" 
               variant="primary"
-              className="continue-button"
+              className="input-step__submit-button"
             >
               Continue
             </Button>

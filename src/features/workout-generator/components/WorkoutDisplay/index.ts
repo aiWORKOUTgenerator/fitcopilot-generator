@@ -5,5 +5,4 @@
  * and workout previews for easier importing.
  */
 
-export * from './WorkoutCard';
-export * from './WorkoutPreview'; 
+export * from './WorkoutCard'; 

@@ -29,64 +29,8 @@ import { WorkoutCard } from '../WorkoutDisplay';
 <WorkoutCard postId={123} workout={workoutData} />
 ```
 
-### WorkoutPreview
-
-The `WorkoutPreview` component provides a visual summary of workout parameters before generation. It helps users understand exactly what they're requesting before committing to the full AI generation process.
-
-#### Props
-
-- `goal` (string): The selected workout goal
-- `difficulty` (WorkoutDifficulty): User's experience level
-- `duration` (number): Workout duration in minutes
-- `equipment` (string[], optional): Selected equipment IDs
-- `restrictions` (string, optional): Physical restrictions or preferences
-
-#### Features
-
-- Visual representation of selected workout parameters
-- Summary of key workout attributes (goal, difficulty, duration)
-- Equipment list display
-- Restrictions/limitations display
-
-#### Usage
-
-```tsx
-import { WorkoutPreview } from '../WorkoutDisplay';
-
-<WorkoutPreview 
-  goal="build-muscle"
-  difficulty="intermediate"
-  duration={45}
-  equipment={['dumbbells', 'bench']}
-  restrictions="Shoulder injury, prefer no overhead movements"
-/>
-```
-
-#### Visual Elements
-
-The component includes:
-
-1. **Parameter Cards**:
-   - Goal (blue background)
-   - Experience Level (green background)
-   - Duration (purple background)
-
-2. **Equipment Tags**: 
-   - Displayed as rounded pills
-   - Only shown when equipment is selected
-   
-3. **Restrictions Box**:
-   - Shows user-entered physical limitations
-   - Only displayed when provided
-
-4. **Animation**:
-   - Subtle fade-in and slide-up animation
-   - Provides visual feedback when the preview appears
-
 ## Usage Patterns
 
-### Multi-step Form Integration
-
-The WorkoutPreview component is designed to be used in a multi-step form process, particularly between the initial input stage and the final generation stage. It provides users with a confirmation step before committing to the potentially time-consuming AI generation process.
+The WorkoutCard component is designed to display complete workouts with organized sections for warm-up, main workout, and cool-down exercises.
 
 See the [Form Components](./form.md) documentation for more details on the integration with the workout request form flow. 

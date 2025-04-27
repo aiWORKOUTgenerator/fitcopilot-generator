@@ -23,12 +23,13 @@ interface PreviewStepProps {
 
 // Map goal keys to human-readable labels
 const GOAL_LABELS: Record<string, string> = {
-  'weight-loss': 'Weight Loss',
-  'muscle-gain': 'Muscle Gain',
-  'endurance': 'Endurance',
-  'strength': 'Strength',
-  'flexibility': 'Flexibility',
+  'lose-weight': 'Weight Loss',
+  'build-muscle': 'Muscle Gain',
+  'improve-endurance': 'Endurance',
+  'increase-strength': 'Strength',
+  'enhance-flexibility': 'Flexibility',
   'general-fitness': 'General Fitness',
+  'sport-specific': 'Sport-Specific Training'
 };
 
 // Map difficulty keys to human-readable labels
@@ -69,7 +70,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
   isLoading = false,
 }) => {
   // Format the display values for the workout preview
-  const goalDisplay = formValues.goals ? GOAL_LABELS[formValues.goals] : '';
+  const goalDisplay = formValues.goals ? GOAL_LABELS[formValues.goals] || formValues.goals : '';
   const difficultyDisplay = formValues.difficulty ? DIFFICULTY_LABELS[formValues.difficulty] : '';
   const durationDisplay = formValues.duration ? `${formValues.duration} minutes` : '';
   
