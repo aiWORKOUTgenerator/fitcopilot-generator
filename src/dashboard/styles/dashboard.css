@@ -1,0 +1,98 @@
+/* Dashboard styles */
+
+.fitcopilot-dashboard {
+  @apply w-full max-w-6xl mx-auto;
+}
+
+.fitcopilot-dashboard-header {
+  @apply mb-6;
+}
+
+.fitcopilot-dashboard-title {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+.fitcopilot-dashboard-subtitle {
+  @apply text-base text-gray-600 mt-1;
+}
+
+.fitcopilot-dashboard-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.fitcopilot-dashboard-card {
+  @apply bg-white rounded-lg shadow-md p-5;
+}
+
+.fitcopilot-dashboard-card-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.fitcopilot-dashboard-card-title {
+  @apply text-lg font-semibold text-gray-800;
+}
+
+.fitcopilot-dashboard-card-actions {
+  @apply flex space-x-2;
+}
+
+.fitcopilot-dashboard-stats {
+  @apply flex flex-col space-y-4;
+}
+
+.fitcopilot-dashboard-stat-item {
+  @apply flex justify-between items-center;
+}
+
+.fitcopilot-dashboard-stat-label {
+  @apply text-sm text-gray-500;
+}
+
+.fitcopilot-dashboard-stat-value {
+  @apply text-base font-medium text-gray-900;
+}
+
+.fitcopilot-dashboard-filters {
+  @apply flex flex-wrap space-x-4 mb-6;
+}
+
+.fitcopilot-dashboard-filter {
+  @apply inline-flex items-center rounded-md px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800;
+}
+
+.fitcopilot-dashboard-filter-active {
+  @apply bg-primary-100 text-primary-800;
+}
+
+/* Dark mode styles */
+.dark .fitcopilot-dashboard-title {
+  @apply text-white;
+}
+
+.dark .fitcopilot-dashboard-subtitle {
+  @apply text-gray-400;
+}
+
+.dark .fitcopilot-dashboard-card {
+  @apply bg-gray-800;
+}
+
+.dark .fitcopilot-dashboard-card-title {
+  @apply text-white;
+}
+
+.dark .fitcopilot-dashboard-stat-label {
+  @apply text-gray-400;
+}
+
+.dark .fitcopilot-dashboard-stat-value {
+  @apply text-white;
+}
+
+.dark .fitcopilot-dashboard-filter {
+  @apply bg-gray-700 text-gray-300;
+}
+
+.dark .fitcopilot-dashboard-filter-active {
+  @apply bg-primary-900 text-primary-200;
+} 

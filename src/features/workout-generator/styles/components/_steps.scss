@@ -1,0 +1,140 @@
+/**
+ * Step Components
+ * Styles for the different steps in the workout generator flow
+ */
+
+@import '../_variables';
+
+/* Main container */
+.workout-generator-feature {
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    
+    .dark-theme & {
+      color: #ffffff;
+    }
+  }
+  
+  &__description {
+    color: #4b5563;
+    margin-bottom: $wg-spacing-xl;
+    
+    .dark-theme & {
+      color: #dedede;
+    }
+  }
+}
+
+/* Preview Step */
+.preview-step {
+  text-align: left;
+  padding: $wg-spacing-lg 0;
+  
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: $wg-spacing-xl;
+    
+    .dark-theme & {
+      color: #ffffff;
+    }
+  }
+  
+  &__message {
+    margin: $wg-spacing-xl 0;
+    text-align: center;
+    
+    .dark-theme & {
+      color: #dedede;
+    }
+  }
+  
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: $wg-spacing-xl;
+  }
+}
+
+/* Result Step */
+.result-step {
+  text-align: left;
+  
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff; /* White text for dark background */
+    margin-bottom: $wg-spacing-lg;
+    text-align: center;
+  }
+  
+  &__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: $wg-spacing-lg;
+  }
+  
+  &--error,
+  &--empty {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+  
+  &__error-container {
+    margin-bottom: $wg-spacing-xl;
+    padding: 1rem;
+    border-radius: $wg-border-radius;
+    background-color: rgba(220, 53, 69, 0.1);
+    
+    .dark-theme & {
+      background-color: rgba(255, 107, 107, 0.1);
+    }
+  }
+  
+  &__error-message {
+    color: $wg-error-color;
+    margin-bottom: $wg-spacing-sm;
+    
+    .dark-theme & {
+      color: #ff6b6b;
+    }
+  }
+}
+
+/* Generating Step */
+.generating-step {
+  width: 100%;
+  
+  &--error {
+    color: var(--color-error);
+  }
+  
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $wg-spacing-lg;
+    margin-top: $wg-spacing-lg;
+  }
+  
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+  }
+  
+  &__message {
+    font-size: 1rem;
+    text-align: center;
+    color: var(--color-text-secondary);
+    margin: 0;
+    min-height: 24px;
+    transition: opacity 0.3s ease;
+  }
+} 

@@ -1,0 +1,162 @@
+/**
+ * Button Styles
+ * Custom button components for the workout generator
+ */
+
+@import '../_variables';
+
+/* Submit Button */
+.continue-button {
+  width: 100%;
+  background-color: $wg-primary-color;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: $wg-border-radius;
+  border: none;
+  cursor: pointer;
+  transition: background-color $wg-transition-speed;
+  font-size: 1rem;
+  text-align: center;
+  
+  &:hover {
+    background-color: $wg-primary-hover;
+  }
+}
+
+/* Edit & Generate buttons for preview step */
+.preview-step {
+  &__edit-button {
+    background-color: $wg-secondary-color;
+    color: white;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: $wg-border-radius;
+    border: none;
+    cursor: pointer;
+    transition: background-color $wg-transition-speed;
+    text-align: center;
+    
+    &:hover {
+      background-color: $wg-secondary-hover;
+    }
+    
+    .dark-theme & {
+      background-color: #444;
+      
+      &:hover {
+        background-color: #555;
+      }
+    }
+  }
+  
+  &__generate-button {
+    background-color: $wg-primary-color;
+    color: white;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: $wg-border-radius;
+    border: none;
+    cursor: pointer;
+    transition: background-color $wg-transition-speed;
+    text-align: center;
+    
+    &:hover {
+      background-color: $wg-primary-hover;
+    }
+  }
+}
+
+/* Result step buttons */
+.result-step {
+  &__save-button, 
+  &__print-button, 
+  &__new-button {
+    width: 100%;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: $wg-border-radius;
+    cursor: pointer;
+    transition: background-color $wg-transition-speed;
+    text-align: center;
+  }
+  
+  &__save-button {
+    background-color: $wg-primary-color;
+    color: white;
+    border: none;
+    
+    &:hover {
+      background-color: $wg-primary-hover;
+    }
+  }
+  
+  &__print-button {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    
+    &:hover {
+      background-color: #e5e7eb;
+    }
+    
+    .dark-theme & {
+      background-color: #333;
+      color: #dedede;
+      border-color: #444;
+      
+      &:hover {
+        background-color: #444;
+      }
+    }
+  }
+  
+  &__new-button {
+    background-color: $wg-secondary-color;
+    color: white;
+    border: none;
+    
+    &:hover {
+      background-color: $wg-secondary-hover;
+    }
+  }
+}
+
+/* View Full Workout button */
+.view-full-workout-button {
+  display: block;
+  width: 100%;
+  background-color: $wg-primary-color;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: $wg-border-radius;
+  border: none;
+  cursor: pointer;
+  transition: background-color $wg-transition-speed;
+  text-align: center;
+  margin-bottom: 1rem;
+  
+  &:hover {
+    background-color: $wg-primary-hover;
+  }
+}
+
+/* Generate Another Workout button */
+.generate-another-button {
+  display: block;
+  width: 100%;
+  background-color: $wg-secondary-color;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: $wg-border-radius;
+  border: none;
+  cursor: pointer;
+  transition: background-color $wg-transition-speed;
+  text-align: center;
+  
+  &:hover {
+    background-color: $wg-secondary-hover;
+  }
+} 

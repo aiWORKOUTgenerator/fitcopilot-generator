@@ -3,9 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import feature-specific styles */
-@import './features/workout-generator/styles/workout-generator.css';
-
 /* Global styles */
 .fitcopilot-container {
   @apply max-w-5xl mx-auto p-4;

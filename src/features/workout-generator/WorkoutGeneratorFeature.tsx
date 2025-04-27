@@ -11,7 +11,7 @@ import { ErrorBoundary, DebugControls, TipsCard } from './components/common';
 import { SubscriptionModalWrapper, ProfileSetupPrompt } from './components/Modals';
 
 // Import styles
-import './styles/workout-generator.css';
+import './styles/workout-generator.scss';
 
 /**
  * Workout Generator feature component

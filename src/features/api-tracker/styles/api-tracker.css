@@ -4,10 +4,7 @@
 
 /* Main container */
 .api-tracker-container {
-  position: relative;
-  z-index: 100;
-  isolation: isolate;
-  pointer-events: auto;
+  @apply w-full max-w-5xl mx-auto;
 }
 
 .fitcopilot-api-tracker {
@@ -160,12 +157,7 @@
 
 /* Card styling */
 .api-tracker-card {
-  background: #fff;
-  border: 1px solid #e2e4e7;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  margin-bottom: 20px;
+  @apply bg-white rounded-lg shadow-md p-6 mb-6;
 }
 
 .api-tracker-card h2 {
@@ -693,4 +685,163 @@
   background: #f5f5f5;
   border-top: 1px solid #ddd;
   text-align: right;
+}
+
+/* API Tracker Styles */
+
+.api-tracker-heading {
+  @apply text-2xl font-bold text-gray-900 mb-6;
+}
+
+.api-tracker-subheading {
+  @apply text-xl font-semibold text-gray-800 mb-4;
+}
+
+.api-tracker-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.api-tracker-table-header {
+  @apply bg-gray-50;
+}
+
+.api-tracker-table-th {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.api-tracker-table-row {
+  @apply bg-white;
+}
+
+.api-tracker-table-row:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.api-tracker-table-td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500;
+}
+
+.api-tracker-filter {
+  @apply flex space-x-4 mb-6;
+}
+
+.api-tracker-filter-item {
+  @apply flex items-center;
+}
+
+.api-tracker-filter-label {
+  @apply mr-2 text-sm font-medium text-gray-700;
+}
+
+.api-tracker-filter-select {
+  @apply block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm;
+}
+
+.api-tracker-pagination {
+  @apply flex justify-between items-center mt-6;
+}
+
+.api-tracker-pagination-info {
+  @apply text-sm text-gray-700;
+}
+
+.api-tracker-pagination-buttons {
+  @apply flex space-x-2;
+}
+
+.api-tracker-pagination-button {
+  @apply inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50;
+}
+
+.api-tracker-pagination-button-active {
+  @apply bg-primary-100 text-primary-700 border-primary-500;
+}
+
+.api-tracker-pagination-button-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.api-tracker-status-success {
+  @apply px-2 py-1 text-xs font-medium rounded-full text-green-800 bg-green-100;
+}
+
+.api-tracker-status-error {
+  @apply px-2 py-1 text-xs font-medium rounded-full text-red-800 bg-red-100;
+}
+
+.api-tracker-status-warning {
+  @apply px-2 py-1 text-xs font-medium rounded-full text-yellow-800 bg-yellow-100;
+}
+
+.api-tracker-empty-state {
+  @apply text-center py-12;
+}
+
+.api-tracker-empty-state-icon {
+  @apply mx-auto h-12 w-12 text-gray-400;
+}
+
+.api-tracker-empty-state-text {
+  @apply mt-2 text-sm font-medium text-gray-900;
+}
+
+.api-tracker-empty-state-description {
+  @apply mt-1 text-sm text-gray-500;
+}
+
+/* Dark mode styles */
+.dark .api-tracker-heading {
+  @apply text-white;
+}
+
+.dark .api-tracker-subheading {
+  @apply text-gray-200;
+}
+
+.dark .api-tracker-card {
+  @apply bg-gray-800;
+}
+
+.dark .api-tracker-table-header {
+  @apply bg-gray-900;
+}
+
+.dark .api-tracker-table-th {
+  @apply text-gray-300;
+}
+
+.dark .api-tracker-table-row {
+  @apply bg-gray-800;
+}
+
+.dark .api-tracker-table-row:nth-child(even) {
+  @apply bg-gray-700;
+}
+
+.dark .api-tracker-table-td {
+  @apply text-gray-300;
+}
+
+.dark .api-tracker-filter-label {
+  @apply text-gray-300;
+}
+
+.dark .api-tracker-pagination-info {
+  @apply text-gray-300;
+}
+
+.dark .api-tracker-pagination-button {
+  @apply text-gray-300 bg-gray-800 border-gray-600 hover:bg-gray-700;
+}
+
+.dark .api-tracker-empty-state-icon {
+  @apply text-gray-500;
+}
+
+.dark .api-tracker-empty-state-text {
+  @apply text-gray-200;
+}
+
+.dark .api-tracker-empty-state-description {
+  @apply text-gray-400;
 } 

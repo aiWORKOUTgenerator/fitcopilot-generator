@@ -1,0 +1,14 @@
+/* UI Components Styles */
+
+/* Local UI component styles */
+@import './Card.scss';
+@import './Card/Card.scss'; 
+
+/* Common UI component styles */
+@import '../../common/components/UI/Button/Button.scss';
+@import '../../common/components/UI/Card/Card.scss';
+@import '../../common/components/UI/Checkbox/Checkbox.scss';
+@import '../../common/components/UI/ProgressBar/ProgressBar.scss';
+@import '../../common/components/UI/Select/Select.scss';
+@import '../../common/components/UI/Textarea/Textarea.scss';
+@import '../../common/components/UI/ThemeToggle/ThemeToggle.scss'; 

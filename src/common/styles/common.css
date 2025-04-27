@@ -1,0 +1,61 @@
+/* Common styles shared across features */
+
+/* Typography styles */
+.fitcopilot-heading {
+  @apply text-2xl font-bold text-gray-900 mb-4;
+}
+
+.fitcopilot-subheading {
+  @apply text-xl font-semibold text-gray-800 mb-3;
+}
+
+.fitcopilot-text {
+  @apply text-base text-gray-700;
+}
+
+.fitcopilot-text-sm {
+  @apply text-sm text-gray-600;
+}
+
+/* Layout utilities */
+.fitcopilot-flex-row {
+  @apply flex flex-row items-center;
+}
+
+.fitcopilot-flex-col {
+  @apply flex flex-col;
+}
+
+.fitcopilot-grid {
+  @apply grid gap-4;
+}
+
+/* Spacing utilities */
+.fitcopilot-spacing-y {
+  @apply space-y-4;
+}
+
+.fitcopilot-spacing-x {
+  @apply space-x-4;
+}
+
+/* Theme-specific styles */
+.dark .fitcopilot-card {
+  @apply bg-gray-800 text-white;
+}
+
+.dark .fitcopilot-heading {
+  @apply text-white;
+}
+
+.dark .fitcopilot-subheading {
+  @apply text-gray-200;
+}
+
+.dark .fitcopilot-text {
+  @apply text-gray-300;
+}
+
+.dark .fitcopilot-text-sm {
+  @apply text-gray-400;
+} 

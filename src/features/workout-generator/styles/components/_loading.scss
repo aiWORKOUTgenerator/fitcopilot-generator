@@ -1,0 +1,70 @@
+/**
+ * Loading Components
+ * Styles for loading indicators and animations
+ */
+
+@import '../_variables';
+
+/* Loading indicator styles */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  
+  &__spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid #e5e7eb;
+    border-top-color: $wg-primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 1rem;
+  }
+  
+  &__content {
+    flex: 1;
+  }
+  
+  &__message {
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: $wg-spacing-sm;
+  }
+  
+  &__progress-bar {
+    height: 4px;
+    background-color: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  
+  &__progress-fill {
+    height: 100%;
+    background-color: $wg-primary-color;
+    border-radius: 2px;
+    width: 30%;
+    animation: progress 2s infinite;
+  }
+}
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+    left: 0;
+  }
+  50% {
+    width: 30%;
+    left: 70%;
+  }
+  100% {
+    width: 0%;
+    left: 100%;
+  }
+} 

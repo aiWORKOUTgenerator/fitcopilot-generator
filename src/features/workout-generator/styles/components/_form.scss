@@ -1,0 +1,175 @@
+/**
+ * Form Elements
+ * Styles for form controls in workout generator
+ */
+
+@import '../_variables';
+
+/* Form container */
+.workout-generator-form {
+  background-color: white;
+  padding: $wg-spacing-lg;
+  border-radius: $wg-border-radius;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: $wg-spacing-xl;
+  max-width: 650px;
+  margin: 0 auto;
+  
+  .dark-theme & {
+    background-color: #121212;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Form elements */
+.form-group {
+  margin-bottom: $wg-spacing-lg;
+}
+
+.form-label {
+  display: block;
+  color: #4b5563;
+  font-weight: 500;
+  margin-bottom: $wg-spacing-sm;
+  
+  .dark-theme & {
+    color: #dedede;
+  }
+}
+
+.form-error {
+  color: $wg-error-color;
+  font-size: 0.875rem;
+  margin-left: $wg-spacing-sm;
+  
+  .dark-theme & {
+    color: #f87171;
+  }
+}
+
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: $wg-border-radius;
+  background-color: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  
+  .dark-theme & {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #dedede;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23aaaaaa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  }
+  
+  &--error {
+    border-color: $wg-error-color;
+  }
+}
+
+.form-textarea {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: $wg-border-radius;
+  background-color: white;
+  min-height: 100px;
+  resize: vertical;
+  
+  .dark-theme & {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #dedede;
+  }
+  
+  &--error {
+    border-color: $wg-error-color;
+  }
+}
+
+/* Difficulty options (radio buttons) */
+.difficulty-options {
+  display: flex;
+  gap: $wg-spacing-lg;
+  margin-top: $wg-spacing-sm;
+}
+
+.difficulty-option {
+  display: flex;
+  align-items: center;
+  
+  .dark-theme & {
+    color: #dedede;
+  }
+  
+  input[type="radio"] {
+    margin-right: $wg-spacing-sm;
+  }
+}
+
+/* Advanced options toggle */
+.advanced-options-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: white;
+  border: 1px solid $wg-primary-color;
+  border-radius: $wg-border-radius;
+  color: $wg-primary-color;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  
+  .dark-theme & {
+    background-color: #1e1e1e;
+    border-color: #0066cc;
+    color: #0099ff;
+  }
+}
+
+.advanced-options {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: $wg-border-radius;
+  padding: 1rem;
+  margin-top: -0.75rem;
+  margin-bottom: $wg-spacing-lg;
+  
+  .dark-theme & {
+    background-color: #1e1e1e;
+    border-color: #333;
+  }
+}
+
+.advanced-options-icon {
+  font-size: 0.75rem;
+}
+
+/* Equipment options */
+.equipment-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: $wg-spacing-sm;
+}
+
+.equipment-option {
+  display: flex;
+  align-items: center;
+  
+  .dark-theme & {
+    color: #dedede;
+  }
+  
+  input[type="checkbox"] {
+    margin-right: $wg-spacing-sm;
+  }
+} 

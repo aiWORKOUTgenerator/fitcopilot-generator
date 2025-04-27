@@ -40,9 +40,223 @@
 }
 
 .token-usage-container {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
+  @apply w-full max-w-5xl mx-auto;
+}
+
+.token-usage-heading {
+  @apply text-2xl font-bold text-gray-900 mb-6;
+}
+
+.token-usage-subheading {
+  @apply text-xl font-semibold text-gray-800 mb-4;
+}
+
+.token-usage-card {
+  @apply bg-white rounded-lg shadow-md p-6 mb-6;
+}
+
+.token-usage-stats {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8;
+}
+
+.token-usage-stat-card {
+  @apply bg-white rounded-lg shadow-sm p-4 border border-gray-200;
+}
+
+.token-usage-stat-title {
+  @apply text-sm font-medium text-gray-500 mb-1;
+}
+
+.token-usage-stat-value {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+.token-usage-stat-secondary {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+.token-usage-charts {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8;
+}
+
+.token-usage-chart-container {
+  @apply bg-white rounded-lg shadow-sm p-4 border border-gray-200;
+}
+
+.token-usage-chart-title {
+  @apply text-base font-medium text-gray-800 mb-4;
+}
+
+.token-usage-chart {
+  @apply h-64;
+}
+
+.token-usage-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.token-usage-table-header {
+  @apply bg-gray-50;
+}
+
+.token-usage-table-th {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.token-usage-table-row {
+  @apply bg-white;
+}
+
+.token-usage-table-row:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.token-usage-table-td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500;
+}
+
+.token-usage-filter {
+  @apply flex flex-wrap space-x-4 mb-6;
+}
+
+.token-usage-filter-item {
+  @apply flex items-center;
+}
+
+.token-usage-filter-label {
+  @apply mr-2 text-sm font-medium text-gray-700;
+}
+
+.token-usage-filter-select {
+  @apply block mt-1 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm;
+}
+
+.token-usage-pagination {
+  @apply flex justify-between items-center mt-6;
+}
+
+.token-usage-pagination-info {
+  @apply text-sm text-gray-700;
+}
+
+.token-usage-pagination-buttons {
+  @apply flex space-x-2;
+}
+
+.token-usage-pagination-button {
+  @apply inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50;
+}
+
+.token-usage-pagination-button-active {
+  @apply bg-primary-100 text-primary-700 border-primary-500;
+}
+
+.token-usage-pagination-button-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.token-usage-empty-state {
+  @apply text-center py-12;
+}
+
+.token-usage-empty-state-icon {
+  @apply mx-auto h-12 w-12 text-gray-400;
+}
+
+.token-usage-empty-state-text {
+  @apply mt-2 text-sm font-medium text-gray-900;
+}
+
+.token-usage-empty-state-description {
+  @apply mt-1 text-sm text-gray-500;
+}
+
+/* Token cost highlights */
+.token-usage-cost-low {
+  @apply text-green-600;
+}
+
+.token-usage-cost-medium {
+  @apply text-yellow-600;
+}
+
+.token-usage-cost-high {
+  @apply text-red-600;
+}
+
+/* Dark mode styles */
+.dark .token-usage-heading {
+  @apply text-white;
+}
+
+.dark .token-usage-subheading {
+  @apply text-gray-200;
+}
+
+.dark .token-usage-card,
+.dark .token-usage-stat-card,
+.dark .token-usage-chart-container {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.dark .token-usage-stat-title {
+  @apply text-gray-400;
+}
+
+.dark .token-usage-stat-value {
+  @apply text-white;
+}
+
+.dark .token-usage-stat-secondary {
+  @apply text-gray-400;
+}
+
+.dark .token-usage-chart-title {
+  @apply text-gray-200;
+}
+
+.dark .token-usage-table-header {
+  @apply bg-gray-900;
+}
+
+.dark .token-usage-table-th {
+  @apply text-gray-300;
+}
+
+.dark .token-usage-table-row {
+  @apply bg-gray-800;
+}
+
+.dark .token-usage-table-row:nth-child(even) {
+  @apply bg-gray-700;
+}
+
+.dark .token-usage-table-td {
+  @apply text-gray-300;
+}
+
+.dark .token-usage-filter-label {
+  @apply text-gray-300;
+}
+
+.dark .token-usage-pagination-info {
+  @apply text-gray-300;
+}
+
+.dark .token-usage-pagination-button {
+  @apply text-gray-300 bg-gray-800 border-gray-600 hover:bg-gray-700;
+}
+
+.dark .token-usage-empty-state-icon {
+  @apply text-gray-500;
+}
+
+.dark .token-usage-empty-state-text {
+  @apply text-gray-200;
+}
+
+.dark .token-usage-empty-state-description {
+  @apply text-gray-400;
 }
 
 /* Summary Section */

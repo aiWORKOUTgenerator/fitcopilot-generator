@@ -63,5 +63,10 @@ module.exports = (env, argv) => {
         },
       },
     },
+    performance: {
+      hints: isProduction ? 'warning' : false,
+      maxEntrypointSize: 1024 * 1000, // 1MB
+      maxAssetSize: 1024 * 500, // 500KB
+    },
   };
 }; 

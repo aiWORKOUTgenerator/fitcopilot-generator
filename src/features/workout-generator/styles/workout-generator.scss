@@ -1,0 +1,14 @@
+/**
+ * Workout Generator Styles
+ * Main entry point for the workout generator feature styles
+ */
+
+// Import variables
+@import '_variables';
+
+// Import component styles
+@import 'components/_form';
+@import 'components/_buttons';
+@import 'components/_cards';
+@import 'components/_steps';
+@import 'components/_loading';

@@ -117,31 +117,29 @@ export const ResultStep: React.FC<ResultStepProps> = ({
   return (
     <ErrorBoundary>
       <div className="result-step">
-        <Card elevated padding="large">
-          <h2 className="result-step__title">Your Custom Workout</h2>
+        <h2 className="result-step__title">Your Custom Workout</h2>
+        
+        <div className="result-step__content">
+          <WorkoutCard workout={workout} />
+        </div>
+        
+        <div className="result-step__actions">
+          <Button 
+            variant="primary"
+            onClick={handleViewFullWorkout}
+            className="view-full-workout-button"
+          >
+            View Full Workout
+          </Button>
           
-          <div className="result-step__content">
-            <WorkoutCard workout={workout} />
-          </div>
-          
-          <div className="result-step__actions">
-            <Button 
-              variant="primary"
-              onClick={handleViewFullWorkout}
-              className="view-full-workout-button"
-            >
-              View Full Workout
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={onGenerateNew}
-              className="generate-another-button"
-            >
-              Generate Another Workout
-            </Button>
-          </div>
-        </Card>
+          <Button
+            variant="outline"
+            onClick={onGenerateNew}
+            className="generate-another-button"
+          >
+            Generate Another Workout
+          </Button>
+        </div>
       </div>
     </ErrorBoundary>
   );
