@@ -4,10 +4,11 @@
  * Main entry point for the workout generator feature.
  * Wraps the form with necessary providers and imports styles.
  */
-import React from 'react';
-import { WorkoutGeneratorProvider } from './context/WorkoutGeneratorContext';
-import { WorkoutRequestForm } from './components/Form/WorkoutRequestForm';
-import ErrorBoundary from './components/common/ErrorBoundary';
+import React, { useState } from 'react';
+import { WorkoutGeneratorProvider } from './context';
+import { WorkoutRequestForm } from './components/Form';
+import { ErrorBoundary, DebugControls, TipsCard } from './components/common';
+import { SubscriptionModalWrapper, ProfileSetupPrompt } from './components/Modals';
 
 // Import styles
 import './styles/workout-generator.css';
@@ -21,20 +22,37 @@ import './styles/workout-generator.css';
  * @returns {JSX.Element} The rendered feature component
  */
 export const WorkoutGeneratorFeature: React.FC = () => {
+  const [isSubscriptionOpen, setSubscriptionOpen] = useState(false);
+  const [isProfilePromptOpen, setProfilePromptOpen] = useState(false);
+
   return (
     <ErrorBoundary>
-      <div className="workout-generator-feature">
-        <h2 className="workout-generator-feature__title">
-          AI Workout Generator
-        </h2>
-        <p className="workout-generator-feature__description">
-          Generate personalized workout plans based on your goals, experience level, and available equipment.
-        </p>
-        
-        <WorkoutGeneratorProvider>
+      <WorkoutGeneratorProvider>
+        <div className="workout-generator-feature">
+          <h2 className="workout-generator-feature__title">
+            AI Workout Generator
+          </h2>
+          <p className="workout-generator-feature__description">
+            Generate personalized workout plans based on your goals, experience level, and available equipment.
+          </p>
+          
+          <DebugControls />
           <WorkoutRequestForm />
-        </WorkoutGeneratorProvider>
-      </div>
+          <TipsCard />
+
+          <SubscriptionModalWrapper
+            isOpen={isSubscriptionOpen}
+            onClose={() => setSubscriptionOpen(false)}
+            onSuccess={() => {/* retry generation logic */}}
+          />
+
+          <ProfileSetupPrompt
+            isOpen={isProfilePromptOpen}
+            onClose={() => setProfilePromptOpen(false)}
+            onComplete={() => {/* re-check profile & proceed */}}
+          />
+        </div>
+      </WorkoutGeneratorProvider>
     </ErrorBoundary>
   );
 };

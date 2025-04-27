@@ -3,11 +3,10 @@
  * 
  * Displays a loading state during workout generation with progress feedback and error handling.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Button from '../../../../../components/ui/Button';
 import LoadingIndicator from '../../../components/ui/LoadingIndicator';
 import ErrorBoundary from '../../../components/common/ErrorBoundary';
-import { useProgressEstimator } from '../../../hooks/useProgressEstimator';
 import { GenerationError } from '../../../types/errors';
 import './styles/generating-step.scss';
 
@@ -50,29 +49,73 @@ export const GeneratingStep: React.FC<GeneratingStepProps> = ({
     'Listen to your body - pain is different from discomfort.',
   ];
 
-  // Use the progress estimator to track generation progress
-  const [currentProgress, completeProgress] = useProgressEstimator({
-    initialProgress: progress,
-    totalDuration: 20000,
-    maxProgress: 95
-  });
+  // Internal progress state
+  const [currentProgress, setCurrentProgress] = useState(progress > 0 ? progress : 0);
+  const [startTime] = useState(Date.now());
+  const [isComplete, setIsComplete] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Randomly select a fitness tip
   const [tipIndex] = useState(() => Math.floor(Math.random() * fitnessTips.length));
   
+  // Handle external progress updates
+  useEffect(() => {
+    if (progress >= 100) {
+      completeProgress();
+    }
+  }, [progress]);
+  
+  // Function to complete progress and clean up
+  const completeProgress = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    
+    setCurrentProgress(100);
+    setIsComplete(true);
+    onComplete();
+  };
+  
+  // Update progress based on elapsed time
+  useEffect(() => {
+    if (isComplete) {
+      return;
+    }
+    
+    const totalDuration = 20000; // 20 seconds total estimation
+    const maxProgress = 95; // Max progress before completion signal
+    const updateInterval = 200; // Update every 200ms
+    
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(() => {
+      const elapsedTime = Date.now() - startTime;
+      const linearProgress = Math.min((elapsedTime / totalDuration) * 100, maxProgress);
+      
+      // Non-linear progress: starts faster, slows down as it approaches maxProgress
+      const factor = 1 - linearProgress / maxProgress;
+      const adjustedProgress = maxProgress - maxProgress * Math.pow(factor, 2);
+      setCurrentProgress(Math.min(adjustedProgress, maxProgress));
+    }, updateInterval);
+
+    // Clean up interval on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [startTime, isComplete]);
+
   // Determine which status message to show based on progress
   const statusIndex = Math.min(
     Math.floor((currentProgress / 100) * statusMessages.length),
     statusMessages.length - 1
   );
-
-  // Check for completion
-  useEffect(() => {
-    if (progress >= 100) {
-      completeProgress(true);
-      onComplete();
-    }
-  }, [progress, completeProgress, onComplete]);
 
   // Handle error state
   if (error) {

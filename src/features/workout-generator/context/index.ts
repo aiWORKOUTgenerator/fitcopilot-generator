@@ -6,6 +6,7 @@
 
 export { 
   WorkoutGeneratorProvider, 
-  useWorkoutGenerator,
-  GenerationStatus
+  useWorkoutGenerator 
 } from './WorkoutGeneratorContext'; 
+
+export type { GenerationStatus } from './WorkoutGeneratorContext'; 

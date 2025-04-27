@@ -16,12 +16,9 @@ export { default as useWorkoutForm } from './useWorkoutForm';
 
 // Performance optimization
 export { default as usePerformanceCache } from './usePerformanceCache';
-export { default as useProgressEstimator } from './useProgressEstimator';
 
 // Workout generation and management
-export { default as useWorkoutGeneration } from './useWorkoutGeneration';
-export { default as useWorkoutGenerator } from './useWorkoutGenerator';
-export { default as useDirectWorkoutGenerator } from './useDirectWorkoutGenerator';
+export { useWorkoutGenerator } from './useWorkoutGenerator';
 export { default as useWorkoutHistory } from './useWorkoutHistory';
 
 // User and subscription features

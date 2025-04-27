@@ -11,7 +11,7 @@ import Card from '../../../../components/ui/Card';
  */
 const workoutTips = [
   'Be specific about your goals (strength, cardio, flexibility).',
-  'Mention time constraints if you're short on time.',
+  'Mention time constraints if you\'re short on time.',
   'Specify focus areas such as "upper body" or "core."',
   'Include intensity preferences like "challenging" or "moderate."',
   'List equipment you want to use or avoid.',
