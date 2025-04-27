@@ -1,0 +1,104 @@
+/**
+ * Global Styles
+ * 
+ * This file contains global styles, mixins, and imports
+ * that can be used across the application.
+ */
+
+// Import variables
+@import './variables.scss';
+
+// Global mixins
+
+// Flexbox utilities
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Responsive breakpoints
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'mobile' {
+    @media (max-width: 480px) { @content; }
+  } @else if $breakpoint == 'tablet' {
+    @media (max-width: 768px) { @content; }
+  } @else if $breakpoint == 'desktop' {
+    @media (min-width: 769px) { @content; }
+  }
+}
+
+// Accessibility
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Typography utilities
+@mixin heading-1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@mixin heading-2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+@mixin heading-3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+@mixin body-text {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@mixin small-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+// Animation utilities
+@mixin fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Dark theme transition
+html {
+  &.dark-theme {
+    background-color: $darker-slate;
+    color: rgba(white, 0.9);
+  }
+  
+  &, *, *::before, *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+} 

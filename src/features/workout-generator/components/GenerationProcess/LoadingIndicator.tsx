@@ -5,7 +5,7 @@
  * during the workout generation process.
  */
 import React from 'react';
-import { ProgressBar } from '../../../../common/components/ui';
+import { ProgressBar } from '../../../../common/components';
 import './LoadingIndicator.scss';
 
 interface LoadingIndicatorProps {

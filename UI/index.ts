@@ -12,4 +12,4 @@ export { default as Checkbox } from './Checkbox';
 export { default as ProgressBar } from './ProgressBar';
 export { default as Select } from './Select';
 export { default as Textarea } from './Textarea';
-export { default as ThemeToggle } from './ThemeToggle';
+export { default as ThemeToggle } from './ThemeToggle'; 
