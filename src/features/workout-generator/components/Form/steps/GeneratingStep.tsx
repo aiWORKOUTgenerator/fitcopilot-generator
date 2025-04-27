@@ -5,8 +5,8 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import Button from '../../../../../components/ui/Button';
-import LoadingIndicator from '../../../components/ui/LoadingIndicator';
-import ErrorBoundary from '../../../components/common/ErrorBoundary';
+import LoadingIndicator from '../../GenerationProcess/LoadingIndicator';
+import ErrorBoundary from '../../common/ErrorBoundary';
 import { GenerationError } from '../../../types/errors';
 import './styles/generating-step.scss';
 

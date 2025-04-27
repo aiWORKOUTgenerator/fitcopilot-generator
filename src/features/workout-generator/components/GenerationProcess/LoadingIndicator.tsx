@@ -5,6 +5,7 @@
  * during the workout generation process.
  */
 import React from 'react';
+import { ProgressBar } from '../ui';
 import './LoadingIndicator.scss';
 
 interface LoadingIndicatorProps {
@@ -12,30 +13,39 @@ interface LoadingIndicatorProps {
   message?: string;
   /** Current progress percentage (0-100) */
   progress?: number;
+  /** Optional ARIA label for accessibility (defaults to message if not provided) */
+  ariaLabel?: string;
 }
 
 /**
- * Loading indicator component with animation
+ * Loading indicator component with animation and accessibility features
  */
 export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   message = 'Generating your personalized workout...',
-  progress = 0
+  progress = 0,
+  ariaLabel
 }) => {
   return (
-    <div className="loading-indicator">
-      <div className="loading-indicator__spinner"></div>
+    <div 
+      className="loading-indicator"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label={ariaLabel || message}
+    >
+      <div 
+        className="loading-indicator__spinner" 
+        aria-hidden="true"
+      ></div>
       
       <div className="loading-indicator__content">
         <p className="loading-indicator__message">{message}</p>
-        <div className="loading-indicator__progress-bar">
-          <div 
-            className="loading-indicator__progress-fill" 
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-        <div className="loading-indicator__progress-text">
-          {Math.round(progress)}%
-        </div>
+        <ProgressBar 
+          progress={progress}
+          height={12}
+          animated={true}
+          ariaLabel={`Workout generation progress: ${Math.round(progress)}%`}
+        />
       </div>
     </div>
   );

@@ -1,0 +1,100 @@
+// ProgressBar.scss - Styles for the progress bar component
+
+.progress-bar {
+  &-container {
+    width: 100%;
+  }
+
+  &-track {
+    width: 100%;
+    background-color: #1e293b;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  &-fill {
+    height: 100%;
+    background-color: #60a5fa;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: width 0.5s ease;
+  }
+
+  &-stripes {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.15) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.15) 75%,
+      transparent 75%
+    );
+    background-size: 16px 16px;
+    animation: stripesAnimation 1s linear infinite;
+  }
+
+  &-label {
+    position: absolute;
+    right: 4px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &-percentage {
+    background-color: #7dd3fc;
+    color: #0f172a;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes stripesAnimation {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 16px 0;
+  }
+}
+
+.progress-bar-track:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.dark-theme {
+  .progress-bar {
+    &-track {
+      background-color: #0f172a;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .progress-bar {
+    &-track {
+      border: 1px solid CanvasText;
+    }
+    
+    &-fill {
+      background-color: Highlight;
+    }
+    
+    &-percentage {
+      background-color: Canvas;
+      color: CanvasText;
+      border: 1px solid CanvasText;
+    }
+  }
+} 
