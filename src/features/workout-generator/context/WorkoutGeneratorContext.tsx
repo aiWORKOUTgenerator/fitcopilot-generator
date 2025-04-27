@@ -7,8 +7,21 @@
 import React, { createContext, useReducer, useContext, ReactNode, useCallback, useMemo } from 'react';
 import { GeneratedWorkout, WorkoutFormParams } from '../types/workout';
 import { ValidationErrors } from '../domain/validators';
-import { apiFetch } from '../api/client';
+import { apiFetch, ApiResponse } from '../api/client';
 import { API_ENDPOINTS } from '../api/endpoints';
+import { 
+  WorkoutGeneratorAction, 
+  WorkoutActionType,
+  updateForm,
+  setFormErrors,
+  startGeneration,
+  setGenerationProcessing,
+  setGenerationSuccess,
+  setGenerationError,
+  resetGenerator,
+  setResult,
+  setStep
+} from './actions';
 
 /**
  * Status of the workout generation process
@@ -23,6 +36,8 @@ interface UIState {
   loading: boolean;
   formErrors: ValidationErrors | null;
   errorMessage: string | null;
+  debugMode: boolean;
+  logs: any[];
 }
 
 /**
@@ -50,6 +65,8 @@ const initialState: WorkoutGeneratorState = {
     loading: false,
     formErrors: null,
     errorMessage: null,
+    debugMode: false,
+    logs: []
   },
   domain: {
     formValues: {
@@ -64,20 +81,6 @@ const initialState: WorkoutGeneratorState = {
 };
 
 /**
- * Action types for the workout generator reducer
- */
-type WorkoutGeneratorAction =
-  | { type: 'UPDATE_FORM'; payload: Partial<WorkoutFormParams> }
-  | { type: 'SET_FORM_ERRORS'; payload: ValidationErrors | null }
-  | { type: 'GENERATION_START' }
-  | { type: 'GENERATION_PROCESSING' }
-  | { type: 'GENERATION_SUCCESS'; payload: GeneratedWorkout }
-  | { type: 'GENERATION_ERROR'; payload: string }
-  | { type: 'RESET_GENERATOR' }
-  | { type: 'SET_RESULT'; payload: GeneratedWorkout }
-  | { type: 'SET_STEP'; payload: GenerationStatus };
-
-/**
  * Reducer for the workout generator
  */
 function workoutGeneratorReducer(
@@ -85,7 +88,7 @@ function workoutGeneratorReducer(
   action: WorkoutGeneratorAction
 ): WorkoutGeneratorState {
   switch (action.type) {
-    case 'UPDATE_FORM':
+    case WorkoutActionType.UPDATE_FORM:
       return {
         ...state,
         domain: {
@@ -97,7 +100,7 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'SET_FORM_ERRORS':
+    case WorkoutActionType.SET_FORM_ERRORS:
       return {
         ...state,
         ui: {
@@ -106,7 +109,7 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'GENERATION_START':
+    case WorkoutActionType.GENERATION_START:
       return {
         ...state,
         ui: {
@@ -117,7 +120,7 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'GENERATION_PROCESSING':
+    case WorkoutActionType.GENERATION_PROCESSING:
       return {
         ...state,
         ui: {
@@ -126,7 +129,7 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'GENERATION_SUCCESS':
+    case WorkoutActionType.GENERATION_SUCCESS:
       return {
         ...state,
         ui: {
@@ -140,7 +143,7 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'GENERATION_ERROR':
+    case WorkoutActionType.GENERATION_ERROR:
       return {
         ...state,
         ui: {
@@ -151,7 +154,7 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'RESET_GENERATOR':
+    case WorkoutActionType.RESET_GENERATOR:
       return {
         ...initialState,
         domain: {
@@ -160,7 +163,7 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'SET_RESULT':
+    case WorkoutActionType.SET_RESULT:
       return {
         ...state,
         domain: {
@@ -169,13 +172,31 @@ function workoutGeneratorReducer(
         },
       };
       
-    case 'SET_STEP':
+    case WorkoutActionType.SET_STEP:
       return {
         ...state,
         ui: {
           ...state.ui,
           status: action.payload,
           loading: action.payload === 'submitting' || action.payload === 'generating',
+        },
+      };
+      
+    case WorkoutActionType.TOGGLE_DEBUG_MODE:
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          debugMode: action.payload,
+        },
+      };
+      
+    case WorkoutActionType.SET_LOGS:
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          logs: action.payload,
         },
       };
       
@@ -191,6 +212,9 @@ interface WorkoutGeneratorContextValue {
   state: WorkoutGeneratorState;
   dispatch: React.Dispatch<WorkoutGeneratorAction>;
   generateWorkout: (formData: WorkoutFormParams) => Promise<GeneratedWorkout>;
+  updateFormValues: (values: Partial<WorkoutFormParams>) => void;
+  resetForm: () => void;
+  setStep: (step: GenerationStatus) => void;
 }
 
 /**
@@ -269,15 +293,15 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
    */
   const generateWorkout = useCallback(async (formData: WorkoutFormParams) => {
     // Start the generation process
-    dispatch({ type: 'GENERATION_START' });
+    dispatch(startGeneration());
     
     try {
       // After a short delay, update UI to show we're processing
       setTimeout(() => {
-        dispatch({ type: 'GENERATION_PROCESSING' });
+        dispatch(setGenerationProcessing());
       }, 500);
       
-      // CRITICAL: PHP endpoint requires 'specific_request'
+      // Prepare request payload
       const requestBody = {
         specific_request: `A ${formData.difficulty} level ${formData.duration}-minute workout focusing on ${formData.goals}${formData.restrictions ? ` with restrictions: ${formData.restrictions}` : ''}`,
         duration: formData.duration,
@@ -287,12 +311,8 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
         restrictions: formData.restrictions || ''
       };
       
-      // Direct API call with correct format
-      const response = await apiFetch<{ 
-        success: boolean; 
-        data: any;  // Changed type to 'any' to handle various response formats
-        message?: string;
-      }>(
+      // Make API request to generate workout
+      const response = await apiFetch<ApiResponse<GeneratedWorkout>>(
         API_ENDPOINTS.GENERATE,
         {
           method: 'POST',
@@ -300,87 +320,70 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
         }
       );
       
-      // Debug the response
-      console.log('API Response:', JSON.stringify(response, null, 2));
-      
-      // Handle the response - normalize data structure
-      if (response.success) {
-        // Get the workout data - in our case, the data property itself is the workout
-        const workoutData = response.data;
-        
-        if (workoutData) {
+      // If the response includes data, dispatch success
+      if (response.success && response.data) {
+        try {
+          const workoutData = response.data;
           console.log('Success! Workout data received');
-          dispatch({ 
-            type: 'GENERATION_SUCCESS', 
-            payload: workoutData  // Use data directly as the workout
-          });
+          dispatch(setGenerationSuccess(workoutData));
           return workoutData;
-        } else {
-          const error = new Error('Server returned success but no workout data');
-          logError(error, { 
-            componentName: 'WorkoutGeneratorProvider', 
-            action: 'generateWorkout',
-            additionalData: { response }
-          });
+        } catch (parseError) {
+          console.error('Failed to parse workout data', parseError);
           
-          dispatch({
-            type: 'GENERATION_ERROR',
-            payload: 'Server returned success but no workout data'
-          });
-          throw error;
+          dispatch(setGenerationError('Failed to parse workout data'));
+          throw new Error('Failed to parse workout data');
         }
       } else {
-        // Explicit failure from server
-        const errorMsg = response.message || 'Failed to generate workout';
-        const error = new Error(errorMsg);
+        // API returned success: false or no data
+        const errorMsg = response.message || 'Server returned success but no workout data';
+        console.error('API Error:', errorMsg);
         
-        logError(error, {
-          componentName: 'WorkoutGeneratorProvider',
-          action: 'generateWorkout',
-          additionalData: { response }
-        });
-        
-        dispatch({
-          type: 'GENERATION_ERROR',
-          payload: errorMsg
-        });
-        throw error;
+        dispatch(setGenerationError(errorMsg));
+        throw new Error(errorMsg);
       }
     } catch (error) {
-      // Handle error with centralized error handler
-      const formattedError = handleError(error, {
-        componentName: 'WorkoutGeneratorProvider',
-        action: 'generateWorkout',
-        additionalData: { formData }
-      });
+      // Handle any other errors
+      console.error('Error generating workout:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error generating workout';
       
-      const errorMessage = formattedError.message || 'Failed to generate workout. Please try again.';
-      
-      dispatch({ 
-        type: 'GENERATION_ERROR', 
-        payload: errorMessage 
-      });
-      
-      throw formattedError;
+      dispatch(setGenerationError(errorMessage));
+      throw error;
     }
-  }, [dispatch, handleError, logError]);
+  }, []);
   
-  // Create a stable value object for the context
-  const value = useMemo(() => ({
+  // Helper functions for common actions
+  const updateFormValues = useCallback((values: Partial<WorkoutFormParams>) => {
+    dispatch(updateForm(values));
+  }, []);
+
+  const resetForm = useCallback(() => {
+    dispatch(resetGenerator());
+  }, []);
+
+  const setStepValue = useCallback((step: GenerationStatus) => {
+    dispatch(setStep(step));
+  }, []);
+
+  // Create context value object with memoization
+  const contextValue = useMemo(() => ({
     state,
     dispatch,
-    generateWorkout
-  }), [state, dispatch, generateWorkout]);
+    generateWorkout,
+    updateFormValues,
+    resetForm,
+    setStep: setStepValue,
+  }), [state, generateWorkout, updateFormValues, resetForm, setStepValue]);
   
   return (
-    <WorkoutGeneratorContext.Provider value={value}>
+    <WorkoutGeneratorContext.Provider value={contextValue}>
       {children}
     </WorkoutGeneratorContext.Provider>
   );
 }
 
 /**
- * Hook for using the workout generator context
+ * Custom hook for accessing the workout generator context
+ * @throws {Error} If used outside of WorkoutGeneratorProvider
  */
 export function useWorkoutGenerator() {
   const context = useContext(WorkoutGeneratorContext);
