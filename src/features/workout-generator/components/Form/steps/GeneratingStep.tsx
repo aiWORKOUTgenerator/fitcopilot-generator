@@ -4,7 +4,7 @@
  * Displays a loading state during workout generation with progress feedback and error handling.
  */
 import React, { useEffect, useState, useRef } from 'react';
-import Button from '../../../../../components/ui/Button';
+import { Button } from '../../../../../common/components/UI';
 import LoadingIndicator from '../../GenerationProcess/LoadingIndicator';
 import ErrorBoundary from '../../common/ErrorBoundary';
 import { GenerationError } from '../../../types/errors';

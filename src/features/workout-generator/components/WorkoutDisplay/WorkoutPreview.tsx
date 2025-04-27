@@ -23,7 +23,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Card, Button } from '../../../../components/ui';
+import { Card } from '../../../../components/ui';
+import { Button } from '../../../../common/components/UI';
 import { WorkoutDifficulty } from '../../types/workout';
 import './WorkoutPreview.scss';
 

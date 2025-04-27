@@ -5,7 +5,8 @@
  * or generating a new workout.
  */
 import React from 'react';
-import { Card, Button } from '../../../../../components/ui';
+import { Card } from '../../../../../components/ui';
+import { Button } from '../../../../../common/components/UI';
 import { GeneratedWorkout } from '../../../types/workout';
 import WorkoutCard from '../../WorkoutDisplay/WorkoutCard';
 import ErrorBoundary from '../../common/ErrorBoundary';

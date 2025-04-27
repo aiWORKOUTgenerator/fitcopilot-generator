@@ -5,7 +5,8 @@
  * to confirm or edit their selections.
  */
 import React from 'react';
-import { Card, Button } from '../../../../../components/ui';
+import { Card } from '../../../../../components/ui';
+import { Button } from '../../../../../common/components/UI';
 import { WorkoutFormParams } from '../../../types/workout';
 import './PreviewStep.scss';
 

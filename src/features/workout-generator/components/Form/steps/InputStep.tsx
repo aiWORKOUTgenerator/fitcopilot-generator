@@ -4,7 +4,8 @@
  * First step in the workout generation process where users input their preferences.
  */
 import React, { useState } from 'react';
-import { Card, Button } from '../../../../../components/ui';
+import { Card } from '../../../../../components/ui';
+import { Button } from '../../../../../common/components/UI';
 import { WorkoutFormParams, WorkoutDifficulty } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
 import '../form.scss';

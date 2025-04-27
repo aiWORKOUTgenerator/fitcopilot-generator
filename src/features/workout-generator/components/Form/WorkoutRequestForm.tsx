@@ -46,8 +46,7 @@ import PreviewStep from './steps/PreviewStep';
 import GeneratingStep from './steps/GeneratingStep';
 import { ResultStep } from './steps/ResultStep';
 import ErrorBoundary from '../common/ErrorBoundary';
-import { Button } from '../../../../components/ui';
-import ThemeToggle from '../../../../components/ui/ThemeToggle';
+import { Button, ThemeToggle } from '../../../../common/components/UI';
 import './form.scss';
 
 /**
