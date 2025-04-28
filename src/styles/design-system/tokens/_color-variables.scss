@@ -1,0 +1,122 @@
+/**
+ * Color Variables
+ * 
+ * This file exports the semantic color tokens as CSS variables.
+ * All components should reference these variables rather than direct color values.
+ */
+
+@import './color-semantic';
+
+:root {
+  /* Primary colors with RGB values */
+  --color-primary-rgb: #{$color-semantic-primary-rgb};
+  --color-primary: rgb(var(--color-primary-rgb));
+  --color-primary-dark-rgb: #{$color-semantic-primary-dark-rgb};
+  --color-primary-dark: rgb(var(--color-primary-dark-rgb));
+  --color-primary-light-rgb: #{$color-semantic-primary-light-rgb};
+  --color-primary-light: rgb(var(--color-primary-light-rgb));
+  
+  /* Accent colors with RGB values */
+  --color-accent-rgb: #{$color-semantic-accent-rgb};
+  --color-accent: rgb(var(--color-accent-rgb));
+  --color-accent-dark-rgb: #{$color-semantic-accent-dark-rgb};
+  --color-accent-dark: rgb(var(--color-accent-dark-rgb));
+  --color-accent-light-rgb: #{$color-semantic-accent-light-rgb};
+  --color-accent-light: rgb(var(--color-accent-light-rgb));
+
+  /* Base UI colors with RGB values */
+  --color-bg-rgb: #{$color-semantic-bg-rgb};
+  --color-bg: rgb(var(--color-bg-rgb));
+  --color-surface-rgb: #{$color-semantic-surface-rgb};
+  --color-surface: rgb(var(--color-surface-rgb));
+  --color-surface-accent-rgb: #{$color-semantic-surface-accent-rgb};
+  --color-surface-accent: rgb(var(--color-surface-accent-rgb));
+  --color-border-rgb: #{$color-semantic-border-rgb};
+  --color-border: rgb(var(--color-border-rgb));
+  
+  /* Text colors with RGB values */
+  --color-text-rgb: #{$color-semantic-text-rgb};
+  --color-text: rgb(var(--color-text-rgb));
+  --color-text-muted-rgb: #{$color-semantic-text-muted-rgb};
+  --color-text-muted: rgb(var(--color-text-muted-rgb));
+  
+  /* Feedback colors with RGB values */
+  --color-success-rgb: #{$color-semantic-success-rgb};
+  --color-success: rgb(var(--color-success-rgb));
+  --color-error-rgb: #{$color-semantic-error-rgb};
+  --color-error: rgb(var(--color-error-rgb));
+  --color-warning-rgb: #{$color-semantic-warning-rgb};
+  --color-warning: rgb(var(--color-warning-rgb));
+  --color-info-rgb: #{$color-semantic-info-rgb};
+  --color-info: rgb(var(--color-info-rgb));
+
+  /* Dark theme colors with RGB values */
+  --color-dark-bg-rgb: #{$color-semantic-dark-bg-rgb};
+  --color-dark-bg: rgb(var(--color-dark-bg-rgb));
+  --color-dark-surface-rgb: #{$color-semantic-dark-surface-rgb};
+  --color-dark-surface: rgb(var(--color-dark-surface-rgb));
+  --color-dark-card-rgb: #{$color-semantic-dark-card-rgb};
+  --color-dark-card: rgb(var(--color-dark-card-rgb));
+  --color-dark-border-rgb: #{$color-semantic-dark-border-rgb};
+  --color-dark-border: rgb(var(--color-dark-border-rgb));
+  --color-dark-highlight-rgb: #{$color-semantic-dark-highlight-rgb};
+  --color-dark-highlight: rgb(var(--color-dark-highlight-rgb));
+  --color-dark-surface-hover-rgb: #{$color-semantic-dark-surface-hover-rgb};
+  --color-dark-surface-hover: rgb(var(--color-dark-surface-hover-rgb));
+  
+  /* Dark theme accent colors with RGB values */
+  --color-dark-primary-rgb: #{$color-semantic-dark-primary-rgb};
+  --color-dark-primary: rgb(var(--color-dark-primary-rgb));
+  --color-dark-accent-rgb: #{$color-semantic-dark-accent-rgb};
+  --color-dark-accent: rgb(var(--color-dark-accent-rgb));
+  --color-dark-success-rgb: #{$color-semantic-dark-success-rgb};
+  --color-dark-success: rgb(var(--color-dark-success-rgb));
+  --color-dark-info-rgb: #{$color-semantic-dark-info-rgb};
+  --color-dark-info: rgb(var(--color-dark-info-rgb));
+  --color-dark-warning-rgb: #{$color-semantic-dark-warning-rgb};
+  --color-dark-warning: rgb(var(--color-dark-warning-rgb));
+  --color-dark-error-rgb: #{$color-semantic-dark-error-rgb};
+  --color-dark-error: rgb(var(--color-dark-error-rgb));
+  
+  /* Dark theme text colors with RGB values */
+  --color-dark-text-rgb: #{$color-semantic-dark-text-rgb};
+  --color-dark-text: rgb(var(--color-dark-text-rgb));
+  --color-dark-text-muted-rgb: #{$color-semantic-dark-muted-rgb};
+  --color-dark-text-muted: rgb(var(--color-dark-text-muted-rgb));
+  
+  /* Workout Generator colors with RGB values */
+  --color-wg-primary-rgb: #{$color-semantic-wg-primary-rgb};
+  --color-wg-primary: rgb(var(--color-wg-primary-rgb));
+  --color-wg-primary-hover-rgb: #{$color-semantic-wg-primary-hover-rgb};
+  --color-wg-primary-hover: rgb(var(--color-wg-primary-hover-rgb));
+  --color-wg-secondary-rgb: #{$color-semantic-wg-secondary-rgb};
+  --color-wg-secondary: rgb(var(--color-wg-secondary-rgb));
+  --color-wg-secondary-hover-rgb: #{$color-semantic-wg-secondary-hover-rgb};
+  --color-wg-secondary-hover: rgb(var(--color-wg-secondary-hover-rgb));
+  --color-wg-success-rgb: #{$color-semantic-wg-success-rgb};
+  --color-wg-success: rgb(var(--color-wg-success-rgb));
+  --color-wg-error-rgb: #{$color-semantic-wg-error-rgb};
+  --color-wg-error: rgb(var(--color-wg-error-rgb));
+  
+  /* Workout Generator card colors with RGB values */
+  --color-wg-goal-bg-rgb: #{$color-semantic-wg-goal-bg-rgb};
+  --color-wg-goal-bg: rgb(var(--color-wg-goal-bg-rgb));
+  --color-wg-level-bg-rgb: #{$color-semantic-wg-level-bg-rgb};
+  --color-wg-level-bg: rgb(var(--color-wg-level-bg-rgb));
+  --color-wg-duration-bg-rgb: #{$color-semantic-wg-duration-bg-rgb};
+  --color-wg-duration-bg: rgb(var(--color-wg-duration-bg-rgb));
+  --color-wg-goal-color-rgb: #{$color-semantic-wg-goal-color-rgb};
+  --color-wg-goal-color: rgb(var(--color-wg-goal-color-rgb));
+  --color-wg-level-color-rgb: #{$color-semantic-wg-level-color-rgb};
+  --color-wg-level-color: rgb(var(--color-wg-level-color-rgb));
+  --color-wg-duration-color-rgb: #{$color-semantic-wg-duration-color-rgb};
+  --color-wg-duration-color: rgb(var(--color-wg-duration-color-rgb));
+  
+  /* Workout Generator dark mode cards */
+  --color-wg-dark-goal-bg: rgba(#{$color-semantic-wg-primary-rgb}, 0.2);
+  --color-wg-dark-level-bg: rgba(#{$color-semantic-wg-success-rgb}, 0.2);
+  --color-wg-dark-duration-bg: rgba(#{$color-semantic-wg-duration-color-rgb}, 0.2);
+  --color-wg-dark-goal-color: rgb(#{$color-semantic-dark-primary-rgb});
+  --color-wg-dark-level-color: rgb(#{$color-semantic-dark-success-rgb});
+  --color-wg-dark-duration-color: rgb(#{$color-semantic-wg-duration-color-rgb});
+} 

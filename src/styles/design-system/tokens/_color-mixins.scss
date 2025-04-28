@@ -1,0 +1,350 @@
+/**
+ * Color Mixins
+ * 
+ * This file provides standardized mixins for common color applications.
+ * Using these mixins ensures consistent color patterns across components.
+ */
+
+@import './color-maps';
+
+// ===== Text Color Mixins =====
+
+/// Sets text color with optional dark mode variant
+/// @param {String} $color - Base color name
+/// @param {String} $variant [base] - Color variant
+/// @example scss
+///   @include text-color('primary');
+///   @include text-color('feedback', 'success');
+@mixin text-color($color, $variant: 'base') {
+  color: color($color, $variant);
+  
+  .dark-theme & {
+    @if $color == 'text' and $variant == 'muted' {
+      color: dark-color('text-muted');
+    } @else {
+      color: dark-color($color, $variant);
+    }
+  }
+}
+
+/// Sets link color with appropriate hover states
+/// @param {String} $color - Base color name
+/// @param {String} $hover-color - Hover color name
+/// @example scss
+///   @include link-color('primary', 'primary-dark');
+@mixin link-color($color, $hover-color: null) {
+  $hover: if($hover-color, $hover-color, $color);
+  
+  color: color($color);
+  transition: color 0.2s ease;
+  
+  &:hover, &:focus {
+    color: color($hover, 'dark');
+  }
+  
+  .dark-theme & {
+    color: dark-color($color);
+    
+    &:hover, &:focus {
+      color: dark-color($hover);
+    }
+  }
+}
+
+// ===== Background Color Mixins =====
+
+/// Sets background color with optional dark mode variant
+/// @param {String} $color - Base color name
+/// @param {String} $variant [base] - Color variant
+/// @example scss
+///   @include bg-color('surface');
+///   @include bg-color('primary', 'light');
+@mixin bg-color($color, $variant: 'base') {
+  background-color: color($color, $variant);
+  
+  .dark-theme & {
+    background-color: dark-color($color, $variant);
+  }
+}
+
+/// Sets subtle background color using alpha
+/// @param {String} $color - Base color name
+/// @param {Number} $opacity - Opacity value (0-1)
+/// @example scss
+///   @include bg-color-alpha('primary', 0.1);
+@mixin bg-color-alpha($color, $opacity: 0.1) {
+  background-color: rgba(var(--color-#{$color}-rgb), $opacity);
+  
+  .dark-theme & {
+    background-color: rgba(var(--color-dark-#{$color}-rgb), $opacity);
+  }
+}
+
+// ===== Border Color Mixins =====
+
+/// Sets border color with options for position, width and style
+/// @param {String} $color - Base color name
+/// @param {String} $variant [base] - Color variant
+/// @param {String} $position [null] - Border position (top, right, bottom, left)
+/// @param {String} $width [1px] - Border width
+/// @param {String} $style [solid] - Border style
+/// @example scss
+///   @include border-color('border');
+///   @include border-color('primary', 'base', 'bottom', '2px');
+@mixin border-color($color, $variant: 'base', $position: null, $width: 1px, $style: solid) {
+  @if $position {
+    border-#{$position}: $width $style color($color, $variant);
+    
+    .dark-theme & {
+      border-#{$position}: $width $style dark-color($color, $variant);
+    }
+  } @else {
+    border: $width $style color($color, $variant);
+    
+    .dark-theme & {
+      border: $width $style dark-color($color, $variant);
+    }
+  }
+}
+
+// ===== Interactive State Mixins =====
+
+/// Applies focus state styling
+/// @param {String} $color [primary] - Color name to use for focus
+/// @example scss
+///   @include focus-state();
+///   @include focus-state('accent');
+@mixin focus-state($color: 'primary') {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--color-#{$color}-rgb), 0.3);
+  }
+  
+  .dark-theme &:focus {
+    box-shadow: 0 0 0 3px rgba(var(--color-dark-#{$color}-rgb), 0.4);
+  }
+}
+
+/// Applies interactive hover states
+/// @param {String} $bg-color [primary] - Background color on hover
+/// @param {Number} $opacity [0.1] - Background opacity
+/// @param {Boolean} $elevate [true] - Whether to add elevation on hover
+/// @example scss
+///   @include hover-state();
+///   @include hover-state('accent', 0.15, false);
+@mixin hover-state($bg-color: 'primary', $opacity: 0.1, $elevate: true) {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: rgba(var(--color-#{$bg-color}-rgb), $opacity);
+    
+    @if $elevate {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(var(--color-text-rgb), 0.1);
+    }
+  }
+  
+  .dark-theme &:hover {
+    background-color: rgba(var(--color-dark-#{$bg-color}-rgb), $opacity + 0.05);
+    
+    @if $elevate {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+/// Applies disabled state
+/// @param {Number} $opacity [0.65] - Opacity for disabled state
+/// @example scss
+///   @include disabled-state();
+///   @include disabled-state(0.5);
+@mixin disabled-state($opacity: 0.65) {
+  &:disabled, &.disabled {
+    opacity: $opacity;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// ===== Component-specific Mixins =====
+
+/// Applies card styling
+/// @param {Boolean} $bordered [true] - Whether to add border
+/// @param {Boolean} $elevated [false] - Whether to add elevation
+/// @example scss
+///   @include card-styling();
+///   @include card-styling(false, true);
+@mixin card-styling($bordered: true, $elevated: false) {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md, 0.5rem);
+  
+  @if $bordered {
+    border: 1px solid var(--color-border);
+  }
+  
+  @if $elevated {
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .dark-theme & {
+    background-color: var(--color-dark-surface);
+    
+    @if $bordered {
+      border-color: var(--color-dark-border);
+    }
+    
+    @if $elevated {
+      box-shadow: var(--dark-shadow-sm);
+    }
+  }
+}
+
+/// Applies button styling
+/// @param {String} $variant [primary] - Button variant (primary, secondary, outline, text)
+/// @example scss
+///   @include button-styling();
+///   @include button-styling('outline');
+@mixin button-styling($variant: 'primary') {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md, 0.5rem);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  @if $variant == 'primary' {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    
+    &:hover:not(:disabled) {
+      background-color: var(--color-primary-dark);
+      transform: translateY(-2px);
+    }
+    
+    .dark-theme & {
+      background-color: var(--color-dark-primary);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-dark-accent);
+      }
+    }
+  } @else if $variant == 'secondary' {
+    background-color: var(--color-surface-accent);
+    color: var(--color-text);
+    border: none;
+    
+    &:hover:not(:disabled) {
+      background-color: var(--color-border);
+    }
+    
+    .dark-theme & {
+      background-color: var(--color-dark-surface-hover);
+      color: var(--color-dark-text);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-dark-highlight);
+      }
+    }
+  } @else if $variant == 'outline' {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    
+    &:hover:not(:disabled) {
+      background-color: rgba(var(--color-primary-rgb), 0.05);
+    }
+    
+    .dark-theme & {
+      color: var(--color-dark-primary);
+      border-color: var(--color-dark-primary);
+      
+      &:hover:not(:disabled) {
+        background-color: rgba(var(--color-dark-primary-rgb), 0.1);
+      }
+    }
+  } @else if $variant == 'text' {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: none;
+    
+    &:hover:not(:disabled) {
+      background-color: rgba(var(--color-primary-rgb), 0.05);
+    }
+    
+    .dark-theme & {
+      color: var(--color-dark-primary);
+      
+      &:hover:not(:disabled) {
+        background-color: rgba(var(--color-dark-primary-rgb), 0.1);
+      }
+    }
+  }
+  
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+// ===== Workout Generator Specific Mixins =====
+
+/// Applies Workout Generator primary color styling
+/// @param {String} $property - CSS property to set
+/// @param {String} $variant [base] - Color variant
+/// @example scss
+///   @include wg-color-property('color');
+///   @include wg-color-property('background-color', 'hover');
+@mixin wg-color-property($property, $variant: 'base') {
+  #{$property}: wg-color('primary', $variant);
+  
+  .dark-theme & {
+    #{$property}: var(--color-dark-primary);
+  }
+}
+
+/// Applies Workout Generator card styling
+/// @param {String} $type - Card type (goal, level, duration)
+/// @example scss
+///   @include wg-card('goal');
+@mixin wg-card($type) {
+  background-color: wg-card-color($type, 'bg');
+  color: wg-card-color($type, 'color');
+  
+  .dark-theme & {
+    background-color: wg-card-color($type, 'dark-bg');
+    color: wg-card-color($type, 'dark-color');
+  }
+}
+
+/// Applies form input styling for Workout Generator
+/// @param {Boolean} $with-focus [true] - Whether to add focus state
+/// @example scss
+///   @include wg-form-input();
+@mixin wg-form-input($with-focus: true) {
+  border: 1px solid wg-form-color('border', 'base');
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  
+  @if $with-focus {
+    &:focus {
+      border-color: wg-form-color('border', 'focus');
+      outline: none;
+      box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
+    }
+  }
+  
+  .dark-theme & {
+    border-color: wg-form-color('border', 'dark');
+    background-color: var(--color-dark-surface);
+    color: var(--color-dark-text);
+    
+    @if $with-focus {
+      &:focus {
+        border-color: wg-form-color('border', 'dark-focus');
+        box-shadow: 0 0 0 3px wg-form-color('shadow', 'dark-focus');
+      }
+    }
+  }
+} 

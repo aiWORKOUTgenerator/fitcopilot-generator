@@ -1,9 +1,20 @@
+/**
+ * Design System Index
+ * 
+ * Imports all design system files in the correct order.
+ * Always import the token system first to ensure proper color inheritance.
+ */
+
+// First import the core token system
+@import './tokens/index';
+
+// Then import utility files that build on the token system
 @import './colors';
 @import './typography';
 @import './backgrounds';
 @import './animations';
 @import './gradients';
 @import './components';
-@import 'spacing';
-@import 'shadows';
-@import 'dark-theme';
+@import './spacing';
+@import './shadows';
+@import './dark-theme';

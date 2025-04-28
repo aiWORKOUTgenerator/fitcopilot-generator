@@ -1,32 +1,39 @@
-@import '../../styles/design-system/colors';
+@import '../../styles/design-system/tokens/index';
 @import '../../styles/design-system/spacing';
 @import '../../styles/design-system/shadows';
-@import '../../styles/design-system/dark-theme';
 
 .card {
   display: block;
-  background-color: var(--bg-surface, #ffffff);
-  border-radius: map-get($spacing, 'radius-md');
+  @include card-styling(false);
   transition: all 0.2s ease-in-out;
   width: 100%;
 
   // Border styles
   &--bordered {
-    border: 1px solid var(--border-color, #e0e0e0);
+    @include border-color('border');
   }
 
   // Elevation styles
   &--elevated {
     box-shadow: var(--shadow-sm);
+    
+    .dark-theme & {
+      box-shadow: var(--dark-shadow-sm);
+    }
   }
 
   // Hover effect
   &--hoverable {
     cursor: pointer;
     
+    @include hover-state('surface', 0.05, true);
+    
     &:hover, &:focus {
-      transform: translateY(-4px);
       box-shadow: var(--shadow-md);
+      
+      .dark-theme & {
+        box-shadow: var(--dark-shadow-md);
+      }
     }
   }
 
@@ -43,23 +50,5 @@
     padding: map-get($spacing, 'space-6');
   }
 
-  // Dark mode specific styles
-  .dark-mode & {
-    background-color: var(--dark-bg-surface, #1e1e1e);
-    color: var(--dark-text-primary, #f0f0f0);
-    
-    &--bordered {
-      border-color: var(--dark-border-color, #3a3a3a);
-    }
-    
-    &--elevated {
-      box-shadow: var(--dark-shadow-sm);
-    }
-    
-    &--hoverable {
-      &:hover, &:focus {
-        box-shadow: var(--dark-shadow-md);
-      }
-    }
-  }
+  // Dark mode is handled by the mixins
 } 

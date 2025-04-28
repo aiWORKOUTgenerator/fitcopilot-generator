@@ -1,36 +1,12 @@
 /* 
  * Workout Generator Variables
- * Custom variables specific to the workout generator feature
  * 
- * This file imports the new color token system while maintaining backward compatibility.
- * New components should use the token system directly.
+ * This file imports the color token system and provides non-color variables
+ * for the workout generator feature.
  */
 
+// Import the color token system
 @import 'color-tokens';
-
-// Colors
-$wg-primary-color: var(--color-wg-primary);
-$wg-primary-hover: var(--color-wg-primary-hover);
-$wg-secondary-color: var(--color-wg-secondary);
-$wg-secondary-hover: var(--color-wg-secondary-hover);
-$wg-success-color: var(--color-wg-success);
-$wg-error-color: var(--color-wg-error);
-
-// Card colors
-$wg-goal-bg: var(--color-wg-goal-bg);
-$wg-level-bg: var(--color-wg-level-bg);
-$wg-duration-bg: var(--color-wg-duration-bg);
-$wg-goal-color: var(--color-wg-goal-color);
-$wg-level-color: var(--color-wg-level-color);
-$wg-duration-color: var(--color-wg-duration-color);
-
-// Dark mode colors
-$wg-dark-goal-bg: var(--color-wg-dark-goal-bg);
-$wg-dark-level-bg: var(--color-wg-dark-level-bg);
-$wg-dark-duration-bg: var(--color-wg-dark-duration-bg);
-$wg-dark-goal-color: var(--color-wg-dark-goal-color);
-$wg-dark-level-color: var(--color-wg-dark-level-color);
-$wg-dark-duration-color: var(--color-wg-dark-duration-color);
 
 // Spacing
 $wg-spacing-sm: 0.5rem;

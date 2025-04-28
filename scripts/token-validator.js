@@ -22,7 +22,7 @@ const CONFIG = {
   // Files to exclude
   excludePatterns: ['**/tokens.scss'],
   // Token file path (relative to project root)
-  tokenFile: 'src/styles/tokens.scss',
+  tokenFile: 'src/styles/design-system/tokens/_color-maps.scss',
   // Allowed exceptions (won't be flagged)
   allowedValues: [
     'transparent',
@@ -38,6 +38,9 @@ const componentFilter = args.find(arg => arg.startsWith('--component='))?.split(
                       (args.includes('--component') && args[args.indexOf('--component') + 1]);
 const featureFilter = args.find(arg => arg.startsWith('--feature='))?.split('=')[1] || 
                      (args.includes('--feature') && args[args.indexOf('--feature') + 1]);
+const filesFilter = args.find(arg => arg.startsWith('--files='))?.split('=')[1] || 
+                     (args.includes('--files') && args[args.indexOf('--files') + 1]);
+const generateReport = args.includes('--report');
 
 // State for tracking results
 const results = {
@@ -168,6 +171,21 @@ function scanFile(filePath) {
  * @returns {string[]} Array of file paths to scan
  */
 function getFilesToScan() {
+  // If specific files are provided via a file list
+  if (filesFilter) {
+    try {
+      const filePath = path.resolve(process.cwd(), filesFilter);
+      const fileContent = fs.readFileSync(filePath, 'utf8');
+      // Get list of files from the provided file
+      return fileContent.split('\n')
+        .filter(line => line.trim() !== '')
+        .map(line => path.resolve(process.cwd(), line.trim()));
+    } catch (error) {
+      console.error(chalk.red(`Error reading files list: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
   let searchPattern = CONFIG.includePatterns;
   const ignorePatterns = [
     ...CONFIG.excludeDirs.map(dir => `**/${dir}/**`),
@@ -196,6 +214,168 @@ function getFilesToScan() {
   }
   
   return files;
+}
+
+/**
+ * Generates an HTML report of token usage
+ */
+function generateHtmlReport() {
+  if (!generateReport) return;
+  
+  const reportDir = 'reports';
+  const reportPath = path.join(reportDir, 'token-validation-report.html');
+  
+  // Create reports directory if it doesn't exist
+  if (!fs.existsSync(reportDir)) {
+    fs.mkdirSync(reportDir, { recursive: true });
+  }
+  
+  // Extract top 10 most frequent hardcoded values
+  const valueFrequency = {};
+  results.issues.forEach(fileResult => {
+    fileResult.issues.forEach(issue => {
+      if (!valueFrequency[issue.value]) {
+        valueFrequency[issue.value] = 0;
+      }
+      valueFrequency[issue.value]++;
+    });
+  });
+  
+  const topValues = Object.entries(valueFrequency)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  
+  // Generate HTML content
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Token Validation Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1, h2, h3 {
+      margin-top: 2rem;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .card {
+      background: #f9f9f9;
+      border-radius: 4px;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card .number {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+    .file {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+    .issue {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      background: #f5f5f5;
+      border-left: 3px solid #ff5252;
+    }
+    .color-preview {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 3px;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+      border: 1px solid #ddd;
+    }
+    .top-values {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .value-card {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .value-count {
+      margin-left: auto;
+      font-weight: bold;
+      background: #f0f0f0;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Color Token Validation Report</h1>
+  <p>Generated on ${new Date().toLocaleString()}</p>
+  
+  <div class="summary">
+    <div class="card">
+      <h3>Files Scanned</h3>
+      <div class="number">${results.totalFiles}</div>
+    </div>
+    <div class="card">
+      <h3>Files with Issues</h3>
+      <div class="number">${results.filesWithIssues}</div>
+    </div>
+    <div class="card">
+      <h3>Total Issues</h3>
+      <div class="number">${results.totalIssues}</div>
+    </div>
+  </div>
+  
+  <h2>Most Common Hardcoded Values</h2>
+  <div class="top-values">
+    ${topValues.map(([value, count]) => `
+      <div class="value-card">
+        <span class="color-preview" style="background-color: ${value}"></span>
+        <code>${value}</code>
+        <span class="value-count">${count}</span>
+      </div>
+    `).join('')}
+  </div>
+  
+  <h2>Issues by File</h2>
+  ${results.issues.map(fileResult => `
+    <div class="file">
+      <h3>${fileResult.file}</h3>
+      <p>Found ${fileResult.issues.length} issues:</p>
+      ${fileResult.issues.slice(0, 10).map(issue => `
+        <div class="issue">
+          <p>Line ${issue.line}: <strong>${issue.value}</strong></p>
+          <pre>${issue.context}</pre>
+        </div>
+      `).join('')}
+      ${fileResult.issues.length > 10 ? `<p>...and ${fileResult.issues.length - 10} more issues.</p>` : ''}
+    </div>
+  `).join('')}
+</body>
+</html>
+  `;
+  
+  // Write HTML to file
+  fs.writeFileSync(reportPath, html);
+  console.log(chalk.blue(`Report generated at: ${reportPath}`));
 }
 
 /**
@@ -256,6 +436,9 @@ function main() {
   if (featureFilter) {
     console.log(chalk.blue(`Filtering to feature: ${featureFilter}`));
   }
+  if (filesFilter) {
+    console.log(chalk.blue(`Using files from: ${filesFilter}`));
+  }
   
   // Load tokens
   console.log(chalk.blue('Loading tokens...'));
@@ -274,6 +457,11 @@ function main() {
     }
     scanFile(file);
   });
+  
+  // Generate HTML report if requested
+  if (generateReport) {
+    generateHtmlReport();
+  }
   
   // Print results
   printResults();

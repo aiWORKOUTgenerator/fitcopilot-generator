@@ -23,7 +23,7 @@ const CONFIG = {
   // Files to exclude
   excludePatterns: ['**/tokens.ts', '**/colors.ts', '**/theme.ts'],
   // Design token file path (for reference)
-  tokenFile: 'src/styles/design-system/_colors.scss',
+  tokenFile: 'src/styles/design-system/tokens/_color-maps.scss',
   // Allowed exceptions (won't be flagged)
   allowedValues: [
     'transparent',

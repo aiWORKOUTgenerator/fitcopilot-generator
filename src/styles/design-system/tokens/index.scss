@@ -1,0 +1,24 @@
+/**
+ * Design System Token Index
+ * 
+ * This file imports all token files in the correct dependency order.
+ * Import this file to access the complete token system.
+ */
+
+// First, import the core color tokens
+@import './color-core';
+
+// Then the semantic color mappings
+@import './color-semantic';
+
+// Then the CSS variables
+@import './color-variables';
+
+// Then the access maps and functions
+@import './color-maps';
+
+// Finally, the mixins for standardized color applications
+@import './color-mixins';
+
+// Export a flag to show this file was imported
+$tokens-imported: true; 

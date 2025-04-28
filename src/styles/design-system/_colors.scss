@@ -1,116 +1,12 @@
-:root {
-  /* Primary and accent colors with RGB values */
-  --color-primary-rgb: 31, 173, 159;
-  --color-primary: rgb(var(--color-primary-rgb));
-  --color-primary-dark-rgb: 0, 122, 145;
-  --color-primary-dark: rgb(var(--color-primary-dark-rgb));
-  --color-primary-light-rgb: 51, 177, 201;
-  --color-primary-light: rgb(var(--color-primary-light-rgb));
-  
-  --color-accent-rgb: 212, 160, 23;
-  --color-accent: rgb(var(--color-accent-rgb));
-  --color-accent-dark-rgb: 230, 176, 34;
-  --color-accent-dark: rgb(var(--color-accent-dark-rgb));
-  --color-accent-light-rgb: 255, 225, 159;
-  --color-accent-light: rgb(var(--color-accent-light-rgb));
+/**
+ * Color Utilities
+ * 
+ * This file provides utility classes for color application.
+ * Core color tokens are defined in the tokens directory.
+ */
 
-  /* Base colors with RGB values */
-  --color-bg-rgb: 245, 247, 250;
-  --color-bg: rgb(var(--color-bg-rgb));
-  --color-surface-rgb: 255, 255, 255;
-  --color-surface: rgb(var(--color-surface-rgb));
-  --color-surface-accent-rgb: 240, 240, 240;
-  --color-surface-accent: rgb(var(--color-surface-accent-rgb));
-  --color-text-rgb: 51, 51, 51;
-  --color-text: rgb(var(--color-text-rgb));
-  --color-text-muted-rgb: 108, 117, 125;
-  --color-text-muted: rgb(var(--color-text-muted-rgb));
-  --color-border-rgb: 222, 226, 230;
-  --color-border: rgb(var(--color-border-rgb));
-  
-  /* Feedback colors with RGB values */
-  --color-success-rgb: 43, 174, 102;
-  --color-success: rgb(var(--color-success-rgb));
-  --color-error-rgb: 217, 78, 78;
-  --color-error: rgb(var(--color-error-rgb));
-  --color-warning-rgb: 240, 173, 78;
-  --color-warning: rgb(var(--color-warning-rgb));
-  --color-info-rgb: 77, 171, 245;
-  --color-info: rgb(var(--color-info-rgb));
-
-  /* Dark theme colors with RGB values */
-  --color-dark-bg-rgb: 18, 18, 18;
-  --color-dark-bg: rgb(var(--color-dark-bg-rgb));
-  --color-dark-surface-rgb: 30, 30, 30;
-  --color-dark-surface: rgb(var(--color-dark-surface-rgb));
-  --color-dark-card-rgb: 37, 37, 37;
-  --color-dark-card: rgb(var(--color-dark-card-rgb));
-  --color-dark-border-rgb: 51, 51, 51;
-  --color-dark-border: rgb(var(--color-dark-border-rgb));
-  
-  /* Accent colors with RGB values */
-  --color-dark-primary-rgb: 0, 180, 216;
-  --color-dark-primary: rgb(var(--color-dark-primary-rgb));
-  --color-dark-accent-rgb: 212, 255, 80;
-  --color-dark-accent: rgb(var(--color-dark-accent-rgb));
-  --color-dark-success-rgb: 6, 214, 160;
-  --color-dark-success: rgb(var(--color-dark-success-rgb));
-  --color-dark-info-rgb: 14, 165, 233;
-  --color-dark-info: rgb(var(--color-dark-info-rgb));
-  --color-dark-warning-rgb: 251, 191, 36;
-  --color-dark-warning: rgb(var(--color-dark-warning-rgb));
-  --color-dark-error-rgb: 239, 68, 68;
-  --color-dark-error: rgb(var(--color-dark-error-rgb));
-  
-  /* Text colors with RGB values */
-  --color-dark-text-rgb: 243, 244, 246;
-  --color-dark-text: rgb(var(--color-dark-text-rgb));
-  --color-dark-muted-rgb: 156, 163, 175;
-  --color-dark-muted: rgb(var(--color-dark-muted-rgb));
-  
-  /* Interactive elements */
-  --color-dark-highlight-rgb: 61, 61, 61;
-  --color-dark-highlight: rgb(var(--color-dark-highlight-rgb));
-  --color-dark-surface-hover-rgb: 42, 42, 42;
-  --color-dark-surface-hover: rgb(var(--color-dark-surface-hover-rgb));
-  
-  /* Workout Generator specific colors */
-  /* These bridge the gap between the specific WG variables and global tokens */
-  --color-wg-primary-rgb: 37, 99, 235;
-  --color-wg-primary: rgb(var(--color-wg-primary-rgb));
-  --color-wg-primary-hover-rgb: 29, 78, 216;
-  --color-wg-primary-hover: rgb(var(--color-wg-primary-hover-rgb));
-  --color-wg-secondary-rgb: 107, 114, 128;
-  --color-wg-secondary: rgb(var(--color-wg-secondary-rgb));
-  --color-wg-secondary-hover-rgb: 75, 85, 99;
-  --color-wg-secondary-hover: rgb(var(--color-wg-secondary-hover-rgb));
-  --color-wg-success-rgb: 22, 163, 74;
-  --color-wg-success: rgb(var(--color-wg-success-rgb));
-  --color-wg-error-rgb: 220, 53, 69;
-  --color-wg-error: rgb(var(--color-wg-error-rgb));
-  
-  /* Workout Generator card colors */
-  --color-wg-goal-bg-rgb: 239, 246, 255;
-  --color-wg-goal-bg: rgb(var(--color-wg-goal-bg-rgb));
-  --color-wg-level-bg-rgb: 240, 253, 244;
-  --color-wg-level-bg: rgb(var(--color-wg-level-bg-rgb));
-  --color-wg-duration-bg-rgb: 245, 243, 255;
-  --color-wg-duration-bg: rgb(var(--color-wg-duration-bg-rgb));
-  --color-wg-goal-color-rgb: 37, 99, 235;
-  --color-wg-goal-color: rgb(var(--color-wg-goal-color-rgb));
-  --color-wg-level-color-rgb: 22, 163, 74;
-  --color-wg-level-color: rgb(var(--color-wg-level-color-rgb));
-  --color-wg-duration-color-rgb: 124, 58, 237;
-  --color-wg-duration-color: rgb(var(--color-wg-duration-color-rgb));
-  
-  /* Workout Generator dark mode cards */
-  --color-wg-dark-goal-bg: rgba(0, 102, 204, 0.2);
-  --color-wg-dark-level-bg: rgba(0, 153, 102, 0.2);
-  --color-wg-dark-duration-bg: rgba(102, 51, 204, 0.2);
-  --color-wg-dark-goal-color: #0099ff;
-  --color-wg-dark-level-color: #00cc66;
-  --color-wg-dark-duration-color: #9966ff;
-}
+// Import the token system
+@import './tokens/index';
 
 /* Color utilities */
 .text-primary { color: var(--color-primary); }
@@ -137,7 +33,7 @@
   .text-error { color: var(--color-dark-error); }
   .text-info { color: var(--color-dark-info); }
   .text-warning { color: var(--color-dark-warning); }
-  .text-muted { color: var(--color-dark-muted); }
+  .text-muted { color: var(--color-dark-text-muted); }
   
   .bg-primary { background-color: var(--color-dark-primary); }
   .bg-accent { background-color: var(--color-dark-accent); }

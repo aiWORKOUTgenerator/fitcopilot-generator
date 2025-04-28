@@ -1,0 +1,143 @@
+/**
+ * Color Maps
+ * 
+ * This file provides structured SCSS maps for accessing colors.
+ * These maps should be used by helper functions to standardize token access.
+ */
+
+@import './color-semantic';
+
+// Base Color Maps
+$colors: (
+  'primary': (
+    'base': var(--color-primary),
+    'dark': var(--color-primary-dark),
+    'light': var(--color-primary-light)
+  ),
+  'accent': (
+    'base': var(--color-accent),
+    'dark': var(--color-accent-dark),
+    'light': var(--color-accent-light)
+  ),
+  'surface': (
+    'base': var(--color-surface),
+    'accent': var(--color-surface-accent)
+  ),
+  'text': (
+    'base': var(--color-text),
+    'muted': var(--color-text-muted)
+  ),
+  'border': var(--color-border),
+  'feedback': (
+    'success': var(--color-success),
+    'error': var(--color-error),
+    'warning': var(--color-warning),
+    'info': var(--color-info)
+  )
+);
+
+// Dark Theme Color Maps
+$dark-colors: (
+  'primary': var(--color-dark-primary),
+  'accent': var(--color-dark-accent),
+  'surface': var(--color-dark-surface),
+  'card': var(--color-dark-card),
+  'border': var(--color-dark-border),
+  'highlight': var(--color-dark-highlight),
+  'text': var(--color-dark-text),
+  'text-muted': var(--color-dark-text-muted),
+  'feedback': (
+    'success': var(--color-dark-success),
+    'error': var(--color-dark-error),
+    'warning': var(--color-dark-warning),
+    'info': var(--color-dark-info)
+  )
+);
+
+// Workout Generator Color Maps
+$wg-colors: (
+  'primary': (
+    'base': var(--color-wg-primary),
+    'hover': var(--color-wg-primary-hover)
+  ),
+  'secondary': (
+    'base': var(--color-wg-secondary),
+    'hover': var(--color-wg-secondary-hover)
+  ),
+  'feedback': (
+    'success': var(--color-wg-success),
+    'error': var(--color-wg-error)
+  ),
+  'card': (
+    'goal': (
+      'bg': var(--color-wg-goal-bg),
+      'color': var(--color-wg-goal-color),
+      'dark-bg': var(--color-wg-dark-goal-bg),
+      'dark-color': var(--color-wg-dark-goal-color)
+    ),
+    'level': (
+      'bg': var(--color-wg-level-bg),
+      'color': var(--color-wg-level-color),
+      'dark-bg': var(--color-wg-dark-level-bg),
+      'dark-color': var(--color-wg-dark-level-color)
+    ),
+    'duration': (
+      'bg': var(--color-wg-duration-bg),
+      'color': var(--color-wg-duration-color),
+      'dark-bg': var(--color-wg-dark-duration-bg),
+      'dark-color': var(--color-wg-dark-duration-color)
+    )
+  )
+);
+
+// Helper functions for color access
+@function color($category, $variant: 'base') {
+  @if not map-has-key($colors, $category) {
+    @error "Color category '#{$category}' not found in $colors";
+  }
+  
+  $category-map: map-get($colors, $category);
+  
+  @if type-of($category-map) == 'map' {
+    @if not map-has-key($category-map, $variant) {
+      @error "Variant '#{$variant}' not found in color category '#{$category}'";
+    }
+    @return map-get($category-map, $variant);
+  } @else {
+    @return $category-map;
+  }
+}
+
+@function dark-color($category, $variant: null) {
+  @if not map-has-key($dark-colors, $category) {
+    @error "Dark color category '#{$category}' not found in $dark-colors";
+  }
+  
+  $category-value: map-get($dark-colors, $category);
+  
+  @if $variant != null and type-of($category-value) == 'map' {
+    @if not map-has-key($category-value, $variant) {
+      @error "Variant '#{$variant}' not found in dark color category '#{$category}'";
+    }
+    @return map-get($category-value, $variant);
+  } @else {
+    @return $category-value;
+  }
+}
+
+@function wg-color($category, $variant: 'base') {
+  @if not map-has-key($wg-colors, $category) {
+    @error "Workout Generator color category '#{$category}' not found in $wg-colors";
+  }
+  
+  $category-map: map-get($wg-colors, $category);
+  
+  @if type-of($category-map) == 'map' {
+    @if not map-has-key($category-map, $variant) {
+      @error "Variant '#{$variant}' not found in Workout Generator color category '#{$category}'";
+    }
+    @return map-get($category-map, $variant);
+  } @else {
+    @return $category-map;
+  }
+} 

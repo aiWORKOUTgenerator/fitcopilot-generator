@@ -1,0 +1,1088 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Token Validation Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1, h2, h3 {
+      margin-top: 2rem;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .card {
+      background: #f9f9f9;
+      border-radius: 4px;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card .number {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+    .file {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+    .issue {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      background: #f5f5f5;
+      border-left: 3px solid #ff5252;
+    }
+    .color-preview {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 3px;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+      border: 1px solid #ddd;
+    }
+    .top-values {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .value-card {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .value-count {
+      margin-left: auto;
+      font-weight: bold;
+      background: #f0f0f0;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Color Token Validation Report</h1>
+  <p>Generated on 4/28/2025, 8:14:38 AM</p>
+  
+  <div class="summary">
+    <div class="card">
+      <h3>Files Scanned</h3>
+      <div class="number">100</div>
+    </div>
+    <div class="card">
+      <h3>Files with Issues</h3>
+      <div class="number">20</div>
+    </div>
+    <div class="card">
+      <h3>Total Issues</h3>
+      <div class="number">376</div>
+    </div>
+  </div>
+  
+  <h2>Most Common Hardcoded Values</h2>
+  <div class="top-values">
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #84cc16"></span>
+        <code>#84cc16</code>
+        <span class="value-count">20</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #333"></span>
+        <code>#333</code>
+        <span class="value-count">16</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #ddd"></span>
+        <code>#ddd</code>
+        <span class="value-count">12</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #444"></span>
+        <code>#444</code>
+        <span class="value-count">11</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #dedede"></span>
+        <code>#dedede</code>
+        <span class="value-count">11</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #eee"></span>
+        <code>#eee</code>
+        <span class="value-count">10</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #22d3ee"></span>
+        <code>#22d3ee</code>
+        <span class="value-count">9</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #555"></span>
+        <code>#555</code>
+        <span class="value-count">9</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #666"></span>
+        <code>#666</code>
+        <span class="value-count">9</span>
+      </div>
+    
+      <div class="value-card">
+        <span class="color-preview" style="background-color: #f9f9f9"></span>
+        <code>#f9f9f9</code>
+        <span class="value-count">8</span>
+      </div>
+    
+  </div>
+  
+  <h2>Issues by File</h2>
+  
+    <div class="file">
+      <h3>src/common/components/UI/ProgressBar/ProgressBar.scss</h3>
+      <p>Found 6 issues:</p>
+      
+        <div class="issue">
+          <p>Line 10: <strong>#1e293b</strong></p>
+          <pre>background-color: #1e293b;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 19: <strong>#60a5fa</strong></p>
+          <pre>background-color: #60a5fa;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 52: <strong>#7dd3fc</strong></p>
+          <pre>background-color: #7dd3fc;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 53: <strong>#0f172a</strong></p>
+          <pre>color: #0f172a;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 72: <strong>#3b82f6</strong></p>
+          <pre>outline: 2px solid #3b82f6;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 79: <strong>#0f172a</strong></p>
+          <pre>background-color: #0f172a;</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/common/styles/variables.scss</h3>
+      <p>Found 6 issues:</p>
+      
+        <div class="issue">
+          <p>Line 4: <strong>#60a5fa</strong></p>
+          <pre>$primary-blue: #60a5fa;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 5: <strong>#67e8f9</strong></p>
+          <pre>$primary-cyan: #67e8f9;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 6: <strong>#7dd3fc</strong></p>
+          <pre>$light-cyan: #7dd3fc;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 7: <strong>#1e293b</strong></p>
+          <pre>$dark-slate: #1e293b;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 8: <strong>#0f172a</strong></p>
+          <pre>$darker-slate: #0f172a;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 9: <strong>#111827</strong></p>
+          <pre>$text-dark: #111827;</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/components/Form/form.scss</h3>
+      <p>Found 6 issues:</p>
+      
+        <div class="issue">
+          <p>Line 411: <strong>#f8f9fa</strong></p>
+          <pre>background-color: #f8f9fa;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 459: <strong>#e9ecef</strong></p>
+          <pre>background-color: #e9ecef;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 460: <strong>#495057</strong></p>
+          <pre>color: #495057;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 524: <strong>#dc3545</strong></p>
+          <pre>color: #dc3545;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 516: <strong>rgba(220, 53, 69, 0.1)</strong></p>
+          <pre>background-color: rgba(220, 53, 69, 0.1);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 519: <strong>rgba(255, 107, 107, 0.1)</strong></p>
+          <pre>background-color: rgba(255, 107, 107, 0.1);</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/components/Form/steps/InputStep.scss</h3>
+      <p>Found 42 issues:</p>
+      
+        <div class="issue">
+          <p>Line 23: <strong>#84cc16</strong></p>
+          <pre>background: linear-gradient(to right, var(--color-primary-light, #84cc16), var(--color-secondary, #22d3ee));</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 23: <strong>#22d3ee</strong></p>
+          <pre>background: linear-gradient(to right, var(--color-primary-light, #84cc16), var(--color-secondary, #22d3ee));</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 94: <strong>#1f2937</strong></p>
+          <pre>background-color: rgba(var(--color-dark-surface-accent, #1f2937), 0.6);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 160: <strong>#84cc16</strong></p>
+          <pre>color: rgba(var(--color-primary-light, #84cc16), 0.8);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 207: <strong>#84cc16</strong></p>
+          <pre>background-color: var(--color-primary, #84cc16);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 214: <strong>#84cc16</strong></p>
+          <pre>background-color: var(--color-dark-primary, #84cc16);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 243: <strong>#84cc16</strong></p>
+          <pre>border-color: rgba(var(--color-primary-light, #84cc16), 0.5);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 247: <strong>#84cc16</strong></p>
+          <pre>color: rgba(var(--color-primary-light, #84cc16), 0.8);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 259: <strong>#84cc16</strong></p>
+          <pre>border-color: var(--color-primary, #84cc16);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 268: <strong>#84cc16</strong></p>
+          <pre>box-shadow: 0 0 0 3px rgba(var(--color-primary-light, #84cc16), 0.2);</pre>
+        </div>
+      
+      <p>...and 32 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/components/Form/steps/styles/generating-step.scss</h3>
+      <p>Found 5 issues:</p>
+      
+        <div class="issue">
+          <p>Line 33: <strong>#0366d6</strong></p>
+          <pre>color: #0366d6;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 43: <strong>#fff0f0</strong></p>
+          <pre>background-color: #fff0f0;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 44: <strong>#ffcdd2</strong></p>
+          <pre>border: 1px solid #ffcdd2;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 48: <strong>#d32f2f</strong></p>
+          <pre>color: #d32f2f;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 27: <strong>rgba(232, 244, 253, 0.6)</strong></p>
+          <pre>background-color: rgba(232, 244, 253, 0.6);</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/components/ui/ProgressBar.scss</h3>
+      <p>Found 6 issues:</p>
+      
+        <div class="issue">
+          <p>Line 10: <strong>#1e293b</strong></p>
+          <pre>background-color: #1e293b;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 19: <strong>#60a5fa</strong></p>
+          <pre>background-color: #60a5fa;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 52: <strong>#7dd3fc</strong></p>
+          <pre>background-color: #7dd3fc;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 53: <strong>#0f172a</strong></p>
+          <pre>color: #0f172a;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 72: <strong>#3b82f6</strong></p>
+          <pre>outline: 2px solid #3b82f6;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 79: <strong>#0f172a</strong></p>
+          <pre>background-color: #0f172a;</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/styles/components/_buttons.scss</h3>
+      <p>Found 10 issues:</p>
+      
+        <div class="issue">
+          <p>Line 45: <strong>#444</strong></p>
+          <pre>background-color: #444;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 48: <strong>#555</strong></p>
+          <pre>background-color: #555;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 95: <strong>#f3f4f6</strong></p>
+          <pre>background-color: #f3f4f6;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 96: <strong>#4b5563</strong></p>
+          <pre>color: #4b5563;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 97: <strong>#d1d5db</strong></p>
+          <pre>border: 1px solid #d1d5db;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 100: <strong>#e5e7eb</strong></p>
+          <pre>background-color: #e5e7eb;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 104: <strong>#333</strong></p>
+          <pre>background-color: #333;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 105: <strong>#dedede</strong></p>
+          <pre>color: #dedede;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 106: <strong>#444</strong></p>
+          <pre>border-color: #444;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 109: <strong>#444</strong></p>
+          <pre>background-color: #444;</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/styles/components/_cards.scss</h3>
+      <p>Found 14 issues:</p>
+      
+        <div class="issue">
+          <p>Line 15: <strong>#1f2937</strong></p>
+          <pre>color: #1f2937;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 62: <strong>#6b7280</strong></p>
+          <pre>color: #6b7280;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 66: <strong>#aaaaaa</strong></p>
+          <pre>color: #aaaaaa;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 109: <strong>#4b5563</strong></p>
+          <pre>color: #4b5563;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 113: <strong>#dedede</strong></p>
+          <pre>color: #dedede;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 125: <strong>#e9ecef</strong></p>
+          <pre>background-color: #e9ecef;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 126: <strong>#4b5563</strong></p>
+          <pre>color: #4b5563;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 132: <strong>#333</strong></p>
+          <pre>background-color: #333;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 133: <strong>#dedede</strong></p>
+          <pre>color: #dedede;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 138: <strong>#f9fafb</strong></p>
+          <pre>background-color: #f9fafb;</pre>
+        </div>
+      
+      <p>...and 4 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/styles/components/_form.scss</h3>
+      <p>Found 21 issues:</p>
+      
+        <div class="issue">
+          <p>Line 19: <strong>#121212</strong></p>
+          <pre>background-color: #121212;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 31: <strong>#4b5563</strong></p>
+          <pre>color: #4b5563;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 36: <strong>#dedede</strong></p>
+          <pre>color: #dedede;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 46: <strong>#f87171</strong></p>
+          <pre>color: #f87171;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 54: <strong>#d1d5db</strong></p>
+          <pre>border: 1px solid #d1d5db;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 64: <strong>#1e1e1e</strong></p>
+          <pre>background-color: #1e1e1e;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 65: <strong>#333</strong></p>
+          <pre>border-color: #333;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 66: <strong>#dedede</strong></p>
+          <pre>color: #dedede;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 79: <strong>#d1d5db</strong></p>
+          <pre>border: 1px solid #d1d5db;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 86: <strong>#1e1e1e</strong></p>
+          <pre>background-color: #1e1e1e;</pre>
+        </div>
+      
+      <p>...and 11 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/styles/components/_loading.scss</h3>
+      <p>Found 3 issues:</p>
+      
+        <div class="issue">
+          <p>Line 17: <strong>#e5e7eb</strong></p>
+          <pre>border: 3px solid #e5e7eb;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 30: <strong>#4b5563</strong></p>
+          <pre>color: #4b5563;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 36: <strong>#e5e7eb</strong></p>
+          <pre>background-color: #e5e7eb;</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/styles/components/_steps.scss</h3>
+      <p>Found 8 issues:</p>
+      
+        <div class="issue">
+          <p>Line 13: <strong>#1f2937</strong></p>
+          <pre>color: #1f2937;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 22: <strong>#4b5563</strong></p>
+          <pre>color: #4b5563;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 26: <strong>#dedede</strong></p>
+          <pre>color: #dedede;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 39: <strong>#1f2937</strong></p>
+          <pre>color: #1f2937;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 52: <strong>#dedede</strong></p>
+          <pre>color: #dedede;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 104: <strong>#ff6b6b</strong></p>
+          <pre>color: #ff6b6b;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 92: <strong>rgba(220, 53, 69, 0.1)</strong></p>
+          <pre>background-color: rgba(220, 53, 69, 0.1);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 95: <strong>rgba(255, 107, 107, 0.1)</strong></p>
+          <pre>background-color: rgba(255, 107, 107, 0.1);</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/styles/design-system/_animations.scss</h3>
+      <p>Found 25 issues:</p>
+      
+        <div class="issue">
+          <p>Line 52: <strong>rgba(0, 180, 216, 0.3)</strong></p>
+          <pre>box-shadow: 0 0 5px rgba(0, 180, 216, 0.3);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 55: <strong>rgba(0, 180, 216, 0.6)</strong></p>
+          <pre>box-shadow: 0 0 15px rgba(0, 180, 216, 0.6);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 152: <strong>rgba(0, 180, 216, 0.3)</strong></p>
+          <pre>box-shadow: 0 0 5px rgba(0, 180, 216, 0.3);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 155: <strong>rgba(0, 180, 216, 0.8)</strong></p>
+          <pre>box-shadow: 0 0 20px rgba(0, 180, 216, 0.8);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 196: <strong>rgba(0, 180, 216, 0.7)</strong></p>
+          <pre>box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.7);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 199: <strong>rgba(0, 180, 216, 0)</strong></p>
+          <pre>box-shadow: 0 0 0 10px rgba(0, 180, 216, 0);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 202: <strong>rgba(0, 180, 216, 0)</strong></p>
+          <pre>box-shadow: 0 0 0 0 rgba(0, 180, 216, 0);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 208: <strong>rgba(255, 209, 102, 0.7)</strong></p>
+          <pre>box-shadow: 0 0 0 0 rgba(255, 209, 102, 0.7);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 211: <strong>rgba(255, 209, 102, 0)</strong></p>
+          <pre>box-shadow: 0 0 0 10px rgba(255, 209, 102, 0);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 214: <strong>rgba(255, 209, 102, 0)</strong></p>
+          <pre>box-shadow: 0 0 0 0 rgba(255, 209, 102, 0);</pre>
+        </div>
+      
+      <p>...and 15 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/styles/design-system/_components.scss</h3>
+      <p>Found 6 issues:</p>
+      
+        <div class="issue">
+          <p>Line 212: <strong>#00b4d8</strong></p>
+          <pre>background-color: lighten(#00b4d8, 10%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 223: <strong>#121212</strong></p>
+          <pre>color: #121212;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 226: <strong>#d4ff50</strong></p>
+          <pre>background-color: lighten(#d4ff50, 10%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 378: <strong>#121212</strong></p>
+          <pre>border: solid #121212;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 294: <strong>rgba(35, 35, 35, 0.8)</strong></p>
+          <pre>background-color: rgba(35, 35, 35, 0.8);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 301: <strong>rgba(239, 68, 68, 0.5)</strong></p>
+          <pre>box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/styles/design-system/_gradients.scss</h3>
+      <p>Found 27 issues:</p>
+      
+        <div class="issue">
+          <p>Line 5: <strong>#0077b6</strong></p>
+          <pre>--gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, #0077b6 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 6: <strong>#e6a700</strong></p>
+          <pre>--gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, #e6a700 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 7: <strong>#06d6a0</strong></p>
+          <pre>--gradient-success: linear-gradient(135deg, #06d6a0 0%, #1b9aaa 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 7: <strong>#1b9aaa</strong></p>
+          <pre>--gradient-success: linear-gradient(135deg, #06d6a0 0%, #1b9aaa 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 8: <strong>#ff9f1c</strong></p>
+          <pre>--gradient-warning: linear-gradient(135deg, #ff9f1c 0%, #ffbf69 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 8: <strong>#ffbf69</strong></p>
+          <pre>--gradient-warning: linear-gradient(135deg, #ff9f1c 0%, #ffbf69 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 9: <strong>#ef476f</strong></p>
+          <pre>--gradient-error: linear-gradient(135deg, #ef476f 0%, #ff6b6b 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 9: <strong>#ff6b6b</strong></p>
+          <pre>--gradient-error: linear-gradient(135deg, #ef476f 0%, #ff6b6b 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 12: <strong>#0077b6</strong></p>
+          <pre>--gradient-dark-primary: linear-gradient(135deg, var(--color-dark-primary) 0%, #0077b6 100%);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 13: <strong>#e6a700</strong></p>
+          <pre>--gradient-dark-accent: linear-gradient(135deg, var(--color-dark-accent) 0%, #e6a700 100%);</pre>
+        </div>
+      
+      <p>...and 17 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/styles/design-system/_shadows.scss</h3>
+      <p>Found 16 issues:</p>
+      
+        <div class="issue">
+          <p>Line 25: <strong>rgba(0, 95, 115, 0.3)</strong></p>
+          <pre>--shadow-focus: 0 0 0 3px rgba(0, 95, 115, 0.3);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 26: <strong>rgba(34, 211, 238, 0.3)</strong></p>
+          <pre>--dark-shadow-focus: 0 0 0 3px rgba(34, 211, 238, 0.3); // cyan-300 glow</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 29: <strong>rgba(0, 180, 216, 0.5)</strong></p>
+          <pre>--glow-primary: 0 0 15px rgba(0, 180, 216, 0.5);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 30: <strong>rgba(255, 209, 102, 0.5)</strong></p>
+          <pre>--glow-accent: 0 0 15px rgba(255, 209, 102, 0.5);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 31: <strong>rgba(6, 214, 160, 0.5)</strong></p>
+          <pre>--glow-success: 0 0 15px rgba(6, 214, 160, 0.5);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 32: <strong>rgba(239, 71, 111, 0.5)</strong></p>
+          <pre>--glow-error: 0 0 15px rgba(239, 71, 111, 0.5);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 33: <strong>rgba(0, 180, 216, 0.25)</strong></p>
+          <pre>--glow-focus: 0 0 0 3px rgba(0, 180, 216, 0.25);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 36: <strong>rgba(0, 180, 216, 0.6)</strong></p>
+          <pre>--glow-dark-primary: 0 0 20px rgba(0, 180, 216, 0.6);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 37: <strong>rgba(255, 209, 102, 0.6)</strong></p>
+          <pre>--glow-dark-accent: 0 0 20px rgba(255, 209, 102, 0.6);</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 38: <strong>rgba(6, 214, 160, 0.6)</strong></p>
+          <pre>--glow-dark-success: 0 0 20px rgba(6, 214, 160, 0.6);</pre>
+        </div>
+      
+      <p>...and 6 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/features/api-tracker/styles/api-tracker.css</h3>
+      <p>Found 93 issues:</p>
+      
+        <div class="issue">
+          <p>Line 32: <strong>#e2e4e7</strong></p>
+          <pre>border-bottom: 1px solid #e2e4e7;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 42: <strong>#f6f7f7</strong></p>
+          <pre>background-color: #f6f7f7;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 43: <strong>#2271b1</strong></p>
+          <pre>border-left: 4px solid #2271b1;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 51: <strong>#23282d</strong></p>
+          <pre>color: #23282d;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 57: <strong>#ccd0d4</strong></p>
+          <pre>border-bottom: 1px solid #ccd0d4;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 67: <strong>#f1f1f1</strong></p>
+          <pre>background: #f1f1f1;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 68: <strong>#ccd0d4</strong></p>
+          <pre>border: 1px solid #ccd0d4;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 74: <strong>#555</strong></p>
+          <pre>color: #555;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 92: <strong>#f9f9f9</strong></p>
+          <pre>background-color: #f9f9f9;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 93: <strong>#333</strong></p>
+          <pre>color: #333;</pre>
+        </div>
+      
+      <p>...and 83 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/features/token-usage/styles/token-usage.css</h3>
+      <p>Found 62 issues:</p>
+      
+        <div class="issue">
+          <p>Line 11: <strong>#333</strong></p>
+          <pre>color: #333;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 12: <strong>#2271b1</strong></p>
+          <pre>--primary-color: #2271b1;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 13: <strong>#135e96</strong></p>
+          <pre>--primary-hover: #135e96;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 14: <strong>#00a32a</strong></p>
+          <pre>--success-color: #00a32a;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 15: <strong>#dba617</strong></p>
+          <pre>--warning-color: #dba617;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 16: <strong>#d63638</strong></p>
+          <pre>--error-color: #d63638;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 37: <strong>#555</strong></p>
+          <pre>color: #555;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 280: <strong>#23282d</strong></p>
+          <pre>color: #23282d;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 290: <strong>#444</strong></p>
+          <pre>color: #444;</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 299: <strong>#666</strong></p>
+          <pre>color: #666;</pre>
+        </div>
+      
+      <p>...and 52 more issues.</p>
+    </div>
+  
+    <div class="file">
+      <h3>src/features/api-tracker/components/EndpointStatsTable.tsx</h3>
+      <p>Found 9 issues:</p>
+      
+        <div class="issue">
+          <p>Line 111: <strong>#ffe8e8</strong></p>
+          <pre>backgroundColor = '#ffe8e8';</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 115: <strong>#fff8e8</strong></p>
+          <pre>backgroundColor = '#fff8e8';</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 119: <strong>#e8e8ff</strong></p>
+          <pre>backgroundColor = '#e8e8ff';</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 123: <strong>#e8fff0</strong></p>
+          <pre>backgroundColor = '#e8fff0';</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 127: <strong>#f0e8ff</strong></p>
+          <pre>backgroundColor = '#f0e8ff';</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 494: <strong>#eee</strong></p>
+          <pre>border: '1px solid #eee',</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 503: <strong>#eee</strong></p>
+          <pre>borderBottom: index < mockErrorData.dbQueries.length - 1 ? '1px solid #eee' : 'none'</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 528: <strong>#eee</strong></p>
+          <pre>border: '1px solid #eee',</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 629: <strong>#ddd</strong></p>
+          <pre>border: '1px solid #ddd',</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/token-usage/components/ModelDistribution.tsx</h3>
+      <p>Found 8 issues:</p>
+      
+        <div class="issue">
+          <p>Line 15: <strong>#2271b1</strong></p>
+          <pre>'#2271b1', // Primary blue</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 16: <strong>#3498db</strong></p>
+          <pre>'#3498db', // Light blue</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 17: <strong>#2ecc71</strong></p>
+          <pre>'#2ecc71', // Green</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 18: <strong>#e74c3c</strong></p>
+          <pre>'#e74c3c', // Red</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 19: <strong>#f39c12</strong></p>
+          <pre>'#f39c12', // Orange</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 20: <strong>#9b59b6</strong></p>
+          <pre>'#9b59b6', // Purple</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 21: <strong>#1abc9c</strong></p>
+          <pre>'#1abc9c', // Turquoise</pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 22: <strong>#34495e</strong></p>
+          <pre>'#34495e', // Dark blue</pre>
+        </div>
+      
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/workout-generator/styles/ColorSystem.stories.tsx</h3>
+      <p>Found 3 issues:</p>
+      
+        <div class="issue">
+          <p>Line 42: <strong>#eee</strong></p>
+          <pre><h2 style={{ borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '16px' }}>{title}</h2></pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 134: <strong>#f5f5f5</strong></p>
+          <pre><div style={{ marginTop: '40px', padding: '20px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}></pre>
+        </div>
+      
+        <div class="issue">
+          <p>Line 172: <strong>#121212</strong></p>
+          <pre><div className="dark-theme" style={{ backgroundColor: '#121212', color: 'white', minHeight: '100vh', padding: '20px' }}></pre>
+        </div>
+      
+      
+    </div>
+  
+</body>
+</html>
+  

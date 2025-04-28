@@ -64,7 +64,7 @@ export async function apiFetch<T>(
     },
   };
   
-  const { retries = 3, retryDelay = 1000, timeout = 30000 } = mergedOptions;
+  const { retries = 3, retryDelay = 1000, timeout = 60000 } = mergedOptions;
   delete mergedOptions.retries;
   delete mergedOptions.retryDelay;
   delete mergedOptions.timeout;

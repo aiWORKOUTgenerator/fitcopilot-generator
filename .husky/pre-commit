@@ -1,0 +1,36 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run lint-staged
+npx lint-staged
+
+# Run token validator on staged files
+echo "Running token validator..."
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(scss|css|tsx|jsx)$")
+
+if [ -n "$STAGED_FILES" ]; then
+  # Create a temp file list for validation
+  echo "$STAGED_FILES" > .staged-files-temp
+  
+  # Run validator only on staged files
+  node scripts/token-validator.js --files=.staged-files-temp
+  
+  # Check validator exit code
+  VALIDATOR_RESULT=$?
+  
+  # Clean up temp file
+  rm .staged-files-temp
+  
+  # If validator found issues
+  if [ $VALIDATOR_RESULT -ne 0 ]; then
+    echo "⚠️ Token validation failed! Please fix hardcoded color values before committing."
+    echo "Run 'node scripts/token-validator.js --verbose' for detailed information."
+    echo "See docs/token-mapping.md for token reference."
+    
+    # Uncomment to block commits with token issues
+    # exit 1
+    
+    # For now, just warn but allow commit
+    echo "Warning: Allowing commit despite token issues. Please fix in a follow-up commit."
+  fi
+fi 

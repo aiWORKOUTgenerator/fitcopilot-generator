@@ -8,7 +8,7 @@
 // Import the base color tokens
 @import '../color-tokens';
 
-// Form component tokens
+// Form component tokens - simplified to reduce redundancy
 $wg-form-colors: (
   'background': (
     'base': var(--color-surface),
@@ -21,7 +21,7 @@ $wg-form-colors: (
     'error': wg-semantic-color('feedback', 'error'),
     'dark': var(--color-dark-border),
     'dark-focus': var(--color-dark-primary),
-    'dark-hover': rgba(var(--color-primary-light), 0.5),
+    'dark-hover': rgba(var(--color-primary-light-rgb), 0.5),
     'dark-error': var(--color-dark-error)
   ),
   'text': (
@@ -33,8 +33,8 @@ $wg-form-colors: (
     'dark-placeholder': var(--color-dark-text-muted)
   ),
   'shadow': (
-    'focus': rgba(0, 180, 216, 0.2),
-    'dark-focus': rgba(var(--color-primary-light), 0.2)
+    'focus': rgba(var(--color-primary-rgb), 0.2),
+    'dark-focus': rgba(var(--color-dark-primary-rgb), 0.2)
   ),
   'button': (
     'primary': wg-color('primary'),
@@ -44,31 +44,31 @@ $wg-form-colors: (
     'secondary': transparent,
     'secondary-border': wg-color('primary'),
     'secondary-text': wg-color('primary'),
-    'secondary-hover': rgba(var(--color-primary-rgb), 0.1),
+    'secondary-hover': rgba(var(--color-wg-primary-rgb), 0.1),
     'dark-secondary-border': var(--color-dark-primary),
     'dark-secondary-text': var(--color-dark-primary),
     'dark-secondary-hover': rgba(var(--color-dark-primary-rgb), 0.15)
   )
 );
 
-// Result component tokens
+// Result component tokens - simplified
 $wg-result-colors: (
   'background': (
     'base': var(--color-surface),
     'dark': var(--color-dark-surface),
     'highlight': var(--color-surface-accent),
-    'dark-highlight': var(--color-dark-surface-accent)
+    'dark-highlight': var(--color-dark-surface-hover)
   ),
   'text': (
     'title': wg-color('primary'),
     'dark-title': var(--color-dark-primary),
-    'subtitle': var(--color-text-secondary),
-    'dark-subtitle': var(--color-dark-text-secondary)
+    'subtitle': var(--color-text-muted),
+    'dark-subtitle': var(--color-dark-text-muted)
   ),
   'exercise': (
-    'background': rgba(var(--color-primary-rgb), 0.05),
+    'background': rgba(var(--color-wg-primary-rgb), 0.05),
     'dark-background': rgba(var(--color-dark-primary-rgb), 0.1),
-    'border': rgba(var(--color-primary-rgb), 0.2),
+    'border': rgba(var(--color-wg-primary-rgb), 0.2),
     'dark-border': rgba(var(--color-dark-primary-rgb), 0.3)
   )
 );
