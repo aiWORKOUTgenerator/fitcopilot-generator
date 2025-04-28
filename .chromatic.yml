@@ -1,0 +1,77 @@
+# Chromatic configuration
+# https://www.chromatic.com/docs/config
+
+# Project token from Chromatic
+projectToken: ${CHROMATIC_PROJECT_TOKEN}
+
+# Build script to run before taking snapshots
+buildScriptName: build-storybook
+
+# Storybook configuration
+storybookBuildDir: storybook-static
+
+# Snapshot settings
+snapshot:
+  # Only snapshot stories that have changed
+  onlyChanged: true
+  
+  # Ignore stories that match these patterns
+  ignore:
+    - "**/docs/**"
+    - "**/test/**"
+    - "**/*.test.*"
+    - "**/*.spec.*"
+
+# Viewport configurations
+viewports:
+  - 320
+  - 768
+  - 1024
+  - 1440
+
+# Customize the diff threshold
+diffIncludeAntiAliasing: true
+diffThreshold: 0.1
+
+# CI settings
+ci:
+  # Only run on main branch and pull requests
+  branch: main
+  autoAcceptChanges: main
+
+# Storybook settings
+storybook:
+  # Use the latest version of Storybook
+  version: latest
+  
+  # Configure the build
+  build:
+    # Build static files
+    staticDir: storybook-static
+    
+    # Include source maps
+    sourceMaps: true
+    
+    # Enable performance budgets
+    performance: true
+
+# Visual regression settings
+visualRegression:
+  # Enable visual regression testing
+  enabled: true
+  
+  # Configure the diff engine
+  diffEngine:
+    # Use the default diff engine
+    type: default
+    
+    # Configure the diff settings
+    settings:
+      # Ignore anti-aliasing differences
+      ignoreAntialiasing: true
+      
+      # Set the threshold for considering a difference
+      threshold: 0.1
+      
+      # Include alpha channel in diff
+      includeAlpha: true 

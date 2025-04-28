@@ -1,3 +1,5 @@
+@import '../../../styles/components/component-tokens';
+
 .input-step {
   width: 100%;
   max-width: 800px;
@@ -9,11 +11,11 @@
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
     text-align: center;
-    color: var(--color-text);
+    color: wg-form-color('text', 'base');
     font-weight: 600;
     
     .dark-theme & {
-      color: var(--color-dark-text);
+      color: wg-form-color('text', 'dark');
     }
     
     // Gradient text for dark mode
@@ -26,15 +28,15 @@
   }
   
   &__form {
-    background-color: var(--color-surface);
+    background-color: wg-form-color('background', 'base');
     border-radius: 12px;
     padding: 2rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     
     .dark-theme & {
-      background-color: var(--color-dark-surface);
+      background-color: wg-form-color('background', 'dark');
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--color-dark-border);
+      border: 1px solid wg-form-color('border', 'dark');
     }
   }
   
@@ -50,20 +52,20 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: wg-form-color('text', 'label');
     font-size: 1.125rem;
     
     .dark-theme & {
-      color: var(--color-dark-text);
+      color: wg-form-color('text', 'dark-label');
     }
   }
   
   &__required {
-    color: var(--color-error);
+    color: wg-semantic-color('feedback', 'error');
     margin-left: 0.25rem;
     
     .dark-theme & {
-      color: var(--color-dark-error);
+      color: wg-form-color('border', 'dark-error');
     }
   }
   
@@ -72,34 +74,34 @@
   &__textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid wg-form-color('border', 'base');
     border-radius: 8px;
     background-color: var(--color-bg);
-    color: var(--color-text);
+    color: wg-form-color('text', 'base');
     transition: all 0.2s ease;
     
     &:hover {
-      border-color: var(--color-primary-light, #a3e635);
+      border-color: wg-form-color('border', 'hover');
     }
     
     &:focus {
       outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.2);
+      border-color: wg-color('primary');
+      box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
     }
     
     .dark-theme & {
       background-color: rgba(var(--color-dark-surface-accent, #1f2937), 0.6);
-      border-color: var(--color-dark-border);
-      color: var(--color-dark-text);
+      border-color: wg-form-color('border', 'dark');
+      color: wg-form-color('text', 'dark');
       
       &:hover {
-        border-color: rgba(var(--color-primary-light, #84cc16), 0.5);
+        border-color: wg-form-color('border', 'dark-hover');
       }
       
       &:focus {
-        border-color: var(--color-dark-primary, #84cc16);
-        box-shadow: 0 0 0 3px rgba(var(--color-primary-light, #84cc16), 0.2);
+        border-color: wg-form-color('border', 'dark-focus');
+        box-shadow: 0 0 0 3px wg-form-color('shadow', 'dark-focus');
       }
     }
   }
@@ -125,12 +127,12 @@
     }
     
     &--focused {
-      border-color: var(--color-primary, #84cc16);
-      box-shadow: 0 0 0 3px rgba(var(--color-primary-light, #84cc16), 0.2);
+      border-color: wg-color('primary');
+      box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
       
       .dark-theme & {
-        border-color: var(--color-dark-primary, #84cc16);
-        box-shadow: 0 0 0 3px rgba(var(--color-primary-light, #84cc16), 0.2);
+        border-color: wg-form-color('border', 'dark-focus');
+        box-shadow: 0 0 0 3px wg-form-color('shadow', 'dark-focus');
       }
     }
   }
@@ -151,7 +153,7 @@
     
     &:hover {
       .input-step__radio-button {
-        border-color: rgba(var(--color-primary-light, #84cc16), 0.5);
+        border-color: wg-form-color('border', 'hover');
       }
       
       .input-step__radio-text {
@@ -167,7 +169,7 @@
     height: 0;
     
     &:checked + .input-step__radio-button {
-      border-color: var(--color-primary, #84cc16);
+      border-color: wg-color('primary');
       
       .input-step__radio-dot {
         transform: scale(1);
@@ -176,11 +178,11 @@
     }
     
     &:checked ~ .input-step__radio-text {
-      color: var(--color-primary, #84cc16);
+      color: wg-color('primary');
     }
     
     &:focus + .input-step__radio-button {
-      box-shadow: 0 0 0 3px rgba(var(--color-primary-light, #84cc16), 0.2);
+      box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
     }
   }
   
@@ -190,13 +192,13 @@
     justify-content: center;
     width: 1.5rem;
     height: 1.5rem;
-    border: 2px solid var(--color-border);
+    border: 2px solid wg-form-color('border', 'base');
     border-radius: 50%;
     margin-right: 0.625rem;
     transition: all 0.2s ease;
     
     .dark-theme & {
-      border-color: var(--color-dark-border);
+      border-color: wg-form-color('border', 'dark');
     }
     
     .input-step__radio-dot {

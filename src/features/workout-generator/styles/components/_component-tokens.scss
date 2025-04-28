@@ -1,0 +1,89 @@
+/* 
+ * Component-Specific Color Tokens
+ * 
+ * This file defines color tokens for specific components in the workout generator feature.
+ * It uses the base color token system defined in _color-tokens.scss.
+ */
+
+// Import the base color tokens
+@import '../color-tokens';
+
+// Form component tokens
+$wg-form-colors: (
+  'background': (
+    'base': var(--color-surface),
+    'dark': var(--color-dark-surface)
+  ),
+  'border': (
+    'base': var(--color-border),
+    'focus': wg-color('primary'),
+    'hover': var(--color-primary-light),
+    'error': wg-semantic-color('feedback', 'error'),
+    'dark': var(--color-dark-border),
+    'dark-focus': var(--color-dark-primary),
+    'dark-hover': rgba(var(--color-primary-light), 0.5),
+    'dark-error': var(--color-dark-error)
+  ),
+  'text': (
+    'base': var(--color-text),
+    'dark': var(--color-dark-text),
+    'label': var(--color-text),
+    'dark-label': var(--color-dark-text),
+    'placeholder': var(--color-text-muted),
+    'dark-placeholder': var(--color-dark-text-muted)
+  ),
+  'shadow': (
+    'focus': rgba(0, 180, 216, 0.2),
+    'dark-focus': rgba(var(--color-primary-light), 0.2)
+  ),
+  'button': (
+    'primary': wg-color('primary'),
+    'primary-hover': var(--color-accent),
+    'dark-primary': var(--color-dark-primary),
+    'dark-primary-hover': var(--color-dark-accent),
+    'secondary': transparent,
+    'secondary-border': wg-color('primary'),
+    'secondary-text': wg-color('primary'),
+    'secondary-hover': rgba(var(--color-primary-rgb), 0.1),
+    'dark-secondary-border': var(--color-dark-primary),
+    'dark-secondary-text': var(--color-dark-primary),
+    'dark-secondary-hover': rgba(var(--color-dark-primary-rgb), 0.15)
+  )
+);
+
+// Result component tokens
+$wg-result-colors: (
+  'background': (
+    'base': var(--color-surface),
+    'dark': var(--color-dark-surface),
+    'highlight': var(--color-surface-accent),
+    'dark-highlight': var(--color-dark-surface-accent)
+  ),
+  'text': (
+    'title': wg-color('primary'),
+    'dark-title': var(--color-dark-primary),
+    'subtitle': var(--color-text-secondary),
+    'dark-subtitle': var(--color-dark-text-secondary)
+  ),
+  'exercise': (
+    'background': rgba(var(--color-primary-rgb), 0.05),
+    'dark-background': rgba(var(--color-dark-primary-rgb), 0.1),
+    'border': rgba(var(--color-primary-rgb), 0.2),
+    'dark-border': rgba(var(--color-dark-primary-rgb), 0.3)
+  )
+);
+
+// Helper functions
+@function wg-form-color($category, $variant) {
+  @if not map-has-key($wg-form-colors, $category) {
+    @error "Form color category '#{$category}' not found in $wg-form-colors";
+  }
+  @return map-get(map-get($wg-form-colors, $category), $variant);
+}
+
+@function wg-result-color($category, $variant) {
+  @if not map-has-key($wg-result-colors, $category) {
+    @error "Result color category '#{$category}' not found in $wg-result-colors";
+  }
+  @return map-get(map-get($wg-result-colors, $category), $variant);
+} 

@@ -1,0 +1,122 @@
+/* 
+ * Color Token System
+ * 
+ * This file defines our color token system while maintaining backward compatibility
+ * with existing variables. New components should use the token system directly.
+ */
+
+// Base color tokens
+$wg-colors: (
+  'primary': (
+    'base': var(--color-wg-primary),
+    'hover': var(--color-wg-primary-hover),
+    'active': var(--color-wg-primary-active),
+    'disabled': var(--color-wg-primary-disabled)
+  ),
+  'secondary': (
+    'base': var(--color-wg-secondary),
+    'hover': var(--color-wg-secondary-hover),
+    'active': var(--color-wg-secondary-active),
+    'disabled': var(--color-wg-secondary-disabled)
+  ),
+  'surface': (
+    'base': var(--color-wg-surface),
+    'hover': var(--color-wg-surface-hover),
+    'active': var(--color-wg-surface-active)
+  )
+);
+
+// Semantic usage tokens
+$wg-semantic-colors: (
+  'interactive': (
+    'primary': map-get($wg-colors, 'primary', 'base'),
+    'secondary': map-get($wg-colors, 'secondary', 'base')
+  ),
+  'feedback': (
+    'success': var(--color-wg-success),
+    'error': var(--color-wg-error),
+    'warning': var(--color-wg-warning)
+  ),
+  'text': (
+    'primary': var(--color-wg-text-primary),
+    'secondary': var(--color-wg-text-secondary),
+    'disabled': var(--color-wg-text-disabled)
+  )
+);
+
+// State colors with contrast guarantees
+$wg-state-colors: (
+  'focus': (
+    'outline': var(--color-wg-focus-outline),
+    'background': var(--color-wg-focus-bg)
+  ),
+  'hover': (
+    'background': var(--color-wg-hover-bg),
+    'text': var(--color-wg-hover-text)
+  )
+);
+
+// Dark mode color mapping
+$wg-dark-mode-colors: (
+  'surface': (
+    'base': var(--color-wg-dark-surface),
+    'hover': var(--color-wg-dark-surface-hover)
+  ),
+  'text': (
+    'primary': var(--color-wg-dark-text-primary),
+    'secondary': var(--color-wg-dark-text-secondary)
+  )
+);
+
+// Backward compatibility aliases
+$wg-primary-color: map-get($wg-colors, 'primary', 'base');
+$wg-primary-hover: map-get($wg-colors, 'primary', 'hover');
+$wg-secondary-color: map-get($wg-colors, 'secondary', 'base');
+$wg-secondary-hover: map-get($wg-colors, 'secondary', 'hover');
+$wg-success-color: map-get($wg-semantic-colors, 'feedback', 'success');
+$wg-error-color: map-get($wg-semantic-colors, 'feedback', 'error');
+
+// Card colors (maintaining backward compatibility)
+$wg-goal-bg: var(--color-wg-goal-bg);
+$wg-level-bg: var(--color-wg-level-bg);
+$wg-duration-bg: var(--color-wg-duration-bg);
+$wg-goal-color: var(--color-wg-goal-color);
+$wg-level-color: var(--color-wg-level-color);
+$wg-duration-color: var(--color-wg-duration-color);
+
+// Dark mode colors (maintaining backward compatibility)
+$wg-dark-goal-bg: var(--color-wg-dark-goal-bg);
+$wg-dark-level-bg: var(--color-wg-dark-level-bg);
+$wg-dark-duration-bg: var(--color-wg-dark-duration-bg);
+$wg-dark-goal-color: var(--color-wg-dark-goal-color);
+$wg-dark-level-color: var(--color-wg-dark-level-color);
+$wg-dark-duration-color: var(--color-wg-dark-duration-color);
+
+// Helper functions for accessing color tokens
+@function wg-color($category, $variant: 'base') {
+  @if not map-has-key($wg-colors, $category) {
+    @error "Color category '#{$category}' not found in $wg-colors";
+  }
+  @return map-get(map-get($wg-colors, $category), $variant);
+}
+
+@function wg-semantic-color($category, $variant) {
+  @if not map-has-key($wg-semantic-colors, $category) {
+    @error "Semantic color category '#{$category}' not found in $wg-semantic-colors";
+  }
+  @return map-get(map-get($wg-semantic-colors, $category), $variant);
+}
+
+@function wg-state-color($state, $property) {
+  @if not map-has-key($wg-state-colors, $state) {
+    @error "State '#{$state}' not found in $wg-state-colors";
+  }
+  @return map-get(map-get($wg-state-colors, $state), $property);
+}
+
+@function wg-dark-color($category, $variant: 'base') {
+  @if not map-has-key($wg-dark-mode-colors, $category) {
+    @error "Dark mode color category '#{$category}' not found in $wg-dark-mode-colors";
+  }
+  @return map-get(map-get($wg-dark-mode-colors, $category), $variant);
+} 

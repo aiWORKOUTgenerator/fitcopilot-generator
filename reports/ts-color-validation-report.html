@@ -1,0 +1,447 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypeScript Color Token Validation Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1, h2, h3 {
+      margin-top: 2rem;
+    }
+    h1 {
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .card {
+      background: #f9f9f9;
+      border-radius: 4px;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card h3 {
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .card .number {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+    .file {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+    .file h3 {
+      margin-bottom: 0.5rem;
+    }
+    .issue {
+      background: #fff;
+      border-left: 4px solid #ff5252;
+      padding: 0.75rem;
+      margin: 0.75rem 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .issue .property {
+      color: #2196F3;
+      font-weight: bold;
+    }
+    .issue .value {
+      color: #ff5252;
+      font-weight: bold;
+    }
+    .issue .context {
+      font-family: monospace;
+      background: #f5f5f5;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .issue .suggestion {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .type-card {
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    .type-card .type-name {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .type-card .type-count {
+      font-size: 1.5rem;
+      color: #ff5252;
+    }
+  </style>
+</head>
+<body>
+  <h1>TypeScript Color Token Validation Report</h1>
+  <p>Generated on 4/27/2025, 9:59:12 PM</p>
+  
+  <div class="summary">
+    <div class="card">
+      <h3>Files Scanned</h3>
+      <div class="number">109</div>
+    </div>
+    <div class="card">
+      <h3>Files with Issues</h3>
+      <div class="number">2</div>
+    </div>
+    <div class="card">
+      <h3>Total Issues</h3>
+      <div class="number">48</div>
+    </div>
+  </div>
+  
+  <h2>Issues by Type</h2>
+  <div class="types">
+    
+        <div class="type-card">
+          <div class="type-name">hex</div>
+          <div class="type-count">38</div>
+        </div>
+      
+        <div class="type-card">
+          <div class="type-name">rgba</div>
+          <div class="type-count">5</div>
+        </div>
+      
+        <div class="type-card">
+          <div class="type-name">namedColor</div>
+          <div class="type-count">5</div>
+        </div>
+      
+  </div>
+  
+  <h2>Detailed Issues</h2>
+  
+    <div class="file">
+      <h3>src/features/api-tracker/components/EndpointStatsTable.tsx</h3>
+      
+        <div class="issue">
+          <div>Line 31: <span class="property">backgroundColor</span>: <span class="value">#f5f</span></div>
+          <div class="context">backgroundColor: '#f5f5f5',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 72: <span class="property">backgroundColor</span>: <span class="value">#f8f</span></div>
+          <div class="context">backgroundColor: '#f8f8f8',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 80: <span class="property">color</span>: <span class="value">#333</span></div>
+          <div class="context">color: '#333',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 344: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context">background: '#f5f5f5',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 367: <span class="property">color</span>: <span class="value">#666</span></div>
+          <div class="context">color: '#666'</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 432: <span class="property">color</span>: <span class="value">#cf1</span></div>
+          <div class="context">color: '#cf1322'</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 453: <span class="property">backgroundColor</span>: <span class="value">#2d2</span></div>
+          <div class="context">backgroundColor: '#2d2d2d',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 454: <span class="property">color</span>: <span class="value">#f8f</span></div>
+          <div class="context">color: '#f8f8f2',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 479: <span class="property">backgroundColor</span>: <span class="value">#f0f</span></div>
+          <div class="context">backgroundColor: '#f0f0f0',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 482: <span class="property">color</span>: <span class="value">#555</span></div>
+          <div class="context">color: '#555'</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 493: <span class="property">backgroundColor</span>: <span class="value">#f8f</span></div>
+          <div class="context">backgroundColor: '#f8f8f8',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 518: <span class="property">color</span>: <span class="value">#007</span></div>
+          <div class="context"><ul style={{ marginLeft: '20px', color: '#0073aa' }}></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 535: <span class="property">backgroundColor</span>: <span class="value">#f5f</span></div>
+          <div class="context"><tr style={{ backgroundColor: '#f5f5f5' }}></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 552: <span class="property">color</span>: <span class="value">#666</span></div>
+          <div class="context"><div style={{ padding: '15px', textAlign: 'center', color: '#666' }}></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 571: <span class="property">color</span>: <span class="value">#007</span></div>
+          <div class="context">color: '#0073aa',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 574: <span class="property">backgroundColor</span>: <span class="value">#f0f</span></div>
+          <div class="context">backgroundColor: '#f0f0f0',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 589: <span class="property">backgroundColor</span>: <span class="value">#007</span></div>
+          <div class="context">backgroundColor: '#0073aa',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 615: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context">background: '#f5f5f5',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 628: <span class="property">background</span>: <span class="value">#f6f</span></div>
+          <div class="context">background: '#f6f7f7',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 718: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 720: <span class="property">color</span>: <span class="value">#666</span></div>
+          <div class="context"><button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 727: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 728: <span class="property">background</span>: <span class="value">#f6f</span></div>
+          <div class="context"><button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 813: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 815: <span class="property">color</span>: <span class="value">#666</span></div>
+          <div class="context"><button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 822: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 823: <span class="property">background</span>: <span class="value">#f6f</span></div>
+          <div class="context"><button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 879: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 881: <span class="property">color</span>: <span class="value">#666</span></div>
+          <div class="context"><button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 888: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 889: <span class="property">background</span>: <span class="value">#f6f</span></div>
+          <div class="context"><button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1021: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1023: <span class="property">color</span>: <span class="value">#666</span></div>
+          <div class="context"><button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1030: <span class="property">background</span>: <span class="value">#f5f</span></div>
+          <div class="context"><div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;"></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1031: <span class="property">background</span>: <span class="value">#f6f</span></div>
+          <div class="context"><button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1107: <span class="property">background</span>: <span class="value">#ffe</span></div>
+          <div class="context"><div className="debug-controls" style={{background: "#ffe", padding: "10px", marginBottom: "10px", border: "1px solid #ccc"}}></div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1169: <span class="property">background</span>: <span class="value">#ffe</span></div>
+          <div class="context">background: '#ffeeee',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1170: <span class="property">color</span>: <span class="value">#990</span></div>
+          <div class="context">color: '#990000',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 590: <span class="property">color</span>: <span class="value">white</span></div>
+          <div class="context">color: 'white',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1117: <span class="property">background</span>: <span class="value">red</span></div>
+          <div class="context">style={{padding: "5px 10px", background: "red", color: "white"}}</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1117: <span class="property">color</span>: <span class="value">white</span></div>
+          <div class="context">style={{padding: "5px 10px", background: "red", color: "white"}}</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1129: <span class="property">background</span>: <span class="value">blue</span></div>
+          <div class="context">style={{padding: "5px 10px", background: "blue", color: "white", marginLeft: "10px"}}</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 1129: <span class="property">color</span>: <span class="value">white</span></div>
+          <div class="context">style={{padding: "5px 10px", background: "blue", color: "white", marginLeft: "10px"}}</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+    </div>
+  
+    <div class="file">
+      <h3>src/features/api-tracker/components/UsageChart.tsx</h3>
+      
+        <div class="issue">
+          <div>Line 107: <span class="property">backgroundColor</span>: <span class="value">rgba(54, 162, 235, 0.7)</span></div>
+          <div class="context">backgroundColor: 'rgba(54, 162, 235, 0.7)',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 108: <span class="property">borderColor</span>: <span class="value">rgba(54, 162, 235, 1)</span></div>
+          <div class="context">borderColor: 'rgba(54, 162, 235, 1)',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 117: <span class="property">borderColor</span>: <span class="value">rgba(255, 99, 132, 1)</span></div>
+          <div class="context">borderColor: 'rgba(255, 99, 132, 1)',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 118: <span class="property">backgroundColor</span>: <span class="value">rgba(255, 99, 132, 0.1)</span></div>
+          <div class="context">backgroundColor: 'rgba(255, 99, 132, 0.1)',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+        <div class="issue">
+          <div>Line 121: <span class="property">pointBackgroundColor</span>: <span class="value">rgba(255, 99, 132, 1)</span></div>
+          <div class="context">pointBackgroundColor: 'rgba(255, 99, 132, 1)',</div>
+          <div class="suggestion">Suggestion: Use an appropriate design token</div>
+        </div>
+      
+    </div>
+  
+</body>
+</html>
+  

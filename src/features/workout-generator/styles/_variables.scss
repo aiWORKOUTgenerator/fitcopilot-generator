@@ -1,31 +1,36 @@
 /* 
  * Workout Generator Variables
  * Custom variables specific to the workout generator feature
+ * 
+ * This file imports the new color token system while maintaining backward compatibility.
+ * New components should use the token system directly.
  */
 
+@import 'color-tokens';
+
 // Colors
-$wg-primary-color: #2563eb;
-$wg-primary-hover: #1d4ed8;
-$wg-secondary-color: #6b7280;
-$wg-secondary-hover: #4b5563;
-$wg-success-color: #16a34a;
-$wg-error-color: #dc3545;
+$wg-primary-color: var(--color-wg-primary);
+$wg-primary-hover: var(--color-wg-primary-hover);
+$wg-secondary-color: var(--color-wg-secondary);
+$wg-secondary-hover: var(--color-wg-secondary-hover);
+$wg-success-color: var(--color-wg-success);
+$wg-error-color: var(--color-wg-error);
 
 // Card colors
-$wg-goal-bg: #eff6ff;
-$wg-level-bg: #f0fdf4;
-$wg-duration-bg: #f5f3ff;
-$wg-goal-color: #2563eb;
-$wg-level-color: #16a34a;
-$wg-duration-color: #7c3aed;
+$wg-goal-bg: var(--color-wg-goal-bg);
+$wg-level-bg: var(--color-wg-level-bg);
+$wg-duration-bg: var(--color-wg-duration-bg);
+$wg-goal-color: var(--color-wg-goal-color);
+$wg-level-color: var(--color-wg-level-color);
+$wg-duration-color: var(--color-wg-duration-color);
 
 // Dark mode colors
-$wg-dark-goal-bg: rgba(0, 102, 204, 0.2);
-$wg-dark-level-bg: rgba(0, 153, 102, 0.2);
-$wg-dark-duration-bg: rgba(102, 51, 204, 0.2);
-$wg-dark-goal-color: #0099ff;
-$wg-dark-level-color: #00cc66;
-$wg-dark-duration-color: #9966ff;
+$wg-dark-goal-bg: var(--color-wg-dark-goal-bg);
+$wg-dark-level-bg: var(--color-wg-dark-level-bg);
+$wg-dark-duration-bg: var(--color-wg-dark-duration-bg);
+$wg-dark-goal-color: var(--color-wg-dark-goal-color);
+$wg-dark-level-color: var(--color-wg-dark-level-color);
+$wg-dark-duration-color: var(--color-wg-dark-duration-color);
 
 // Spacing
 $wg-spacing-sm: 0.5rem;
@@ -37,4 +42,44 @@ $wg-spacing-xl: 2rem;
 $wg-border-radius: 0.375rem;
 
 // Transitions
-$wg-transition-speed: 0.2s; 
+$wg-transition-speed: 0.2s;
+
+// Z-index layers
+$wg-z-index: (
+  'modal': 1000,
+  'overlay': 900,
+  'dropdown': 800,
+  'header': 700,
+  'footer': 600
+);
+
+// Breakpoints
+$wg-breakpoints: (
+  'xs': 320px,
+  'sm': 576px,
+  'md': 768px,
+  'lg': 992px,
+  'xl': 1200px
+);
+
+// Typography
+$wg-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+$wg-font-sizes: (
+  'xs': 0.75rem,
+  'sm': 0.875rem,
+  'base': 1rem,
+  'lg': 1.125rem,
+  'xl': 1.25rem,
+  '2xl': 1.5rem,
+  '3xl': 1.875rem,
+  '4xl': 2.25rem
+);
+
+// Shadows
+$wg-shadows: (
+  'sm': 0 1px 2px 0 rgba(0, 0, 0, 0.05),
+  'base': 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+  'md': 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  'lg': 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  'xl': 0 20px 25px -5px rgba(0, 0, 0, 0.1)
+); 

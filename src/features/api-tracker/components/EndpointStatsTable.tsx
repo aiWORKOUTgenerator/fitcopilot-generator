@@ -18,7 +18,7 @@ const CollapsibleSection = ({
   return (
     <div className="api-tracker-collapsible-section" style={{
       marginBottom: '15px',
-      border: '1px solid #ddd',
+      border: '1px solid var(--color-border)',
       borderRadius: '4px',
       overflow: 'hidden'
     }}>
@@ -28,8 +28,8 @@ const CollapsibleSection = ({
         onClick={() => setIsExpanded(!isExpanded)}
         style={{
           padding: '10px 15px',
-          backgroundColor: '#f5f5f5',
-          borderBottom: isExpanded ? '1px solid #ddd' : 'none',
+          backgroundColor: 'var(--color-surface-accent)',
+          borderBottom: isExpanded ? '1px solid var(--color-border)' : 'none',
           cursor: 'pointer',
           display: 'flex',
           justifyContent: 'space-between',
@@ -69,15 +69,15 @@ const JsonFormatter = ({ data }: { data: any }) => {
   
   return (
     <pre style={{
-      backgroundColor: '#f8f8f8',
+      backgroundColor: 'var(--color-surface-accent)',
       padding: '10px',
       borderRadius: '4px',
-      border: '1px solid #eee',
+      border: '1px solid var(--color-border)',
       fontSize: '13px',
       lineHeight: '1.4',
       overflow: 'auto',
       maxHeight: '300px',
-      color: '#333',
+      color: 'var(--color-text)',
       fontFamily: 'monospace'
     }}>
       {formatJson(data)}
@@ -103,33 +103,33 @@ const KeyValue = ({
 
 // Error Category Badge
 const ErrorCategoryBadge = ({ category }: { category: string }) => {
-  let backgroundColor = '#f8f8f8';
-  let textColor = '#333';
+  let backgroundColor = 'var(--color-surface-accent)';
+  let textColor = 'var(--color-text)';
   
   switch (category.toLowerCase()) {
     case 'authentication':
       backgroundColor = '#ffe8e8';
-      textColor = '#d63638';
+      textColor = 'var(--color-error)';
       break;
     case 'authorization':
       backgroundColor = '#fff8e8';
-      textColor = '#996600';
+      textColor = 'var(--color-warning)';
       break;
     case 'server':
       backgroundColor = '#e8e8ff';
-      textColor = '#3366cc';
+      textColor = 'var(--color-info)';
       break;
     case 'client':
       backgroundColor = '#e8fff0';
-      textColor = '#00994d';
+      textColor = 'var(--color-success)';
       break;
     case 'validation':
       backgroundColor = '#f0e8ff';
-      textColor = '#6600cc';
+      textColor = 'var(--color-wg-duration-color)';
       break;
     default:
-      backgroundColor = '#f8f8f8';
-      textColor = '#666';
+      backgroundColor = 'var(--color-surface-accent)';
+      textColor = 'var(--color-text-muted)';
   }
   
   return (
@@ -326,7 +326,7 @@ const ErrorModal = ({
         ref={modalRef}
         tabIndex={-1}
         style={{
-          background: '#fff',
+          background: 'var(--color-surface)',
           width: '90%',
           maxWidth: '900px',
           maxHeight: '90vh',
@@ -341,8 +341,8 @@ const ErrorModal = ({
       >
         <div className="error-modal-header" style={{
           padding: '15px 20px',
-          background: '#f5f5f5',
-          borderBottom: '1px solid #ddd',
+          background: 'var(--color-surface-accent)',
+          borderBottom: '1px solid var(--color-border)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
@@ -364,7 +364,7 @@ const ErrorModal = ({
               fontSize: '24px',
               cursor: 'pointer',
               padding: '0',
-              color: '#666'
+              color: 'var(--color-text-muted)'
             }}
           >
             ×
@@ -426,10 +426,10 @@ const ErrorModal = ({
                     <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Error Message', 'fitcopilot')}</h4>
                     <div style={{ 
                       padding: '15px', 
-                      backgroundColor: '#fff1f0', 
-                      border: '1px solid #ffccc7',
+                      backgroundColor: 'rgba(var(--color-error-rgb), 0.1)', 
+                      border: '1px solid var(--color-error)',
                       borderRadius: '4px',
-                      color: '#cf1322' 
+                      color: 'var(--color-error)' 
                     }}>
                       {mockErrorData.errorMessage}
                     </div>
@@ -450,8 +450,8 @@ const ErrorModal = ({
                   <div style={{ marginTop: '15px', marginBottom: '15px' }}>
                     <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Stack Trace', 'fitcopilot')}</h4>
                     <pre style={{ 
-                      backgroundColor: '#2d2d2d', 
-                      color: '#f8f8f2',
+                      backgroundColor: 'var(--color-dark-surface)', 
+                      color: 'var(--color-dark-text)',
                       padding: '15px',
                       borderRadius: '4px',
                       overflow: 'auto',
@@ -476,10 +476,10 @@ const ErrorModal = ({
                         <span key={index} style={{
                           display: 'inline-block',
                           padding: '3px 8px',
-                          backgroundColor: '#f0f0f0',
+                          backgroundColor: 'var(--color-surface-accent)',
                           borderRadius: '3px',
                           fontSize: '12px',
-                          color: '#555'
+                          color: 'var(--color-text-muted)'
                         }}>
                           {hook}
                         </span>
@@ -490,7 +490,7 @@ const ErrorModal = ({
                   <div style={{ marginTop: '15px', marginBottom: '15px' }}>
                     <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Database Queries', 'fitcopilot')}</h4>
                     <div style={{
-                      backgroundColor: '#f8f8f8',
+                      backgroundColor: 'var(--color-surface-accent)',
                       border: '1px solid #eee',
                       borderRadius: '4px',
                       padding: '10px',
@@ -515,7 +515,7 @@ const ErrorModal = ({
                 <div className="troubleshooting-tools">
                   <div style={{ marginBottom: '15px' }}>
                     <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>{__('Common Solutions', 'fitcopilot')}</h4>
-                    <ul style={{ marginLeft: '20px', color: '#0073aa' }}>
+                    <ul style={{ marginLeft: '20px', color: 'var(--color-primary)' }}>
                       {mockErrorData.commonSolutions.map((solution, index) => (
                         <li key={index} style={{ marginBottom: '5px' }}>{solution}</li>
                       ))}
@@ -532,24 +532,24 @@ const ErrorModal = ({
                       {mockErrorData.similarErrors.length > 0 ? (
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                           <thead>
-                            <tr style={{ backgroundColor: '#f5f5f5' }}>
-                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #eee' }}>{__('Error ID', 'fitcopilot')}</th>
-                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #eee' }}>{__('Endpoint', 'fitcopilot')}</th>
-                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #eee' }}>{__('Timestamp', 'fitcopilot')}</th>
+                            <tr style={{ backgroundColor: 'var(--color-surface-accent)' }}>
+                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid var(--color-border)' }}>{__('Error ID', 'fitcopilot')}</th>
+                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid var(--color-border)' }}>{__('Endpoint', 'fitcopilot')}</th>
+                              <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid var(--color-border)' }}>{__('Timestamp', 'fitcopilot')}</th>
                             </tr>
                           </thead>
                           <tbody>
                             {mockErrorData.similarErrors.map((error, index) => (
-                              <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#fff' : '#f9f9f9' }}>
-                                <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{error.id}</td>
-                                <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{error.endpoint}</td>
-                                <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{error.timestamp}</td>
+                              <tr key={index} style={{ backgroundColor: index % 2 === 0 ? 'var(--color-surface)' : 'var(--color-surface-accent)' }}>
+                                <td style={{ padding: '8px', borderBottom: '1px solid var(--color-border)' }}>{error.id}</td>
+                                <td style={{ padding: '8px', borderBottom: '1px solid var(--color-border)' }}>{error.endpoint}</td>
+                                <td style={{ padding: '8px', borderBottom: '1px solid var(--color-border)' }}>{error.timestamp}</td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       ) : (
-                        <div style={{ padding: '15px', textAlign: 'center', color: '#666' }}>
+                        <div style={{ padding: '15px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                           {__('No similar errors found', 'fitcopilot')}
                         </div>
                       )}
@@ -568,10 +568,10 @@ const ErrorModal = ({
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              color: '#0073aa',
+                              color: 'var(--color-primary)',
                               textDecoration: 'none',
                               padding: '5px 10px',
-                              backgroundColor: '#f0f0f0',
+                              backgroundColor: 'var(--color-surface-accent)',
                               borderRadius: '3px',
                               fontSize: '13px'
                             }}
@@ -586,8 +586,8 @@ const ErrorModal = ({
                   <div style={{ textAlign: 'center', marginTop: '20px' }}>
                     <button 
                       style={{
-                        backgroundColor: '#0073aa',
-                        color: 'white',
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'var(--color-surface)',
                         border: 'none',
                         borderRadius: '4px',
                         padding: '8px 16px',
@@ -612,8 +612,8 @@ const ErrorModal = ({
         
         <div className="error-modal-footer" style={{
           padding: '15px 20px',
-          background: '#f5f5f5',
-          borderTop: '1px solid #ddd',
+          background: 'var(--color-surface-accent)',
+          borderTop: '1px solid var(--color-border)',
           textAlign: 'right'
         }}>
           <button 
@@ -625,7 +625,7 @@ const ErrorModal = ({
             className="button"
             style={{
               padding: '6px 12px',
-              background: '#f6f7f7',
+              background: 'var(--color-bg)',
               border: '1px solid #ddd',
               borderRadius: '3px',
               cursor: 'pointer'
@@ -714,18 +714,19 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
       
       // Create modal content
       modalContainer.innerHTML = `
-        <div style="background: #fff; width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
-          <div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: var(--color-surface); width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
+          <div style="padding: 15px 20px; background: var(--color-surface-accent); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
             <h3 style="margin: 0; font-size: 18px;">Error Details for ${endpoint.namespace + endpoint.route.replace('/' + endpoint.namespace, '')}</h3>
-            <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button>
+            <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: var(--color-text-muted);">×</button>
           </div>
           <div style="padding: 20px;">
-            <p><strong>Endpoint:</strong> ${endpoint.method} ${endpoint.route}</p>
-            <p><strong>Errors:</strong> ${endpoint.errors?.count || 0}</p>
+            <p><strong>Error Code:</strong> ${endpoint.errors?.lastError?.code || 'Unknown'}</p>
+            <p><strong>Message:</strong> ${endpoint.errors?.lastError?.message || 'No message available'}</p>
+            <p><strong>Time:</strong> ${endpoint.errors?.lastError?.time || 'Unknown'}</p>
             <p><strong>Note:</strong> This is a fallback modal created directly in the DOM.</p>
           </div>
-          <div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;">
-            <button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button>
+          <div style="padding: 15px 20px; background: var(--color-surface-accent); border-top: 1px solid var(--color-border); text-align: right;">
+            <button id="direct-modal-close-btn" style="padding: 6px 12px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 3px; cursor: pointer;">Close</button>
           </div>
         </div>
       `;
@@ -809,18 +810,19 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
                 
                 // Create modal content
                 modalContainer.innerHTML = `
-                  <div style="background: #fff; width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
-                    <div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="background: var(--color-surface); width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
+                    <div style="padding: 15px 20px; background: var(--color-surface-accent); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
                       <h3 style="margin: 0; font-size: 18px;">Error Details for ${stats[0].namespace + stats[0].route.replace('/' + stats[0].namespace, '')}</h3>
-                      <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button>
+                      <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: var(--color-text-muted);">×</button>
                     </div>
                     <div style="padding: 20px;">
-                      <p><strong>Endpoint:</strong> ${stats[0].method} ${stats[0].route}</p>
-                      <p><strong>Errors:</strong> ${stats[0].errors?.count || 0}</p>
+                      <p><strong>Error Code:</strong> ${stats[0].errors?.lastError?.code || 'Unknown'}</p>
+                      <p><strong>Message:</strong> ${stats[0].errors?.lastError?.message || 'No message available'}</p>
+                      <p><strong>Time:</strong> ${stats[0].errors?.lastError?.time || 'Unknown'}</p>
                       <p><strong>Note:</strong> This is a fallback modal created via debug function.</p>
                     </div>
-                    <div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;">
-                      <button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button>
+                    <div style="padding: 15px 20px; background: var(--color-surface-accent); border-top: 1px solid var(--color-border); text-align: right;">
+                      <button id="direct-modal-close-btn" style="padding: 6px 12px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 3px; cursor: pointer;">Close</button>
                     </div>
                   </div>
                 `;
@@ -875,18 +877,19 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
             
             // Create modal content
             modalContainer.innerHTML = `
-              <div style="background: #fff; width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
-                <div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+              <div style="background: var(--color-surface); width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
+                <div style="padding: 15px 20px; background: var(--color-surface-accent); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
                   <h3 style="margin: 0; font-size: 18px;">Error Details for ${stats[0].namespace + stats[0].route.replace('/' + stats[0].namespace, '')}</h3>
-                  <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button>
+                  <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: var(--color-text-muted);">×</button>
                 </div>
                 <div style="padding: 20px;">
-                  <p><strong>Endpoint:</strong> ${stats[0].method} ${stats[0].route}</p>
-                  <p><strong>Errors:</strong> ${stats[0].errors?.count || 0}</p>
+                  <p><strong>Error Code:</strong> ${stats[0].errors?.lastError?.code || 'Unknown'}</p>
+                  <p><strong>Message:</strong> ${stats[0].errors?.lastError?.message || 'No message available'}</p>
+                  <p><strong>Time:</strong> ${stats[0].errors?.lastError?.time || 'Unknown'}</p>
                   <p><strong>Note:</strong> This is a direct DOM modal created for debugging.</p>
                 </div>
-                <div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;">
-                  <button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button>
+                <div style="padding: 15px 20px; background: var(--color-surface-accent); border-top: 1px solid var(--color-border); text-align: right;">
+                  <button id="direct-modal-close-btn" style="padding: 6px 12px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 3px; cursor: pointer;">Close</button>
                 </div>
               </div>
             `;
@@ -1017,18 +1020,19 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
         
         // Create modal content
         modalContainer.innerHTML = `
-          <div style="background: #fff; width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
-            <div style="padding: 15px 20px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
+          <div style="background: var(--color-surface); width: 90%; max-width: 800px; max-height: 90vh; border-radius: 4px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); overflow: auto;">
+            <div style="padding: 15px 20px; background: var(--color-surface-accent); border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center;">
               <h3 style="margin: 0; font-size: 18px;">Error Details for ${endpoint.namespace + endpoint.route.replace('/' + endpoint.namespace, '')}</h3>
-              <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #666;">×</button>
+              <button id="direct-modal-close" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: var(--color-text-muted);">×</button>
             </div>
             <div style="padding: 20px;">
-              <p><strong>Endpoint:</strong> ${endpoint.method} ${endpoint.route}</p>
-              <p><strong>Errors:</strong> ${endpoint.errors?.count || 0}</p>
-              <p><strong>Note:</strong> This is a fallback modal created via direct DOM manipulation.</p>
+              <p><strong>Error Code:</strong> ${endpoint.errors?.lastError?.code || 'Unknown'}</p>
+              <p><strong>Message:</strong> ${endpoint.errors?.lastError?.message || 'No message available'}</p>
+              <p><strong>Time:</strong> ${endpoint.errors?.lastError?.time || 'Unknown'}</p>
+              <p><strong>Note:</strong> This is a fallback modal created directly in the DOM.</p>
             </div>
-            <div style="padding: 15px 20px; background: #f5f5f5; border-top: 1px solid #ddd; text-align: right;">
-              <button id="direct-modal-close-btn" style="padding: 6px 12px; background: #f6f7f7; border: 1px solid #ddd; border-radius: 3px; cursor: pointer;">Close</button>
+            <div style="padding: 15px 20px; background: var(--color-surface-accent); border-top: 1px solid var(--color-border); text-align: right;">
+              <button id="direct-modal-close-btn" style="padding: 6px 12px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 3px; cursor: pointer;">Close</button>
             </div>
           </div>
         `;
@@ -1104,7 +1108,7 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
   return (
     <>
       {process.env.NODE_ENV === 'development' && (
-        <div className="debug-controls" style={{background: "#ffe", padding: "10px", marginBottom: "10px", border: "1px solid #ccc"}}>
+        <div className="debug-controls" style={{background: "var(--color-wg-goal-bg)", padding: "10px", marginBottom: "10px", border: "1px solid var(--color-border)"}}>
           <button
             onClick={() => {
               console.log("Debug button clicked");
@@ -1114,7 +1118,7 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
                 console.error("No stats available for debug modal");
               }
             }}
-            style={{padding: "5px 10px", background: "red", color: "white"}}
+            style={{padding: "5px 10px", background: "var(--color-error)", color: "var(--color-surface)"}}
           >
             DEBUG: Open Modal
           </button>
@@ -1126,7 +1130,7 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
                 window.debugApiTracker.endpointStats.createDirectModal();
               }
             }}
-            style={{padding: "5px 10px", background: "blue", color: "white", marginLeft: "10px"}}
+            style={{padding: "5px 10px", background: "var(--color-info)", color: "var(--color-surface)", marginLeft: "10px"}}
           >
             DEBUG: Direct DOM Modal
           </button>
@@ -1166,10 +1170,10 @@ const EndpointStatsTable: React.FC<EndpointStatsTableProps> = ({ stats, isLoadin
                       aria-label={__('View Error Details for', 'fitcopilot') + ' ' + stat.route}
                       style={{
                         cursor: 'pointer',
-                        background: '#ffeeee',
-                        color: '#990000',
+                        background: 'var(--color-error-rgb, 0.1)',
+                        color: 'var(--color-error)',
                         padding: '5px 10px',
-                        border: '1px solid #cc0000',
+                        border: '1px solid var(--color-error)',
                         borderRadius: '3px',
                         fontSize: '12px',
                         fontWeight: 500
