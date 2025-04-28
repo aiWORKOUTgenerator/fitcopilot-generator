@@ -5,7 +5,7 @@
  * Wraps the form with necessary providers and imports styles.
  */
 import React, { useState } from 'react';
-import { WorkoutGeneratorProvider } from './context';
+import { WorkoutGeneratorProvider, FormFlowProvider } from './context';
 import { WorkoutRequestForm } from './components/Form';
 import { ErrorBoundary, DebugControls, TipsCard } from './components/common';
 import { SubscriptionModalWrapper, ProfileSetupPrompt } from './components/Modals';
@@ -18,6 +18,11 @@ import './styles/workout-generator.scss';
  * 
  * This is the main entry point for the workout generator functionality
  * and serves as the container for the entire workout generation experience.
+ * 
+ * Provider hierarchy:
+ * - ErrorBoundary: Catches any uncaught errors in the feature
+ * - WorkoutGeneratorProvider: Manages core workout state and API integration
+ * - WorkoutRequestForm: Contains its own FormFlowProvider for form flow management
  * 
  * @returns {JSX.Element} The rendered feature component
  */

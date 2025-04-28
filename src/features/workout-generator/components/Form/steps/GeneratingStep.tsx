@@ -1,7 +1,7 @@
 /**
  * GeneratingStep Component
  * 
- * Displays a loading state during workout generation with progress feedback and error handling.
+ * Displays an enhanced visualization of the workout generation process with realistic progress feedback.
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '../../../../../common/components/UI';
@@ -18,7 +18,42 @@ export interface GeneratingStepProps {
 }
 
 /**
- * GeneratingStep displays a loading state during workout generation
+ * Status messages to display during different phases of generation
+ */
+const STATUS_MESSAGES = [
+  // Initial phase (0-25%)
+  'Analyzing your workout preferences...',
+  'Evaluating your fitness goals...',
+  'Planning exercise combinations...',
+  // Middle phase (25-60%)
+  'Designing optimal workout structure...',
+  'Selecting appropriate exercise intensity...',
+  'Optimizing for your available equipment...',
+  // Late phase (60-90%)
+  'Creating detailed exercise instructions...',
+  'Balancing muscle groups and movements...',
+  'Finalizing workout structure...',
+  // Completion phase (90-100%)
+  'Adding finishing touches to your workout...',
+  'Preparing to display your custom plan...',
+];
+
+/**
+ * Fitness tips to display during generation
+ */
+const FITNESS_TIPS = [
+  'Hydration is key! Aim to drink water before, during, and after your workout.',
+  'Rest days are just as important as workout days for muscle recovery.',
+  'Proper form is more important than lifting heavy weights.',
+  'Consistency matters more than intensity when starting a fitness journey.',
+  'Mix cardio and strength training for optimal results.',
+  'Dynamic stretching before and static stretching after workouts is ideal.',
+  'Small, consistent progress leads to long-term success.',
+  'Listen to your body - pain is different from discomfort.',
+];
+
+/**
+ * GeneratingStep displays enhanced progress visualization during workout generation
  *
  * @param {GeneratingStepProps} props - Component props
  * @returns {JSX.Element} Rendered component
@@ -29,93 +64,47 @@ export const GeneratingStep: React.FC<GeneratingStepProps> = ({
   progress = 0,
   error = null,
 }) => {
-  // Status messages to display during generation
-  const statusMessages = [
-    'Analyzing your workout preferences...',
-    'Creating a personalized workout for you...',
-    'Designing exercise combinations...',
-    'Finalizing your custom workout plan...',
-  ];
-
-  // Fitness tips to display during generation
-  const fitnessTips = [
-    'Hydration is key! Aim to drink water before, during, and after your workout.',
-    'Rest days are just as important as workout days for muscle recovery.',
-    'Proper form is more important than lifting heavy weights.',
-    'Consistency matters more than intensity when starting a fitness journey.',
-    'Mix cardio and strength training for optimal results.',
-    'Dynamic stretching before and static stretching after workouts is ideal.',
-    'Small, consistent progress leads to long-term success.',
-    'Listen to your body - pain is different from discomfort.',
-  ];
-
   // Internal progress state
   const [currentProgress, setCurrentProgress] = useState(progress > 0 ? progress : 0);
-  const [startTime] = useState(Date.now());
   const [isComplete, setIsComplete] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Randomly select a fitness tip
-  const [tipIndex] = useState(() => Math.floor(Math.random() * fitnessTips.length));
+  const [tipIndex] = useState(() => Math.floor(Math.random() * FITNESS_TIPS.length));
   
   // Handle external progress updates
   useEffect(() => {
     if (progress >= 100) {
       completeProgress();
+    } else if (progress > 0) {
+      setCurrentProgress(progress);
     }
   }, [progress]);
   
   // Function to complete progress and clean up
   const completeProgress = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    
     setCurrentProgress(100);
     setIsComplete(true);
     onComplete();
   };
   
-  // Update progress based on elapsed time
-  useEffect(() => {
-    if (isComplete) {
-      return;
-    }
-    
-    const totalDuration = 20000; // 20 seconds total estimation
-    const maxProgress = 95; // Max progress before completion signal
-    const updateInterval = 200; // Update every 200ms
-    
-    // Clear any existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    intervalRef.current = setInterval(() => {
-      const elapsedTime = Date.now() - startTime;
-      const linearProgress = Math.min((elapsedTime / totalDuration) * 100, maxProgress);
-      
-      // Non-linear progress: starts faster, slows down as it approaches maxProgress
-      const factor = 1 - linearProgress / maxProgress;
-      const adjustedProgress = maxProgress - maxProgress * Math.pow(factor, 2);
-      setCurrentProgress(Math.min(adjustedProgress, maxProgress));
-    }, updateInterval);
-
-    // Clean up interval on unmount
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [startTime, isComplete]);
-
   // Determine which status message to show based on progress
-  const statusIndex = Math.min(
-    Math.floor((currentProgress / 100) * statusMessages.length),
-    statusMessages.length - 1
-  );
+  const getStatusMessage = () => {
+    // Map progress to appropriate message index
+    const index = Math.min(
+      Math.floor((currentProgress / 100) * STATUS_MESSAGES.length),
+      STATUS_MESSAGES.length - 1
+    );
+    
+    return STATUS_MESSAGES[index];
+  };
+  
+  // Calculate estimated time remaining
+  const getTimeEstimate = () => {
+    if (currentProgress < 25) return 'About 30-40 seconds remaining';
+    if (currentProgress < 60) return 'About 20-30 seconds remaining';
+    if (currentProgress < 85) return 'About 10-15 seconds remaining';
+    return 'Almost done...';
+  };
 
   // Handle error state
   if (error) {
@@ -133,14 +122,25 @@ export const GeneratingStep: React.FC<GeneratingStepProps> = ({
   return (
     <ErrorBoundary>
       <div className="generating-step">
-        <LoadingIndicator message={statusMessages[statusIndex]} progress={currentProgress} />
-        <div className="status-container">
-          <h3 className="status-message">{statusMessages[statusIndex]}</h3>
-          <p className="fitness-tip">
-            <strong>Fitness Tip:</strong> {fitnessTips[tipIndex]}
+        <h2 className="generating-step__title">Creating Your Personalized Workout</h2>
+        
+        <LoadingIndicator 
+          message={getStatusMessage()} 
+          progress={currentProgress} 
+          estimatedTimeRemaining={getTimeEstimate()}
+        />
+        
+        <div className="generating-step__tip-container">
+          <p className="generating-step__tip">
+            <span className="generating-step__tip-label">Fitness Tip:</span> {FITNESS_TIPS[tipIndex]}
           </p>
         </div>
-        <Button variant="secondary" onClick={onCancel}>
+        
+        <Button 
+          variant="secondary" 
+          onClick={onCancel} 
+          className="generating-step__cancel-button"
+        >
           Cancel
         </Button>
       </div>

@@ -28,6 +28,12 @@ This section contains technical documentation for developers working with the Fi
 - [Feature Components](./components/feature.md)
 - [Form Components](./components/form.md)
 
+### [Hooks Reference](./hooks/index.md)
+- [useAbortController](./hooks/useAbortController.md)
+- [Form and Validation Hooks](./hooks/index.md#form-flow-hooks)
+- [API and Network Hooks](./hooks/index.md#api-and-network-hooks)
+- [Workout Hooks](./hooks/index.md#workout-hooks)
+
 ### [State Management](./state-management/index.md)
 - [Context API Usage](./state-management/context.md)
 - [Hooks](./state-management/hooks.md)
@@ -45,6 +51,7 @@ This section contains technical documentation for developers working with the Fi
 - [Design System Documentation](./design-system/index.md)
 - [Component Implementation Guide](./components/implementation.md)
 - [Development Environment Setup](../contribution/workflow/setup.md)
+- [Hooks Reference](./hooks/index.md)
 
 ## Related Documentation
 

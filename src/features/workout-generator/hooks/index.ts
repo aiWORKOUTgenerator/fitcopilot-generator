@@ -5,6 +5,7 @@
 // API and authentication hooks
 export { default as useApiRequest } from './useApiRequest';
 export { default as useAuthNonce } from './useAuthNonce';
+export { useAbortController, type AbortReason } from './useAbortController';
 
 // Error handling
 export { default as useErrorHandler } from './useErrorHandler';

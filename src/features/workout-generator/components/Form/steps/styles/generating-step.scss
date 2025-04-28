@@ -7,31 +7,42 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  gap: 1.5rem;
-  text-align: center;
+  padding: 1.5rem;
+  gap: 1.75rem;
+  max-width: 800px;
+  margin: 0 auto;
   
-  .status-container {
-    max-width: 600px;
-    margin: 0 auto;
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--wg-heading);
+    margin: 0;
+    text-align: center;
   }
   
-  .status-message {
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
-  
-  .fitness-tip {
-    padding: 1rem;
-    background-color: rgba(232, 244, 253, 0.6);
+  &__tip-container {
+    width: 100%;
+    background-color: var(--wg-background-hint);
     border-radius: 8px;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    
-    strong {
-      color: #0366d6;
-    }
+    padding: 1rem 1.5rem;
+    border-left: 4px solid var(--wg-primary);
+  }
+  
+  &__tip {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--wg-text);
+    margin: 0;
+  }
+  
+  &__tip-label {
+    font-weight: 600;
+    color: var(--wg-primary);
+    margin-right: 0.5rem;
+  }
+  
+  &__cancel-button {
+    margin-top: 0.5rem;
   }
   
   .generation-error {
@@ -40,17 +51,33 @@
     align-items: center;
     gap: 1rem;
     padding: 1.5rem;
-    background-color: #fff0f0;
-    border: 1px solid #ffcdd2;
+    background-color: var(--wg-error-light);
+    border: 1px solid var(--wg-error);
     border-radius: 8px;
+    width: 100%;
     
     h3 {
-      color: #d32f2f;
+      color: var(--wg-error);
       margin: 0;
+      font-size: 1.25rem;
     }
     
     p {
-      margin-bottom: 1rem;
+      margin: 0.5rem 0 1rem;
+      color: var(--wg-text);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    padding: 1rem;
+    gap: 1.5rem;
+    
+    &__title {
+      font-size: 1.5rem;
+    }
+    
+    &__tip-container {
+      padding: 1rem;
     }
   }
 } 

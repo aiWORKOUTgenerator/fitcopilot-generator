@@ -132,7 +132,7 @@ export function useWorkoutGenerator() {
         restrictions: workoutParams.restrictions || '',
       };
       
-      // First, set the status to submitting
+      // First, set the status to submitting (start generation)
       dispatch({ type: WorkoutActionType.GENERATION_START });
       
       // Check if we have a cached result for these parameters
@@ -146,7 +146,14 @@ export function useWorkoutGenerator() {
           additionalData: { status: 'cache-hit', params: completeParams }
         });
         
-        // Update the state with the cached workout
+        // For cached workouts, simulate a proper generation sequence
+        // First set processing state to ensure proper step transition
+        dispatch({ type: WorkoutActionType.GENERATION_PROCESSING });
+        
+        // Add a small delay to simulate processing and ensure proper step transitions
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Then update the state with the cached workout
         dispatch({ type: WorkoutActionType.GENERATION_SUCCESS, payload: cachedWorkout });
         
         return cachedWorkout;
@@ -177,6 +184,16 @@ export function useWorkoutGenerator() {
       if (requestTimeoutRef.current) {
         clearTimeout(requestTimeoutRef.current);
         requestTimeoutRef.current = null;
+      }
+      
+      // Check if this request was cancelled before updating state
+      // We're using the debug mode as a cancellation flag
+      if (state.ui.debugMode) {
+        // Request was cancelled, don't update with results
+        console.log('Ignoring completed request because it was cancelled');
+        // Reset the cancellation flag
+        dispatch({ type: WorkoutActionType.TOGGLE_DEBUG_MODE, payload: false });
+        return null;
       }
       
       // If we get here, generation was successful
@@ -326,7 +343,12 @@ export function useWorkoutGenerator() {
    * Cancel the current workout generation
    */
   const cancelGeneration = useCallback(() => {
+    // Add a flag to track that the generation was explicitly cancelled
+    const wasCancelled = true;
     cleanup();
+    
+    // Reset the error states fully to prevent them from persisting
+    dispatch({ type: WorkoutActionType.SET_STEP, payload: 'idle' });
     
     // If using direct generation, update local state
     if (['starting', 'submitting', 'generating'].includes(directStatus)) {
@@ -334,11 +356,39 @@ export function useWorkoutGenerator() {
       setDirectError(null);
     }
     
-    // If using context-based generation, update context state
+    // If using context-based generation, update context state without error message
     if (['submitting', 'generating'].includes(contextStatus)) {
-      dispatch({ type: WorkoutActionType.GENERATION_ERROR, payload: 'Generation cancelled by user' });
+      dispatch({ type: WorkoutActionType.RESET_GENERATOR });
+      // Store the cancellation state in the context
+      dispatch({ 
+        type: WorkoutActionType.TOGGLE_DEBUG_MODE, 
+        payload: true  // Repurpose debug mode to store cancellation state
+      });
     }
   }, [cleanup, directStatus, contextStatus, dispatch]);
+  
+  /**
+   * Listen for abort events from FormFlowContext
+   * This ensures proper cancellation when the form flow transitions between steps
+   */
+  useEffect(() => {
+    // Handler for abort events
+    const handleAbortEvent = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail?.reason === 'step_transition') {
+        console.log('Aborting workout generation due to step transition', customEvent.detail);
+        cancelGeneration();
+      }
+    };
+    
+    // Add event listener
+    window.addEventListener('workout_generation_abort', handleAbortEvent);
+    
+    return () => {
+      // Clean up event listener
+      window.removeEventListener('workout_generation_abort', handleAbortEvent);
+    };
+  }, [cancelGeneration]);
   
   /**
    * Reset the generator state
@@ -349,6 +399,9 @@ export function useWorkoutGenerator() {
     
     // Reset context state
     dispatch({ type: WorkoutActionType.RESET_GENERATOR });
+    
+    // Ensure cancellation flag is cleared
+    dispatch({ type: WorkoutActionType.TOGGLE_DEBUG_MODE, payload: false });
     
     // Reset direct generation state
     setDirectStatus('idle');

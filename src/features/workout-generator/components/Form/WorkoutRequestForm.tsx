@@ -5,20 +5,24 @@
  * It serves as the primary entry point for the workout generation feature, handling the entire
  * workflow from collecting user preferences to displaying the generated workout.
  * 
+ * Form flow follows these steps:
+ * 1. Input Step: User enters workout preferences
+ * 2. Preview Step: User reviews settings before submitting
+ * 3. Generating Step: API request is processing with feedback
+ * 4. Completed Step: Generated workout is displayed
+ * 
+ * The component uses FormFlowContext for centralized state management of the form flow,
+ * eliminating race conditions and state conflicts between steps.
+ * 
  * Features:
+ * - Multi-step form flow with consistent transitions
  * - Form fields for selecting workout preferences (goal, difficulty, duration)
  * - Advanced options for equipment and physical restrictions
  * - Real-time validation of form inputs
- * - Loading state management with rotating status messages
+ * - Loading state management with progressive status indicator
  * - Error and success state handling
  * - Analytics tracking for user interactions
  * - Form state persistence between sessions
- * 
- * The component integrates several hooks for state management and API interactions:
- * - useWorkoutForm: Manages form values, validation, and persistence
- * - useWorkoutGenerator: Handles the OpenAI API interaction for generating workouts
- * - useAnalytics: Tracks user interactions for analytics
- * - useErrorHandler: Handles centralized error handling
  * 
  * @example
  * // Basic usage (usually rendered by the main feature component)
@@ -34,10 +38,11 @@
  * };
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useWorkoutForm } from '../../hooks/useWorkoutForm';
 import { useWorkoutGenerator } from '../../hooks/useWorkoutGenerator';
 import { useErrorHandler } from '../../hooks/useErrorHandler';
+import { FormFlowProvider, useFormFlow } from '../../context/FormFlowContext';
 import { WorkoutFormParams, FormSteps } from '../../types/workout';
 import { GenerationError } from '../../types/errors';
 
@@ -109,100 +114,142 @@ interface WorkoutRequestFormProps {
 }
 
 /**
- * Map context status to form step
+ * WorkoutRequestForm Component with wrapped FormFlowProvider
  * 
- * @param status - The generation status from context
- * @returns The corresponding form step
- */
-function mapStatusToStep(status: string): FormSteps {
-  switch (status) {
-    case 'idle':
-      return 'input';
-    case 'submitting':
-    case 'generating':
-      return 'generating';
-    case 'completed':
-      return 'completed';
-    case 'error':
-      return 'generating'; // Error is shown in GeneratingStep
-    default:
-      return 'input';
-  }
-}
-
-/**
- * WorkoutRequestForm Component
+ * This component is the main entry point for the workout generator form flow.
+ * It wraps the actual form in a FormFlowProvider for centralized state management.
  * 
  * @param props - Component props
  * @returns React component
  */
 export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) {
+  return (
+    <FormFlowProvider>
+      <WorkoutRequestFormInner className={className} />
+    </FormFlowProvider>
+  );
+}
+
+/**
+ * Inner WorkoutRequestForm Component that consumes FormFlowContext
+ * 
+ * This component implements the actual form UI and logic, using the
+ * form flow state from FormFlowContext.
+ * 
+ * @param props - Component props
+ * @returns React component
+ */
+function WorkoutRequestFormInner({ className = '' }: WorkoutRequestFormProps) {
   // Get the form management and workout generation hooks
   const workoutForm = useWorkoutForm();
   const { 
     status, 
-    loading, 
-    error: errorMessage, 
+    error: generatorErrorMessage,
     workout: generatedWorkout,
     startGeneration, 
     resetGenerator,
-    isGenerating
+    cancelGeneration,
+    isGenerating: isGeneratorRunning
   } = useWorkoutGenerator();
+  
+  // Get form flow context
+  const { 
+    state: { 
+      currentStep, 
+      progress,
+      isPreviewMode,
+      errorMessage: flowErrorMessage
+    },
+    derivedStep,
+    setProgress,
+    setGenerationStatus,
+    setPreviewMode,
+    setError,
+    resetFlow,
+    goToInputStep,
+    goToPreviewStep,
+    goToGeneratingStep
+  } = useFormFlow();
+  
   const { handleError } = useErrorHandler();
   
-  // Track the preview state separately as it's not in the generation status
-  const [isPreviewMode, setIsPreviewMode] = React.useState(false);
+  // Progress interval reference
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
   
-  // Track generation progress for better UX
-  const [progress, setProgress] = useState(0);
-  
-  // Determine the current step to display
-  const currentStep: FormSteps = isPreviewMode ? 'preview' : mapStatusToStep(status);
-  
-  // Update progress during generation
+  // Sync generator status with form flow
   useEffect(() => {
-    let progressInterval: NodeJS.Timeout;
+    // Update generation status in form flow when it changes
+    setGenerationStatus(status);
     
-    if (status === 'generating' || status === 'submitting') {
-      // Reset progress when generation starts
-      setProgress(0);
+    // Sync error messages
+    if (generatorErrorMessage) {
+      setError(generatorErrorMessage);
+    }
+  }, [status, generatorErrorMessage, setGenerationStatus, setError]);
+  
+  // Handle progress simulation during generation
+  useEffect(() => {
+    // Clean up any existing interval
+    if (progressInterval.current) {
+      clearInterval(progressInterval.current);
+      progressInterval.current = null;
+    }
+    
+    // Manage progress based on generation status
+    if (status === 'starting') {
+      // Initial progress when starting
+      setProgress(5);
+    } else if (status === 'submitting') {
+      // Progress when submitting the request
+      setProgress(15);
+    } else if (status === 'generating') {
+      // Start at 25% for generation phase
+      if (progress < 25) {
+        setProgress(25);
+      }
       
-      // Simulate progress over time
-      progressInterval = setInterval(() => {
-        setProgress(prev => {
-          // Cap at 95% until complete, so users know it's not done
-          if (prev < 95) {
-            return prev + (Math.random() * 2 + 0.5); // Increments between 0.5 and 2.5
+      // Simulate progress during generation
+      progressInterval.current = setInterval(() => {
+        setProgress((prevProgress: number) => {
+          // Cap progress at 95% until complete
+          if (prevProgress < 95) {
+            // Progressively slower increments as we approach 95%
+            const increment = Math.max(0.5, (90 - prevProgress) / 15);
+            return prevProgress + increment;
           }
-          return prev;
+          return prevProgress;
         });
       }, 1000);
     } else if (status === 'completed') {
-      // Set to 100% when complete
+      // Ensure 100% progress on completion
       setProgress(100);
     } else if (status === 'idle') {
-      // Reset when idle
+      // Reset progress when idle
       setProgress(0);
     }
     
+    // Clean up on unmount or status change
     return () => {
-      if (progressInterval) {
-        clearInterval(progressInterval);
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+        progressInterval.current = null;
       }
     };
-  }, [status]);
+  }, [status, progress, setProgress]);
   
   /**
    * Handle form submission to preview step
+   * 
+   * Validates the form and transitions to preview step if valid.
    */
-  const handlePreviewStep = async () => {
+  const handlePreviewStep = useCallback(async () => {
     try {
       // Validate form before previewing
       const isValid = workoutForm.validateForm();
       
       if (isValid) {
         // No errors, proceed to preview
-        setIsPreviewMode(true);
+        goToPreviewStep();
       } else {
         // Handle validation errors
         handleError(new Error('Please fill in all required fields'), {
@@ -216,21 +263,34 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
         action: 'handlePreviewStep'
       });
     }
-  };
+  }, [workoutForm, goToPreviewStep, handleError]);
   
   /**
    * Handle final form submission to generate workout
+   * 
+   * Exits preview mode and initiates the workout generation process.
    */
-  const handleSubmitForm = async () => {
+  const handleSubmitForm = useCallback(async () => {
     try {
       const formValues = workoutForm.formValues;
-      // Exit preview mode
-      setIsPreviewMode(false);
-      // Reset progress for new generation
-      setProgress(0);
-      // Generation status transition is handled by startGeneration
+      
+      // First reset any existing error state
+      setError(null);
+      
+      // Reset the generator to clean state
+      resetGenerator();
+      
+      // First explicitly transition to generating step to avoid reverting to input
+      setPreviewMode(false);
+      
+      // Force transition to generating step before API call
+      goToGeneratingStep();
+      
+      // Start generation process with fresh state
       await startGeneration(formValues);
     } catch (error) {
+      // Even if there's an error, stay on generating step to show error state
+      // rather than going back to input step
       handleError(error, {
         componentName: 'WorkoutRequestForm',
         action: 'handleSubmitForm',
@@ -238,44 +298,60 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
       });
       // Error UI is handled by GeneratingStep component
     }
-  };
+  }, [workoutForm.formValues, setPreviewMode, goToGeneratingStep, startGeneration, handleError, resetGenerator, setError]);
   
   /**
    * Handle editing form from preview
+   * 
+   * Returns to the input step from preview mode.
    */
-  const handleEditForm = () => {
-    setIsPreviewMode(false);
-  };
+  const handleEditForm = useCallback(() => {
+    setPreviewMode(false);
+  }, [setPreviewMode]);
   
   /**
    * Handle cancelling workout generation
+   * 
+   * Cancels any ongoing generation and resets the form flow.
    */
-  const handleCancelGeneration = () => {
-    resetGenerator();
-    setProgress(0);
-  };
+  const handleCancelGeneration = useCallback(() => {
+    // Cancel generation API request
+    cancelGeneration();
+    
+    // Reset form flow state
+    resetFlow();
+  }, [cancelGeneration, resetFlow]);
   
   /**
    * Handle restart to generate a new workout
+   * 
+   * Resets the generator and form flow to start over.
    */
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
+    // Reset the generator
     resetGenerator();
+    
+    // Reset form errors
     workoutForm.resetFormErrors();
-    setProgress(0);
-  };
+    
+    // Reset form flow
+    resetFlow();
+    
+    // Go to input step
+    goToInputStep();
+  }, [resetGenerator, workoutForm, resetFlow, goToInputStep]);
 
   /**
    * Handle workout completion (when progress reaches 100%)
    */
-  const handleGenerationComplete = () => {
-    // If we're at 100% progress but status hasn't updated yet,
-    // this smooths the transition between steps
+  const handleGenerationComplete = useCallback(() => {
+    // If progress is 100% but status isn't updated yet,
+    // this helps smooth the transition between steps
     if (progress >= 100 && status === 'generating') {
-      // The status will be updated by the generator hook
+      // Status will be updated by the generator hook
     }
-  };
+  }, [progress, status]);
 
-  // Render the appropriate step based on current state
   return (
     <ErrorBoundary>
       <div className={`workout-form-container ${className}`}>
@@ -284,7 +360,8 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
         </div>
         
         <div className="workout-generator-form">
-          {currentStep === 'input' && (
+          {/* Use derivedStep to determine which component to render */}
+          {derivedStep === 'input' && (
             <InputStep 
               formValues={workoutForm.formValues}
               formErrors={workoutForm.formErrors || {}}
@@ -301,7 +378,7 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
             />
           )}
           
-          {currentStep === 'preview' && (
+          {derivedStep === 'preview' && (
             <PreviewStep 
               formValues={{
                 duration: Number(workoutForm.formValues.duration || 0),
@@ -312,23 +389,25 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
               }} 
               onEditRequest={handleEditForm}
               onGenerateWorkout={handleSubmitForm}
-              isLoading={isGenerating}
+              isLoading={isGeneratorRunning}
             />
           )}
           
-          {currentStep === 'generating' && (
-            <GeneratingStep 
-              error={errorMessage ? { message: errorMessage } : null}
+          {derivedStep === 'generating' && (
+            <GeneratingStep
               onCancel={handleCancelGeneration}
-              progress={progress}
               onComplete={handleGenerationComplete}
+              progress={progress} 
+              error={flowErrorMessage || generatorErrorMessage ? {
+                message: flowErrorMessage || generatorErrorMessage || 'An error occurred during generation'
+              } : null}
             />
           )}
           
-          {currentStep === 'completed' && generatedWorkout && (
+          {derivedStep === 'completed' && generatedWorkout && (
             <ResultStep 
               workout={generatedWorkout} 
-              error={errorMessage}
+              error={flowErrorMessage}
               onGenerateNew={handleRestart}
             />
           )}
