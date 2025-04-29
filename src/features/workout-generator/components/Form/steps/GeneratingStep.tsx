@@ -97,14 +97,6 @@ export const GeneratingStep: React.FC<GeneratingStepProps> = ({
     
     return STATUS_MESSAGES[index];
   };
-  
-  // Calculate estimated time remaining
-  const getTimeEstimate = () => {
-    if (currentProgress < 25) return 'About 30-40 seconds remaining';
-    if (currentProgress < 60) return 'About 20-30 seconds remaining';
-    if (currentProgress < 85) return 'About 10-15 seconds remaining';
-    return 'Almost done...';
-  };
 
   // Handle error state
   if (error) {
@@ -127,7 +119,6 @@ export const GeneratingStep: React.FC<GeneratingStepProps> = ({
         <LoadingIndicator 
           message={getStatusMessage()} 
           progress={currentProgress} 
-          estimatedTimeRemaining={getTimeEstimate()}
         />
         
         <div className="generating-step__tip-container">
