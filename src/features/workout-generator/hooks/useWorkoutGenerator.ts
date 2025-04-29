@@ -20,6 +20,7 @@ import {
 } from '../utils/workoutCache';
 import { WorkoutActionType } from '../context/actions';
 import { createAbortableRequest } from '../api/client';
+import { API_ENDPOINTS } from '../api/endpoints';
 
 // Status types unified between direct and context-based generation
 export type GenerationStatus = 'idle' | 'starting' | 'submitting' | 'generating' | 'completed' | 'error';
@@ -68,8 +69,9 @@ export function useWorkoutGenerator() {
   const { status: contextStatus, loading, errorMessage } = state.ui;
   const { formValues: contextFormValues, generatedWorkout: contextWorkout } = state.domain;
   
-  // Cleanup function to handle abort controllers and timeouts
+  // Cleanup function to handle abort controllers and timeouts - defined before cancelGeneration
   const cleanup = useCallback(() => {
+    // Silently clean up abort controller and timeouts without state changes
     if (abortControllerRef.current) {
       try {
         abortControllerRef.current.abort('User cancelled request');
@@ -109,8 +111,23 @@ export function useWorkoutGenerator() {
    * @param workoutParams - Parameters for the workout generation
    */
   const startGeneration = useCallback(async (workoutParams: Partial<WorkoutFormParams>) => {
-    // Clean up any existing requests
-    cleanup();
+    // ENHANCEMENT: Clean up any existing requests and ensure proper reason
+    if (abortControllerRef.current) {
+      try {
+        // Always provide a clear reason for aborting
+        abortControllerRef.current.abort('new_request_started');
+      } catch (e) {
+        // Ignore errors during abort
+        console.debug('Error while aborting previous request:', e);
+      }
+      abortControllerRef.current = null;
+    }
+    
+    // ENHANCEMENT: Clear any existing timeout to prevent race conditions
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+      requestTimeoutRef.current = null;
+    }
     
     try {
       // Validate the form before submitting
@@ -162,14 +179,18 @@ export function useWorkoutGenerator() {
       // No cache hit, proceed with API call
       dispatch({ type: WorkoutActionType.GENERATION_PROCESSING });
       
-      // Create an AbortController for this request
+      // ENHANCEMENT: Create a shared abortable request with explicit reason tracking
+      // This allows us to cleanly abort the request with context
       const abortableRequest = createAbortableRequest<{data: GeneratedWorkout}>();
+      
+      // ENHANCEMENT: Create a new AbortController with reason already set
       abortControllerRef.current = new AbortController();
       
-      // Set a timeout for the request (60 seconds)
+      // ENHANCEMENT: Set a timeout with explicit reason for abort
       requestTimeoutRef.current = setTimeout(() => {
         if (abortControllerRef.current) {
-          abortControllerRef.current.abort('Request timed out');
+          // Always include a reason when aborting
+          abortControllerRef.current.abort('timeout');
           dispatch({ 
             type: WorkoutActionType.GENERATION_ERROR, 
             payload: 'The workout generation request timed out. Please try again.' 
@@ -177,37 +198,126 @@ export function useWorkoutGenerator() {
         }
       }, 60000);
       
-      // This will return the workout data directly if successful, or throw an error if not
-      const workoutData = await generateWorkout(completeParams);
+      // ENHANCEMENT: Listen for timeout events from other abort sources
+      const timeoutHandler = (event: Event) => {
+        const detail = (event as CustomEvent).detail;
+        console.warn('Request timeout detected:', detail);
+        
+        // Only handle timeouts for our API endpoint
+        if (detail?.url?.includes(API_ENDPOINTS.GENERATE)) {
+          dispatch({ 
+            type: WorkoutActionType.GENERATION_ERROR, 
+            payload: 'The workout generation request timed out. Please try again.' 
+          });
+        }
+      };
       
-      // Clear the timeout
-      if (requestTimeoutRef.current) {
-        clearTimeout(requestTimeoutRef.current);
-        requestTimeoutRef.current = null;
+      // Add listener for custom timeout events
+      window.addEventListener('fitcopilot_request_timeout', timeoutHandler);
+      
+      try {
+        // This will return the workout data directly if successful, or throw an error if not
+        const workoutData = await generateWorkout(completeParams);
+        
+        // ENHANCEMENT: Remove timeout listener once request completes
+        window.removeEventListener('fitcopilot_request_timeout', timeoutHandler);
+        
+        // Clear the timeout
+        if (requestTimeoutRef.current) {
+          clearTimeout(requestTimeoutRef.current);
+          requestTimeoutRef.current = null;
+        }
+        
+        // Check if this request was cancelled before updating state
+        // We're using the debug mode as a cancellation flag
+        if (state.ui.debugMode) {
+          // Request was cancelled, don't update with results
+          console.log('Ignoring completed request because it was cancelled');
+          // Reset the cancellation flag
+          dispatch({ type: WorkoutActionType.TOGGLE_DEBUG_MODE, payload: false });
+          return null;
+        }
+        
+        // If we get here, generation was successful
+        handleError(null, {
+          componentName: 'useWorkoutGenerator',
+          action: 'startGeneration',
+          additionalData: { status: 'success' }
+        });
+        
+        // Cache the result for future use
+        setCached(completeParams, workoutData);
+        
+        // We don't need to do anything else as the context already updated the state
+        return workoutData;
+      } catch (error) {
+        // ENHANCEMENT: Remove timeout listener in case of error
+        window.removeEventListener('fitcopilot_request_timeout', timeoutHandler);
+        
+        // Clean up timeout if it exists
+        if (requestTimeoutRef.current) {
+          clearTimeout(requestTimeoutRef.current);
+          requestTimeoutRef.current = null;
+        }
+        
+        // Check for abort errors
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Handle abort errors
+          const abortController = abortControllerRef.current;
+          const signal = abortController?.signal;
+          
+          // Get abort reason safely with backwards compatibility for older browsers
+          // Some browsers may not support signal.reason property
+          let abortReason: string | undefined;
+          
+          try {
+            // Check if reason property exists on the signal
+            if (signal && 'reason' in signal) {
+              abortReason = signal.reason as string;
+            }
+          } catch (e) {
+            // Ignore any errors when accessing signal.reason
+            console.debug('Unable to access signal.reason:', e);
+          }
+          
+          // Set appropriate state based on reason
+          if (abortReason === 'timeout') {
+            dispatch({ 
+              type: WorkoutActionType.GENERATION_ERROR,
+              payload: 'The workout generation request timed out. Please try again.'
+            });
+          } else if (abortReason === 'user_cancelled') {
+            dispatch({ 
+              type: WorkoutActionType.GENERATION_ERROR,
+              payload: 'Generation was cancelled.'
+            });
+          } else {
+            // For other abort reasons or if reason couldn't be determined
+            dispatch({ 
+              type: WorkoutActionType.GENERATION_ERROR,
+              payload: 'Generation was cancelled.'
+            });
+          }
+        } else {
+          // Handle non-abort errors
+          handleError(error, {
+            componentName: 'useWorkoutGenerator',
+            action: 'startGeneration',
+            additionalData: { workoutParams }
+          });
+          
+          dispatch({ 
+            type: WorkoutActionType.GENERATION_ERROR,
+            payload: 'Failed to generate workout. Please try again.'
+          });
+        }
+        
+        // Re-throw the error for the UI component to handle if needed
+        throw error;
+      } finally {
+        // Ensure AbortController is cleaned up
+        abortControllerRef.current = null;
       }
-      
-      // Check if this request was cancelled before updating state
-      // We're using the debug mode as a cancellation flag
-      if (state.ui.debugMode) {
-        // Request was cancelled, don't update with results
-        console.log('Ignoring completed request because it was cancelled');
-        // Reset the cancellation flag
-        dispatch({ type: WorkoutActionType.TOGGLE_DEBUG_MODE, payload: false });
-        return null;
-      }
-      
-      // If we get here, generation was successful
-      handleError(null, {
-        componentName: 'useWorkoutGenerator',
-        action: 'startGeneration',
-        additionalData: { status: 'success' }
-      });
-      
-      // Cache the result for future use
-      setCached(completeParams, workoutData);
-      
-      // We don't need to do anything else as the context already updated the state
-      return workoutData;
     } catch (error) {
       // Clean up timeout if it exists
       if (requestTimeoutRef.current) {
@@ -236,9 +346,6 @@ export function useWorkoutGenerator() {
       
       // Re-throw the error for the UI component to handle if needed
       throw error;
-    } finally {
-      // Ensure AbortController is cleaned up
-      abortControllerRef.current = null;
     }
   }, [generateWorkout, handleError, getCached, setCached, dispatch, validateForm, isValid, cleanup]);
 
@@ -268,7 +375,18 @@ export function useWorkoutGenerator() {
       // Set a timeout for the request (60 seconds)
       requestTimeoutRef.current = setTimeout(() => {
         if (abortControllerRef.current) {
-          abortControllerRef.current.abort('Request timed out');
+          try {
+            // Use a safer cross-browser compatible approach
+            // Try the modern .abort(reason) first, and fallback to without reason
+            abortControllerRef.current.abort('timeout');
+          } catch (e) {
+            // Fall back to basic abort without reason for older browsers
+            try {
+              abortControllerRef.current.abort();
+            } catch (innerError) {
+              console.debug('Failed to abort request:', innerError);
+            }
+          }
           setDirectError('The workout generation request timed out. Please try again.');
           setDirectStatus('error');
         }
@@ -316,8 +434,30 @@ export function useWorkoutGenerator() {
       // Special handling for AbortError
       const isAbortError = err instanceof Error && err.name === 'AbortError';
       
+      // Safely get the abort reason with browser compatibility
+      let abortReason = 'unknown';
+      if (isAbortError) {
+        try {
+          // First check if the message contains a reason (backward compatible)
+          const messageMatch = (err as Error).message?.match(/abort(?:ed)?\s*(?:with reason:?\s*)?['"]?([^'"]+)['"]?/i);
+          if (messageMatch && messageMatch[1]) {
+            abortReason = messageMatch[1].trim();
+          } 
+          // Then try accessing the signal reason if it exists
+          else if (abortControllerRef.current?.signal && 'reason' in abortControllerRef.current.signal) {
+            abortReason = (abortControllerRef.current.signal as any).reason || 'unknown';
+          }
+          // Handle user cancelled message explicitly
+          else if ((err as Error).message === 'User cancelled request') {
+            abortReason = 'user_cancelled';
+          }
+        } catch (e) {
+          console.debug('Error accessing abort reason:', e);
+        }
+      }
+      
       // Only update error state if this wasn't a user-initiated abort
-      if (!isAbortError || (isAbortError && err.message !== 'User cancelled request')) {
+      if (!isAbortError || (isAbortError && !['user_cancelled', 'timeout'].includes(abortReason))) {
         // Update state with the error
         setDirectStatus('error');
         const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -340,13 +480,18 @@ export function useWorkoutGenerator() {
   }, [cleanup]);
   
   /**
-   * Cancel the current workout generation
+   * Cancel the current workout generation with UI updates
    */
-  const cancelGeneration = useCallback(() => {
-    // Add a flag to track that the generation was explicitly cancelled
-    const wasCancelled = true;
+  const cancelGeneration = useCallback((shouldLog = true) => {
+    // Only log if shouldLog is true
+    if (shouldLog) {
+      console.debug('Explicitly cancelling workout generation');
+    }
+    
+    // First perform the basic resource cleanup (same as the cleanup function)
     cleanup();
     
+    // Then handle the UI state updates
     // Reset the error states fully to prevent them from persisting
     dispatch({ type: WorkoutActionType.SET_STEP, payload: 'idle' });
     
@@ -358,12 +503,10 @@ export function useWorkoutGenerator() {
     
     // If using context-based generation, update context state without error message
     if (['submitting', 'generating'].includes(contextStatus)) {
+      // ENHANCEMENT: Use RESET_GENERATOR instead of setting error state
+      // This provides a cleaner reset that doesn't leave error messages
       dispatch({ type: WorkoutActionType.RESET_GENERATOR });
-      // Store the cancellation state in the context
-      dispatch({ 
-        type: WorkoutActionType.TOGGLE_DEBUG_MODE, 
-        payload: true  // Repurpose debug mode to store cancellation state
-      });
+      dispatch({ type: WorkoutActionType.TOGGLE_DEBUG_MODE, payload: false });
     }
   }, [cleanup, directStatus, contextStatus, dispatch]);
   
@@ -377,7 +520,7 @@ export function useWorkoutGenerator() {
       const customEvent = event as CustomEvent;
       if (customEvent.detail?.reason === 'step_transition') {
         console.log('Aborting workout generation due to step transition', customEvent.detail);
-        cancelGeneration();
+        cancelGeneration(false); // Silent cancelGeneration for transitions
       }
     };
     

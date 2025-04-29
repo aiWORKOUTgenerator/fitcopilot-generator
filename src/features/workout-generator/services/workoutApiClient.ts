@@ -244,7 +244,26 @@ export class WorkoutApiClient {
     signals.forEach(signal => {
       // When any signal aborts, abort the combined controller
       const onAbort = () => {
-        controller.abort(signal.reason);
+        try {
+          // Safely extract reason with browser compatibility
+          let reason: string | undefined;
+          try {
+            if ('reason' in signal) {
+              reason = (signal as any).reason;
+            }
+          } catch (e) {
+            console.debug('Error accessing signal reason:', e);
+          }
+          
+          // Try to abort with reason, fall back to basic abort if not supported
+          try {
+            controller.abort(reason);
+          } catch (e) {
+            controller.abort();
+          }
+        } catch (e) {
+          console.debug('Error during abort in combineSignals:', e);
+        }
         
         // Clean up listeners from other signals
         signals.forEach(s => {

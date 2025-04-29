@@ -43,7 +43,19 @@ export function useAbortController(currentStep?: FormSteps) {
   const cleanupController = useCallback(() => {
     if (controllerRef.current && !controllerRef.current.signal.aborted) {
       try {
-        controllerRef.current.abort(reasonRef.current || 'component_unmount');
+        // Only call abort with the reason, don't try to set the reason directly
+        reasonRef.current = reasonRef.current || 'component_unmount';
+        try {
+          // Try modern approach with reason parameter
+          controllerRef.current.abort(reasonRef.current);
+        } catch (innerError) {
+          // Fallback for older browsers that don't support abort with reason
+          try {
+            controllerRef.current.abort();
+          } catch (fallbackError) {
+            console.debug('Failed to abort controller:', fallbackError);
+          }
+        }
       } catch (e) {
         // Ignore errors during abort
       }
@@ -90,7 +102,18 @@ export function useAbortController(currentStep?: FormSteps) {
   const abort = useCallback((reason: AbortReason): boolean => {
     if (controllerRef.current && !controllerRef.current.signal.aborted) {
       reasonRef.current = reason;
-      controllerRef.current.abort(reason);
+      // Call abort with reason parameter - this is the correct way to set the reason
+      try {
+        // Try modern approach with reason parameter
+        controllerRef.current.abort(reason);
+      } catch (e) {
+        // Fallback for older browsers
+        try {
+          controllerRef.current.abort();
+        } catch (innerError) {
+          console.debug('Failed to abort controller:', innerError);
+        }
+      }
       
       // Reset the controller reference after aborting
       controllerRef.current = null;
