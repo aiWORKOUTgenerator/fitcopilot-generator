@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Token Migration Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 0.5rem;
+    }
+
+    .test-section {
+      margin-bottom: 3rem;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .color-card {
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .color-swatch {
+      height: 80px;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .color-info {
+      font-size: 14px;
+    }
+
+    .color-name {
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .color-value {
+      font-family: monospace;
+    }
+
+    .test-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .toggle-theme {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .dark-theme .toggle-theme {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    /* Demo component styles */
+    .primary-button-old {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 0.625rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .primary-button-new {
+      background-color: var(--color-wg-primary);
+      color: white;
+      border: none;
+      padding: 0.625rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .secondary-button-old {
+      background-color: #6b7280;
+      color: white;
+      border: none;
+      padding: 0.625rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .secondary-button-new {
+      background-color: var(--color-wg-secondary);
+      color: white;
+      border: none;
+      padding: 0.625rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .text-input-old {
+      padding: 0.625rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      width: 100%;
+    }
+
+    .text-input-new {
+      padding: 0.625rem 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: 0.375rem;
+      width: 100%;
+    }
+
+    .dark-theme {
+      background-color: #121212;
+      color: #f5f5f5;
+    }
+
+    .dark-theme .color-card {
+      background-color: #1e1e1e;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+  <link rel="stylesheet" href="../../../styles/design-system/index.scss">
+</head>
+<body>
+  <button class="toggle-theme" onclick="document.body.classList.toggle('dark-theme')">Toggle Theme</button>
+  
+  <h1>Color Token Migration Test</h1>
+  
+  <div class="test-section">
+    <h2>Button Components</h2>
+    <p>This section compares old hardcoded button styles with the new token-based styles.</p>
+    
+    <div class="test-buttons">
+      <div>
+        <h3>Old Primary Button (hardcoded)</h3>
+        <button class="primary-button-old">Primary Button</button>
+      </div>
+      
+      <div>
+        <h3>New Primary Button (token-based)</h3>
+        <button class="primary-button-new">Primary Button</button>
+      </div>
+      
+      <div>
+        <h3>Old Secondary Button (hardcoded)</h3>
+        <button class="secondary-button-old">Secondary Button</button>
+      </div>
+      
+      <div>
+        <h3>New Secondary Button (token-based)</h3>
+        <button class="secondary-button-new">Secondary Button</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Form Components</h2>
+    <p>This section compares old hardcoded form styles with the new token-based styles.</p>
+    
+    <div class="test-grid">
+      <div>
+        <h3>Old Text Input (hardcoded)</h3>
+        <input type="text" class="text-input-old" placeholder="Enter text...">
+      </div>
+      
+      <div>
+        <h3>New Text Input (token-based)</h3>
+        <input type="text" class="text-input-new" placeholder="Enter text...">
+      </div>
+    </div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Primary Color Swatches</h2>
+    <div class="test-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-wg-primary);"></div>
+        <div class="color-info">
+          <div class="color-name">Primary (WG Feature)</div>
+          <div class="color-value">var(--color-wg-primary)</div>
+        </div>
+      </div>
+      
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-wg-primary-hover);"></div>
+        <div class="color-info">
+          <div class="color-name">Primary Hover (WG Feature)</div>
+          <div class="color-value">var(--color-wg-primary-hover)</div>
+        </div>
+      </div>
+      
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-primary);"></div>
+        <div class="color-info">
+          <div class="color-name">Primary (Global)</div>
+          <div class="color-value">var(--color-primary)</div>
+        </div>
+      </div>
+      
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-primary-dark);"></div>
+        <div class="color-info">
+          <div class="color-name">Primary Dark (Global)</div>
+          <div class="color-value">var(--color-primary-dark)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>Feedback Color Swatches</h2>
+    <div class="test-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-success);"></div>
+        <div class="color-info">
+          <div class="color-name">Success</div>
+          <div class="color-value">var(--color-success)</div>
+        </div>
+      </div>
+      
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-error);"></div>
+        <div class="color-info">
+          <div class="color-name">Error</div>
+          <div class="color-value">var(--color-error)</div>
+        </div>
+      </div>
+      
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-warning);"></div>
+        <div class="color-info">
+          <div class="color-name">Warning</div>
+          <div class="color-value">var(--color-warning)</div>
+        </div>
+      </div>
+      
+      <div class="color-card">
+        <div class="color-swatch" style="background-color: var(--color-info);"></div>
+        <div class="color-info">
+          <div class="color-name">Info</div>
+          <div class="color-value">var(--color-info)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Optional JavaScript to enhance the test page
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Color Token Migration Test page loaded');
+    });
+  </script>
+</body>
+</html> 
