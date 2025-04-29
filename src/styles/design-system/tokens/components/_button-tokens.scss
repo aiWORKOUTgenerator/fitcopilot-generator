@@ -133,9 +133,25 @@ $button-tokens: (
  * @param {String} $variant - Button variant (primary, secondary, outline, text)
  * @param {String} $property - Property to access
  * @param {String} $state - Button state (optional)
+ * @param {Boolean} $dark - Whether to use dark mode values (optional)
  * @return {*} Token value
  */
-@function button-token($variant, $property, $state: null) {
+@function button-token($variant, $property, $state: null, $dark: false) {
+  @if $dark {
+    // Handle dark mode variant tokens
+    @if map-has-key(map-get($button-tokens, $variant), 'dark') {
+      @if $state and map-has-key(map-get(map-get($button-tokens, $variant), 'dark'), $state) {
+        @if map-has-key(map-get(map-get(map-get($button-tokens, $variant), 'dark'), $state), $property) {
+          @return map-get(map-get(map-get(map-get($button-tokens, $variant), 'dark'), $state), $property);
+        }
+      } @else if map-has-key(map-get(map-get($button-tokens, $variant), 'dark'), $property) {
+        @return map-get(map-get(map-get($button-tokens, $variant), 'dark'), $property);
+      }
+    }
+    // If no specific dark mode token, fall back to regular tokens
+  }
+  
+  // Handle regular tokens
   @if $state {
     @if map-has-key(map-get($button-tokens, $variant), $state) {
       @if map-has-key(map-get(map-get($button-tokens, $variant), $state), $property) {
@@ -148,7 +164,7 @@ $button-tokens: (
     }
   }
   
-  @warn 'Button token `#{$variant}: #{$property}` not found';
+  @warn 'Button token `#{$variant}: #{$property}` not found for state:#{$state}, dark:#{$dark}';
   @return null;
 }
 

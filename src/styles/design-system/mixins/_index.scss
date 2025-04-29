@@ -1,7 +1,9 @@
 /**
- * Mixins Index
+ * Design System Mixins Index
  *
- * This file provides a single entry point to import all mixins.
+ * This file imports all mixins from the design system
  */
 
-@import 'form-mixins'; 
+@import './form-mixins';
+@import './button-mixins';
+@import './card-mixins'; 

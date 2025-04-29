@@ -1,0 +1,87 @@
+/**
+ * Card Mixins
+ *
+ * Mixins for styling cards with consistent theming
+ */
+
+@import '../tokens/semantic/surfaces';
+
+/**
+ * Card styling mixin - applies styling based on card type
+ * 
+ * @param {Boolean} $elevated - Whether the card should have elevation
+ * @param {String} $type - Card type (default: card)
+ */
+@mixin card-styling($elevated: false, $type: 'card') {
+  background-color: surface-style($type, 'bg');
+  border-radius: surface-style($type, 'border-radius');
+  padding: surface-style($type, 'padding');
+  
+  @if $elevated {
+    box-shadow: surface-style($type, 'shadow');
+  }
+  
+  .dark-theme & {
+    background-color: surface-style($type, 'bg', null, true);
+    
+    @if $elevated {
+      box-shadow: surface-style($type, 'shadow', null, true);
+    }
+  }
+}
+
+/**
+ * Card hover effect mixin
+ * 
+ * @param {String} $type - Card type (default: card)
+ */
+@mixin card-hover($type: 'card') {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover, &:focus {
+    transform: translateY(-4px);
+    background-color: surface-style($type, 'bg', 'hover');
+    box-shadow: surface-style($type, 'shadow', 'hover');
+    
+    .dark-theme & {
+      background-color: surface-style($type, 'bg', 'hover', true);
+      box-shadow: surface-style($type, 'shadow', 'hover', true);
+    }
+  }
+}
+
+/**
+ * Border color mixin for cards
+ * 
+ * @param {String} $color - Border color token
+ * @param {String} $width - Border width (default: 1px)
+ * @param {String} $style - Border style (default: solid)
+ */
+@mixin border-color($color, $width: 1px, $style: solid) {
+  border: $width $style var(--color-#{$color});
+  
+  .dark-theme & {
+    border-color: var(--color-dark-#{$color});
+  }
+}
+
+/**
+ * Hover state for surface elements
+ * 
+ * @param {String} $color - Base color token
+ * @param {Number} $opacity - Opacity for hover state (default: 0.05)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin hover-state($color, $opacity: 0.05, $dark: false) {
+  transition: background-color 0.2s ease;
+  
+  &:hover, &:focus {
+    background-color: rgba(var(--color-#{$color}-rgb), $opacity);
+  }
+  
+  @if $dark {
+    .dark-theme &:hover, .dark-theme &:focus {
+      background-color: rgba(var(--color-dark-#{$color}-rgb), $opacity + 0.05);
+    }
+  }
+} 

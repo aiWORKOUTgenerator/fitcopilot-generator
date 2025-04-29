@@ -1,100 +1,177 @@
-# FitCopilot Design System: Color Token Architecture
+# Color Token System
 
-This document outlines the consolidated color token architecture implemented in the FitCopilot design system. The system is structured to provide a clear inheritance model, reduce redundancy, and ensure consistent application of colors across the application.
+This directory contains the color token system for the FitCopilot design system. The token system is designed to provide a consistent, maintainable, and accessible color palette for the entire application.
 
-## Token Structure
+## Architecture
 
-The color system follows a 4-tier hierarchical approach:
+The color token system is organized in layers:
 
-1. **Core Color Tokens** - Raw RGB color values
-2. **Semantic Color Tokens** - Mapping core colors to semantic roles
-3. **CSS Variables** - Exporting semantic tokens as CSS variables
-4. **Component-Specific Tokens** - Feature and component specific color applications
+1. **Core Tokens** - The foundational color values
+2. **Semantic Tokens** - Contextual meaning applied to core tokens
+3. **Component Tokens** - Component-specific color applications
 
-## Files Organization
+## Directory Structure
 
-- `_color-core.scss` - Core RGB values
-- `_color-semantic.scss` - Maps core values to semantic purposes
-- `_color-variables.scss` - Exports as CSS variables
-- `_color-maps.scss` - Provides SCSS maps and helper functions
-- `index.scss` - Aggregates all token files
+```
+tokens/
+├── core/                  # Core foundational tokens
+│   ├── _colors.scss       # Base color palette
+│   ├── _typography.scss   # Typography tokens
+│   └── _spacing.scss      # Spacing tokens
+├── semantic/              # Semantic meaning tokens
+│   ├── _feedback.scss     # Success, error, warning, info
+│   └── _surfaces.scss     # Surfaces, cards, panels
+├── components/            # Component-specific tokens
+│   ├── _button-tokens.scss
+│   ├── _input-tokens.scss
+│   └── ...
+├── _color-variables.scss  # CSS custom properties
+├── _color-maps.scss       # Color access maps and functions
+├── _color-mixins.scss     # Color application patterns
+└── index.scss             # Main entry point
+```
+
+## Color Scale System
+
+Our color system uses a consistent numbering scheme:
+
+- **50-100**: Lightest shades, typically used for backgrounds
+- **200-400**: Light to mid-range shades
+- **500**: Base color (default)
+- **600-700**: Slightly darker shades, often for hover/active states
+- **800-900**: Darkest shades, typically for text
+
+For example, `$color-primary-500` is our main primary color, while `$color-primary-50` is the lightest shade of primary, suitable for subtle backgrounds.
 
 ## Usage Guidelines
 
-### Accessing Colors
+### Using Color Tokens
 
-**Preferred Method: Helper Functions**
-```scss
-// In global components
-color('primary');
-color('primary', 'dark');
-color('feedback', 'success');
-
-// In dark theme contexts
-dark-color('primary');
-dark-color('feedback', 'success');
-
-// In Workout Generator components
-wg-color('primary');
-wg-color('secondary', 'hover');
-```
-
-**Alternative Method: CSS Variables**
-```scss
-var(--color-primary)
-var(--color-primary-dark)
-var(--color-success)
-```
-
-### Feature-Specific Colors
-
-When implementing feature-specific components, use the feature-specific helper functions:
+#### SCSS Variables
 
 ```scss
-// In form components
-wg-form-color('border', 'focus');
-wg-form-color('button', 'primary');
+// Core colors
+.my-element {
+  color: $color-primary-500;
+  background-color: $color-gray-100;
+}
 
-// In result display components
-wg-result-color('background', 'highlight');
-wg-result-color('exercise', 'border');
+// Semantic colors (recommended)
+.my-element {
+  color: $color-text;
+  background-color: $color-surface-accent;
+}
 ```
 
-## Token Groups
+#### CSS Custom Properties
 
-### Base Colors
+```scss
+.my-element {
+  color: var(--color-primary);
+  background-color: var(--color-surface-accent);
+}
+```
 
-- `primary` - Main brand color
-- `accent` - Secondary brand color
-- `surface` - UI surface colors
-- `text` - Typography colors
-- `feedback` - Status and message colors
+### Using Color Functions
 
-### State Colors
+```scss
+// Get a color from the palette
+.my-element {
+  color: color('primary', '600');
+  background-color: color('gray', '50');
+}
 
-- `focus` - Focus state indicators
-- `hover` - Hover state styling
-- `active` - Active state styling
-- `disabled` - Disabled state styling
+// Get a specific primary shade
+.my-element {
+  color: primary('600');
+  background-color: primary('50');
+}
 
-### Feature-Specific Colors
+// Get a semantic color
+.my-element {
+  color: semantic-color('text');
+  background-color: semantic-color('surface');
+}
+```
 
-- `wg-primary` - Workout Generator primary color
-- `wg-secondary` - Workout Generator secondary color
-- `wg-card-*` - Specialized card styling for Workout Generator
+### Using Color Mixins
 
-## Benefits of New System
+```scss
+.my-element {
+  @include text-primary('600');
+  @include bg-gray('50');
+}
 
-1. **Reduced Redundancy** - Consolidated duplicate tokens
-2. **Clear Inheritance** - Transparent relationships between tokens
-3. **Consistent Format** - Standardized RGB format for all colors
-4. **Error Checking** - Built-in validation via helper functions
-5. **Dark Theme Support** - Parallel structure for dark theme tokens
+// For feedback elements
+.alert-success {
+  @include alert-variant('success');
+}
 
-## Migration Guide
+// For buttons
+.button-primary {
+  @include button-color-variant('primary');
+}
 
-When working with existing components:
+.button-outline {
+  @include button-color-variant('primary', true);
+}
+```
 
-1. Replace direct CSS variable references with helper functions
-2. Use the most specific token function for your context
-3. If backwards compatibility is needed, use the legacy variables in `_color-tokens.scss` 
+## Accessibility
+
+All color combinations in the system have been tested for accessibility according to WCAG 2.1 AA standards:
+
+- Text on backgrounds should have a minimum contrast ratio of 4.5:1
+- Large text (18pt+) on backgrounds should have a minimum contrast ratio of 3:1
+- UI elements and graphical objects should have a minimum contrast ratio of 3:1
+
+Run the color analyzer (`scripts/color-analyzer.js`) to get an accessibility report.
+
+## Adding New Colors
+
+When adding new colors to the system:
+
+1. Add the base color scale to `core/_colors.scss`
+2. Add semantic tokens in the appropriate semantic file
+3. Add CSS variables in `_color-variables.scss`
+4. Update color maps in `_color-maps.scss`
+5. Run the color analyzer to check for duplicates and accessibility issues
+
+## Best Practices
+
+1. **Always use tokens** - Never use raw color values
+2. **Prefer semantic tokens** - Use semantic tokens instead of core tokens when possible
+3. **Keep a limited palette** - Avoid introducing unnecessary new colors
+4. **Document purpose** - Comment the intended usage of any new color tokens
+5. **Test accessibility** - Verify color combinations meet contrast requirements
+
+## Theme Support
+
+The color system supports both light and dark themes:
+
+```scss
+// Light theme (default)
+.element {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+// Dark theme
+.dark-theme .element {
+  color: var(--color-dark-text);
+  background-color: var(--color-dark-surface);
+}
+```
+
+## Tools
+
+- `scripts/color-analyzer.js` - Analyzes color usage and identifies issues
+- `scripts/generate-color-docs.js` - Generates color documentation
+
+## Migration
+
+When migrating from the old color system:
+
+1. Use the compatibility layer in `_compatibility.scss`
+2. Replace old token references with new tokens
+3. Use the color analyzer to identify direct color usage 

@@ -1,0 +1,104 @@
+/**
+ * Button Mixins
+ *
+ * Mixins for styling buttons with consistent theming
+ */
+
+@import '../tokens/components/button-tokens';
+
+/**
+ * Button styling mixin - applies styling based on variant
+ * 
+ * @param {String} $variant - Button variant (primary, secondary, outline, text)
+ */
+@mixin button-styling($variant) {
+  background-color: button-token($variant, 'bg');
+  color: button-token($variant, 'text');
+  border: button-token($variant, 'border');
+  border-radius: button-base('border-radius');
+  font-weight: button-base('font-weight');
+  transition: button-base('transition');
+  
+  &:hover:not(:disabled) {
+    background-color: button-token($variant, 'bg', 'hover');
+    transform: button-token($variant, 'transform', 'hover');
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px button-token($variant, 'ring', 'focus');
+  }
+  
+  &:disabled {
+    opacity: button-base('disabled-opacity');
+    cursor: not-allowed;
+  }
+  
+  .dark-theme & {
+    background-color: button-token($variant, 'bg', null, true);
+    color: button-token($variant, 'text', null, true);
+    border: button-token($variant, 'border', null, true);
+    
+    &:hover:not(:disabled) {
+      background-color: button-token($variant, 'bg', 'hover', true);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px button-token($variant, 'ring', 'focus', true);
+    }
+  }
+}
+
+/**
+ * Button size mixin - applies size-specific styling
+ * 
+ * @param {String} $size - Button size (sm, md, lg) 
+ */
+@mixin button-size($size) {
+  padding: button-size($size, 'padding');
+  font-size: button-size($size, 'font-size');
+}
+
+/**
+ * Disabled state mixin for buttons
+ */
+@mixin disabled-state() {
+  opacity: button-base('disabled-opacity');
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/**
+ * Loading state mixin for buttons
+ * 
+ * @param {String} $variant - Button variant
+ */
+@mixin loading-state($variant) {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    top: calc(50% - 0.5rem);
+    left: calc(50% - 0.5rem);
+    border-radius: 50%;
+    border: 2px solid button-token($variant, 'border-color', 'spinner');
+    border-top-color: button-token($variant, 'border-top-color', 'spinner');
+    animation: spin 0.8s linear infinite;
+  }
+  
+  .dark-theme &::after {
+    border-color: button-token($variant, 'border-color', 'spinner', true);
+    border-top-color: button-token($variant, 'border-top-color', 'spinner', true);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+} 

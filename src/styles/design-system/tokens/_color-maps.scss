@@ -1,143 +1,212 @@
 /**
  * Color Maps
  * 
- * This file provides structured SCSS maps for accessing colors.
- * These maps should be used by helper functions to standardize token access.
+ * This file provides maps and functions to access colors programmatically.
+ * It creates structured data collections for colors that can be accessed with functions.
  */
 
-@import './color-semantic';
+@import 'core/colors';
 
-// Base Color Maps
-$colors: (
-  'primary': (
-    'base': var(--color-primary),
-    'dark': var(--color-primary-dark),
-    'light': var(--color-primary-light)
-  ),
-  'accent': (
-    'base': var(--color-accent),
-    'dark': var(--color-accent-dark),
-    'light': var(--color-accent-light)
-  ),
-  'surface': (
-    'base': var(--color-surface),
-    'accent': var(--color-surface-accent)
-  ),
-  'text': (
-    'base': var(--color-text),
-    'muted': var(--color-text-muted)
-  ),
-  'border': var(--color-border),
-  'feedback': (
-    'success': var(--color-success),
-    'error': var(--color-error),
-    'warning': var(--color-warning),
-    'info': var(--color-info)
-  )
+// ----------------------------------------------------------------------------
+// COLOR MAPS
+// ----------------------------------------------------------------------------
+
+// Primary color map
+$color-primary-map: (
+  '50': $color-primary-50,
+  '100': $color-primary-100,
+  '200': $color-primary-200,
+  '300': $color-primary-300,
+  '400': $color-primary-400,
+  '500': $color-primary-500,
+  '600': $color-primary-600,
+  '700': $color-primary-700,
+  '800': $color-primary-800,
+  '900': $color-primary-900,
 );
 
-// Dark Theme Color Maps
-$dark-colors: (
-  'primary': var(--color-dark-primary),
-  'accent': var(--color-dark-accent),
-  'surface': var(--color-dark-surface),
-  'card': var(--color-dark-card),
-  'border': var(--color-dark-border),
-  'highlight': var(--color-dark-highlight),
-  'text': var(--color-dark-text),
-  'text-muted': var(--color-dark-text-muted),
-  'feedback': (
-    'success': var(--color-dark-success),
-    'error': var(--color-dark-error),
-    'warning': var(--color-dark-warning),
-    'info': var(--color-dark-info)
-  )
+// Secondary color map
+$color-secondary-map: (
+  '50': $color-secondary-50,
+  '100': $color-secondary-100,
+  '200': $color-secondary-200,
+  '300': $color-secondary-300,
+  '400': $color-secondary-400,
+  '500': $color-secondary-500,
+  '600': $color-secondary-600,
+  '700': $color-secondary-700,
+  '800': $color-secondary-800,
+  '900': $color-secondary-900,
 );
 
-// Workout Generator Color Maps
-$wg-colors: (
-  'primary': (
-    'base': var(--color-wg-primary),
-    'hover': var(--color-wg-primary-hover)
-  ),
-  'secondary': (
-    'base': var(--color-wg-secondary),
-    'hover': var(--color-wg-secondary-hover)
-  ),
-  'feedback': (
-    'success': var(--color-wg-success),
-    'error': var(--color-wg-error)
-  ),
-  'card': (
-    'goal': (
-      'bg': var(--color-wg-goal-bg),
-      'color': var(--color-wg-goal-color),
-      'dark-bg': var(--color-wg-dark-goal-bg),
-      'dark-color': var(--color-wg-dark-goal-color)
-    ),
-    'level': (
-      'bg': var(--color-wg-level-bg),
-      'color': var(--color-wg-level-color),
-      'dark-bg': var(--color-wg-dark-level-bg),
-      'dark-color': var(--color-wg-dark-level-color)
-    ),
-    'duration': (
-      'bg': var(--color-wg-duration-bg),
-      'color': var(--color-wg-duration-color),
-      'dark-bg': var(--color-wg-dark-duration-bg),
-      'dark-color': var(--color-wg-dark-duration-color)
-    )
-  )
+// Gray color map
+$color-gray-map: (
+  '50': $color-gray-50,
+  '100': $color-gray-100,
+  '200': $color-gray-200,
+  '300': $color-gray-300,
+  '400': $color-gray-400,
+  '500': $color-gray-500,
+  '600': $color-gray-600,
+  '700': $color-gray-700,
+  '800': $color-gray-800,
+  '900': $color-gray-900,
+  'white': $color-white,
+  'black': $color-black,
 );
 
-// Helper functions for color access
-@function color($category, $variant: 'base') {
-  @if not map-has-key($colors, $category) {
-    @error "Color category '#{$category}' not found in $colors";
-  }
-  
-  $category-map: map-get($colors, $category);
-  
-  @if type-of($category-map) == 'map' {
-    @if not map-has-key($category-map, $variant) {
-      @error "Variant '#{$variant}' not found in color category '#{$category}'";
+// Success color map
+$color-success-map: (
+  '50': $color-success-50,
+  '100': $color-success-100,
+  '200': $color-success-200,
+  '300': $color-success-300,
+  '400': $color-success-400,
+  '500': $color-success-500,
+  '600': $color-success-600,
+  '700': $color-success-700,
+  '800': $color-success-800,
+  '900': $color-success-900,
+);
+
+// Error color map
+$color-error-map: (
+  '50': $color-error-50,
+  '100': $color-error-100,
+  '200': $color-error-200,
+  '300': $color-error-300,
+  '400': $color-error-400,
+  '500': $color-error-500,
+  '600': $color-error-600,
+  '700': $color-error-700,
+  '800': $color-error-800,
+  '900': $color-error-900,
+);
+
+// Warning color map
+$color-warning-map: (
+  '50': $color-warning-50,
+  '100': $color-warning-100,
+  '200': $color-warning-200,
+  '300': $color-warning-300,
+  '400': $color-warning-400,
+  '500': $color-warning-500,
+  '600': $color-warning-600,
+  '700': $color-warning-700,
+  '800': $color-warning-800,
+  '900': $color-warning-900,
+);
+
+// Info color map
+$color-info-map: (
+  '50': $color-info-50,
+  '100': $color-info-100,
+  '200': $color-info-200,
+  '300': $color-info-300,
+  '400': $color-info-400,
+  '500': $color-info-500,
+  '600': $color-info-600,
+  '700': $color-info-700,
+  '800': $color-info-800,
+  '900': $color-info-900,
+);
+
+// All colors map
+$color-palette: (
+  'primary': $color-primary-map,
+  'secondary': $color-secondary-map,
+  'gray': $color-gray-map,
+  'success': $color-success-map,
+  'error': $color-error-map,
+  'warning': $color-warning-map,
+  'info': $color-info-map,
+);
+
+// Semantic UI maps
+$color-semantic: (
+  'text': $color-gray-800,
+  'text-light': $color-gray-600,
+  'text-muted': $color-gray-500,
+  'background': $color-white,
+  'border': $color-gray-200,
+  'border-hover': $color-gray-400,
+  'border-focus': $color-primary-500,
+  'surface': $color-white,
+  'surface-accent': $color-gray-50,
+  'focus-ring': rgba($color-primary-500, 0.5),
+);
+
+// ----------------------------------------------------------------------------
+// COLOR ACCESS FUNCTIONS
+// ----------------------------------------------------------------------------
+
+/**
+ * Get a color from the palette
+ *
+ * @param {String} $family - The color family (primary, secondary, etc.)
+ * @param {String} $shade - The shade of the color (50, 100, 200, etc.)
+ * @return {Color} The color value
+ */
+@function color($family, $shade: '500') {
+  @if map-has-key($color-palette, $family) {
+    $family-map: map-get($color-palette, $family);
+    
+    @if map-has-key($family-map, $shade) {
+      @return map-get($family-map, $shade);
     }
-    @return map-get($category-map, $variant);
-  } @else {
-    @return $category-map;
+    
+    @warn "Color shade `#{$shade}` not found in family `#{$family}`.";
+    @return null;
   }
+  
+  @warn "Color family `#{$family}` not found.";
+  @return null;
 }
 
-@function dark-color($category, $variant: null) {
-  @if not map-has-key($dark-colors, $category) {
-    @error "Dark color category '#{$category}' not found in $dark-colors";
+/**
+ * Get a semantic color
+ *
+ * @param {String} $name - The semantic color name
+ * @return {Color} The color value
+ */
+@function semantic-color($name) {
+  @if map-has-key($color-semantic, $name) {
+    @return map-get($color-semantic, $name);
   }
   
-  $category-value: map-get($dark-colors, $category);
-  
-  @if $variant != null and type-of($category-value) == 'map' {
-    @if not map-has-key($category-value, $variant) {
-      @error "Variant '#{$variant}' not found in dark color category '#{$category}'";
-    }
-    @return map-get($category-value, $variant);
-  } @else {
-    @return $category-value;
-  }
+  @warn "Semantic color `#{$name}` not found.";
+  @return null;
 }
 
-@function wg-color($category, $variant: 'base') {
-  @if not map-has-key($wg-colors, $category) {
-    @error "Workout Generator color category '#{$category}' not found in $wg-colors";
-  }
-  
-  $category-map: map-get($wg-colors, $category);
-  
-  @if type-of($category-map) == 'map' {
-    @if not map-has-key($category-map, $variant) {
-      @error "Variant '#{$variant}' not found in Workout Generator color category '#{$category}'";
-    }
-    @return map-get($category-map, $variant);
-  } @else {
-    @return $category-map;
-  }
-} 
+/**
+ * Get a specific shade of the primary color
+ *
+ * @param {String} $shade - The shade of the primary color
+ * @return {Color} The primary color at the specified shade
+ */
+@function primary($shade: '500') {
+  @return color('primary', $shade);
+}
+
+/**
+ * Get a specific shade of the secondary color
+ *
+ * @param {String} $shade - The shade of the secondary color
+ * @return {Color} The secondary color at the specified shade
+ */
+@function secondary($shade: '500') {
+  @return color('secondary', $shade);
+}
+
+/**
+ * Get a specific shade of gray
+ *
+ * @param {String} $shade - The shade of gray
+ * @return {Color} The gray color at the specified shade
+ */
+@function gray($shade: '500') {
+  @return color('gray', $shade);
+}
+
+// Export a flag to indicate this file was imported
+$color-maps-imported: true; 

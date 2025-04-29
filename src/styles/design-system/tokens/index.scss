@@ -5,29 +5,51 @@
  * Import this file to access the complete token system.
  */
 
-// First, import the core color tokens
-@import './color-core';
+// ----------------------------------------------------------------------------
+// CORE TOKENS
+// ----------------------------------------------------------------------------
+// These are the foundational values that other tokens build upon
 
-// Import the spacing tokens
-@import './core/spacing';
+// Core color tokens (must be imported first)
+@import './core/colors';
 
-// Import the typography tokens
+// Core typography tokens
 @import './core/typography';
 
-// Then the semantic color mappings
-@import './color-semantic';
+// Core spacing tokens
+@import './core/spacing';
 
-// Then the CSS variables
-@import './color-variables';
+// ----------------------------------------------------------------------------
+// SEMANTIC TOKENS
+// ----------------------------------------------------------------------------
+// These build upon core tokens to provide contextual meaning
 
-// Then the access maps and functions
-@import './color-maps';
+// Semantic feedback tokens
+@import './semantic/feedback';
 
-// Then the mixins for standardized color applications
-@import './color-mixins';
+// Semantic surface tokens
+@import './semantic/surfaces';
 
-// Finally, import component-specific tokens
-// (Commented out until needed to avoid circular dependencies)
+// ----------------------------------------------------------------------------
+// COMPOSITE TOKENS
+// ----------------------------------------------------------------------------
+// These combine multiple token types for specific applications
+
+// Export CSS variables for use in styles
+@import './_color-variables';
+
+// Access helpers and functions
+@import './_color-maps';
+
+// Standardized color application mixins
+@import './_color-mixins';
+
+// ----------------------------------------------------------------------------
+// COMPONENT TOKENS
+// ----------------------------------------------------------------------------
+// Component-specific tokens (import last to avoid circular dependencies)
+
+// Only enable when needed
 // @import './components/index';
 
 // Export a flag to show this file was imported
