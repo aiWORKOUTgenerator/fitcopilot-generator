@@ -4,6 +4,8 @@
  */
 
 @import '../_variables';
+@import '../../../../styles/design-system/_compatibility';
+@import '../../../../styles/design-system/tokens/semantic/surfaces';
 
 /* Workout preview card layout */
 .workout-preview {
@@ -33,26 +35,26 @@
     text-align: center;
     
     &--goal {
-      background-color: var(--color-wg-goal-bg);
+      @include card-bg-color('feature', null, false);
       
       .dark-theme & {
-        background-color: var(--color-wg-dark-goal-bg);
+        @include card-bg-color('feature', null, true);
       }
     }
     
     &--level {
-      background-color: var(--color-wg-level-bg);
+      @include card-bg-color('feature', null, false);
       
       .dark-theme & {
-        background-color: var(--color-wg-dark-level-bg);
+        @include card-bg-color('feature', null, true);
       }
     }
     
     &--duration {
-      background-color: var(--color-wg-duration-bg);
+      @include card-bg-color('feature', null, false);
       
       .dark-theme & {
-        background-color: var(--color-wg-dark-duration-bg);
+        @include card-bg-color('feature', null, true);
       }
     }
   }
@@ -122,27 +124,37 @@
   }
   
   &__equipment-tag {
-    background-color: var(--color-surface-accent);
+    @include card-bg-color('accent');
     color: var(--color-text);
     font-size: $font-size-sm;
     padding: $spacing-1-5 $spacing-3;
-    border-radius: 9999px;
+    border-radius: surface-style('accent', 'border-radius');
+    transition: transition-preset('color');
+    
+    &:hover {
+      @include card-bg-color('accent', 'hover');
+    }
     
     .dark-theme & {
-      background-color: var(--color-dark-surface-hover);
+      @include card-bg-color('accent', null, true);
       color: var(--color-dark-text);
+      
+      &:hover {
+        @include card-bg-color('accent', 'hover', true);
+      }
     }
   }
   
   &__restrictions {
-    background-color: var(--color-surface-accent);
+    @include card-bg-color('accent');
     padding: $spacing-3;
-    border-radius: $wg-border-radius;
+    @include card-border-radius('accent');
     color: var(--color-text);
     margin-top: $wg-spacing-sm;
+    transition: transition-preset('color');
     
     .dark-theme & {
-      background-color: var(--color-dark-surface);
+      @include card-bg-color('accent', null, true);
       color: var(--color-dark-text);
       border: 1px solid var(--color-dark-border);
     }
@@ -151,9 +163,10 @@
 
 /* Workout Card styles */
 .workout-card {
-  background-color: var(--color-dark-bg);
-  border-radius: $wg-border-radius;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  @include card-bg-color('card');
+  @include card-border-radius('card');
+  @include card-shadow('card');
+  @include card-hover-effect('card');
   overflow: hidden;
   margin-bottom: $wg-spacing-lg;
   width: 100%;
@@ -173,7 +186,7 @@
   }
   
   &__content {
-    padding: $spacing-4;
+    @include card-padding('card');
   }
   
   &__section {

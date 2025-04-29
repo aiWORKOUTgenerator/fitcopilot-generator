@@ -45,6 +45,14 @@ $panel-padding: 1rem;
 $panel-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 $panel-dark-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.18);
 
+// Feature card specific tokens
+$feature-padding: 1rem;
+$feature-border-radius: 0.375rem;
+
+// Accent surface tokens
+$accent-padding: 0.75rem;
+$accent-border-radius: 0.375rem;
+
 // Surface component maps
 $surface-styles: (
   'card': (
@@ -76,6 +84,38 @@ $surface-styles: (
     'dark': (
       'bg': $color-dark-surface,
       'shadow': $panel-dark-shadow,
+      'hover': (
+        'bg': $color-dark-surface-hover
+      )
+    )
+  ),
+  'feature': (
+    'bg': $color-surface-accent,
+    'border-radius': $feature-border-radius,
+    'padding': $feature-padding,
+    'shadow': none,
+    'hover': (
+      'bg': $color-surface-hover
+    ),
+    'dark': (
+      'bg': $color-dark-surface-accent,
+      'shadow': none,
+      'hover': (
+        'bg': $color-dark-surface-hover
+      )
+    )
+  ),
+  'accent': (
+    'bg': $color-surface-accent,
+    'border-radius': $accent-border-radius,
+    'padding': $accent-padding,
+    'shadow': none,
+    'hover': (
+      'bg': $color-surface-hover
+    ),
+    'dark': (
+      'bg': $color-dark-surface-accent,
+      'shadow': none,
       'hover': (
         'bg': $color-dark-surface-hover
       )

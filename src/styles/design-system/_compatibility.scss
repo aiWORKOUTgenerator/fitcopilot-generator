@@ -224,4 +224,389 @@ $badge-border-radius: badge-variant('filled', 'border-radius') !default;
 }
 
 // Feature flag for gradual migration
-$use-new-token-system: true !default; 
+$use-new-token-system: true !default;
+
+/* ====== BUTTON COMPATIBILITY LAYER ====== */
+
+// Import button tokens to ensure they're available
+@import 'tokens/components/button-tokens';
+
+// Button background color mapping
+@mixin button-bg-color($variant, $state: null) {
+  @if $use-new-token-system {
+    background-color: button-token($variant, 'bg', $state);
+  } @else {
+    // Legacy background colors - these will be removed after migration
+    @if $variant == 'primary' {
+      background-color: var(--color-primary);
+    } @else if $variant == 'secondary' {
+      background-color: var(--color-surface-accent);
+    } @else if $variant == 'outline' or $variant == 'text' {
+      background-color: transparent;
+    }
+    
+    // Add hover state
+    @if $state == 'hover' {
+      @if $variant == 'primary' {
+        background-color: var(--color-primary-dark);
+      } @else if $variant == 'secondary' {
+        background-color: var(--color-border);
+      } @else if $variant == 'outline' or $variant == 'text' {
+        background-color: rgba(var(--color-primary-rgb), 0.05);
+      }
+    }
+  }
+}
+
+// Button text color mapping
+@mixin button-text-color($variant) {
+  @if $use-new-token-system {
+    color: button-token($variant, 'text');
+  } @else {
+    // Legacy text colors
+    @if $variant == 'primary' {
+      color: white;
+    } @else if $variant == 'secondary' {
+      color: var(--color-text);
+    } @else if $variant == 'outline' or $variant == 'text' {
+      color: var(--color-primary);
+    }
+  }
+}
+
+// Button border mapping
+@mixin button-border($variant) {
+  @if $use-new-token-system {
+    border: button-token($variant, 'border');
+  } @else {
+    // Legacy border styles
+    @if $variant == 'primary' or $variant == 'secondary' or $variant == 'text' {
+      border: none;
+    } @else if $variant == 'outline' {
+      border: 1px solid var(--color-primary);
+    }
+  }
+}
+
+// Button focus ring mapping
+@mixin button-focus-ring($variant) {
+  @if $use-new-token-system {
+    box-shadow: 0 0 0 3px button-token($variant, 'ring', 'focus');
+  } @else {
+    // Legacy focus ring styles
+    @if $variant == 'primary' {
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+    } @else if $variant == 'secondary' {
+      box-shadow: 0 0 0 3px rgba(var(--color-surface-accent-rgb), 0.25);
+    } @else if $variant == 'outline' or $variant == 'text' {
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
+    }
+  }
+}
+
+/* ====== CARD COMPATIBILITY LAYER ====== */
+
+// Import surface tokens to ensure they're available
+@import 'tokens/semantic/surfaces';
+
+// Card background color mapping
+@mixin card-bg-color($type: 'card', $state: null, $dark: false) {
+  @if $use-new-token-system {
+    background-color: surface-style($type, 'bg', $state, $dark);
+  } @else {
+    // Legacy card background colors
+    @if $state == 'hover' {
+      @if $dark {
+        background-color: var(--color-dark-surface-hover);
+      } @else {
+        background-color: var(--color-surface-hover);
+      }
+    } @else {
+      @if $dark {
+        background-color: var(--color-dark-surface);
+      } @else {
+        background-color: var(--color-surface);
+      }
+    }
+  }
+}
+
+// Card shadow mapping
+@mixin card-shadow($type: 'card', $state: null, $dark: false) {
+  @if $use-new-token-system {
+    @if $state == null and $dark == true {
+      // Handle the card--elevated case with only dark mode set
+      box-shadow: surface-style($type, 'shadow', null, true);
+    } @else {
+      box-shadow: surface-style($type, 'shadow', $state, $dark);
+    }
+  } @else {
+    // Legacy shadow styles
+    @if $state == 'hover' {
+      @if $dark {
+        box-shadow: var(--shadow-lg-dark);
+      } @else {
+        box-shadow: var(--shadow-lg);
+      }
+    } @else {
+      @if $dark {
+        box-shadow: var(--dark-shadow-md);
+      } @else {
+        box-shadow: var(--shadow-md);
+      }
+    }
+  }
+}
+
+// Card border radius mapping
+@mixin card-border-radius($type: 'card') {
+  @if $use-new-token-system {
+    border-radius: surface-style($type, 'border-radius');
+  } @else {
+    // Legacy border radius
+    border-radius: var(--radius-lg);
+  }
+}
+
+// Card padding mapping
+@mixin card-padding($type: 'card') {
+  @if $use-new-token-system {
+    padding: surface-style($type, 'padding');
+  } @else {
+    // Legacy padding
+    padding: var(--spacing-6);
+  }
+}
+
+// Card hover effect mapping
+@mixin card-hover-effect($type: 'card') {
+  @if $use-new-token-system {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover, &:focus {
+      transform: translateY(-4px);
+      @include card-bg-color($type, 'hover');
+      @include card-shadow($type, 'hover');
+    }
+  } @else {
+    // Legacy hover effects
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover, &:focus {
+      transform: translateY(-4px);
+      background-color: var(--color-surface-hover);
+      box-shadow: var(--shadow-lg);
+      
+      .dark-theme & {
+        background-color: var(--color-dark-surface-hover);
+        box-shadow: var(--shadow-lg-dark);
+      }
+    }
+  }
+}
+
+/* ====== TRANSITION PRESETS COMPATIBILITY LAYER ====== */
+
+// Import motion tokens to ensure they're available
+@import 'tokens/semantic/motion';
+
+// Transition preset function
+@function compat-transition-preset($type) {
+  @if $use-new-token-system {
+    // Use the transition-preset function from _motion.scss
+    @if $type == 'card' {
+      @return transition-preset('card');
+    } @else if $type == 'button' {
+      @return transition-preset('button');
+    } @else if $type == 'fade' {
+      @return transition-preset('opacity');
+    } @else if $type == 'slide' {
+      @return transition-preset('transform');
+    } @else {
+      @return transition-preset($type);
+    }
+  } @else {
+    // Legacy transition presets
+    @if $type == 'card' {
+      @return transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+    } @else if $type == 'button' {
+      @return all 0.2s var(--ease-out);
+    } @else if $type == 'fade' {
+      @return opacity 0.15s var(--ease-out);
+    } @else if $type == 'slide' {
+      @return transform 0.3s var(--ease-out);
+    } @else {
+      @return all 0.2s var(--ease-out);
+    }
+  }
+}
+
+// For backward compatibility, allow both function names
+@function transition-preset($type) {
+  @return compat-transition-preset($type);
+}
+
+/* ====== SPACING COMPATIBILITY LAYER ====== */
+
+// Import spacing tokens to ensure they're available
+@import 'tokens/core/spacing';
+
+// Map the old spacing values to the new token system
+$spacing-map: (
+  'space-0': 0,
+  'space-1': if($use-new-token-system, spacing-value('1'), 0.25rem),
+  'space-2': if($use-new-token-system, spacing-value('2'), 0.5rem),
+  'space-3': if($use-new-token-system, spacing-value('3'), 0.75rem),
+  'space-4': if($use-new-token-system, spacing-value('4'), 1rem),
+  'space-5': if($use-new-token-system, spacing-value('5'), 1.25rem),
+  'space-6': if($use-new-token-system, spacing-value('6'), 1.5rem),
+  'space-8': if($use-new-token-system, spacing-value('8'), 2rem),
+  'space-10': if($use-new-token-system, spacing-value('10'), 2.5rem),
+  'space-12': if($use-new-token-system, spacing-value('12'), 3rem),
+  'space-16': if($use-new-token-system, spacing-value('16'), 4rem),
+  'space-20': if($use-new-token-system, spacing-value('20'), 5rem),
+  'space-24': if($use-new-token-system, spacing-value('24'), 6rem)
+);
+
+// Function to get spacing value
+@function spacing($size) {
+  @if map-has-key($spacing-map, $size) {
+    @return map-get($spacing-map, $size);
+  } @else {
+    @warn 'Spacing size `#{$size}` not found in spacing map.';
+    @return 0;
+  }
+}
+
+/* ====== FORM INPUT COMPATIBILITY LAYER ====== */
+
+// Import form tokens to ensure they're available
+@import 'tokens/components/input-tokens';
+@import 'tokens/components/select-tokens';
+@import 'tokens/components/form-controls-tokens';
+
+// Form input background color mapping
+@mixin input-bg-color($state: null, $dark: false) {
+  @if $use-new-token-system {
+    background-color: input-token('bg', $state, $dark);
+  } @else {
+    // Legacy input background colors
+    @if $state == 'disabled' {
+      @if $dark {
+        background-color: var(--color-dark-surface-disabled);
+      } @else {
+        background-color: var(--color-surface-disabled);
+      }
+    } @else {
+      @if $dark {
+        background-color: var(--color-dark-surface);
+      } @else {
+        background-color: var(--color-surface);
+      }
+    }
+  }
+}
+
+// Form input text color mapping
+@mixin input-text-color($state: null, $dark: false) {
+  @if $use-new-token-system {
+    color: input-token('text', $state, $dark);
+  } @else {
+    // Legacy input text colors
+    @if $state == 'disabled' {
+      @if $dark {
+        color: var(--color-dark-text-muted);
+      } @else {
+        color: var(--color-text-muted);
+      }
+    } @else {
+      @if $dark {
+        color: var(--color-dark-text);
+      } @else {
+        color: var(--color-text);
+      }
+    }
+  }
+}
+
+// Form input border mapping
+@mixin input-border($state: null, $dark: false) {
+  @if $use-new-token-system {
+    border-color: input-token('border', $state, $dark);
+  } @else {
+    // Legacy input border colors
+    @if $state == 'hover' {
+      @if $dark {
+        border-color: var(--color-dark-border-hover);
+      } @else {
+        border-color: var(--color-border-hover);
+      }
+    } @else if $state == 'focus' {
+      @if $dark {
+        border-color: var(--color-dark-primary);
+      } @else {
+        border-color: var(--color-primary);
+      }
+    } @else if $state == 'disabled' {
+      @if $dark {
+        border-color: var(--color-dark-border-muted);
+      } @else {
+        border-color: var(--color-border-muted);
+      }
+    } @else {
+      @if $dark {
+        border-color: var(--color-dark-border);
+      } @else {
+        border-color: var(--color-border);
+      }
+    }
+  }
+}
+
+// Form input focus ring mapping
+@mixin input-focus-ring($dark: false) {
+  @if $use-new-token-system {
+    box-shadow: 0 0 0 3px input-token('ring', 'focus', $dark);
+  } @else {
+    // Legacy input focus ring
+    @if $dark {
+      box-shadow: 0 0 0 3px rgba(var(--color-dark-primary-rgb), 0.25);
+    } @else {
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+    }
+  }
+}
+
+// Form checkbox/radio mapping
+@mixin checkbox-bg-color($state: null, $dark: false) {
+  @if $use-new-token-system {
+    background-color: checkbox-token('bg', $state, $dark);
+  } @else {
+    // Legacy checkbox background
+    @if $state == 'checked' {
+      @if $dark {
+        background-color: var(--color-dark-primary);
+      } @else {
+        background-color: var(--color-primary);
+      }
+    } @else if $state == 'hover' {
+      @if $dark {
+        background-color: var(--color-dark-surface-hover);
+      } @else {
+        background-color: var(--color-surface-hover);
+      }
+    } @else if $state == 'disabled' {
+      @if $dark {
+        background-color: var(--color-dark-surface-disabled);
+      } @else {
+        background-color: var(--color-surface-disabled);
+      }
+    } @else {
+      @if $dark {
+        background-color: var(--color-dark-surface);
+      } @else {
+        background-color: var(--color-surface);
+      }
+    }
+  }
+} 

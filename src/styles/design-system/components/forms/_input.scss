@@ -5,6 +5,7 @@
  */
 
 @import '../../tokens/components/input-tokens';
+@import '../../_compatibility';
 
 // Base input styles
 .input {
@@ -14,9 +15,10 @@
   border-radius: input-base('border-radius');
   font-weight: input-base('font-weight');
   line-height: input-base('line-height');
-  background-color: input-token('bg');
-  color: input-token('text');
-  border: 1px solid input-token('border');
+  @include input-bg-color();
+  @include input-text-color();
+  border: 1px solid;
+  @include input-border();
   transition: input-base('transition');
   
   &::placeholder {
@@ -24,19 +26,19 @@
   }
   
   &:hover:not(:disabled):not(.input--error) {
-    border-color: input-token('border', 'hover');
+    @include input-border('hover');
   }
   
   &:focus:not(:disabled):not(.input--error) {
     outline: none;
-    border-color: input-token('border', 'focus');
-    box-shadow: 0 0 0 3px input-token('ring', 'focus');
+    @include input-border('focus');
+    @include input-focus-ring();
   }
   
   &:disabled {
     opacity: input-base('disabled-opacity');
-    background-color: input-token('bg', 'disabled');
-    color: input-token('text', 'disabled');
+    @include input-bg-color('disabled');
+    @include input-text-color('disabled');
     cursor: not-allowed;
   }
   
@@ -50,26 +52,26 @@
   
   // Dark theme styles
   .dark-theme & {
-    background-color: input-token('bg', null, true);
-    color: input-token('text', null, true);
-    border-color: input-token('border', null, true);
+    @include input-bg-color(null, true);
+    @include input-text-color(null, true);
+    @include input-border(null, true);
     
     &::placeholder {
       color: input-token('placeholder', null, true);
     }
     
     &:hover:not(:disabled):not(.input--error) {
-      border-color: input-token('border', 'hover', true);
+      @include input-border('hover', true);
     }
     
     &:focus:not(:disabled):not(.input--error) {
-      border-color: input-token('border', 'focus', true);
-      box-shadow: 0 0 0 3px input-token('ring', 'focus', true);
+      @include input-border('focus', true);
+      @include input-focus-ring(true);
     }
     
     &:disabled {
-      background-color: input-token('bg', 'disabled', true);
-      color: input-token('text', 'disabled', true);
+      @include input-bg-color('disabled', true);
+      @include input-text-color('disabled', true);
     }
     
     &--error {
@@ -124,12 +126,13 @@
     align-items: center;
     padding: 0 0.75rem;
     background-color: var(--color-surface-accent);
-    border: 1px solid input-token('border');
+    border: 1px solid;
+    @include input-border();
     color: var(--color-text-muted);
     
     .dark-theme & {
       background-color: var(--color-dark-surface-accent);
-      border-color: input-token('border', null, true);
+      @include input-border(null, true);
       color: var(--color-dark-text-muted);
     }
   }

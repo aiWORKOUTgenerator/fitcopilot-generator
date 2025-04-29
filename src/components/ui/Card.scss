@@ -2,11 +2,12 @@
 @import '../../styles/design-system/spacing';
 @import '../../styles/design-system/shadows';
 @import '../../styles/design-system/mixins/index';
+@import '../../styles/design-system/_compatibility';
 
 .card {
   display: block;
   @include card-styling(false);
-  transition: all 0.2s ease-in-out;
+  transition: compat-transition-preset('card');
   width: 100%;
 
   // Border styles
@@ -16,39 +17,30 @@
 
   // Elevation styles
   &--elevated {
-    box-shadow: var(--shadow-sm);
+    @include card-shadow();
     
     .dark-theme & {
-      box-shadow: var(--dark-shadow-sm);
+      @include card-shadow(null, null, true);
     }
   }
 
   // Hover effect
   &--hoverable {
     cursor: pointer;
-    
-    @include hover-state('surface', 0.05, true);
-    
-    &:hover, &:focus {
-      box-shadow: var(--shadow-md);
-      
-      .dark-theme & {
-        box-shadow: var(--dark-shadow-md);
-      }
-    }
+    @include card-hover();
   }
 
   // Padding variations
   &--padding-small {
-    padding: map-get($spacing, 'space-2');
+    padding: spacing('space-2');
   }
 
   &--padding-medium {
-    padding: map-get($spacing, 'space-4');
+    padding: spacing('space-4');
   }
 
   &--padding-large {
-    padding: map-get($spacing, 'space-6');
+    padding: spacing('space-6');
   }
 
   // Dark mode is handled by the mixins
