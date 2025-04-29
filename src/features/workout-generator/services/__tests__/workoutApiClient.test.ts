@@ -2,6 +2,7 @@
  * Tests for workoutApiClient
  */
 import { workoutApiClient, ApiRequestOptions } from '../workoutApiClient';
+import { createMockBrowserEnvironment } from '../../__tests__/browser-compatibility-utils';
 
 describe('WorkoutApiClient', () => {
   // Mock fetch
@@ -246,6 +247,276 @@ describe('WorkoutApiClient', () => {
         success: true,
         data: { workout: { title: 'Test Workout' } }
       });
+    });
+  });
+  
+  describe('Abort Handling', () => {
+    test('should abort request when signal is aborted', async () => {
+      // Arrange
+      const workoutParams = { duration: 30 };
+      const controller = new AbortController();
+      
+      // Mock fetch to never resolve
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      
+      // Act
+      const resultPromise = workoutApiClient.generateWorkout(
+        workoutParams,
+        { signal: controller.signal }
+      );
+      
+      // Abort the request
+      controller.abort('user_cancelled');
+      
+      // Wait for result
+      const result = await resultPromise;
+      
+      // Assert
+      expect(result.success).toBe(false);
+      expect(result.code).toContain('abort');
+    });
+    
+    test('should timeout after specified duration', async () => {
+      // Arrange
+      const workoutParams = { duration: 30 };
+      const controller = new AbortController();
+      
+      // Mock fetch to never resolve
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      
+      // Act
+      const resultPromise = workoutApiClient.generateWorkout(
+        workoutParams,
+        { signal: controller.signal, timeout: 1000 }
+      );
+      
+      // Advance timers to trigger timeout
+      jest.advanceTimersByTime(1001);
+      
+      // Get the result
+      const result = await resultPromise;
+      
+      // Assert
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('timed out');
+      expect(result.code).toContain('timeout');
+    });
+    
+    test('should combine multiple signals correctly', async () => {
+      // Arrange
+      const workoutParams = { duration: 30 };
+      const controller1 = new AbortController();
+      const controller2 = new AbortController();
+      
+      // Access private method for testing
+      const combinedSignal = (workoutApiClient as any).combineSignals([
+        controller1.signal, 
+        controller2.signal
+      ]);
+      
+      // Mock fetch to never resolve
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      
+      // Act - Start a request and abort one of the controllers
+      const resultPromise = fetch('/test', { signal: combinedSignal });
+      controller1.abort('test_reason');
+      
+      // Assert
+      expect(combinedSignal.aborted).toBe(true);
+      
+      // Clean up
+      await resultPromise.catch(() => {});
+    });
+    
+    test('should clean up signal listeners when request completes', async () => {
+      // Arrange
+      const mockSignal1 = {
+        aborted: false,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      };
+      
+      const mockSignal2 = {
+        aborted: false,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      };
+      
+      // Act
+      const combinedSignal = (workoutApiClient as any).combineSignals([
+        mockSignal1 as any, 
+        mockSignal2 as any
+      ]);
+      
+      // Simulate abort on first signal
+      const abortHandler = mockSignal1.addEventListener.mock.calls[0][1];
+      mockSignal1.aborted = true;
+      abortHandler();
+      
+      // Assert
+      expect(mockSignal2.removeEventListener).toHaveBeenCalled();
+    });
+  });
+  
+  describe('Browser Compatibility', () => {
+    test('should handle modern browsers with full AbortController support', async () => {
+      // Arrange
+      const { cleanup } = createMockBrowserEnvironment('modern');
+      
+      try {
+        const workoutParams = { duration: 30 };
+        const controller = new AbortController();
+        
+        // Mock fetch to throw AbortError
+        (global.fetch as jest.Mock).mockImplementation(() => {
+          controller.abort('test_reason');
+          const error = new DOMException('The operation was aborted', 'AbortError');
+          return Promise.reject(error);
+        });
+        
+        // Act
+        const result = await workoutApiClient.generateWorkout(
+          workoutParams,
+          { signal: controller.signal }
+        );
+        
+        // Assert
+        expect(result.success).toBe(false);
+        expect(result.code).toContain('abort');
+      } finally {
+        cleanup();
+      }
+    });
+    
+    test('should handle legacy browsers with basic AbortController', async () => {
+      // Arrange
+      const { cleanup } = createMockBrowserEnvironment('legacy');
+      
+      try {
+        const workoutParams = { duration: 30 };
+        const controller = new AbortController();
+        
+        // Mock fetch to throw AbortError
+        (global.fetch as jest.Mock).mockImplementation(() => {
+          controller.abort(); // Legacy browsers don't support reason
+          const error = new DOMException('The operation was aborted', 'AbortError');
+          return Promise.reject(error);
+        });
+        
+        // Act
+        const result = await workoutApiClient.generateWorkout(
+          workoutParams,
+          { signal: controller.signal }
+        );
+        
+        // Assert
+        expect(result.success).toBe(false);
+        expect(result.code).toContain('abort');
+      } finally {
+        cleanup();
+      }
+    });
+    
+    test('should handle browsers that throw on abort with reason', async () => {
+      // Arrange
+      const { cleanup } = createMockBrowserEnvironment('partial');
+      
+      try {
+        const workoutParams = { duration: 30 };
+        const controller = new AbortController();
+        
+        // Mock fetch to throw AbortError
+        (global.fetch as jest.Mock).mockImplementation(() => {
+          // This should work despite the browser throwing on abort with reason
+          controller.abort('test_reason');
+          const error = new DOMException('The operation was aborted', 'AbortError');
+          return Promise.reject(error);
+        });
+        
+        // Act
+        const result = await workoutApiClient.generateWorkout(
+          workoutParams,
+          { signal: controller.signal }
+        );
+        
+        // Assert
+        expect(result.success).toBe(false);
+        expect(result.code).toContain('abort');
+      } finally {
+        cleanup();
+      }
+    });
+  });
+  
+  describe('Progress Simulation', () => {
+    test('should call progress callback with increasing values', async () => {
+      // Arrange
+      const workoutParams = { duration: 30 };
+      const controller = new AbortController();
+      const progressCallback = jest.fn();
+      
+      // Act
+      const resultPromise = workoutApiClient.generateWorkout(
+        workoutParams,
+        { signal: controller.signal },
+        progressCallback
+      );
+      
+      // Advance timers to see progress updates
+      jest.advanceTimersByTime(500);  // Initial progress
+      jest.advanceTimersByTime(1000); // Additional progress
+      jest.advanceTimersByTime(2000); // More progress
+      
+      // Complete the request
+      await resultPromise;
+      
+      // Assert
+      expect(progressCallback).toHaveBeenCalled();
+      
+      // Check that progress values increase
+      const calls = progressCallback.mock.calls;
+      let lastProgress = 0;
+      
+      for (const call of calls) {
+        const progress = call[0];
+        expect(progress).toBeGreaterThanOrEqual(lastProgress);
+        lastProgress = progress;
+      }
+    });
+    
+    test('should stop progress simulation when request is aborted', async () => {
+      // Arrange
+      const workoutParams = { duration: 30 };
+      const controller = new AbortController();
+      const progressCallback = jest.fn();
+      
+      // Mock fetch to never resolve
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      
+      // Act
+      const resultPromise = workoutApiClient.generateWorkout(
+        workoutParams,
+        { signal: controller.signal },
+        progressCallback
+      );
+      
+      // Advance timers a bit
+      jest.advanceTimersByTime(1000);
+      
+      // Reset mock to check calls after abort
+      progressCallback.mockReset();
+      
+      // Abort the request
+      controller.abort('user_cancelled');
+      
+      // Advance timers more
+      jest.advanceTimersByTime(2000);
+      
+      // Assert
+      expect(progressCallback).not.toHaveBeenCalled();
+      
+      // Clean up
+      await resultPromise;
     });
   });
 }); 

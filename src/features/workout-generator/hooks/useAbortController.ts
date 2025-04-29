@@ -39,15 +39,19 @@ export function useAbortController(currentStep?: FormSteps) {
   /**
    * Explicit cleanup function to handle controller abort and reset
    * This centralized function ensures consistent cleanup across all pathways
+   *
+   * @param forcedReason - Override the current reason with this value
    */
-  const cleanupController = useCallback(() => {
+  const cleanupController = useCallback((forcedReason?: AbortReason) => {
     if (controllerRef.current && !controllerRef.current.signal.aborted) {
       try {
-        // Only call abort with the reason, don't try to set the reason directly
-        reasonRef.current = reasonRef.current || 'component_unmount';
+        // Use forced reason if provided, otherwise fallback to current reason or default
+        const abortReason = forcedReason || reasonRef.current || 'component_unmount';
+        reasonRef.current = abortReason;
+        
         try {
           // Try modern approach with reason parameter
-          controllerRef.current.abort(reasonRef.current);
+          controllerRef.current.abort(abortReason);
         } catch (innerError) {
           // Fallback for older browsers that don't support abort with reason
           try {
@@ -81,7 +85,9 @@ export function useAbortController(currentStep?: FormSteps) {
    */
   const getSignal = useCallback((reason: AbortReason = 'new_request_started'): AbortSignal => {
     // Clean up existing controller if present
-    cleanupController();
+    if (controllerRef.current) {
+      cleanupController(reason);
+    }
     
     // Ensure we start with a clean slate
     resetController();
@@ -165,7 +171,8 @@ export function useAbortController(currentStep?: FormSteps) {
   // Clean up on component unmount
   useEffect(() => {
     return () => {
-      cleanupController();
+      // Always use 'component_unmount' as the reason when cleaning up during unmount
+      cleanupController('component_unmount');
     };
   }, [cleanupController]);
   
