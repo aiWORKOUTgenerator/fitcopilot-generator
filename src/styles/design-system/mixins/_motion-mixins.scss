@@ -1,0 +1,170 @@
+/**
+ * Motion Mixins
+ *
+ * Mixins for applying consistent animations and transitions
+ */
+
+@import '../tokens/semantic/motion';
+
+/**
+ * Apply transition with preset
+ * 
+ * @param {String} $type - Transition type (base, transform, color, etc.)
+ */
+@mixin transition($type: 'base') {
+  transition: transition-preset($type);
+}
+
+/**
+ * Apply animation with preset
+ * 
+ * @param {String} $animation - Animation name (fade-in, slide-in, etc.)
+ */
+@mixin animation($animation) {
+  animation: animation-preset($animation);
+}
+
+/**
+ * Apply fade-in animation
+ * 
+ * @param {String} $duration - Duration speed token (normal, fast, etc.)
+ * @param {String} $delay - Delay in seconds (optional)
+ */
+@mixin fade-in($duration: 'normal', $delay: null) {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-duration: motion-duration($duration);
+  animation-timing-function: motion-easing('standard');
+  animation-fill-mode: forwards;
+  
+  @if $delay {
+    animation-delay: $delay;
+  }
+}
+
+/**
+ * Apply slide-in animation
+ * 
+ * @param {String} $direction - Direction (up, down, left, right)
+ * @param {String} $duration - Duration speed token (normal, fast, etc.)
+ * @param {String} $distance - Distance to travel (in pixels, default: 20px)
+ * @param {String} $delay - Delay in seconds (optional)
+ */
+@mixin slide-in($direction: 'up', $duration: 'normal', $distance: 20px, $delay: null) {
+  opacity: 0;
+  
+  @if $direction == 'up' {
+    transform: translateY($distance);
+  } @else if $direction == 'down' {
+    transform: translateY(-$distance);
+  } @else if $direction == 'left' {
+    transform: translateX($distance);
+  } @else if $direction == 'right' {
+    transform: translateX(-$distance);
+  }
+  
+  animation-name: slideIn;
+  animation-duration: motion-duration($duration);
+  animation-timing-function: motion-easing('spring');
+  animation-fill-mode: forwards;
+  
+  @if $delay {
+    animation-delay: $delay;
+  }
+  
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translate(0);
+    }
+  }
+}
+
+/**
+ * Apply staggered animation to children
+ * 
+ * @param {String} $animation - Animation name (fade-in, slide-in, etc.)
+ * @param {String} $selector - Child selector (default: > *)
+ * @param {Number} $delay-base - Base delay in seconds
+ * @param {Number} $delay-increment - Delay increment per item
+ * @param {Number} $max-items - Maximum number of items to stagger (default: 10)
+ */
+@mixin stagger-children($animation: 'fade-in', $selector: '> *', $delay-base: 0, $delay-increment: 0.05, $max-items: 10) {
+  $properties: motion-animation($animation, 'name') 
+               motion-animation($animation, 'duration')
+               motion-animation($animation, 'easing')
+               motion-animation($animation, 'fill-mode');
+  
+  @for $i from 1 through $max-items {
+    #{$selector}:nth-child(#{$i}) {
+      animation: $properties;
+      animation-delay: $delay-base + ($i - 1) * $delay-increment;
+    }
+  }
+}
+
+/**
+ * Apply loading spinner
+ * 
+ * @param {String} $size - Size in rem or px
+ * @param {String} $border-width - Border width
+ * @param {Color} $color - Active color
+ * @param {Color} $background-color - Inactive color
+ */
+@mixin loading-spinner($size: 1rem, $border-width: 2px, $color: currentColor, $background-color: rgba(currentColor, 0.2)) {
+  width: $size;
+  height: $size;
+  border: $border-width solid $background-color;
+  border-radius: 50%;
+  border-top-color: $color;
+  animation: spin motion-duration('slower') motion-easing('linear') infinite;
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/**
+ * Apply shimmer loading effect
+ * 
+ * @param {Color} $bg-color - Base background color
+ * @param {Color} $shine-color - Shimmer highlight color
+ */
+@mixin shimmer-loading($bg-color: rgba(0, 0, 0, 0.05), $shine-color: rgba(255, 255, 255, 0.2)) {
+  background: linear-gradient(
+    90deg,
+    $bg-color 0%,
+    $shine-color 50%,
+    $bg-color 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer motion-duration('slower') * 3 motion-easing('linear') infinite;
+  
+  @keyframes shimmer {
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+/**
+ * Apply pulse animation
+ * 
+ * @param {Color} $color - Color to pulse
+ * @param {Number} $opacity-min - Minimum opacity
+ * @param {Number} $opacity-max - Maximum opacity
+ */
+@mixin pulse($color: currentColor, $opacity-min: 0.3, $opacity-max: 0.7) {
+  animation: pulse motion-duration('slower') * 2 motion-easing('in-out') infinite;
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: $opacity-max;
+    }
+    50% {
+      opacity: $opacity-min;
+    }
+  }
+} 

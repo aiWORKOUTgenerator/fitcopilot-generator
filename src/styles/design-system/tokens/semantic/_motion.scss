@@ -1,0 +1,229 @@
+/**
+ * Motion Tokens
+ * 
+ * This file defines semantic tokens for animations, transitions, and motion.
+ * These tokens standardize animation behavior across components for consistency.
+ */
+
+// Duration tokens (in seconds)
+$motion-duration: (
+  'instant': 0.075s,
+  'fast': 0.15s,
+  'normal': 0.3s,
+  'slow': 0.5s,
+  'slower': 0.75s
+);
+
+// Easing tokens
+$motion-easing: (
+  'standard': 'ease',
+  'in': 'ease-in',
+  'out': 'ease-out',
+  'in-out': 'ease-in-out',
+  'linear': 'linear',
+  'bounce': 'cubic-bezier(0.68, -0.55, 0.27, 1.55)',
+  'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+  'accelerate': 'cubic-bezier(0.4, 0.0, 1, 1)',
+  'decelerate': 'cubic-bezier(0.0, 0.0, 0.2, 1)'
+);
+
+// Common transition presets
+$motion-transition: (
+  'base': (
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'standard'),
+    'properties': 'all'
+  ),
+  'transform': (
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'standard'),
+    'properties': 'transform'
+  ),
+  'color': (
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'standard'),
+    'properties': 'background-color, border-color, color, fill, stroke'
+  ),
+  'opacity': (
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'in-out'),
+    'properties': 'opacity'
+  ),
+  'size': (
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'bounce'),
+    'properties': 'height, width'
+  ),
+  'shadow': (
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'standard'),
+    'properties': 'box-shadow'
+  ),
+  'button': (
+    'duration': map-get($motion-duration, 'fast'),
+    'easing': map-get($motion-easing, 'standard'),
+    'properties': 'all'
+  ),
+  'input': (
+    'duration': map-get($motion-duration, 'fast'),
+    'easing': map-get($motion-easing, 'standard'),
+    'properties': 'border-color, background-color, box-shadow'
+  ),
+  'card': (
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'out'),
+    'properties': 'transform, box-shadow'
+  )
+);
+
+// Animation presets
+$motion-animation: (
+  'fade-in': (
+    'name': 'fadeIn',
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'standard'),
+    'fill-mode': 'forwards'
+  ),
+  'fade-out': (
+    'name': 'fadeOut',
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'standard'),
+    'fill-mode': 'forwards'
+  ),
+  'slide-in': (
+    'name': 'slideIn',
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'spring'),
+    'fill-mode': 'forwards'
+  ),
+  'slide-out': (
+    'name': 'slideOut',
+    'duration': map-get($motion-duration, 'normal'),
+    'easing': map-get($motion-easing, 'spring'),
+    'fill-mode': 'forwards'
+  ),
+  'loading': (
+    'name': 'spin',
+    'duration': map-get($motion-duration, 'slower'),
+    'easing': map-get($motion-easing, 'linear'),
+    'iteration-count': 'infinite'
+  ),
+  'pulse': (
+    'name': 'pulse',
+    'duration': map-get($motion-duration, 'slower'),
+    'easing': map-get($motion-easing, 'standard'),
+    'iteration-count': 'infinite'
+  ),
+  'shimmer': (
+    'name': 'shimmer',
+    'duration': map-get($motion-duration, 'slower') * 3,
+    'easing': map-get($motion-easing, 'linear'),
+    'iteration-count': 'infinite'
+  )
+);
+
+/**
+ * Get motion duration value
+ * 
+ * @param {String} $speed - Speed token (instant, fast, normal, slow, slower)
+ * @return {*} Duration value
+ */
+@function motion-duration($speed) {
+  @if map-has-key($motion-duration, $speed) {
+    @return map-get($motion-duration, $speed);
+  }
+  
+  @warn 'Motion duration `#{$speed}` not found.';
+  @return map-get($motion-duration, 'normal');
+}
+
+/**
+ * Get motion easing value
+ * 
+ * @param {String} $curve - Easing token (standard, in, out, etc)
+ * @return {*} Easing value
+ */
+@function motion-easing($curve) {
+  @if map-has-key($motion-easing, $curve) {
+    @return map-get($motion-easing, $curve);
+  }
+  
+  @warn 'Motion easing `#{$curve}` not found.';
+  @return map-get($motion-easing, 'standard');
+}
+
+/**
+ * Get motion transition preset
+ * 
+ * @param {String} $type - Transition type (base, transform, color, etc)
+ * @param {String} $property - Property to access (duration, easing, properties)
+ * @return {*} Transition property value
+ */
+@function motion-transition($type, $property) {
+  $type-key: if(map-has-key($motion-transition, $type), $type, 'base');
+  
+  @if map-has-key(map-get($motion-transition, $type-key), $property) {
+    @return map-get(map-get($motion-transition, $type-key), $property);
+  }
+  
+  @warn 'Motion transition `#{$type}.#{$property}` not found.';
+  @return null;
+}
+
+/**
+ * Get full transition string for a component
+ * 
+ * @param {String} $type - Transition type (base, transform, color, etc)
+ * @return {String} Complete transition CSS value
+ */
+@function transition-preset($type) {
+  $type-key: if(map-has-key($motion-transition, $type), $type, 'base');
+  $properties: motion-transition($type-key, 'properties');
+  $duration: motion-transition($type-key, 'duration');
+  $easing: motion-transition($type-key, 'easing');
+  
+  @return #{$properties} #{$duration} #{$easing};
+}
+
+/**
+ * Get animation preset property
+ * 
+ * @param {String} $animation - Animation name (fade-in, slide-in, etc)
+ * @param {String} $property - Property to access (name, duration, etc)
+ * @return {*} Animation property value
+ */
+@function motion-animation($animation, $property) {
+  @if map-has-key($motion-animation, $animation) {
+    @if map-has-key(map-get($motion-animation, $animation), $property) {
+      @return map-get(map-get($motion-animation, $animation), $property);
+    }
+  }
+  
+  @warn 'Motion animation `#{$animation}.#{$property}` not found.';
+  @return null;
+}
+
+/**
+ * Get full animation string
+ * 
+ * @param {String} $animation - Animation name (fade-in, slide-in, etc)
+ * @return {String} Complete animation CSS value
+ */
+@function animation-preset($animation) {
+  @if map-has-key($motion-animation, $animation) {
+    $name: motion-animation($animation, 'name');
+    $duration: motion-animation($animation, 'duration');
+    $easing: motion-animation($animation, 'easing');
+    $fill-mode: motion-animation($animation, 'fill-mode');
+    $iteration-count: motion-animation($animation, 'iteration-count');
+    
+    @if $iteration-count {
+      @return #{$name} #{$duration} #{$easing} #{$fill-mode} #{$iteration-count};
+    } @else {
+      @return #{$name} #{$duration} #{$easing} #{$fill-mode};
+    }
+  }
+  
+  @warn 'Animation preset `#{$animation}` not found.';
+  @return null;
+} 

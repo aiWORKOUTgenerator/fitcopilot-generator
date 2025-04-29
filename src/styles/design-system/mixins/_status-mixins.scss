@@ -1,0 +1,183 @@
+/**
+ * Status Mixins
+ *
+ * Mixins for applying status indicators, badges, and tags with consistent theming
+ */
+
+@import '../tokens/semantic/status';
+
+/**
+ * Apply status styling
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin status-styling($status, $dark: false) {
+  background-color: status-token($status, 'bg');
+  color: status-token($status, 'text');
+  border: 1px solid status-token($status, 'border');
+  
+  @if $dark {
+    .dark-theme & {
+      background-color: status-token($status, 'bg', true);
+      color: status-token($status, 'text', true);
+      border-color: status-token($status, 'border', true);
+    }
+  }
+}
+
+/**
+ * Apply status badge styling
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @param {String} $variant - Badge variant (filled, outlined, pill, dot)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin status-badge($status, $variant: 'filled', $dark: false) {
+  @if $variant == 'filled' {
+    background-color: status-token($status, 'bg');
+    color: status-token($status, 'text');
+    border: none;
+  } @else if $variant == 'outlined' {
+    background-color: transparent;
+    color: status-token($status, 'icon');
+    border: 1px solid status-token($status, 'border');
+  } @else if $variant == 'pill' {
+    background-color: status-token($status, 'bg');
+    color: status-token($status, 'text');
+    border: none;
+  } @else if $variant == 'dot' {
+    background-color: status-token($status, 'icon');
+    border: none;
+  }
+  
+  @if $variant != 'dot' {
+    padding: badge-variant($variant, 'padding');
+    font-size: badge-variant($variant, 'font-size');
+    font-weight: badge-variant($variant, 'font-weight');
+  } @else {
+    width: badge-variant($variant, 'size');
+    height: badge-variant($variant, 'size');
+  }
+  
+  border-radius: badge-variant($variant, 'border-radius');
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  
+  @if $dark {
+    .dark-theme & {
+      @if $variant == 'filled' {
+        background-color: status-token($status, 'bg', true);
+        color: status-token($status, 'text', true);
+      } @else if $variant == 'outlined' {
+        color: status-token($status, 'icon', true);
+        border-color: status-token($status, 'border', true);
+      } @else if $variant == 'pill' {
+        background-color: status-token($status, 'bg', true);
+        color: status-token($status, 'text', true);
+      } @else if $variant == 'dot' {
+        background-color: status-token($status, 'icon', true);
+      }
+    }
+  }
+}
+
+/**
+ * Apply tag styling
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ * @param {Boolean} $clickable - Whether the tag is clickable
+ */
+@mixin tag-styling($status, $dark: false, $clickable: false) {
+  @include status-badge($status, 'pill', $dark);
+  
+  @if $clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      filter: brightness(0.95);
+    }
+    
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+}
+
+/**
+ * Apply status icon
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin status-icon($status, $dark: false) {
+  color: status-token($status, 'icon');
+  
+  @if $dark {
+    .dark-theme & {
+      color: status-token($status, 'icon', true);
+    }
+  }
+}
+
+/**
+ * Apply status dot indicator
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @param {String} $size - Dot size (default: 0.5rem)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin status-dot($status, $size: 0.5rem, $dark: false) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  background-color: status-token($status, 'icon');
+  display: inline-block;
+  
+  @if $dark {
+    .dark-theme & {
+      background-color: status-token($status, 'icon', true);
+    }
+  }
+}
+
+/**
+ * Apply a status indicator with text
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @param {Boolean} $with-dot - Whether to include a status dot
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin status-indicator($status, $with-dot: true, $dark: false) {
+  display: inline-flex;
+  align-items: center;
+  color: status-token($status, 'text');
+  
+  @if $with-dot {
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background-color: status-token($status, 'icon');
+      margin-right: 0.375rem;
+    }
+  }
+  
+  @if $dark {
+    .dark-theme & {
+      color: status-token($status, 'text', true);
+      
+      @if $with-dot {
+        &::before {
+          background-color: status-token($status, 'icon', true);
+        }
+      }
+    }
+  }
+} 

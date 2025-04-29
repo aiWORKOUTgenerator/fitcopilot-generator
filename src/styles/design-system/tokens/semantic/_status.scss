@@ -1,0 +1,232 @@
+/**
+ * Status Tokens
+ * 
+ * This file defines semantic tokens for status indicators, badges, and tags.
+ * These tokens standardize the appearance of indicators across the application.
+ */
+
+@import '../core/colors';
+
+// Status types with their respective colors
+$status-colors: (
+  'active': $color-success-500,
+  'inactive': $color-gray-500,
+  'pending': $color-warning-500,
+  'error': $color-error-500,
+  'success': $color-success-500,
+  'warning': $color-warning-500,
+  'info': $color-info-500,
+  'new': $color-primary-500,
+  'disabled': $color-gray-400
+);
+
+// Status indicator tokens for component states
+$status-tokens: (
+  'active': (
+    'bg': $color-success-50,
+    'text': $color-success-700,
+    'border': $color-success-200,
+    'icon': $color-success-500,
+    'dark': (
+      'bg': rgba($color-success-700, 0.2),
+      'text': $color-success-300,
+      'border': $color-success-700,
+      'icon': $color-success-400
+    )
+  ),
+  'inactive': (
+    'bg': $color-gray-50,
+    'text': $color-gray-700,
+    'border': $color-gray-200,
+    'icon': $color-gray-500,
+    'dark': (
+      'bg': rgba($color-gray-700, 0.2),
+      'text': $color-gray-300,
+      'border': $color-gray-700,
+      'icon': $color-gray-400
+    )
+  ),
+  'pending': (
+    'bg': $color-warning-50,
+    'text': $color-warning-700,
+    'border': $color-warning-200,
+    'icon': $color-warning-500,
+    'dark': (
+      'bg': rgba($color-warning-700, 0.2),
+      'text': $color-warning-300,
+      'border': $color-warning-700,
+      'icon': $color-warning-400
+    )
+  ),
+  'error': (
+    'bg': $color-error-50,
+    'text': $color-error-700,
+    'border': $color-error-200,
+    'icon': $color-error-500,
+    'dark': (
+      'bg': rgba($color-error-700, 0.2),
+      'text': $color-error-300,
+      'border': $color-error-700,
+      'icon': $color-error-400
+    )
+  ),
+  'success': (
+    'bg': $color-success-50,
+    'text': $color-success-700,
+    'border': $color-success-200,
+    'icon': $color-success-500,
+    'dark': (
+      'bg': rgba($color-success-700, 0.2),
+      'text': $color-success-300,
+      'border': $color-success-700,
+      'icon': $color-success-400
+    )
+  ),
+  'warning': (
+    'bg': $color-warning-50,
+    'text': $color-warning-700,
+    'border': $color-warning-200,
+    'icon': $color-warning-500,
+    'dark': (
+      'bg': rgba($color-warning-700, 0.2),
+      'text': $color-warning-300,
+      'border': $color-warning-700,
+      'icon': $color-warning-400
+    )
+  ),
+  'info': (
+    'bg': $color-info-50,
+    'text': $color-info-700,
+    'border': $color-info-200,
+    'icon': $color-info-500,
+    'dark': (
+      'bg': rgba($color-info-700, 0.2),
+      'text': $color-info-300,
+      'border': $color-info-700,
+      'icon': $color-info-400
+    )
+  ),
+  'new': (
+    'bg': $color-primary-50,
+    'text': $color-primary-700,
+    'border': $color-primary-200,
+    'icon': $color-primary-500,
+    'dark': (
+      'bg': rgba($color-primary-700, 0.2),
+      'text': $color-primary-300,
+      'border': $color-primary-700,
+      'icon': $color-primary-400
+    )
+  ),
+  'disabled': (
+    'bg': $color-gray-50,
+    'text': $color-gray-500,
+    'border': $color-gray-200,
+    'icon': $color-gray-400,
+    'dark': (
+      'bg': rgba($color-gray-800, 0.2),
+      'text': $color-gray-500,
+      'border': $color-gray-700,
+      'icon': $color-gray-500
+    )
+  )
+);
+
+// Badge/Tag variants 
+$status-badge-variants: (
+  'filled': (
+    'border-radius': '4px',
+    'padding': '0.25rem 0.5rem',
+    'font-size': '0.75rem',
+    'font-weight': 500
+  ),
+  'outlined': (
+    'border-radius': '4px',
+    'padding': '0.25rem 0.5rem',
+    'font-size': '0.75rem',
+    'font-weight': 500
+  ),
+  'pill': (
+    'border-radius': '9999px',
+    'padding': '0.25rem 0.75rem',
+    'font-size': '0.75rem',
+    'font-weight': 500
+  ),
+  'dot': (
+    'size': '0.5rem',
+    'border-radius': '50%'
+  )
+);
+
+/**
+ * Get status color
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @return {*} Color value
+ */
+@function status-color($status) {
+  @if map-has-key($status-colors, $status) {
+    @return map-get($status-colors, $status);
+  }
+  
+  @warn 'Status color `#{$status}` not found.';
+  @return $color-gray-500;
+}
+
+/**
+ * Get status token value
+ * 
+ * @param {String} $status - Status type (active, inactive, pending, etc.)
+ * @param {String} $property - Property to access (bg, text, border, icon)
+ * @param {Boolean} $dark - Whether to use dark theme tokens (optional)
+ * @return {*} Status token value
+ */
+@function status-token($status, $property, $dark: false) {
+  @if not map-has-key($status-tokens, $status) {
+    @warn 'Status type `#{$status}` not found.';
+    @return null;
+  }
+  
+  $status-map: map-get($status-tokens, $status);
+  
+  @if $dark {
+    @if map-has-key($status-map, 'dark') {
+      $dark-map: map-get($status-map, 'dark');
+      
+      @if map-has-key($dark-map, $property) {
+        @return map-get($dark-map, $property);
+      }
+    }
+    // Fall back to light mode if no dark mode value
+  }
+  
+  @if map-has-key($status-map, $property) {
+    @return map-get($status-map, $property);
+  }
+  
+  @warn 'Status token `#{$status}.#{$property}` not found.';
+  @return null;
+}
+
+/**
+ * Get badge/tag variant property
+ * 
+ * @param {String} $variant - Badge variant (filled, outlined, pill, dot)
+ * @param {String} $property - Property to access
+ * @return {*} Badge variant property value
+ */
+@function badge-variant($variant, $property) {
+  @if not map-has-key($status-badge-variants, $variant) {
+    @warn 'Badge variant `#{$variant}` not found.';
+    @return null;
+  }
+  
+  $variant-map: map-get($status-badge-variants, $variant);
+  
+  @if map-has-key($variant-map, $property) {
+    @return map-get($variant-map, $property);
+  }
+  
+  @warn 'Badge property `#{$variant}.#{$property}` not found.';
+  @return null;
+} 

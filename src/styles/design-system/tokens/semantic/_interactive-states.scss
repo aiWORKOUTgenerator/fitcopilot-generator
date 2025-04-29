@@ -1,0 +1,179 @@
+/**
+ * Interactive States Tokens
+ * 
+ * This file defines semantic tokens for interactive states like hover, focus, active, and disabled.
+ * These tokens standardize interaction behavior across components.
+ */
+
+@import '../core/colors';
+
+// Base interactive state values
+$state-hover-opacity: 0.07;
+$state-active-opacity: 0.12;
+$state-focus-ring-size: 3px;
+$state-disabled-opacity: 0.65;
+
+// State color values by component
+$interactive-states: (
+  'base': (
+    'hover': (
+      'opacity': $state-hover-opacity,
+      'transition': 'all 0.2s ease'
+    ),
+    'focus': (
+      'ring-size': $state-focus-ring-size,
+      'ring-opacity': 0.25,
+      'ring-offset': 0,
+      'transition': 'box-shadow 0.2s ease-in-out'
+    ),
+    'active': (
+      'opacity': $state-active-opacity,
+      'scale': 0.98,
+      'transition': 'transform 0.1s ease-in-out'
+    ),
+    'disabled': (
+      'opacity': $state-disabled-opacity,
+      'background': $color-gray-100,
+      'text': $color-gray-500,
+      'border': $color-gray-300,
+      'dark': (
+        'background': $color-gray-800,
+        'text': $color-gray-600,
+        'border': $color-gray-700
+      )
+    )
+  ),
+  'button': (
+    'hover': (
+      'transform': 'translateY(-2px)',
+      'shadow-increment': 1
+    ),
+    'active': (
+      'transform': 'translateY(0)',
+      'shadow-decrement': 1
+    ),
+    'focus': (
+      'ring-color': (
+        'primary': rgba($color-primary-500, 0.25),
+        'secondary': rgba($color-secondary-500, 0.25),
+        'success': rgba($color-success-500, 0.25),
+        'warning': rgba($color-warning-500, 0.25),
+        'error': rgba($color-error-500, 0.25),
+        'dark': (
+          'primary': rgba($color-primary-300, 0.3),
+          'secondary': rgba($color-secondary-300, 0.3),
+          'success': rgba($color-success-300, 0.3),
+          'warning': rgba($color-warning-300, 0.3),
+          'error': rgba($color-error-300, 0.3)
+        )
+      )
+    ),
+    'dark': (
+      'hover': (
+        'transform': 'translateY(-2px)',
+        'shadow-increment': 1
+      ),
+      'active': (
+        'transform': 'translateY(0)',
+        'shadow-decrement': 1
+      )
+    )
+  ),
+  'input': (
+    'hover': (
+      'border-color': $color-gray-400
+    ),
+    'focus': (
+      'border-color': $color-primary-500,
+      'ring-color': rgba($color-primary-500, 0.25)
+    ),
+    'dark': (
+      'hover': (
+        'border-color': $color-gray-600
+      ),
+      'focus': (
+        'border-color': $color-primary-400,
+        'ring-color': rgba($color-primary-400, 0.3)
+      )
+    )
+  ),
+  'card': (
+    'hover': (
+      'transform': 'translateY(-4px)',
+      'shadow-increment': 1,
+      'background': $color-surface-hover
+    ),
+    'active': (
+      'transform': 'translateY(-2px)',
+      'shadow-increment': 0
+    ),
+    'dark': (
+      'hover': (
+        'background': $color-dark-surface-hover,
+        'transform': 'translateY(-4px)',
+        'shadow-increment': 1
+      )
+    )
+  )
+);
+
+/**
+ * Get interactive state token value
+ * 
+ * @param {String} $component - Component type (button, input, card, or base)
+ * @param {String} $state - State type (hover, focus, active, disabled)
+ * @param {String} $property - Property to access
+ * @param {String} $variant - Component variant (e.g., primary for buttons) (optional)
+ * @param {Boolean} $dark - Whether to use dark mode values (optional)
+ * @return {*} Token value
+ */
+@function interactive-state($component, $state, $property, $variant: null, $dark: false) {
+  // Default to base if component not found
+  $comp-type: if(map-has-key($interactive-states, $component), $component, 'base');
+  $component-map: map-get($interactive-states, $comp-type);
+  
+  // Handle dark mode
+  @if $dark {
+    @if map-has-key($component-map, 'dark') {
+      $dark-map: map-get($component-map, 'dark');
+      
+      @if map-has-key($dark-map, $state) {
+        $state-map: map-get($dark-map, $state);
+        
+        // Handle variant-specific properties (especially for focus rings)
+        @if $variant and map-has-key($state-map, $property) and type-of(map-get($state-map, $property)) == map {
+          $property-map: map-get($state-map, $property);
+          @if map-has-key($property-map, $variant) {
+            @return map-get($property-map, $variant);
+          }
+        } @else if map-has-key($state-map, $property) {
+          @return map-get($state-map, $property);
+        }
+      }
+    }
+    // Fall back to light mode if no dark mode equivalent
+  }
+  
+  // Handle light mode
+  @if map-has-key($component-map, $state) {
+    $state-map: map-get($component-map, $state);
+    
+    // Handle variant-specific properties (especially for focus rings)
+    @if $variant and map-has-key($state-map, $property) and type-of(map-get($state-map, $property)) == map {
+      $property-map: map-get($state-map, $property);
+      @if map-has-key($property-map, $variant) {
+        @return map-get($property-map, $variant);
+      }
+    } @else if map-has-key($state-map, $property) {
+      @return map-get($state-map, $property);
+    }
+  }
+  
+  // If not found in component-specific, try base
+  @if $comp-type != 'base' {
+    @return interactive-state('base', $state, $property, $variant, $dark);
+  }
+  
+  @warn 'Interactive state token for `#{$component}.#{$state}.#{$property}` with variant `#{$variant}` and dark: #{$dark} not found.';
+  @return null;
+} 

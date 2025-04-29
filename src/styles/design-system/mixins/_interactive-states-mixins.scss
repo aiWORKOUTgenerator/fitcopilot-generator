@@ -1,0 +1,158 @@
+/**
+ * Interactive States Mixins
+ *
+ * Mixins for applying interactive states styling with consistent theming
+ */
+
+@import '../tokens/semantic/interactive-states';
+
+/**
+ * Apply hover state styling
+ * 
+ * @param {String} $component - Component type (button, input, card, etc.)
+ * @param {String} $variant - Component variant (e.g., primary for buttons) (optional)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin hover-state($component, $variant: null, $dark: false) {
+  transition: interactive-state($component, 'hover', 'transition');
+  
+  &:hover:not(:disabled) {
+    @if $component == 'button' {
+      transform: interactive-state($component, 'hover', 'transform');
+    }
+    
+    @if $component == 'card' {
+      transform: interactive-state($component, 'hover', 'transform');
+      background-color: interactive-state($component, 'hover', 'background');
+    }
+  }
+  
+  @if $dark {
+    .dark-theme &:hover:not(:disabled) {
+      @if $component == 'button' {
+        transform: interactive-state($component, 'hover', 'transform', $variant, true);
+      }
+      
+      @if $component == 'card' {
+        transform: interactive-state($component, 'hover', 'transform', null, true);
+        background-color: interactive-state($component, 'hover', 'background', null, true);
+      }
+    }
+  }
+}
+
+/**
+ * Apply focus state styling
+ * 
+ * @param {String} $component - Component type (button, input, card, etc.)
+ * @param {String} $variant - Component variant (e.g., primary for buttons) (optional)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin focus-state($component, $variant: null, $dark: false) {
+  &:focus {
+    outline: none;
+    
+    @if $component == 'button' {
+      box-shadow: 0 0 0 interactive-state('base', 'focus', 'ring-size') 
+                  interactive-state($component, 'focus', 'ring-color', $variant);
+    }
+    
+    @if $component == 'input' {
+      border-color: interactive-state($component, 'focus', 'border-color');
+      box-shadow: 0 0 0 interactive-state('base', 'focus', 'ring-size') 
+                  interactive-state($component, 'focus', 'ring-color');
+    }
+  }
+  
+  @if $dark {
+    .dark-theme &:focus {
+      @if $component == 'button' {
+        box-shadow: 0 0 0 interactive-state('base', 'focus', 'ring-size') 
+                    interactive-state($component, 'focus', 'ring-color', $variant, true);
+      }
+      
+      @if $component == 'input' {
+        border-color: interactive-state($component, 'focus', 'border-color', null, true);
+        box-shadow: 0 0 0 interactive-state('base', 'focus', 'ring-size') 
+                    interactive-state($component, 'focus', 'ring-color', null, true);
+      }
+    }
+  }
+}
+
+/**
+ * Apply active state styling
+ * 
+ * @param {String} $component - Component type (button, input, card, etc.)
+ * @param {String} $variant - Component variant (e.g., primary for buttons) (optional)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin active-state($component, $variant: null, $dark: false) {
+  &:active:not(:disabled) {
+    @if $component == 'button' {
+      transform: interactive-state($component, 'active', 'transform');
+    }
+    
+    @if $component == 'card' {
+      transform: interactive-state($component, 'active', 'transform');
+    }
+  }
+  
+  @if $dark {
+    .dark-theme &:active:not(:disabled) {
+      @if $component == 'button' {
+        transform: interactive-state($component, 'active', 'transform', $variant, true);
+      }
+      
+      @if $component == 'card' {
+        transform: interactive-state($component, 'active', 'transform', null, true);
+      }
+    }
+  }
+}
+
+/**
+ * Apply disabled state styling
+ * 
+ * @param {String} $component - Component type (button, input, card, etc.)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin disabled-state($component: 'base', $dark: false) {
+  &:disabled, &.disabled {
+    opacity: interactive-state($component, 'disabled', 'opacity');
+    cursor: not-allowed;
+    pointer-events: none;
+    
+    @if $component != 'base' {
+      background-color: interactive-state($component, 'disabled', 'background');
+      color: interactive-state($component, 'disabled', 'text');
+      border-color: interactive-state($component, 'disabled', 'border');
+    } @else {
+      background-color: interactive-state('base', 'disabled', 'background');
+      color: interactive-state('base', 'disabled', 'text');
+      border-color: interactive-state('base', 'disabled', 'border');
+    }
+  }
+  
+  @if $dark {
+    .dark-theme &:disabled, .dark-theme &.disabled {
+      background-color: interactive-state($component, 'disabled', 'background', null, true);
+      color: interactive-state($component, 'disabled', 'text', null, true);
+      border-color: interactive-state($component, 'disabled', 'border', null, true);
+    }
+  }
+}
+
+/**
+ * Apply all interactive states (hover, focus, active, disabled)
+ * 
+ * @param {String} $component - Component type (button, input, card, etc.)
+ * @param {String} $variant - Component variant (e.g., primary for buttons) (optional)
+ * @param {Boolean} $dark - Whether to include dark mode styles
+ */
+@mixin interactive-states($component, $variant: null, $dark: false) {
+  @include hover-state($component, $variant, $dark);
+  @include focus-state($component, $variant, $dark);
+  @include active-state($component, $variant, $dark);
+  @include disabled-state($component, $dark);
+} 

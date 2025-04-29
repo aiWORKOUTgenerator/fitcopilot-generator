@@ -15,6 +15,9 @@
 @import 'tokens/core/spacing';
 @import 'tokens/semantic/feedback';
 @import 'tokens/semantic/surfaces';
+@import 'tokens/semantic/interactive-states';
+@import 'tokens/semantic/motion';
+@import 'tokens/semantic/status';
 
 // ----------------------------------------------------------------------------
 // COLOR MAPPINGS
@@ -135,6 +138,61 @@ $card-border-radius: $card-border-radius !default;
 $card-padding: $card-padding !default;
 $card-shadow: $card-shadow !default;
 
+// ----------------------------------------------------------------------------
+// INTERACTIVE STATE MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Focus ring mappings
+$focus-ring-color: rgba($color-primary-500, 0.25) !default;
+$focus-ring-size: interactive-state('base', 'focus', 'ring-size') !default;
+
+// Hover state mappings
+$hover-opacity: interactive-state('base', 'hover', 'opacity') !default;
+$hover-transition: interactive-state('base', 'hover', 'transition') !default;
+
+// Disabled state mappings
+$disabled-opacity: interactive-state('base', 'disabled', 'opacity') !default;
+$disabled-bg-color: interactive-state('base', 'disabled', 'background') !default;
+$disabled-text-color: interactive-state('base', 'disabled', 'text') !default;
+$disabled-border-color: interactive-state('base', 'disabled', 'border') !default;
+
+// ----------------------------------------------------------------------------
+// MOTION MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Duration mappings
+$transition-duration-fast: motion-duration('fast') !default;
+$transition-duration-normal: motion-duration('normal') !default;
+$transition-duration-slow: motion-duration('slow') !default;
+
+// Easing mappings
+$transition-easing-default: motion-easing('standard') !default;
+$transition-easing-in: motion-easing('in') !default;
+$transition-easing-out: motion-easing('out') !default;
+$transition-easing-in-out: motion-easing('in-out') !default;
+
+// Common transition mappings
+$transition-default: transition-preset('base') !default;
+$transition-transform: transition-preset('transform') !default;
+$transition-opacity: transition-preset('opacity') !default;
+$transition-color: transition-preset('color') !default;
+
+// ----------------------------------------------------------------------------
+// STATUS MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Status color mappings
+$status-active-color: status-color('active') !default;
+$status-inactive-color: status-color('inactive') !default;
+$status-pending-color: status-color('pending') !default;
+$status-error-color: status-color('error') !default;
+
+// Badge style mappings (common styles)
+$badge-padding: badge-variant('filled', 'padding') !default;
+$badge-font-size: badge-variant('filled', 'font-size') !default;
+$badge-font-weight: badge-variant('filled', 'font-weight') !default;
+$badge-border-radius: badge-variant('filled', 'border-radius') !default;
+
 // CSS Variable Fallbacks
 :root {
   // Backward compatibility for CSS variables
@@ -154,6 +212,15 @@ $card-shadow: $card-shadow !default;
   
   --bg-color: var(--color-surface, #{$color-white});
   --bg-color-light: var(--color-surface-accent, #{$color-gray-50});
+  
+  // Motion variables
+  --transition-fast: #{motion-duration('fast')};
+  --transition-normal: #{motion-duration('normal')};
+  --transition-slow: #{motion-duration('slow')};
+  
+  // Interactive states
+  --focus-ring-size: #{interactive-state('base', 'focus', 'ring-size')};
+  --disabled-opacity: #{interactive-state('base', 'disabled', 'opacity')};
 }
 
 // Feature flag for gradual migration
