@@ -1,0 +1,157 @@
+/**
+ * Checkbox Component Styles
+ * 
+ * This file provides styles for checkbox input elements using the token system.
+ */
+
+@import '../../tokens/components/form-controls-tokens';
+
+// Base checkbox styles
+.checkbox {
+  appearance: none;
+  position: relative;
+  width: form-control-base('size');
+  height: form-control-base('size');
+  border: checkbox-token('border-width') solid checkbox-token('border');
+  border-radius: checkbox-token('border-radius');
+  background-color: checkbox-token('bg');
+  cursor: pointer;
+  transition: form-control-base('transition');
+  
+  &:hover:not(:disabled) {
+    border-color: checkbox-token('border', 'hover');
+    background-color: checkbox-token('bg', 'hover');
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: checkbox-token('border', 'focus');
+    box-shadow: 0 0 0 3px checkbox-token('ring', 'focus');
+  }
+  
+  &:checked {
+    background-color: checkbox-token('bg', 'checked');
+    border-color: checkbox-token('border', 'checked');
+    
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0.45rem;
+      top: 0.25rem;
+      width: 0.25rem;
+      height: 0.5rem;
+      border: solid checkbox-token('indicator-color', 'checked');
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+  
+  &:disabled {
+    opacity: form-control-base('disabled-opacity');
+    cursor: not-allowed;
+    background-color: checkbox-token('bg', 'disabled');
+    border-color: checkbox-token('border', 'disabled');
+    
+    &:checked {
+      background-color: checkbox-token('checked-bg', 'disabled');
+    }
+  }
+  
+  // Dark theme
+  .dark-theme & {
+    border-color: checkbox-token('border', null, true);
+    background-color: checkbox-token('bg', null, true);
+    
+    &:hover:not(:disabled) {
+      border-color: checkbox-token('border', 'hover', true);
+      background-color: checkbox-token('bg', 'hover', true);
+    }
+    
+    &:focus {
+      border-color: checkbox-token('border', 'focus', true);
+      box-shadow: 0 0 0 3px checkbox-token('ring', 'focus', true);
+    }
+    
+    &:checked {
+      background-color: checkbox-token('bg', 'checked', true);
+      border-color: checkbox-token('border', 'checked', true);
+      
+      &::after {
+        border-color: checkbox-token('indicator-color', 'checked', true);
+      }
+    }
+    
+    &:disabled {
+      background-color: checkbox-token('bg', 'disabled', true);
+      border-color: checkbox-token('border', 'disabled', true);
+      
+      &:checked {
+        background-color: checkbox-token('checked-bg', 'disabled', true);
+      }
+    }
+  }
+}
+
+// Checkbox group styles
+.checkbox-group {
+  margin: 0.5rem 0;
+  
+  &__title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    
+    .dark-theme & {
+      color: var(--color-dark-text);
+    }
+  }
+  
+  &--horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    
+    .checkbox-container {
+      margin-right: 1rem;
+    }
+  }
+  
+  &--vertical {
+    .checkbox-container {
+      margin-bottom: 0.5rem;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Checkbox container
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 0.5rem;
+  
+  .checkbox-label {
+    color: control-label-token('color');
+    margin-left: 0.5rem;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    cursor: pointer;
+    
+    .dark-theme & {
+      color: control-label-token('color', true);
+    }
+    
+    &--disabled {
+      color: control-label-token('disabled');
+      cursor: not-allowed;
+      
+      .dark-theme & {
+        color: control-label-token('disabled', true);
+      }
+    }
+  }
+} 

@@ -1,0 +1,107 @@
+name: Color Token Validation
+
+on:
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.jsx'
+      - '**.ts'
+      - '**.tsx'
+      - '**.css'
+      - '**.scss'
+      - '**.sass'
+  workflow_dispatch:
+
+jobs:
+  validate-tokens:
+    name: Validate Color Tokens
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run token validator
+        id: validator
+        run: |
+          node scripts/token-validator.js --report
+        continue-on-error: true
+        
+      - name: Upload validation report
+        uses: actions/upload-artifact@v3
+        with:
+          name: token-validation-report
+          path: token-validation-report.html
+          
+      - name: Add PR comment with validation results
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: token-validation
+          message: |
+            ## 🎨 Color Token Validation Results
+            
+            The color token validator found issues in your code.
+            
+            ### Summary
+            ```
+            Files with issues: ${{ steps.validator.outputs.filesWithIssues }}
+            Total issues: ${{ steps.validator.outputs.totalIssues }}
+            Hex color issues: ${{ steps.validator.outputs.hexIssues }}
+            RGB/RGBA issues: ${{ steps.validator.outputs.rgbaIssues }}
+            ```
+            
+            [Download the full report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            Please replace hardcoded color values with tokens from our design system:
+            - For SCSS files, use `color('primary')`, `color('text')`, etc.
+            - For React components, use `var(--color-primary)`, `var(--color-text)`, etc.
+            - See the [Token Documentation](../../src/styles/design-system/tokens/docs/token-map.md) for reference.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Set PR status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const validatorExitCode = process.env.VALIDATOR_EXIT_CODE;
+            const totalIssues = process.env.TOTAL_ISSUES;
+            
+            if (validatorExitCode === '0') {
+              github.rest.checks.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'Color Token Validation',
+                head_sha: context.payload.pull_request.head.sha,
+                status: 'completed',
+                conclusion: 'success',
+                output: {
+                  title: 'Color Token Validation Passed',
+                  summary: 'No color token issues found. Great job!'
+                }
+              });
+            } else {
+              github.rest.checks.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'Color Token Validation',
+                head_sha: context.payload.pull_request.head.sha,
+                status: 'completed',
+                conclusion: 'neutral',
+                output: {
+                  title: 'Color Token Validation Found Issues',
+                  summary: `Found ${totalIssues} color token issues. Consider replacing hardcoded values with design system tokens.`
+                }
+              });
+            }
+        env:
+          VALIDATOR_EXIT_CODE: ${{ steps.validator.outcome == 'success' && '0' || '1' }}
+          TOTAL_ISSUES: ${{ steps.validator.outputs.totalIssues || '0' }} 

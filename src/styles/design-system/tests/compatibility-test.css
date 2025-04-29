@@ -1,0 +1,46 @@
+/**
+ * Design System Compatibility Layer Test CSS
+ * 
+ * This CSS file is compiled from the test SCSS file and used
+ * to verify that the compatibility layer is working correctly.
+ */
+
+/* Import the test compatibility styles */
+@import url('./_test-compatibility.scss');
+
+/* Additional styles for the test page can be added here */
+.test-old-primary-color, 
+.test-new-primary-color {
+  padding: 1rem;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.test-old-text-color,
+.test-new-text-color {
+  padding: 1rem;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.test-old-typography,
+.test-new-typography {
+  padding: 1rem;
+}
+
+.test-old-spacing,
+.test-new-spacing {
+  border: 1px dashed #ccc;
+}
+
+.test-old-card,
+.test-new-card {
+  min-height: 100px;
+}
+
+.test-old-css-vars,
+.test-new-css-vars {
+  padding: 1rem;
+  border-width: 1px;
+  border-style: solid;
+} 

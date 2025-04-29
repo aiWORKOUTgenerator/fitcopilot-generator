@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitCopilot Color Token Validation Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 {
+      color: #1F2937;
+      border-bottom: 2px solid #E5E7EB;
+      padding-bottom: 0.5rem;
+    }
+    .summary {
+      background-color: #F9FAFB;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .stat-card {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #1F2937;
+    }
+    .stat-label {
+      color: #6B7280;
+      font-size: 0.875rem;
+    }
+    .file-issues {
+      margin-top: 1rem;
+    }
+    .file-path {
+      background-color: #F3F4F6;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-family: monospace;
+      font-weight: bold;
+      color: #1F2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .file-path span {
+      font-weight: normal;
+      color: #6B7280;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    th {
+      background-color: #F9FAFB;
+      font-weight: 600;
+    }
+    .color-value {
+      font-family: monospace;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      background-color: #F3F4F6;
+    }
+    .suggestion {
+      font-family: monospace;
+      color: #059669;
+    }
+    .fixable {
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .fixable.yes {
+      background-color: #D1FAE5;
+      color: #065F46;
+    }
+    .fixable.no {
+      background-color: #FEF3C7;
+      color: #92400E;
+    }
+    .token-docs {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 2px solid #E5E7EB;
+    }
+    .token-docs h2 {
+      color: #1F2937;
+    }
+    .token-docs code {
+      background-color: #F3F4F6;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>FitCopilot Color Token Validation Report</h1>
+  
+  <div class="summary">
+    <div class="stat-card">
+      <div class="stat-value">0/3</div>
+      <div class="stat-label">Files with issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Total issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Hex color issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">0</div>
+      <div class="stat-label">RGB/RGBA issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Auto-fixable issues</div>
+    </div>
+  </div>
+  
+  <div class="file-issues">
+    
+  </div>
+  
+  <div class="token-docs">
+    <h2>How to Fix</h2>
+    <p>Replace hardcoded color values with appropriate tokens from the design system:</p>
+    <ul>
+      <li>For SCSS files, use token functions: <code>color('primary')</code></li>
+      <li>For React components, use CSS variables: <code>var(--color-primary)</code></li>
+      <li>For RGBA values with opacity: <code>rgba(var(--color-primary-rgb), 0.5)</code></li>
+    </ul>
+    <p>See the <a href="src/styles/design-system/tokens/docs/token-map.md">Color Token Documentation</a> for a complete reference.</p>
+    </div>
+</body>
+</html>
+  

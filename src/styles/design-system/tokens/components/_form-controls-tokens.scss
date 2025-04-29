@@ -1,0 +1,240 @@
+/**
+ * Form Controls Component Tokens
+ * 
+ * This file defines the component-specific tokens for form controls like
+ * checkboxes and radio buttons with a structured token system.
+ */
+
+@import '../index';
+
+// Form controls tokens
+$form-controls-tokens: (
+  'base': (
+    'size': '1.25rem',
+    'transition': 'all 0.2s ease',
+    'disabled-opacity': 0.65
+  ),
+  'checkbox': (
+    'bg': var(--color-surface),
+    'border': var(--color-border),
+    'border-radius': '0.25rem',
+    'border-width': '1px',
+    'checked': (
+      'bg': var(--color-primary),
+      'border': var(--color-primary),
+      'indicator-color': white
+    ),
+    'hover': (
+      'border': var(--color-primary-light),
+      'bg': var(--color-surface)
+    ),
+    'focus': (
+      'ring': rgba(var(--color-primary-rgb), 0.25),
+      'border': var(--color-primary)
+    ),
+    'disabled': (
+      'bg': var(--color-surface-muted),
+      'border': var(--color-border),
+      'checked-bg': var(--color-text-muted)
+    ),
+    'dark': (
+      'bg': var(--color-dark-surface),
+      'border': var(--color-dark-border),
+      'checked': (
+        'bg': var(--color-dark-primary),
+        'border': var(--color-dark-primary),
+        'indicator-color': var(--color-dark-surface)
+      ),
+      'hover': (
+        'border': var(--color-dark-primary-light),
+        'bg': var(--color-dark-surface)
+      ),
+      'focus': (
+        'ring': rgba(var(--color-dark-primary-rgb), 0.25),
+        'border': var(--color-dark-primary)
+      ),
+      'disabled': (
+        'bg': var(--color-dark-surface-muted),
+        'border': var(--color-dark-border),
+        'checked-bg': var(--color-dark-text-muted)
+      )
+    )
+  ),
+  'radio': (
+    'bg': var(--color-surface),
+    'border': var(--color-border),
+    'border-radius': '50%',
+    'border-width': '1px',
+    'checked': (
+      'bg': var(--color-surface),
+      'border': var(--color-primary),
+      'indicator': var(--color-primary)
+    ),
+    'hover': (
+      'border': var(--color-primary-light),
+      'bg': var(--color-surface)
+    ),
+    'focus': (
+      'ring': rgba(var(--color-primary-rgb), 0.25),
+      'border': var(--color-primary)
+    ),
+    'disabled': (
+      'bg': var(--color-surface-muted),
+      'border': var(--color-border),
+      'checked-indicator': var(--color-text-muted)
+    ),
+    'dark': (
+      'bg': var(--color-dark-surface),
+      'border': var(--color-dark-border),
+      'checked': (
+        'bg': var(--color-dark-surface),
+        'border': var(--color-dark-primary),
+        'indicator': var(--color-dark-primary)
+      ),
+      'hover': (
+        'border': var(--color-dark-primary-light),
+        'bg': var(--color-dark-surface)
+      ),
+      'focus': (
+        'ring': rgba(var(--color-dark-primary-rgb), 0.25),
+        'border': var(--color-dark-primary)
+      ),
+      'disabled': (
+        'bg': var(--color-dark-surface-muted),
+        'border': var(--color-dark-border),
+        'checked-indicator': var(--color-dark-text-muted)
+      )
+    )
+  ),
+  'label': (
+    'color': var(--color-text),
+    'disabled': var(--color-text-muted),
+    'dark': (
+      'color': var(--color-dark-text),
+      'disabled': var(--color-dark-text-muted)
+    )
+  )
+);
+
+/**
+ * Get form control base token
+ * 
+ * @param {String} $property - Property to access
+ * @return {*} Base token value
+ */
+@function form-control-base($property) {
+  @if map-has-key(map-get($form-controls-tokens, 'base'), $property) {
+    @return map-get(map-get($form-controls-tokens, 'base'), $property);
+  }
+  
+  @warn 'Form control base token `#{$property}` not found';
+  @return null;
+}
+
+/**
+ * Get checkbox token
+ * 
+ * @param {String} $property - Property to access
+ * @param {String} $state - Checkbox state (optional)
+ * @param {Boolean} $dark - Whether to use dark theme tokens (optional)
+ * @return {*} Checkbox token value
+ */
+@function checkbox-token($property, $state: null, $dark: false) {
+  @if $dark {
+    @if $state == 'checked' {
+      @if map-has-key(map-get(map-get(map-get($form-controls-tokens, 'checkbox'), 'dark'), 'checked'), $property) {
+        @return map-get(map-get(map-get(map-get($form-controls-tokens, 'checkbox'), 'dark'), 'checked'), $property);
+      }
+    } @else if $state {
+      @if map-has-key(map-get(map-get(map-get($form-controls-tokens, 'checkbox'), 'dark'), $state), $property) {
+        @return map-get(map-get(map-get(map-get($form-controls-tokens, 'checkbox'), 'dark'), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get(map-get($form-controls-tokens, 'checkbox'), 'dark'), $property) {
+        @return map-get(map-get(map-get($form-controls-tokens, 'checkbox'), 'dark'), $property);
+      }
+    }
+  } @else {
+    @if $state == 'checked' {
+      @if map-has-key(map-get(map-get($form-controls-tokens, 'checkbox'), 'checked'), $property) {
+        @return map-get(map-get(map-get($form-controls-tokens, 'checkbox'), 'checked'), $property);
+      }
+    } @else if $state {
+      @if map-has-key(map-get(map-get($form-controls-tokens, 'checkbox'), $state), $property) {
+        @return map-get(map-get(map-get($form-controls-tokens, 'checkbox'), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get($form-controls-tokens, 'checkbox'), $property) {
+        @return map-get(map-get($form-controls-tokens, 'checkbox'), $property);
+      }
+    }
+  }
+  
+  @warn 'Checkbox token `#{$property}` for state `#{$state}` not found';
+  @return null;
+}
+
+/**
+ * Get radio token
+ * 
+ * @param {String} $property - Property to access
+ * @param {String} $state - Radio state (optional)
+ * @param {Boolean} $dark - Whether to use dark theme tokens (optional)
+ * @return {*} Radio token value
+ */
+@function radio-token($property, $state: null, $dark: false) {
+  @if $dark {
+    @if $state == 'checked' {
+      @if map-has-key(map-get(map-get(map-get($form-controls-tokens, 'radio'), 'dark'), 'checked'), $property) {
+        @return map-get(map-get(map-get(map-get($form-controls-tokens, 'radio'), 'dark'), 'checked'), $property);
+      }
+    } @else if $state {
+      @if map-has-key(map-get(map-get(map-get($form-controls-tokens, 'radio'), 'dark'), $state), $property) {
+        @return map-get(map-get(map-get(map-get($form-controls-tokens, 'radio'), 'dark'), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get(map-get($form-controls-tokens, 'radio'), 'dark'), $property) {
+        @return map-get(map-get(map-get($form-controls-tokens, 'radio'), 'dark'), $property);
+      }
+    }
+  } @else {
+    @if $state == 'checked' {
+      @if map-has-key(map-get(map-get($form-controls-tokens, 'radio'), 'checked'), $property) {
+        @return map-get(map-get(map-get($form-controls-tokens, 'radio'), 'checked'), $property);
+      }
+    } @else if $state {
+      @if map-has-key(map-get(map-get($form-controls-tokens, 'radio'), $state), $property) {
+        @return map-get(map-get(map-get($form-controls-tokens, 'radio'), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get($form-controls-tokens, 'radio'), $property) {
+        @return map-get(map-get($form-controls-tokens, 'radio'), $property);
+      }
+    }
+  }
+  
+  @warn 'Radio token `#{$property}` for state `#{$state}` not found';
+  @return null;
+}
+
+/**
+ * Get control label token
+ * 
+ * @param {String} $property - Property to access
+ * @param {Boolean} $dark - Whether to use dark theme tokens (optional)
+ * @return {*} Label token value
+ */
+@function control-label-token($property, $dark: false) {
+  @if $dark {
+    @if map-has-key(map-get(map-get($form-controls-tokens, 'label'), 'dark'), $property) {
+      @return map-get(map-get(map-get($form-controls-tokens, 'label'), 'dark'), $property);
+    }
+  } @else {
+    @if map-has-key(map-get($form-controls-tokens, 'label'), $property) {
+      @return map-get(map-get($form-controls-tokens, 'label'), $property);
+    }
+  }
+  
+  @warn 'Control label token `#{$property}` not found';
+  @return null;
+} 

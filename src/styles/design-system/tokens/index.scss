@@ -17,8 +17,12 @@
 // Then the access maps and functions
 @import './color-maps';
 
-// Finally, the mixins for standardized color applications
+// Then the mixins for standardized color applications
 @import './color-mixins';
+
+// Finally, import component-specific tokens
+// (Commented out until needed to avoid circular dependencies)
+// @import './components/index';
 
 // Export a flag to show this file was imported
 $tokens-imported: true; 

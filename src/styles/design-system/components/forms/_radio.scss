@@ -1,0 +1,157 @@
+/**
+ * Radio Component Styles
+ * 
+ * This file provides styles for radio input elements using the token system.
+ */
+
+@import '../../tokens/components/form-controls-tokens';
+
+// Base radio styles
+.radio {
+  appearance: none;
+  position: relative;
+  width: form-control-base('size');
+  height: form-control-base('size');
+  border: radio-token('border-width') solid radio-token('border');
+  border-radius: radio-token('border-radius');
+  background-color: radio-token('bg');
+  cursor: pointer;
+  transition: form-control-base('transition');
+  
+  &:hover:not(:disabled) {
+    border-color: radio-token('border', 'hover');
+    background-color: radio-token('bg', 'hover');
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: radio-token('border', 'focus');
+    box-shadow: 0 0 0 3px radio-token('ring', 'focus');
+  }
+  
+  &:checked {
+    background-color: radio-token('bg', 'checked');
+    border-color: radio-token('border', 'checked');
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background-color: radio-token('indicator', 'checked');
+    }
+  }
+  
+  &:disabled {
+    opacity: form-control-base('disabled-opacity');
+    cursor: not-allowed;
+    background-color: radio-token('bg', 'disabled');
+    border-color: radio-token('border', 'disabled');
+    
+    &:checked::after {
+      background-color: radio-token('checked-indicator', 'disabled');
+    }
+  }
+  
+  // Dark theme
+  .dark-theme & {
+    border-color: radio-token('border', null, true);
+    background-color: radio-token('bg', null, true);
+    
+    &:hover:not(:disabled) {
+      border-color: radio-token('border', 'hover', true);
+      background-color: radio-token('bg', 'hover', true);
+    }
+    
+    &:focus {
+      border-color: radio-token('border', 'focus', true);
+      box-shadow: 0 0 0 3px radio-token('ring', 'focus', true);
+    }
+    
+    &:checked {
+      background-color: radio-token('bg', 'checked', true);
+      border-color: radio-token('border', 'checked', true);
+      
+      &::after {
+        background-color: radio-token('indicator', 'checked', true);
+      }
+    }
+    
+    &:disabled {
+      background-color: radio-token('bg', 'disabled', true);
+      border-color: radio-token('border', 'disabled', true);
+      
+      &:checked::after {
+        background-color: radio-token('checked-indicator', 'disabled', true);
+      }
+    }
+  }
+}
+
+// Radio group styles
+.radio-group {
+  margin: 0.5rem 0;
+  
+  &__title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    
+    .dark-theme & {
+      color: var(--color-dark-text);
+    }
+  }
+  
+  &--horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    
+    .radio-container {
+      margin-right: 1rem;
+    }
+  }
+  
+  &--vertical {
+    .radio-container {
+      margin-bottom: 0.5rem;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Radio container
+.radio-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 0.5rem;
+  
+  .radio-label {
+    color: control-label-token('color');
+    margin-left: 0.5rem;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    cursor: pointer;
+    
+    .dark-theme & {
+      color: control-label-token('color', true);
+    }
+    
+    &--disabled {
+      color: control-label-token('disabled');
+      cursor: not-allowed;
+      
+      .dark-theme & {
+        color: control-label-token('disabled', true);
+      }
+    }
+  }
+} 

@@ -1,0 +1,550 @@
+/**
+ * Form Mixins
+ * 
+ * This file provides reusable mixins for common form styles.
+ */
+
+@import '../tokens/components/input-tokens';
+@import '../tokens/components/select-tokens';
+@import '../tokens/components/form-controls-tokens';
+
+/// Base form input styling
+/// @param {String} $variant [input] - Input variant (input, select, textarea)
+/// @example scss
+///   @include form-input();
+///   @include form-input('select');
+@mixin form-input($variant: 'input') {
+  display: block;
+  width: 100%;
+  
+  @if $variant == 'input' or $variant == 'textarea' {
+    padding: input-base('padding');
+    border-radius: input-base('border-radius');
+    font-weight: input-base('font-weight');
+    line-height: input-base('line-height');
+    background-color: input-token('bg');
+    color: input-token('text');
+    border: 1px solid input-token('border');
+    transition: input-base('transition');
+    
+    &::placeholder {
+      color: input-token('placeholder');
+    }
+    
+    &:hover:not(:disabled):not(.input--error) {
+      border-color: input-token('border', 'hover');
+    }
+    
+    &:focus:not(:disabled):not(.input--error) {
+      outline: none;
+      border-color: input-token('border', 'focus');
+      box-shadow: 0 0 0 3px input-token('ring', 'focus');
+    }
+    
+    &:disabled {
+      opacity: input-base('disabled-opacity');
+      background-color: input-token('bg', 'disabled');
+      color: input-token('text', 'disabled');
+      cursor: not-allowed;
+    }
+    
+    .dark-theme & {
+      background-color: input-token('bg', null, true);
+      color: input-token('text', null, true);
+      border-color: input-token('border', null, true);
+      
+      &::placeholder {
+        color: input-token('placeholder', null, true);
+      }
+      
+      &:hover:not(:disabled):not(.input--error) {
+        border-color: input-token('border', 'hover', true);
+      }
+      
+      &:focus:not(:disabled):not(.input--error) {
+        border-color: input-token('border', 'focus', true);
+        box-shadow: 0 0 0 3px input-token('ring', 'focus', true);
+      }
+      
+      &:disabled {
+        background-color: input-token('bg', 'disabled', true);
+        color: input-token('text', 'disabled', true);
+      }
+    }
+  } @else if $variant == 'select' {
+    padding: select-base('padding');
+    border-radius: select-base('border-radius');
+    font-weight: select-base('font-weight');
+    line-height: select-base('line-height');
+    background-color: select-token('bg');
+    color: select-token('text');
+    border: 1px solid select-token('border');
+    transition: select-base('transition');
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    
+    &:hover:not(:disabled) {
+      border-color: select-token('border', 'hover');
+      background-color: select-token('bg', 'hover');
+      cursor: pointer;
+    }
+    
+    &:focus:not(:disabled) {
+      outline: none;
+      border-color: select-token('border', 'focus');
+      box-shadow: 0 0 0 3px select-token('ring', 'focus');
+    }
+    
+    &:disabled {
+      opacity: select-base('disabled-opacity');
+      background-color: select-token('bg', 'disabled');
+      color: select-token('text', 'disabled');
+      cursor: not-allowed;
+    }
+    
+    .dark-theme & {
+      background-color: select-token('bg', null, true);
+      color: select-token('text', null, true);
+      border-color: select-token('border', null, true);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a0aec0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      
+      &:hover:not(:disabled) {
+        border-color: select-token('border', 'hover', true);
+        background-color: select-token('bg', 'hover', true);
+      }
+      
+      &:focus:not(:disabled) {
+        border-color: select-token('border', 'focus', true);
+        box-shadow: 0 0 0 3px select-token('ring', 'focus', true);
+      }
+      
+      &:disabled {
+        background-color: select-token('bg', 'disabled', true);
+        color: select-token('text', 'disabled', true);
+      }
+    }
+  }
+}
+
+/// Form control mixin (checkbox/radio)
+/// @param {String} $type [checkbox] - Control type (checkbox, radio)
+/// @example scss
+///   @include form-control('checkbox');
+///   @include form-control('radio');
+@mixin form-control($type: 'checkbox') {
+  appearance: none;
+  position: relative;
+  width: form-control-base('size');
+  height: form-control-base('size');
+  cursor: pointer;
+  transition: form-control-base('transition');
+  
+  @if $type == 'checkbox' {
+    border: checkbox-token('border-width') solid checkbox-token('border');
+    border-radius: checkbox-token('border-radius');
+    background-color: checkbox-token('bg');
+    
+    &:hover:not(:disabled) {
+      border-color: checkbox-token('border', 'hover');
+      background-color: checkbox-token('bg', 'hover');
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: checkbox-token('border', 'focus');
+      box-shadow: 0 0 0 3px checkbox-token('ring', 'focus');
+    }
+    
+    &:checked {
+      background-color: checkbox-token('bg', 'checked');
+      border-color: checkbox-token('border', 'checked');
+      
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0.45rem;
+        top: 0.25rem;
+        width: 0.25rem;
+        height: 0.5rem;
+        border: solid checkbox-token('indicator-color', 'checked');
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+    }
+    
+    &:disabled {
+      opacity: form-control-base('disabled-opacity');
+      cursor: not-allowed;
+      background-color: checkbox-token('bg', 'disabled');
+      border-color: checkbox-token('border', 'disabled');
+      
+      &:checked {
+        background-color: checkbox-token('checked-bg', 'disabled');
+      }
+    }
+    
+    .dark-theme & {
+      border-color: checkbox-token('border', null, true);
+      background-color: checkbox-token('bg', null, true);
+      
+      &:hover:not(:disabled) {
+        border-color: checkbox-token('border', 'hover', true);
+        background-color: checkbox-token('bg', 'hover', true);
+      }
+      
+      &:focus {
+        border-color: checkbox-token('border', 'focus', true);
+        box-shadow: 0 0 0 3px checkbox-token('ring', 'focus', true);
+      }
+      
+      &:checked {
+        background-color: checkbox-token('bg', 'checked', true);
+        border-color: checkbox-token('border', 'checked', true);
+        
+        &::after {
+          border-color: checkbox-token('indicator-color', 'checked', true);
+        }
+      }
+      
+      &:disabled {
+        background-color: checkbox-token('bg', 'disabled', true);
+        border-color: checkbox-token('border', 'disabled', true);
+        
+        &:checked {
+          background-color: checkbox-token('checked-bg', 'disabled', true);
+        }
+      }
+    }
+  } @else if $type == 'radio' {
+    border: radio-token('border-width') solid radio-token('border');
+    border-radius: radio-token('border-radius');
+    background-color: radio-token('bg');
+    
+    &:hover:not(:disabled) {
+      border-color: radio-token('border', 'hover');
+      background-color: radio-token('bg', 'hover');
+    }
+    
+    &:focus {
+      outline: none;
+      border-color: radio-token('border', 'focus');
+      box-shadow: 0 0 0 3px radio-token('ring', 'focus');
+    }
+    
+    &:checked {
+      background-color: radio-token('bg', 'checked');
+      border-color: radio-token('border', 'checked');
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background-color: radio-token('indicator', 'checked');
+      }
+    }
+    
+    &:disabled {
+      opacity: form-control-base('disabled-opacity');
+      cursor: not-allowed;
+      background-color: radio-token('bg', 'disabled');
+      border-color: radio-token('border', 'disabled');
+      
+      &:checked::after {
+        background-color: radio-token('checked-indicator', 'disabled');
+      }
+    }
+    
+    .dark-theme & {
+      border-color: radio-token('border', null, true);
+      background-color: radio-token('bg', null, true);
+      
+      &:hover:not(:disabled) {
+        border-color: radio-token('border', 'hover', true);
+        background-color: radio-token('bg', 'hover', true);
+      }
+      
+      &:focus {
+        border-color: radio-token('border', 'focus', true);
+        box-shadow: 0 0 0 3px radio-token('ring', 'focus', true);
+      }
+      
+      &:checked {
+        background-color: radio-token('bg', 'checked', true);
+        border-color: radio-token('border', 'checked', true);
+        
+        &::after {
+          background-color: radio-token('indicator', 'checked', true);
+        }
+      }
+      
+      &:disabled {
+        background-color: radio-token('bg', 'disabled', true);
+        border-color: radio-token('border', 'disabled', true);
+        
+        &:checked::after {
+          background-color: radio-token('checked-indicator', 'disabled', true);
+        }
+      }
+    }
+  }
+}
+
+/// Form label mixin
+/// @param {Boolean} $control [false] - Whether this is for a form control (checkbox/radio)
+/// @example scss
+///   @include form-label();
+///   @include form-label(true);
+@mixin form-label($control: false) {
+  display: block;
+  
+  @if $control {
+    color: control-label-token('color');
+    margin-left: 0.5rem;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    cursor: pointer;
+    
+    .dark-theme & {
+      color: control-label-token('color', true);
+    }
+    
+    &--disabled {
+      color: control-label-token('disabled');
+      cursor: not-allowed;
+      
+      .dark-theme & {
+        color: control-label-token('disabled', true);
+      }
+    }
+  } @else {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    
+    .dark-theme & {
+      color: var(--color-dark-text);
+    }
+  }
+}
+
+/// Custom radio button styling
+/// @param {Map} $config - Configuration options
+///   - $size: Size of the radio button (default: null)
+///   - $custom-dot: Whether to use custom dot styling (default: false)
+///   - $dot-size: Size of the indicator dot (default: 0.5rem)
+/// @example scss
+///   .my-radio {
+///     @include radio();
+///   }
+///   .my-large-radio {
+///     @include radio((
+///       $size: 1.5rem,
+///       $dot-size: 0.75rem
+///     ));
+///   }
+@mixin radio($config: ()) {
+  // Default configuration
+  $config: map-merge((
+    $size: null,
+    $custom-dot: false,
+    $dot-size: 0.5rem
+  ), $config);
+  
+  // Extract values
+  $size: map-get($config, $size);
+  $custom-dot: map-get($config, $custom-dot);
+  $dot-size: map-get($config, $dot-size);
+  
+  // Base styles (leveraging the form-control mixin)
+  @include form-control('radio');
+  
+  // If size is specified, override the default size
+  @if $size != null {
+    width: $size;
+    height: $size;
+  }
+  
+  // Custom dot styling if specified
+  @if $custom-dot {
+    &:checked::after {
+      width: $dot-size;
+      height: $dot-size;
+    }
+  }
+}
+
+/// Radio group container styling
+/// @param {String} $layout [vertical] - Layout direction (vertical, horizontal)
+/// @example scss
+///   .my-radio-group {
+///     @include radio-group('horizontal');
+///   }
+@mixin radio-group($layout: 'vertical') {
+  margin: 0.5rem 0;
+  
+  @if $layout == 'horizontal' {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  } @else {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/// Radio container with label styling
+/// @param {Boolean} $reverse [false] - Reverse the order of radio and label
+/// @example scss
+///   .my-radio-container {
+///     @include radio-container();
+///   }
+///   .my-reverse-radio-container {
+///     @include radio-container(true);
+///   }
+@mixin radio-container($reverse: false) {
+  display: flex;
+  align-items: center;
+  position: relative;
+  
+  @if $reverse {
+    flex-direction: row-reverse;
+    
+    .radio-label {
+      margin-right: 0.5rem;
+      margin-left: 0;
+    }
+  } @else {
+    .radio-label {
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+/// Custom radio button implementation
+/// @param {Map} $config - Configuration options
+///   - $size: Size of the radio button (default: 1.25rem)
+///   - $dot-color: Color of the indicator dot (default: null)
+///   - $border-width: Width of the border (default: 2px)
+/// @example scss
+///   .my-custom-radio {
+///     position: relative;
+///     
+///     input {
+///       position: absolute;
+///       opacity: 0;
+///     }
+///     
+///     .indicator {
+///       @include custom-radio-button();
+///     }
+///     
+///     input:checked + .indicator {
+///       @include custom-radio-button-checked();
+///     }
+///   }
+@mixin custom-radio-button($config: ()) {
+  // Default configuration
+  $config: map-merge((
+    $size: 1.25rem,
+    $border-width: 2px,
+    $border-color: null
+  ), $config);
+  
+  // Extract values
+  $size: map-get($config, $size);
+  $border-width: map-get($config, $border-width);
+  $border-color: map-get($config, $border-color);
+  
+  // Determine border color
+  $actual-border-color: if(
+    $border-color != null,
+    $border-color,
+    radio-token('border')
+  );
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $size;
+  height: $size;
+  border: $border-width solid $actual-border-color;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  
+  .dark-theme & {
+    border-color: if(
+      $border-color != null,
+      $border-color,
+      radio-token('border', null, true)
+    );
+  }
+}
+
+/// Custom radio button checked state
+/// @param {Map} $config - Configuration options
+///   - $dot-size: Size of the indicator dot (default: 50% of container)
+///   - $dot-color: Color of the indicator dot (default: null)
+/// @example scss
+///   input:checked + .indicator {
+///     @include custom-radio-button-checked();
+///   }
+@mixin custom-radio-button-checked($config: ()) {
+  // Default configuration
+  $config: map-merge((
+    $dot-size: null,
+    $dot-color: null
+  ), $config);
+  
+  // Extract values
+  $dot-size: map-get($config, $dot-size);
+  $dot-color: map-get($config, $dot-color);
+  
+  // Determine dot color
+  $actual-dot-color: if(
+    $dot-color != null,
+    $dot-color,
+    radio-token('indicator', 'checked')
+  );
+  
+  // Determine dot size (default is 50% of container)
+  $actual-dot-size: if(
+    $dot-size != null,
+    $dot-size,
+    calc(50% - 4px)
+  );
+  
+  border-color: radio-token('border', 'checked');
+  
+  &::after {
+    content: '';
+    width: $actual-dot-size;
+    height: $actual-dot-size;
+    border-radius: 50%;
+    background-color: $actual-dot-color;
+    transform: scale(1);
+    opacity: 1;
+    transition: all 0.2s ease;
+  }
+  
+  .dark-theme & {
+    border-color: radio-token('border', 'checked', true);
+    
+    &::after {
+      background-color: if(
+        $dot-color != null,
+        $dot-color,
+        radio-token('indicator', 'checked', true)
+      );
+    }
+  }
+} 

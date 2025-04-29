@@ -1,0 +1,52 @@
+/**
+ * Dark Theme
+ * 
+ * Dark theme variables for the design system
+ */
+
+.dark-theme {
+  // Surface colors
+  --color-dark-surface: #1e293b;
+  --color-dark-surface-hover: #334155;
+  --color-dark-surface-accent: #1f2937;
+  --color-dark-surface-muted: #0f172a;
+  --color-dark-surface-elevated: #293548;
+  
+  // Border colors
+  --color-dark-border: #334155;
+  --color-dark-border-hover: #475569;
+  --color-dark-border-active: #64748b;
+  
+  // Text colors
+  --color-dark-text: #f1f5f9;
+  --color-dark-text-muted: #94a3b8;
+  --color-dark-text-active: #ffffff;
+  
+  // Brand colors
+  --color-dark-primary: #84cc16; // Same as light theme for brand consistency
+  --color-dark-primary-dark: #65a30d;
+  --color-dark-primary-light: #a3e635;
+  --color-dark-secondary: #8dd3f7;
+  --color-dark-secondary-dark: #22d3ee;
+  --color-dark-secondary-light: #bae6fd;
+  
+  // Feedback colors
+  --color-dark-success: #34d399;
+  --color-dark-warning: #fbbf24;
+  --color-dark-error: #f87171;
+  --color-dark-info: #60a5fa;
+  
+  // RGB variants for opacity operations
+  --color-dark-primary-rgb: 132, 204, 22;
+  --color-dark-primary-dark-rgb: 101, 163, 13;
+  --color-dark-primary-light-rgb: 163, 230, 53;
+  --color-dark-secondary-rgb: 141, 211, 247;
+  --color-dark-secondary-dark-rgb: 34, 211, 238;
+  --color-dark-secondary-light-rgb: 186, 230, 253;
+  --color-dark-surface-rgb: 30, 41, 59;
+  --color-dark-text-rgb: 241, 245, 249;
+  --color-dark-success-rgb: 52, 211, 153;
+  --color-dark-warning-rgb: 251, 191, 36;
+  --color-dark-error-rgb: 248, 113, 113;
+  --color-dark-info-rgb: 96, 165, 250;
+} 

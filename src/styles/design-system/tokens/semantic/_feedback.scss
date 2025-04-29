@@ -1,0 +1,81 @@
+/**
+ * Semantic Feedback Tokens
+ * 
+ * This file defines semantic tokens for feedback states like success, error, warning, and info.
+ * These tokens build on the core color tokens.
+ */
+
+@import '../core/colors';
+
+// Success tokens
+$color-success-bg: $color-success-50;
+$color-success-bg-hover: $color-success-100;
+$color-success-border: $color-success-300;
+$color-success-icon: $color-success-500;
+$color-success-text: $color-success-700;
+
+// Error tokens
+$color-error-bg: $color-error-50;
+$color-error-bg-hover: $color-error-100;
+$color-error-border: $color-error-300;
+$color-error-icon: $color-error-500;
+$color-error-text: $color-error-700;
+
+// Warning tokens
+$color-warning-bg: $color-warning-50;
+$color-warning-bg-hover: $color-warning-100;
+$color-warning-border: $color-warning-300;
+$color-warning-icon: $color-warning-500;
+$color-warning-text: $color-warning-700;
+
+// Info tokens
+$color-info-bg: $color-info-50;
+$color-info-bg-hover: $color-info-100;
+$color-info-border: $color-info-300;
+$color-info-icon: $color-info-500;
+$color-info-text: $color-info-700;
+
+// Feedback component maps
+$feedback-colors: (
+  'success': (
+    'bg': $color-success-bg,
+    'bg-hover': $color-success-bg-hover,
+    'border': $color-success-border,
+    'icon': $color-success-icon,
+    'text': $color-success-text
+  ),
+  'error': (
+    'bg': $color-error-bg,
+    'bg-hover': $color-error-bg-hover,
+    'border': $color-error-border,
+    'icon': $color-error-icon,
+    'text': $color-error-text
+  ),
+  'warning': (
+    'bg': $color-warning-bg,
+    'bg-hover': $color-warning-bg-hover,
+    'border': $color-warning-border,
+    'icon': $color-warning-icon,
+    'text': $color-warning-text
+  ),
+  'info': (
+    'bg': $color-info-bg,
+    'bg-hover': $color-info-bg-hover,
+    'border': $color-info-border,
+    'icon': $color-info-icon,
+    'text': $color-info-text
+  )
+);
+
+// Helper function to get feedback colors
+@function feedback-color($type, $property) {
+  @if map-has-key($feedback-colors, $type) {
+    $type-map: map-get($feedback-colors, $type);
+    @if map-has-key($type-map, $property) {
+      @return map-get($type-map, $property);
+    }
+  }
+  
+  @warn 'Feedback color `#{$type}.#{$property}` not found.';
+  @return null;
+} 

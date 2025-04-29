@@ -1,0 +1,160 @@
+/**
+ * Design System Compatibility Layer
+ * 
+ * This file provides backward compatibility for the design system migration.
+ * It maps old token names to the new token system to ensure existing code
+ * continues to work while the migration is in progress.
+ * 
+ * @deprecated These mappings will be removed in a future version.
+ * Please use the new token system directly.
+ */
+
+// Import the core tokens to ensure they're available
+@import 'tokens/core/colors';
+@import 'tokens/core/typography';
+@import 'tokens/core/spacing';
+@import 'tokens/semantic/feedback';
+@import 'tokens/semantic/surfaces';
+
+// ----------------------------------------------------------------------------
+// COLOR MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Primary color mappings
+$primary-color: $color-primary-500 !default;
+$primary-color-light: $color-primary-400 !default;
+$primary-color-lighter: $color-primary-300 !default;
+$primary-color-lightest: $color-primary-100 !default;
+$primary-color-dark: $color-primary-600 !default;
+$primary-color-darker: $color-primary-700 !default;
+$primary-color-darkest: $color-primary-900 !default;
+
+// Secondary color mappings
+$secondary-color: $color-secondary-500 !default;
+$secondary-color-light: $color-secondary-400 !default;
+$secondary-color-lighter: $color-secondary-300 !default;
+$secondary-color-lightest: $color-secondary-100 !default;
+$secondary-color-dark: $color-secondary-600 !default;
+$secondary-color-darker: $color-secondary-700 !default;
+$secondary-color-darkest: $color-secondary-900 !default;
+
+// Feedback color mappings
+$success-color: $color-success-500 !default;
+$error-color: $color-error-500 !default;
+$warning-color: $color-warning-500 !default;
+$info-color: $color-info-500 !default;
+
+// Text color mappings
+$text-color: $color-gray-800 !default;
+$text-color-light: $color-gray-600 !default;
+$text-color-lighter: $color-gray-500 !default;
+$text-color-lightest: $color-gray-400 !default;
+$text-color-dark: $color-gray-900 !default;
+
+// Background color mappings
+$bg-color: $color-white !default;
+$bg-color-light: $color-gray-50 !default;
+$bg-color-dark: $color-gray-100 !default;
+$bg-color-darker: $color-gray-200 !default;
+
+// Border color mappings
+$border-color: $color-gray-200 !default;
+$border-color-light: $color-gray-100 !default;
+$border-color-dark: $color-gray-300 !default;
+
+// ----------------------------------------------------------------------------
+// TYPOGRAPHY MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Font family mappings
+$font-family: $font-family-sans !default;
+$font-family-mono: $font-family-mono !default;
+
+// Font size mappings
+$font-size-xs: $font-size-xs !default;
+$font-size-sm: $font-size-sm !default;
+$font-size-base: $font-size-md !default;
+$font-size-md: $font-size-md !default;
+$font-size-lg: $font-size-lg !default;
+$font-size-xl: $font-size-xl !default;
+$font-size-2xl: $font-size-2xl !default;
+$font-size-3xl: $font-size-3xl !default;
+$font-size-4xl: $font-size-4xl !default;
+
+// Font weight mappings
+$font-weight-thin: $font-weight-thin !default;
+$font-weight-light: $font-weight-light !default;
+$font-weight-normal: $font-weight-normal !default;
+$font-weight-medium: $font-weight-medium !default;
+$font-weight-semibold: $font-weight-semibold !default;
+$font-weight-bold: $font-weight-bold !default;
+$font-weight-extrabold: $font-weight-extrabold !default;
+$font-weight-black: $font-weight-black !default;
+
+// Line height mappings
+$line-height-none: $line-height-none !default;
+$line-height-tight: $line-height-tight !default;
+$line-height-normal: $line-height-normal !default;
+$line-height-relaxed: $line-height-relaxed !default;
+$line-height-loose: $line-height-loose !default;
+
+// ----------------------------------------------------------------------------
+// SPACING MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Spacing mappings
+$spacing-none: $spacing-0 !default;
+$spacing-xs: $spacing-1 !default;
+$spacing-sm: $spacing-2 !default;
+$spacing-md: $spacing-4 !default;
+$spacing-lg: $spacing-6 !default;
+$spacing-xl: $spacing-8 !default;
+$spacing-2xl: $spacing-10 !default;
+$spacing-3xl: $spacing-12 !default;
+$spacing-4xl: $spacing-16 !default;
+
+// ----------------------------------------------------------------------------
+// BORDER RADIUS MAPPINGS
+// ----------------------------------------------------------------------------
+
+$border-radius-none: 0 !default;
+$border-radius-sm: 0.125rem !default;
+$border-radius-md: 0.25rem !default;
+$border-radius-lg: 0.5rem !default;
+$border-radius-xl: 0.75rem !default;
+$border-radius-2xl: 1rem !default;
+$border-radius-full: 9999px !default;
+
+// ----------------------------------------------------------------------------
+// SURFACE MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Card mappings
+$card-bg-color: $color-surface !default;
+$card-border-radius: $card-border-radius !default;
+$card-padding: $card-padding !default;
+$card-shadow: $card-shadow !default;
+
+// CSS Variable Fallbacks
+:root {
+  // Backward compatibility for CSS variables
+  --primary-color: var(--color-primary, #{$color-primary-500});
+  --primary-color-light: var(--color-primary-light, #{$color-primary-400});
+  --primary-color-dark: var(--color-primary-dark, #{$color-primary-600});
+  
+  --secondary-color: var(--color-secondary, #{$color-secondary-500});
+  --secondary-color-light: var(--color-secondary-light, #{$color-secondary-400});
+  --secondary-color-dark: var(--color-secondary-dark, #{$color-secondary-600});
+  
+  --text-color: var(--color-text, #{$color-gray-800});
+  --text-color-light: var(--color-text-muted, #{$color-gray-600});
+  
+  --border-color: var(--color-border, #{$color-gray-200});
+  --border-color-dark: var(--color-border-hover, #{$color-gray-300});
+  
+  --bg-color: var(--color-surface, #{$color-white});
+  --bg-color-light: var(--color-surface-accent, #{$color-gray-50});
+}
+
+// Feature flag for gradual migration
+$use-new-token-system: true !default; 

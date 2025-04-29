@@ -1,0 +1,239 @@
+/**
+ * Select Component Tokens
+ * 
+ * This file defines the component-specific tokens for select elements.
+ * It maps to the existing select styles while providing a structured
+ * token system for consistent styling.
+ */
+
+@import '../index';
+
+// Select tokens organized by type and state
+$select-tokens: (
+  'base': (
+    'border-radius': var(--radius-md),
+    'font-weight': 400,
+    'line-height': 1.5,
+    'transition': 'all 0.2s ease',
+    'disabled-opacity': 0.65,
+    'padding': '0.75rem 1rem'
+  ),
+  'size': (
+    'sm': (
+      'padding': '0.375rem 0.75rem',
+      'font-size': var(--text-sm)
+    ),
+    'md': (
+      'padding': '0.625rem 1rem',
+      'font-size': var(--text-md)
+    ),
+    'lg': (
+      'padding': '0.75rem 1.25rem',
+      'font-size': var(--text-lg)
+    )
+  ),
+  'default': (
+    'bg': var(--color-surface),
+    'text': var(--color-text),
+    'border': var(--color-border),
+    'icon': var(--color-text-muted),
+    'placeholder': var(--color-text-muted),
+    'hover': (
+      'border': var(--color-border-hover),
+      'bg': var(--color-surface-hover)
+    ),
+    'focus': (
+      'border': var(--color-primary),
+      'ring': rgba(var(--color-primary-rgb), 0.25)
+    ),
+    'disabled': (
+      'bg': var(--color-surface-muted),
+      'text': var(--color-text-muted),
+      'border': var(--color-border)
+    ),
+    'error': (
+      'border': var(--color-error),
+      'text': var(--color-text),
+      'message': var(--color-error)
+    ),
+    'dark': (
+      'bg': var(--color-dark-surface),
+      'text': var(--color-dark-text),
+      'border': var(--color-dark-border),
+      'icon': var(--color-dark-text-muted),
+      'placeholder': var(--color-dark-text-muted),
+      'hover': (
+        'border': var(--color-dark-border-hover),
+        'bg': var(--color-dark-surface-hover)
+      ),
+      'focus': (
+        'border': var(--color-dark-primary),
+        'ring': rgba(var(--color-dark-primary-rgb), 0.25)
+      ),
+      'disabled': (
+        'bg': var(--color-dark-surface-muted),
+        'text': var(--color-dark-text-muted),
+        'border': var(--color-dark-border)
+      ),
+      'error': (
+        'border': var(--color-dark-error),
+        'text': var(--color-dark-text),
+        'message': var(--color-dark-error)
+      )
+    )
+  ),
+  'dropdown': (
+    'bg': var(--color-surface),
+    'border': var(--color-border),
+    'shadow': '0 4px 8px rgba(0, 0, 0, 0.1)',
+    'item': (
+      'text': var(--color-text),
+      'hover': (
+        'bg': var(--color-surface-hover),
+        'text': var(--color-text)
+      ),
+      'selected': (
+        'bg': var(--color-primary-light),
+        'text': var(--color-primary-dark)
+      ),
+      'disabled': (
+        'text': var(--color-text-muted),
+        'bg': 'transparent'
+      )
+    ),
+    'dark': (
+      'bg': var(--color-dark-surface),
+      'border': var(--color-dark-border),
+      'shadow': '0 4px 8px rgba(0, 0, 0, 0.4)',
+      'item': (
+        'text': var(--color-dark-text),
+        'hover': (
+          'bg': var(--color-dark-surface-hover),
+          'text': var(--color-dark-text)
+        ),
+        'selected': (
+          'bg': rgba(var(--color-dark-primary-rgb), 0.2),
+          'text': var(--color-dark-primary)
+        ),
+        'disabled': (
+          'text': var(--color-dark-text-muted),
+          'bg': 'transparent'
+        )
+      )
+    )
+  )
+);
+
+/**
+ * Get select token value
+ * 
+ * @param {String} $property - Property to access
+ * @param {String} $state - Select state (optional)
+ * @param {Boolean} $dark - Whether to use dark theme tokens (optional)
+ * @return {*} Token value
+ */
+@function select-token($property, $state: null, $dark: false) {
+  $select-variant: 'default';
+  
+  @if $dark {
+    @if $state {
+      @if map-has-key(map-get(map-get(map-get($select-tokens, $select-variant), 'dark'), $state), $property) {
+        @return map-get(map-get(map-get(map-get($select-tokens, $select-variant), 'dark'), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get(map-get($select-tokens, $select-variant), 'dark'), $property) {
+        @return map-get(map-get(map-get($select-tokens, $select-variant), 'dark'), $property);
+      }
+    }
+  } @else {
+    @if $state {
+      @if map-has-key(map-get(map-get($select-tokens, $select-variant), $state), $property) {
+        @return map-get(map-get(map-get($select-tokens, $select-variant), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get($select-tokens, $select-variant), $property) {
+        @return map-get(map-get($select-tokens, $select-variant), $property);
+      }
+    }
+  }
+  
+  @warn 'Select token `#{$property}` for state `#{$state}` not found';
+  @return null;
+}
+
+/**
+ * Get base select token
+ * 
+ * @param {String} $property - Property to access
+ * @return {*} Base token value
+ */
+@function select-base($property) {
+  @if map-has-key(map-get($select-tokens, 'base'), $property) {
+    @return map-get(map-get($select-tokens, 'base'), $property);
+  }
+  
+  @warn 'Select base token `#{$property}` not found';
+  @return null;
+}
+
+/**
+ * Get select size token
+ * 
+ * @param {String} $size - Select size (sm, md, lg)
+ * @param {String} $property - Property to access
+ * @return {*} Size token value
+ */
+@function select-size($size, $property) {
+  @if map-has-key(map-get($select-tokens, 'size'), $size) {
+    @if map-has-key(map-get(map-get($select-tokens, 'size'), $size), $property) {
+      @return map-get(map-get(map-get($select-tokens, 'size'), $size), $property);
+    }
+  }
+  
+  @warn 'Select size token `#{$size}: #{$property}` not found';
+  @return null;
+}
+
+/**
+ * Get dropdown token
+ * 
+ * @param {String} $property - Property to access
+ * @param {String} $element - Dropdown element (optional)
+ * @param {String} $state - Element state (optional)
+ * @param {Boolean} $dark - Whether to use dark theme tokens (optional)
+ * @return {*} Dropdown token value
+ */
+@function select-dropdown($property, $element: null, $state: null, $dark: false) {
+  @if $dark {
+    @if $element and $state {
+      @if map-has-key(map-get(map-get(map-get(map-get($select-tokens, 'dropdown'), 'dark'), $element), $state), $property) {
+        @return map-get(map-get(map-get(map-get(map-get($select-tokens, 'dropdown'), 'dark'), $element), $state), $property);
+      }
+    } @else if $element {
+      @if map-has-key(map-get(map-get(map-get($select-tokens, 'dropdown'), 'dark'), $element), $property) {
+        @return map-get(map-get(map-get(map-get($select-tokens, 'dropdown'), 'dark'), $element), $property);
+      }
+    } @else {
+      @if map-has-key(map-get(map-get($select-tokens, 'dropdown'), 'dark'), $property) {
+        @return map-get(map-get(map-get($select-tokens, 'dropdown'), 'dark'), $property);
+      }
+    }
+  } @else {
+    @if $element and $state {
+      @if map-has-key(map-get(map-get(map-get($select-tokens, 'dropdown'), $element), $state), $property) {
+        @return map-get(map-get(map-get(map-get($select-tokens, 'dropdown'), $element), $state), $property);
+      }
+    } @else if $element {
+      @if map-has-key(map-get(map-get($select-tokens, 'dropdown'), $element), $property) {
+        @return map-get(map-get(map-get($select-tokens, 'dropdown'), $element), $property);
+      }
+    } @else {
+      @if map-has-key(map-get($select-tokens, 'dropdown'), $property) {
+        @return map-get(map-get($select-tokens, 'dropdown'), $property);
+      }
+    }
+  }
+  
+  @warn 'Select dropdown token not found';
+  @return null;
+} 

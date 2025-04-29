@@ -1,0 +1,121 @@
+/**
+ * Semantic Surface Tokens
+ * 
+ * This file defines semantic tokens for surface elements like cards, panels, etc.
+ * These tokens build on the core color tokens.
+ */
+
+@import '../core/colors';
+
+// Base surface colors
+$color-surface: $color-white;
+$color-surface-hover: $color-gray-50;
+$color-surface-accent: $color-gray-100;
+$color-surface-muted: $color-gray-50;
+$color-surface-elevated: $color-white;
+
+// Border colors
+$color-border: $color-gray-200;
+$color-border-hover: $color-gray-300;
+$color-border-active: $color-gray-400;
+
+// Dark mode surface colors
+$color-dark-surface: $color-gray-800;
+$color-dark-surface-hover: $color-gray-700;
+$color-dark-surface-accent: $color-gray-700;
+$color-dark-surface-muted: $color-gray-900;
+$color-dark-surface-elevated: $color-gray-700;
+
+// Dark mode border colors
+$color-dark-border: $color-gray-700;
+$color-dark-border-hover: $color-gray-600;
+$color-dark-border-active: $color-gray-500;
+
+// Card specific tokens
+$card-border-radius: 0.5rem;
+$card-padding: 1.5rem;
+$card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$card-dark-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.18);
+$card-dark-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+
+// Panel specific tokens
+$panel-border-radius: 0.375rem;
+$panel-padding: 1rem;
+$panel-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$panel-dark-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.18);
+
+// Surface component maps
+$surface-styles: (
+  'card': (
+    'bg': $color-surface,
+    'border-radius': $card-border-radius,
+    'padding': $card-padding,
+    'shadow': $card-shadow,
+    'hover': (
+      'bg': $color-surface-hover,
+      'shadow': $card-shadow-hover
+    ),
+    'dark': (
+      'bg': $color-dark-surface,
+      'shadow': $card-dark-shadow,
+      'hover': (
+        'bg': $color-dark-surface-hover,
+        'shadow': $card-dark-shadow-hover
+      )
+    )
+  ),
+  'panel': (
+    'bg': $color-surface,
+    'border-radius': $panel-border-radius,
+    'padding': $panel-padding,
+    'shadow': $panel-shadow,
+    'hover': (
+      'bg': $color-surface-hover
+    ),
+    'dark': (
+      'bg': $color-dark-surface,
+      'shadow': $panel-dark-shadow,
+      'hover': (
+        'bg': $color-dark-surface-hover
+      )
+    )
+  )
+);
+
+// Helper function to get surface styles
+@function surface-style($type, $property, $state: null, $dark: false) {
+  @if not map-has-key($surface-styles, $type) {
+    @warn 'Surface type `#{$type}` not found.';
+    @return null;
+  }
+  
+  $type-map: map-get($surface-styles, $type);
+  
+  @if $dark {
+    $dark-map: map-get($type-map, 'dark');
+    
+    @if $state and map-has-key($dark-map, $state) {
+      $state-map: map-get($dark-map, $state);
+      
+      @if map-has-key($state-map, $property) {
+        @return map-get($state-map, $property);
+      }
+    } @else if map-has-key($dark-map, $property) {
+      @return map-get($dark-map, $property);
+    }
+  } @else {
+    @if $state and map-has-key($type-map, $state) {
+      $state-map: map-get($type-map, $state);
+      
+      @if map-has-key($state-map, $property) {
+        @return map-get($state-map, $property);
+      }
+    } @else if map-has-key($type-map, $property) {
+      @return map-get($type-map, $property);
+    }
+  }
+  
+  @warn 'Surface style `#{$type}.#{$property}` for state `#{$state}` and dark: #{$dark} not found.';
+  @return null;
+} 

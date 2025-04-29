@@ -1,0 +1,121 @@
+/**
+ * Compatibility Layer Test
+ * 
+ * This file tests whether the compatibility layer is working correctly.
+ * It creates test classes using both old and new token names, which should
+ * produce identical results if the compatibility layer is functioning properly.
+ * 
+ * How to test:
+ * 1. Import this file into your test environment
+ * 2. Check that matching pairs of .test-old-* and .test-new-* classes have identical styling
+ */
+
+@import '../index';
+
+// -------------------------------------------------------------------------
+// COLOR TESTS
+// -------------------------------------------------------------------------
+
+// Primary Color Tests
+.test-old-primary-color {
+  color: $primary-color;
+  background-color: rgba($primary-color, 0.1);
+  border: 1px solid $primary-color;
+}
+
+.test-new-primary-color {
+  color: $color-primary-500;
+  background-color: rgba($color-primary-500, 0.1);
+  border: 1px solid $color-primary-500;
+}
+
+// Text Color Tests
+.test-old-text-color {
+  color: $text-color;
+  border-color: $text-color-light;
+}
+
+.test-new-text-color {
+  color: $color-gray-800;
+  border-color: $color-gray-600;
+}
+
+// Feedback Color Tests
+.test-old-feedback-colors {
+  --success: $success-color;
+  --error: $error-color;
+  --warning: $warning-color;
+  --info: $info-color;
+}
+
+.test-new-feedback-colors {
+  --success: $color-success-500;
+  --error: $color-error-500;
+  --warning: $color-warning-500;
+  --info: $color-info-500;
+}
+
+// CSS Variable Tests
+.test-old-css-vars {
+  color: var(--primary-color);
+  background-color: var(--bg-color);
+  border-color: var(--border-color);
+}
+
+.test-new-css-vars {
+  color: var(--color-primary);
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+// -------------------------------------------------------------------------
+// TYPOGRAPHY TESTS
+// -------------------------------------------------------------------------
+
+.test-old-typography {
+  font-family: $font-family;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+}
+
+.test-new-typography {
+  font-family: $font-family-sans;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+}
+
+// -------------------------------------------------------------------------
+// SPACING TESTS
+// -------------------------------------------------------------------------
+
+.test-old-spacing {
+  padding: $spacing-md;
+  margin: $spacing-sm $spacing-lg;
+  gap: $spacing-xs;
+}
+
+.test-new-spacing {
+  padding: $spacing-4;
+  margin: $spacing-2 $spacing-6;
+  gap: $spacing-1;
+}
+
+// -------------------------------------------------------------------------
+// SURFACE TESTS
+// -------------------------------------------------------------------------
+
+.test-old-card {
+  background-color: $card-bg-color;
+  border-radius: $card-border-radius;
+  padding: $card-padding;
+  box-shadow: $card-shadow;
+}
+
+.test-new-card {
+  background-color: $color-surface;
+  border-radius: $card-border-radius;
+  padding: $card-padding;
+  box-shadow: $card-shadow;
+} 

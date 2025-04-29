@@ -1,474 +1,532 @@
 #!/usr/bin/env node
 
 /**
- * Token Validator Script
+ * FitCopilot Color Token Validator
  * 
- * Validates color token usage throughout the codebase to ensure design system compliance.
+ * This script scans the codebase for hardcoded color values and suggests
+ * appropriate token alternatives to ensure consistent design system usage.
+ * 
+ * Usage:
+ *   node token-validator.js [--fix] [--report] [path/to/scan]
+ * 
+ * Options:
+ *   --fix       Auto-fix simple token replacements
+ *   --report    Generate HTML report of violations
+ *   path        Optional path to scan (defaults to src/)
  */
 
 const fs = require('fs');
 const path = require('path');
-const glob = require('glob');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 const chalk = require('chalk');
 
 // Configuration
-const CONFIG = {
-  // Directories to scan
-  includeDirs: ['src'],
-  // File patterns to include
-  includePatterns: ['**/*.scss', '**/*.css', '**/*.tsx', '**/*.jsx'],
-  // Directories to exclude
-  excludeDirs: ['node_modules', 'dist', 'build'],
-  // Files to exclude
-  excludePatterns: ['**/tokens.scss'],
-  // Token file path (relative to project root)
-  tokenFile: 'src/styles/design-system/tokens/_color-maps.scss',
-  // Allowed exceptions (won't be flagged)
-  allowedValues: [
-    'transparent',
-    '#000', '#000000', 'rgb(0,0,0)', 'rgb(0, 0, 0)', 'rgba(0,0,0,', 'rgba(0, 0, 0,', 
-    '#fff', '#ffffff', 'rgb(255,255,255)', 'rgb(255, 255, 255)', 'rgba(255,255,255,', 'rgba(255, 255, 255,'
-  ]
+const DEFAULT_SCAN_PATH = 'src/';
+const IGNORE_PATHS = [
+  'node_modules',
+  'dist',
+  'build',
+  'scripts',
+  '.git',
+];
+const OUTPUT_REPORT_PATH = 'token-validation-report.html';
+
+// Color pattern detection regexes
+const HEX_COLOR_REGEX = /#([0-9A-Fa-f]{3}){1,2}\b/g;
+const RGB_COLOR_REGEX = /rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/g;
+const RGBA_COLOR_REGEX = /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[0-9.]+\s*\)/g;
+
+// Common hardcoded values to token mappings
+const COLOR_TOKEN_MAP = {
+  // Primary brand colors
+  '#1FAD9F': "color('primary')",
+  '#007A91': "color('primary', 'dark')",
+  '#33B1C9': "color('primary', 'light')",
+  
+  // Accent colors
+  '#D4A017': "color('accent')",
+  
+  // Workout Generator colors
+  '#2563EB': "wg-color('primary')",
+  '#1D4ED8': "wg-color('primary', 'hover')",
+  
+  // Gray scale
+  '#FFFFFF': "color('surface')",
+  '#F5F7FA': "color('bg')",
+  '#F0F0F0': "color('surface', 'accent')",
+  '#333333': "color('text')",
+  
+  // Feedback colors
+  '#2BAE66': "color('success')",
+  '#D94E4E': "color('error')",
+  '#F0AD4E': "color('warning')",
+  '#4DABF5': "color('info')",
 };
 
-// Command line arguments
-const args = process.argv.slice(2);
-const isVerbose = args.includes('--verbose');
-const componentFilter = args.find(arg => arg.startsWith('--component='))?.split('=')[1] || 
-                      (args.includes('--component') && args[args.indexOf('--component') + 1]);
-const featureFilter = args.find(arg => arg.startsWith('--feature='))?.split('=')[1] || 
-                     (args.includes('--feature') && args[args.indexOf('--feature') + 1]);
-const filesFilter = args.find(arg => arg.startsWith('--files='))?.split('=')[1] || 
-                     (args.includes('--files') && args[args.indexOf('--files') + 1]);
-const generateReport = args.includes('--report');
+// Format for CSS variables
+const CSS_VAR_SUGGESTIONS = {
+  // Primary brand colors
+  '#1FAD9F': 'var(--color-primary)',
+  '#007A91': 'var(--color-primary-dark)',
+  '#33B1C9': 'var(--color-primary-light)',
+  
+  // Accent colors
+  '#D4A017': 'var(--color-accent)',
+  
+  // Workout Generator colors
+  '#2563EB': 'var(--color-wg-primary)',
+  '#1D4ED8': 'var(--color-wg-primary-hover)',
+  
+  // Gray scale
+  '#FFFFFF': 'var(--color-surface)',
+  '#F5F7FA': 'var(--color-bg)',
+  '#F0F0F0': 'var(--color-surface-accent)',
+  '#333333': 'var(--color-text)',
+  
+  // Feedback colors
+  '#2BAE66': 'var(--color-success)',
+  '#D94E4E': 'var(--color-error)',
+  '#F0AD4E': 'var(--color-warning)',
+  '#4DABF5': 'var(--color-info)',
+};
 
-// State for tracking results
-const results = {
+// Track overall stats
+let stats = {
   totalFiles: 0,
   filesWithIssues: 0,
   totalIssues: 0,
-  issuesByType: {
-    hex: 0,
-    rgb: 0,
-    rgba: 0,
-    hsl: 0,
-    hsla: 0
-  },
-  issues: []
+  hexIssues: 0,
+  rgbIssues: 0,
+  rgbaIssues: 0,
+  fixableIssues: 0,
 };
 
-// Regular expressions for finding color values
-const REGEX = {
-  hex: /#([0-9a-f]{3}|[0-9a-f]{6})(?![0-9a-f])/gi,
-  rgb: /rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/gi,
-  rgba: /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[0-9.]+\s*\)/gi,
-  hsl: /hsl\(\s*\d+\s*,\s*\d+%?\s*,\s*\d+%?\s*\)/gi,
-  hsla: /hsla\(\s*\d+\s*,\s*\d+%?\s*,\s*\d+%?\s*,\s*[0-9.]+\s*\)/gi,
-};
+// Parse command line arguments
+const args = process.argv.slice(2);
+const shouldFix = args.includes('--fix');
+const shouldGenerateReport = args.includes('--report');
+const scanPath = args.find(arg => !arg.startsWith('--')) || DEFAULT_SCAN_PATH;
 
 /**
- * Loads and parses the token file to extract valid color tokens
- * @returns {Object} Map of token names to values
+ * Scan a file for hardcoded color values
+ * @param {string} filePath - Path to the file to scan
+ * @returns {Object} - Object with violations and fix suggestions
  */
-function loadTokens() {
-  try {
-    const tokenFilePath = path.resolve(process.cwd(), CONFIG.tokenFile);
-    const tokenContent = fs.readFileSync(tokenFilePath, 'utf8');
-    
-    // Extract variables from SCSS
-    const tokenMap = {};
-    const variableRegex = /\$([\w-]+):\s*([^;]+);/g;
-    let match;
-    
-    while ((match = variableRegex.exec(tokenContent)) !== null) {
-      const [, name, value] = match;
-      tokenMap[name] = value.trim();
-    }
-    
-    return tokenMap;
-  } catch (error) {
-    console.error(chalk.red(`Error loading token file: ${error.message}`));
-    process.exit(1);
+async function scanFile(filePath) {
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  const fileExt = path.extname(filePath);
+  const issues = [];
+  
+  // Skip binary files and specific file types
+  if (
+    fileExt === '.svg' || 
+    fileExt === '.png' || 
+    fileExt === '.jpg' || 
+    fileExt === '.jpeg' || 
+    fileExt === '.gif'
+  ) {
+    return { issues, fileContent };
   }
-}
-
-/**
- * Check if a value is in the allowed exceptions list
- * @param {string} value The color value to check
- * @returns {boolean} True if the value is allowed, false otherwise
- */
-function isAllowedValue(value) {
-  return CONFIG.allowedValues.some(allowed => {
-    // For exact matches
-    if (value === allowed) return true;
-    // For rgba values with alpha
-    if (allowed.endsWith(',') && value.startsWith(allowed)) return true;
-    return false;
-  });
-}
-
-/**
- * Scans a file for hardcoded color values
- * @param {string} filePath Path to the file to scan
- */
-function scanFile(filePath) {
-  try {
-    const content = fs.readFileSync(filePath, 'utf8');
-    const relativePath = path.relative(process.cwd(), filePath);
-    let fileHasIssues = false;
-    const fileIssues = [];
-
-    // Check for each type of color format
-    Object.entries(REGEX).forEach(([type, regex]) => {
-      let match;
-      
-      // Use regex.exec in a loop to find all matches
-      regex.lastIndex = 0; // Reset regex state
-      while ((match = regex.exec(content)) !== null) {
-        const value = match[0];
-        
-        // Skip if it's an allowed value
-        if (isAllowedValue(value)) continue;
-        
-        // Check if this is in a context that might be allowed (like a comment)
-        const line = content.substring(0, match.index).split('\n').length;
-        const lineContent = content.split('\n')[line - 1];
-        
-        // Skip comments
-        if (lineContent.trim().startsWith('//') || lineContent.includes('/*')) continue;
-        
-        // It's an issue - record it
-        fileHasIssues = true;
-        results.totalIssues++;
-        results.issuesByType[type]++;
-        
-        fileIssues.push({
-          type,
-          value,
-          line,
-          column: match.index - content.lastIndexOf('\n', match.index),
-          context: lineContent.trim()
-        });
-      }
-    });
-
-    if (fileHasIssues) {
-      results.filesWithIssues++;
-      results.issues.push({
-        file: relativePath,
-        issues: fileIssues
+  
+  // Match hex colors
+  const hexMatches = Array.from(fileContent.matchAll(HEX_COLOR_REGEX) || []);
+  for (const match of hexMatches) {
+    const hexValue = match[0].toUpperCase();
+    const suggestion = getColorTokenSuggestion(hexValue, fileExt);
+    if (suggestion) {
+      issues.push({
+        type: 'hex',
+        value: hexValue,
+        index: match.index,
+        suggestion,
+        fixable: Boolean(COLOR_TOKEN_MAP[hexValue] || CSS_VAR_SUGGESTIONS[hexValue]),
       });
+      stats.hexIssues++;
+      stats.totalIssues++;
+      if (COLOR_TOKEN_MAP[hexValue] || CSS_VAR_SUGGESTIONS[hexValue]) {
+        stats.fixableIssues++;
+      }
     }
-    
-    results.totalFiles++;
-  } catch (error) {
-    console.error(chalk.yellow(`Warning: Could not scan file ${filePath}: ${error.message}`));
   }
+  
+  // Match rgb colors
+  const rgbMatches = Array.from(fileContent.matchAll(RGB_COLOR_REGEX) || []);
+  for (const match of rgbMatches) {
+    issues.push({
+      type: 'rgb',
+      value: match[0],
+      index: match.index,
+      suggestion: 'Use rgb(var(--color-*-rgb)) instead of hardcoded RGB values',
+      fixable: false,
+    });
+    stats.rgbIssues++;
+    stats.totalIssues++;
+  }
+  
+  // Match rgba colors
+  const rgbaMatches = Array.from(fileContent.matchAll(RGBA_COLOR_REGEX) || []);
+  for (const match of rgbaMatches) {
+    issues.push({
+      type: 'rgba',
+      value: match[0],
+      index: match.index,
+      suggestion: 'Use rgba(var(--color-*-rgb), alpha) instead of hardcoded RGBA values',
+      fixable: false,
+    });
+    stats.rgbaIssues++;
+    stats.totalIssues++;
+  }
+  
+  // Apply fixes if requested
+  let updatedContent = fileContent;
+  if (shouldFix && issues.some(i => i.fixable)) {
+    // Sort issues by index in reverse order to avoid offset issues
+    const fixableIssues = issues
+      .filter(i => i.fixable)
+      .sort((a, b) => b.index - a.index);
+    
+    for (const issue of fixableIssues) {
+      const replacement = getFixReplacement(issue.value, fileExt);
+      if (replacement) {
+        updatedContent = 
+          updatedContent.substring(0, issue.index) + 
+          replacement + 
+          updatedContent.substring(issue.index + issue.value.length);
+      }
+    }
+  }
+  
+  return { issues, updatedContent };
 }
 
 /**
- * Gets the list of files to scan based on configuration and filters
- * @returns {string[]} Array of file paths to scan
+ * Get appropriate color token suggestion based on file type
+ * @param {string} hexValue - Hex color value
+ * @param {string} fileExt - File extension
+ * @returns {string} - Suggestion for token replacement
  */
-function getFilesToScan() {
-  // If specific files are provided via a file list
-  if (filesFilter) {
-    try {
-      const filePath = path.resolve(process.cwd(), filesFilter);
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      // Get list of files from the provided file
-      return fileContent.split('\n')
-        .filter(line => line.trim() !== '')
-        .map(line => path.resolve(process.cwd(), line.trim()));
-    } catch (error) {
-      console.error(chalk.red(`Error reading files list: ${error.message}`));
-      process.exit(1);
+function getColorTokenSuggestion(hexValue, fileExt) {
+  // For CSS/SCSS files, suggest SCSS function
+  if (['.scss', '.css', '.sass'].includes(fileExt)) {
+    return COLOR_TOKEN_MAP[hexValue] || 
+           `Consider using a semantic color token instead of hardcoded value ${hexValue}`;
+  }
+  
+  // For JS/TS/TSX/JSX files, suggest CSS variable
+  if (['.js', '.jsx', '.ts', '.tsx'].includes(fileExt)) {
+    return CSS_VAR_SUGGESTIONS[hexValue] || 
+           `Consider using a CSS variable instead of hardcoded value ${hexValue}`;
+  }
+  
+  // Default suggestion
+  return `Replace hardcoded value ${hexValue} with appropriate design token`;
     }
-  }
 
-  let searchPattern = CONFIG.includePatterns;
-  const ignorePatterns = [
-    ...CONFIG.excludeDirs.map(dir => `**/${dir}/**`),
-    ...CONFIG.excludePatterns
-  ];
-  
-  // Apply component filter if specified
-  if (componentFilter) {
-    searchPattern = [`**/components/**/${componentFilter}/**`, `**/Components/**/${componentFilter}/**`];
+/**
+ * Get appropriate replacement for fixing
+ * @param {string} value - Color value
+ * @param {string} fileExt - File extension
+ * @returns {string} - Replacement value
+ */
+function getFixReplacement(value, fileExt) {
+  // For CSS/SCSS files, use SCSS function
+  if (['.scss', '.css', '.sass'].includes(fileExt)) {
+    return COLOR_TOKEN_MAP[value] || null;
   }
   
-  // Apply feature filter if specified
-  if (featureFilter) {
-    searchPattern = [`**/features/**/${featureFilter}/**`, `**/Features/**/${featureFilter}/**`];
+  // For JS/TS/TSX/JSX files, use CSS variable
+  if (['.js', '.jsx', '.ts', '.tsx'].includes(fileExt)) {
+    return CSS_VAR_SUGGESTIONS[value] || null;
   }
   
-  // Find all matching files
+  return null;
+}
+
+/**
+ * Get all files in a directory recursively
+ * @param {string} dir - Directory to scan
+ * @returns {string[]} - Array of file paths
+ */
+function getAllFiles(dir) {
+  if (IGNORE_PATHS.some(ignorePath => dir.includes(ignorePath))) {
+    return [];
+  }
+  
   const files = [];
-  for (const pattern of searchPattern) {
-    const matches = glob.sync(pattern, {
-      ignore: ignorePatterns,
-      cwd: process.cwd(),
-      absolute: true
-    });
-    files.push(...matches);
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    
+    if (entry.isDirectory()) {
+      files.push(...getAllFiles(fullPath));
+    } else {
+      files.push(fullPath);
+    }
   }
   
   return files;
 }
 
 /**
- * Generates an HTML report of token usage
+ * Generate HTML report of violations
+ * @param {Object[]} fileIssues - Array of file issues
  */
-function generateHtmlReport() {
-  if (!generateReport) return;
-  
-  const reportDir = 'reports';
-  const reportPath = path.join(reportDir, 'token-validation-report.html');
-  
-  // Create reports directory if it doesn't exist
-  if (!fs.existsSync(reportDir)) {
-    fs.mkdirSync(reportDir, { recursive: true });
-  }
-  
-  // Extract top 10 most frequent hardcoded values
-  const valueFrequency = {};
-  results.issues.forEach(fileResult => {
-    fileResult.issues.forEach(issue => {
-      if (!valueFrequency[issue.value]) {
-        valueFrequency[issue.value] = 0;
-      }
-      valueFrequency[issue.value]++;
-    });
-  });
-  
-  const topValues = Object.entries(valueFrequency)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
-  
-  // Generate HTML content
-  const html = `
+function generateReport(fileIssues) {
+  const reportContent = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Color Token Validation Report</title>
+  <title>FitCopilot Color Token Validation Report</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       line-height: 1.6;
       color: #333;
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem;
     }
-    h1, h2, h3 {
-      margin-top: 2rem;
+    h1 {
+      color: #1F2937;
+      border-bottom: 2px solid #E5E7EB;
+      padding-bottom: 0.5rem;
     }
     .summary {
+      background-color: #F9FAFB;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 2rem;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
-      margin: 2rem 0;
     }
-    .card {
-      background: #f9f9f9;
-      border-radius: 4px;
+    .stat-card {
+      background-color: white;
+      border-radius: 0.5rem;
       padding: 1rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    .card .number {
+    .stat-value {
       font-size: 2rem;
       font-weight: bold;
-      margin: 0.5rem 0;
+      color: #1F2937;
     }
-    .file {
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 1rem;
+    .stat-label {
+      color: #6B7280;
+      font-size: 0.875rem;
     }
-    .issue {
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      background: #f5f5f5;
-      border-left: 3px solid #ff5252;
+    .file-issues {
+      margin-top: 1rem;
     }
-    .color-preview {
-      display: inline-block;
-      width: 1rem;
-      height: 1rem;
-      border-radius: 3px;
-      margin-right: 0.5rem;
-      vertical-align: middle;
-      border: 1px solid #ddd;
-    }
-    .top-values {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-      margin: 2rem 0;
-    }
-    .value-card {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem;
-      background: white;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .value-count {
-      margin-left: auto;
+    .file-path {
+      background-color: #F3F4F6;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-family: monospace;
       font-weight: bold;
-      background: #f0f0f0;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
+      color: #1F2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .file-path span {
+      font-weight: normal;
+      color: #6B7280;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+    }
+    th {
+      background-color: #F9FAFB;
+      font-weight: 600;
+    }
+    .color-value {
+      font-family: monospace;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      background-color: #F3F4F6;
+    }
+    .suggestion {
+      font-family: monospace;
+      color: #059669;
+    }
+    .fixable {
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .fixable.yes {
+      background-color: #D1FAE5;
+      color: #065F46;
+    }
+    .fixable.no {
+      background-color: #FEF3C7;
+      color: #92400E;
+    }
+    .token-docs {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 2px solid #E5E7EB;
+    }
+    .token-docs h2 {
+      color: #1F2937;
+    }
+    .token-docs code {
+      background-color: #F3F4F6;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
     }
   </style>
 </head>
 <body>
-  <h1>Color Token Validation Report</h1>
-  <p>Generated on ${new Date().toLocaleString()}</p>
+  <h1>FitCopilot Color Token Validation Report</h1>
   
   <div class="summary">
-    <div class="card">
-      <h3>Files Scanned</h3>
-      <div class="number">${results.totalFiles}</div>
+    <div class="stat-card">
+      <div class="stat-value">${stats.filesWithIssues}/${stats.totalFiles}</div>
+      <div class="stat-label">Files with issues</div>
     </div>
-    <div class="card">
-      <h3>Files with Issues</h3>
-      <div class="number">${results.filesWithIssues}</div>
+    <div class="stat-card">
+      <div class="stat-value">${stats.totalIssues}</div>
+      <div class="stat-label">Total issues</div>
     </div>
-    <div class="card">
-      <h3>Total Issues</h3>
-      <div class="number">${results.totalIssues}</div>
+    <div class="stat-card">
+      <div class="stat-value">${stats.hexIssues}</div>
+      <div class="stat-label">Hex color issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${stats.rgbIssues + stats.rgbaIssues}</div>
+      <div class="stat-label">RGB/RGBA issues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${stats.fixableIssues}</div>
+      <div class="stat-label">Auto-fixable issues</div>
     </div>
   </div>
   
-  <h2>Most Common Hardcoded Values</h2>
-  <div class="top-values">
-    ${topValues.map(([value, count]) => `
-      <div class="value-card">
-        <span class="color-preview" style="background-color: ${value}"></span>
-        <code>${value}</code>
-        <span class="value-count">${count}</span>
+  <div class="file-issues">
+    ${fileIssues.map(file => `
+      <div class="file-path">
+        ${file.path} <span>${file.issues.length} issue${file.issues.length !== 1 ? 's' : ''}</span>
       </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Value</th>
+            <th>Suggestion</th>
+            <th>Auto-fixable</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${file.issues.map(issue => `
+            <tr>
+              <td>${issue.type.toUpperCase()}</td>
+              <td><span class="color-value">${issue.value}</span></td>
+              <td><span class="suggestion">${issue.suggestion}</span></td>
+              <td><span class="fixable ${issue.fixable ? 'yes' : 'no'}">${issue.fixable ? 'Yes' : 'No'}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
     `).join('')}
   </div>
   
-  <h2>Issues by File</h2>
-  ${results.issues.map(fileResult => `
-    <div class="file">
-      <h3>${fileResult.file}</h3>
-      <p>Found ${fileResult.issues.length} issues:</p>
-      ${fileResult.issues.slice(0, 10).map(issue => `
-        <div class="issue">
-          <p>Line ${issue.line}: <strong>${issue.value}</strong></p>
-          <pre>${issue.context}</pre>
-        </div>
-      `).join('')}
-      ${fileResult.issues.length > 10 ? `<p>...and ${fileResult.issues.length - 10} more issues.</p>` : ''}
+  <div class="token-docs">
+    <h2>How to Fix</h2>
+    <p>Replace hardcoded color values with appropriate tokens from the design system:</p>
+    <ul>
+      <li>For SCSS files, use token functions: <code>color('primary')</code></li>
+      <li>For React components, use CSS variables: <code>var(--color-primary)</code></li>
+      <li>For RGBA values with opacity: <code>rgba(var(--color-primary-rgb), 0.5)</code></li>
+    </ul>
+    <p>See the <a href="src/styles/design-system/tokens/docs/token-map.md">Color Token Documentation</a> for a complete reference.</p>
     </div>
-  `).join('')}
 </body>
 </html>
   `;
   
-  // Write HTML to file
-  fs.writeFileSync(reportPath, html);
-  console.log(chalk.blue(`Report generated at: ${reportPath}`));
+  fs.writeFileSync(OUTPUT_REPORT_PATH, reportContent);
+  console.log(`\nReport generated at ${OUTPUT_REPORT_PATH}`);
 }
 
 /**
- * Prints the validation results to the console
+ * Main function
  */
-function printResults() {
-  console.log('\n' + chalk.bold('=== Token Validation Results ===') + '\n');
+async function main() {
+  console.log(`\n🔍 Scanning for hardcoded color values in ${scanPath}...\n`);
   
-  // Print summary
-  console.log(chalk.bold('Summary:'));
-  console.log(`Total files scanned: ${results.totalFiles}`);
-  console.log(`Files with issues: ${results.filesWithIssues}`);
-  console.log(`Total issues found: ${results.totalIssues}`);
-  
-  // Print breakdown by type
-  console.log('\n' + chalk.bold('Issues by Type:'));
-  Object.entries(results.issuesByType).forEach(([type, count]) => {
-    if (count > 0) {
-      console.log(`${type.padEnd(6)}: ${count}`);
+  try {
+    const baseDir = path.resolve(process.cwd(), scanPath);
+    const files = getAllFiles(baseDir);
+    stats.totalFiles = files.length;
+    
+    const fileIssues = [];
+    let fixCount = 0;
+    
+    for (const filePath of files) {
+      const relativePath = path.relative(process.cwd(), filePath);
+      const { issues, updatedContent } = await scanFile(filePath);
+      
+      if (issues.length > 0) {
+        stats.filesWithIssues++;
+        fileIssues.push({
+          path: relativePath,
+          issues
+        });
+        
+        console.log(`${chalk.yellow('!')} ${relativePath}: ${issues.length} issue${issues.length !== 1 ? 's' : ''}`);
+        
+        // If we're fixing and content changed, write back to file
+        if (shouldFix && updatedContent !== fs.readFileSync(filePath, 'utf8')) {
+          fs.writeFileSync(filePath, updatedContent);
+          const fixedCount = issues.filter(i => i.fixable).length;
+          fixCount += fixedCount;
+          console.log(`  ${chalk.green('✓')} Fixed ${fixedCount} issue${fixedCount !== 1 ? 's' : ''}`);
+}
+      }
     }
-  });
+    
+    // Print summary
+    console.log('\n📊 Summary:');
+    console.log(`- Files scanned: ${stats.totalFiles}`);
+    console.log(`- Files with issues: ${stats.filesWithIssues}`);
+    console.log(`- Total issues: ${stats.totalIssues}`);
+    console.log(`  - Hex color issues: ${stats.hexIssues}`);
+    console.log(`  - RGB/RGBA color issues: ${stats.rgbIssues + stats.rgbaIssues}`);
+    
+    if (shouldFix) {
+      console.log(`\n🔧 Fixed ${fixCount} issues automatically`);
+    }
   
-  // Print detailed results if verbose or if there are issues
-  if (isVerbose && results.issues.length > 0) {
-    console.log('\n' + chalk.bold('Detailed Issues:'));
-    results.issues.forEach(fileResult => {
-      console.log('\n' + chalk.underline(fileResult.file));
-      fileResult.issues.forEach(issue => {
-        console.log(`  ${chalk.gray(`Line ${issue.line}:`)} ${chalk.red(issue.value)} in:`);
-        console.log(`    ${chalk.gray(issue.context)}`);
-      });
-    });
+    // Generate report if requested
+    if (shouldGenerateReport) {
+      generateReport(fileIssues);
+    }
+  
+    // Exit with error code if issues found
+    process.exit(stats.totalIssues > 0 ? 1 : 0);
+    
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
   }
-  
-  // Final result
-  console.log('\n' + chalk.bold('Result:'));
-  if (results.totalIssues === 0) {
-    console.log(chalk.green('✓ No token issues found!'));
-  } else {
-    console.log(chalk.red(`✗ Found ${results.totalIssues} token issues in ${results.filesWithIssues} files.`));
-    console.log(chalk.gray('Run with --verbose for detailed information.'));
-  }
-  
-  console.log('\n' + chalk.bold('=== End of Token Validation ===') + '\n');
 }
 
-/**
- * Main function that executes the validation process
- */
-function main() {
-  // Log start
-  console.log(chalk.blue('Starting token validation...'));
-  
-  // Apply filters
-  if (componentFilter) {
-    console.log(chalk.blue(`Filtering to component: ${componentFilter}`));
-  }
-  if (featureFilter) {
-    console.log(chalk.blue(`Filtering to feature: ${featureFilter}`));
-  }
-  if (filesFilter) {
-    console.log(chalk.blue(`Using files from: ${filesFilter}`));
-  }
-  
-  // Load tokens
-  console.log(chalk.blue('Loading tokens...'));
-  const tokens = loadTokens();
-  console.log(chalk.green(`Loaded ${Object.keys(tokens).length} tokens.`));
-  
-  // Get files to scan
-  const files = getFilesToScan();
-  console.log(chalk.blue(`Found ${files.length} files to scan.`));
-  
-  // Scan each file
-  console.log(chalk.blue('Scanning files...'));
-  files.forEach(file => {
-    if (isVerbose) {
-      console.log(chalk.gray(`Scanning ${file}...`));
-    }
-    scanFile(file);
-  });
-  
-  // Generate HTML report if requested
-  if (generateReport) {
-    generateHtmlReport();
-  }
-  
-  // Print results
-  printResults();
-  
-  // Exit with appropriate code
-  process.exit(results.totalIssues > 0 ? 1 : 0);
-}
-
-// Execute main function
+// Run the script
 main(); 

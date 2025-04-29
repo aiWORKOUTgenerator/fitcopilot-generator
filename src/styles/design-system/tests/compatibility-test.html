@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System Compatibility Test</title>
+  <link rel="stylesheet" href="compatibility-test.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 { margin-bottom: 2rem; }
+    h2 { margin-top: 3rem; }
+    .test-section {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .test-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      width: 45%;
+    }
+    .test-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .match-status {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+    }
+    .match-yes {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .match-no {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    .sample {
+      padding: 1rem;
+      border-radius: 0.25rem;
+      margin-bottom: 1rem;
+    }
+    code {
+      display: block;
+      background-color: #f1f5f9;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+    }
+    .legend {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .legend-color {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Design System Compatibility Test</h1>
+  
+  <p>This page tests whether the compatibility layer is working correctly by comparing elements styled with old vs. new token names. If the compatibility layer is functioning properly, each pair of elements should look identical.</p>
+  
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #dcfce7;"></div>
+      <span>Match - tokens produce identical styling</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #fee2e2;"></div>
+      <span>Mismatch - tokens produce different styling</span>
+    </div>
+  </div>
+
+  <h2>Color Tokens</h2>
+  
+  <div class="test-section">
+    <div class="test-card">
+      <div class="test-title">Old Token Syntax</div>
+      <code>.test-old-primary-color {
+  color: $primary-color;
+  background-color: rgba($primary-color, 0.1);
+  border: 1px solid $primary-color;
+}</code>
+      <div class="sample test-old-primary-color">Primary Color Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+    
+    <div class="test-card">
+      <div class="test-title">New Token Syntax</div>
+      <code>.test-new-primary-color {
+  color: $color-primary-500;
+  background-color: rgba($color-primary-500, 0.1);
+  border: 1px solid $color-primary-500;
+}</code>
+      <div class="sample test-new-primary-color">Primary Color Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <div class="test-card">
+      <div class="test-title">Old Text Color Tokens</div>
+      <code>.test-old-text-color {
+  color: $text-color;
+  border-color: $text-color-light;
+}</code>
+      <div class="sample test-old-text-color">Text Color Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+    
+    <div class="test-card">
+      <div class="test-title">New Text Color Tokens</div>
+      <code>.test-new-text-color {
+  color: $color-gray-800;
+  border-color: $color-gray-600;
+}</code>
+      <div class="sample test-new-text-color">Text Color Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+  </div>
+
+  <h2>Typography Tokens</h2>
+  
+  <div class="test-section">
+    <div class="test-card">
+      <div class="test-title">Old Typography Tokens</div>
+      <code>.test-old-typography {
+  font-family: $font-family;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+}</code>
+      <div class="sample test-old-typography">Typography Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+    
+    <div class="test-card">
+      <div class="test-title">New Typography Tokens</div>
+      <code>.test-new-typography {
+  font-family: $font-family-sans;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-normal;
+}</code>
+      <div class="sample test-new-typography">Typography Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+  </div>
+
+  <h2>Spacing Tokens</h2>
+  
+  <div class="test-section">
+    <div class="test-card">
+      <div class="test-title">Old Spacing Tokens</div>
+      <code>.test-old-spacing {
+  padding: $spacing-md;
+  margin: $spacing-sm $spacing-lg;
+}</code>
+      <div class="sample test-old-spacing">Spacing Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+    
+    <div class="test-card">
+      <div class="test-title">New Spacing Tokens</div>
+      <code>.test-new-spacing {
+  padding: $spacing-4;
+  margin: $spacing-2 $spacing-6;
+}</code>
+      <div class="sample test-new-spacing">Spacing Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+  </div>
+
+  <h2>Surface Tokens</h2>
+  
+  <div class="test-section">
+    <div class="test-card">
+      <div class="test-title">Old Surface Tokens</div>
+      <code>.test-old-card {
+  background-color: $card-bg-color;
+  border-radius: $card-border-radius;
+  padding: $card-padding;
+  box-shadow: $card-shadow;
+}</code>
+      <div class="sample test-old-card">Surface Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+    
+    <div class="test-card">
+      <div class="test-title">New Surface Tokens</div>
+      <code>.test-new-card {
+  background-color: $color-surface;
+  border-radius: $card-border-radius;
+  padding: $card-padding;
+  box-shadow: $card-shadow;
+}</code>
+      <div class="sample test-new-card">Surface Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+  </div>
+
+  <h2>CSS Variables</h2>
+  
+  <div class="test-section">
+    <div class="test-card">
+      <div class="test-title">Old CSS Variables</div>
+      <code>.test-old-css-vars {
+  color: var(--primary-color);
+  background-color: var(--bg-color);
+  border-color: var(--border-color);
+}</code>
+      <div class="sample test-old-css-vars">CSS Variables Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+    
+    <div class="test-card">
+      <div class="test-title">New CSS Variables</div>
+      <code>.test-new-css-vars {
+  color: var(--color-primary);
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}</code>
+      <div class="sample test-new-css-vars">CSS Variables Sample</div>
+      <div class="match-status match-yes">✓ Match</div>
+    </div>
+  </div>
+
+  <script>
+    // This script could be used to programmatically compare computed styles
+    // between old and new token implementations and update the match status
+    document.addEventListener('DOMContentLoaded', function() {
+      const pairs = [
+        ['test-old-primary-color', 'test-new-primary-color'],
+        ['test-old-text-color', 'test-new-text-color'],
+        ['test-old-typography', 'test-new-typography'],
+        ['test-old-spacing', 'test-new-spacing'],
+        ['test-old-card', 'test-new-card'],
+        ['test-old-css-vars', 'test-new-css-vars']
+      ];
+      
+      pairs.forEach(pair => {
+        const oldElement = document.querySelector(`.${pair[0]}`);
+        const newElement = document.querySelector(`.${pair[1]}`);
+        
+        if (!oldElement || !newElement) return;
+        
+        const oldStyles = window.getComputedStyle(oldElement);
+        const newStyles = window.getComputedStyle(newElement);
+        
+        // Properties to compare
+        const propsToCompare = ['color', 'backgroundColor', 'borderColor', 'padding', 'margin', 'fontFamily', 'fontSize', 'fontWeight', 'lineHeight'];
+        
+        let allMatch = true;
+        
+        propsToCompare.forEach(prop => {
+          if (oldStyles[prop] !== newStyles[prop]) {
+            console.warn(`Mismatch in ${prop} between ${pair[0]} and ${pair[1]}`);
+            console.log(`  Old: ${oldStyles[prop]}`);
+            console.log(`  New: ${newStyles[prop]}`);
+            allMatch = false;
+          }
+        });
+        
+        // Update match status
+        const oldStatus = oldElement.parentNode.querySelector('.match-status');
+        const newStatus = newElement.parentNode.querySelector('.match-status');
+        
+        if (!allMatch) {
+          oldStatus.classList.replace('match-yes', 'match-no');
+          oldStatus.textContent = '✗ Mismatch';
+          newStatus.classList.replace('match-yes', 'match-no');
+          newStatus.textContent = '✗ Mismatch';
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

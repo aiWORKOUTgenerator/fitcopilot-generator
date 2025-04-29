@@ -1,0 +1,15 @@
+/**
+ * Component Tokens Index
+ *
+ * This file provides a single entry point to import all component-specific tokens.
+ */
+
+// Import component token files
+@import './button-tokens';
+@import './input-tokens';
+@import './select-tokens';
+@import './form-controls-tokens';
+
+// Additional component token imports can be added here as they are created
+// @import './card-tokens';
+// @import './alert-tokens'; 

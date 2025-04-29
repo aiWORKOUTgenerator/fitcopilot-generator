@@ -1,0 +1,151 @@
+/**
+ * Input Component Tokens
+ * 
+ * This file defines the component-specific tokens for input elements.
+ * It maps to the existing input styles while providing a structured
+ * token system for consistent styling.
+ */
+
+@import '../index';
+
+// Input tokens organized by type and state
+$input-tokens: (
+  'base': (
+    'border-radius': var(--radius-md),
+    'font-weight': 400,
+    'line-height': 1.5,
+    'transition': 'all 0.2s ease',
+    'disabled-opacity': 0.65,
+    'padding': '0.75rem 1rem'
+  ),
+  'size': (
+    'sm': (
+      'padding': '0.375rem 0.75rem',
+      'font-size': var(--text-sm)
+    ),
+    'md': (
+      'padding': '0.625rem 1rem',
+      'font-size': var(--text-md)
+    ),
+    'lg': (
+      'padding': '0.75rem 1.25rem',
+      'font-size': var(--text-lg)
+    )
+  ),
+  'default': (
+    'bg': var(--color-surface),
+    'text': var(--color-text),
+    'border': var(--color-border),
+    'placeholder': var(--color-text-muted),
+    'hover': (
+      'border': var(--color-border-hover)
+    ),
+    'focus': (
+      'border': var(--color-primary),
+      'ring': rgba(var(--color-primary-rgb), 0.25)
+    ),
+    'disabled': (
+      'bg': var(--color-surface-muted),
+      'text': var(--color-text-muted),
+      'border': var(--color-border)
+    ),
+    'error': (
+      'border': var(--color-error),
+      'text': var(--color-text),
+      'message': var(--color-error)
+    ),
+    'dark': (
+      'bg': var(--color-dark-surface),
+      'text': var(--color-dark-text),
+      'border': var(--color-dark-border),
+      'placeholder': var(--color-dark-text-muted),
+      'hover': (
+        'border': var(--color-dark-border-hover)
+      ),
+      'focus': (
+        'border': var(--color-dark-primary),
+        'ring': rgba(var(--color-dark-primary-rgb), 0.25)
+      ),
+      'disabled': (
+        'bg': var(--color-dark-surface-muted),
+        'text': var(--color-dark-text-muted),
+        'border': var(--color-dark-border)
+      ),
+      'error': (
+        'border': var(--color-dark-error),
+        'text': var(--color-dark-text),
+        'message': var(--color-dark-error)
+      )
+    )
+  )
+);
+
+/**
+ * Get input token value
+ * 
+ * @param {String} $property - Property to access
+ * @param {String} $state - Input state (optional)
+ * @param {Boolean} $dark - Whether to use dark theme tokens (optional)
+ * @return {*} Token value
+ */
+@function input-token($property, $state: null, $dark: false) {
+  $input-variant: 'default';
+  
+  @if $dark {
+    @if $state {
+      @if map-has-key(map-get(map-get(map-get($input-tokens, $input-variant), 'dark'), $state), $property) {
+        @return map-get(map-get(map-get(map-get($input-tokens, $input-variant), 'dark'), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get(map-get($input-tokens, $input-variant), 'dark'), $property) {
+        @return map-get(map-get(map-get($input-tokens, $input-variant), 'dark'), $property);
+      }
+    }
+  } @else {
+    @if $state {
+      @if map-has-key(map-get(map-get($input-tokens, $input-variant), $state), $property) {
+        @return map-get(map-get(map-get($input-tokens, $input-variant), $state), $property);
+      }
+    } @else {
+      @if map-has-key(map-get($input-tokens, $input-variant), $property) {
+        @return map-get(map-get($input-tokens, $input-variant), $property);
+      }
+    }
+  }
+  
+  @warn 'Input token `#{$property}` for state `#{$state}` not found';
+  @return null;
+}
+
+/**
+ * Get base input token
+ * 
+ * @param {String} $property - Property to access
+ * @return {*} Base token value
+ */
+@function input-base($property) {
+  @if map-has-key(map-get($input-tokens, 'base'), $property) {
+    @return map-get(map-get($input-tokens, 'base'), $property);
+  }
+  
+  @warn 'Input base token `#{$property}` not found';
+  @return null;
+}
+
+/**
+ * Get input size token
+ * 
+ * @param {String} $size - Input size (sm, md, lg)
+ * @param {String} $property - Property to access
+ * @return {*} Size token value
+ */
+@function input-size($size, $property) {
+  @if map-has-key(map-get($input-tokens, 'size'), $size) {
+    @if map-has-key(map-get(map-get($input-tokens, 'size'), $size), $property) {
+      @return map-get(map-get(map-get($input-tokens, 'size'), $size), $property);
+    }
+  }
+  
+  @warn 'Input size token `#{$size}: #{$property}` not found';
+  @return null;
+} 

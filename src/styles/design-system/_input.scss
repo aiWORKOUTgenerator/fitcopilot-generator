@@ -1,0 +1,162 @@
+/**
+ * Input Component Styles
+ * 
+ * This file provides styles for input elements using the token system.
+ */
+
+@import 'tokens/components/input-tokens';
+
+// Base input styles
+.input {
+  display: block;
+  width: 100%;
+  padding: input-base('padding');
+  border-radius: input-base('border-radius');
+  font-weight: input-base('font-weight');
+  line-height: input-base('line-height');
+  background-color: input-token('bg');
+  color: input-token('text');
+  border: 1px solid input-token('border');
+  transition: input-base('transition');
+  
+  &::placeholder {
+    color: input-token('placeholder');
+  }
+  
+  &:hover:not(:disabled):not(.input--error) {
+    border-color: input-token('border', 'hover');
+  }
+  
+  &:focus:not(:disabled):not(.input--error) {
+    outline: none;
+    border-color: input-token('border', 'focus');
+    box-shadow: 0 0 0 3px input-token('ring', 'focus');
+  }
+  
+  &:disabled {
+    opacity: input-base('disabled-opacity');
+    background-color: input-token('bg', 'disabled');
+    color: input-token('text', 'disabled');
+    cursor: not-allowed;
+  }
+  
+  &--error {
+    border-color: input-token('border', 'error');
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(var(--color-error-rgb), 0.25);
+    }
+  }
+  
+  // Dark theme styles
+  .dark-theme & {
+    background-color: input-token('bg', null, true);
+    color: input-token('text', null, true);
+    border-color: input-token('border', null, true);
+    
+    &::placeholder {
+      color: input-token('placeholder', null, true);
+    }
+    
+    &:hover:not(:disabled):not(.input--error) {
+      border-color: input-token('border', 'hover', true);
+    }
+    
+    &:focus:not(:disabled):not(.input--error) {
+      border-color: input-token('border', 'focus', true);
+      box-shadow: 0 0 0 3px input-token('ring', 'focus', true);
+    }
+    
+    &:disabled {
+      background-color: input-token('bg', 'disabled', true);
+      color: input-token('text', 'disabled', true);
+    }
+    
+    &--error {
+      border-color: input-token('border', 'error', true);
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(var(--color-dark-error-rgb), 0.25);
+      }
+    }
+  }
+}
+
+// Input size variants
+.input--sm {
+  padding: input-size('sm', 'padding');
+  font-size: input-size('sm', 'font-size');
+}
+
+.input--md {
+  padding: input-size('md', 'padding');
+  font-size: input-size('md', 'font-size');
+}
+
+.input--lg {
+  padding: input-size('lg', 'padding');
+  font-size: input-size('lg', 'font-size');
+}
+
+// Input validation message
+.input-message {
+  margin-top: 0.5rem;
+  font-size: var(--text-sm);
+  
+  &--error {
+    color: input-token('message', 'error');
+    
+    .dark-theme & {
+      color: input-token('message', 'error', true);
+    }
+  }
+}
+
+// Input group (for prefixes/suffixes)
+.input-group {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  
+  .input-group-prefix,
+  .input-group-suffix {
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    background-color: var(--color-surface-accent);
+    border: 1px solid input-token('border');
+    color: var(--color-text-muted);
+    
+    .dark-theme & {
+      background-color: var(--color-dark-surface-accent);
+      border-color: input-token('border', null, true);
+      color: var(--color-dark-text-muted);
+    }
+  }
+  
+  .input-group-prefix {
+    border-right: none;
+    border-top-left-radius: input-base('border-radius');
+    border-bottom-left-radius: input-base('border-radius');
+  }
+  
+  .input-group-suffix {
+    border-left: none;
+    border-top-right-radius: input-base('border-radius');
+    border-bottom-right-radius: input-base('border-radius');
+  }
+  
+  .input {
+    flex: 1;
+    
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+} 

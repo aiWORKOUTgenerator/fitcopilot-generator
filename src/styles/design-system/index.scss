@@ -1,20 +1,29 @@
 /**
- * Design System Index
+ * Design System
  * 
- * Imports all design system files in the correct order.
- * Always import the token system first to ensure proper color inheritance.
+ * This is the main entry point for the design system.
+ * It imports all necessary tokens, mixins, themes, and components.
  */
 
-// First import the core token system
-@import './tokens/index';
+// Import tokens
+@import 'tokens/core/colors';
+@import 'tokens/core/typography';
+@import 'tokens/core/spacing';
 
-// Then import utility files that build on the token system
-@import './colors';
-@import './typography';
-@import './backgrounds';
-@import './animations';
-@import './gradients';
-@import './components';
-@import './spacing';
-@import './shadows';
-@import './dark-theme';
+// Import semantic tokens (which depend on core tokens)
+@import 'tokens/semantic/feedback';
+@import 'tokens/semantic/surfaces';
+
+// Import themes
+@import 'themes/index';
+
+// Import mixins
+@import 'mixins/index';
+
+// Import compatibility layer for backward compatibility
+@import 'compatibility';
+
+// Import components
+@import 'components/forms/index';
+
+// Future component families will be imported here
