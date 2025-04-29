@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typography & Spacing Token Migration Test</title>
+  <style>
+    body {
+      font-family: var(--font-base);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--spacing-8);
+      background-color: var(--color-surface);
+      color: var(--color-text);
+    }
+
+    .dark-theme {
+      background-color: var(--color-dark-bg);
+      color: var(--color-dark-text);
+    }
+
+    h1 {
+      margin-bottom: var(--spacing-8);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--spacing-4);
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    h2 {
+      margin-top: var(--spacing-8);
+      margin-bottom: var(--spacing-4);
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary);
+    }
+
+    .dark-theme h2 {
+      color: var(--color-dark-primary);
+    }
+
+    .test-section {
+      margin-bottom: var(--spacing-10);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-6);
+    }
+
+    .dark-theme .test-section {
+      border-color: var(--color-dark-border);
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: var(--spacing-4);
+    }
+
+    .token-card {
+      background-color: var(--color-surface-accent);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-4);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-theme .token-card {
+      background-color: var(--color-dark-surface);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .token-name {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      color: var(--color-primary);
+      margin-bottom: var(--spacing-2);
+    }
+
+    .dark-theme .token-name {
+      color: var(--color-dark-primary);
+    }
+
+    .token-value {
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    .dark-theme .token-value {
+      color: var(--color-dark-text-muted);
+    }
+
+    .toggle-theme {
+      position: fixed;
+      top: var(--spacing-4);
+      right: var(--spacing-4);
+      padding: var(--spacing-2) var(--spacing-4);
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .dark-theme .toggle-theme {
+      background-color: var(--color-dark-primary);
+    }
+
+    /* Typography examples */
+    .typography-demo {
+      margin-top: var(--spacing-6);
+    }
+
+    .font-size-example {
+      margin-bottom: var(--spacing-6);
+    }
+
+    .font-size-xs { font-size: var(--font-size-xs); }
+    .font-size-sm { font-size: var(--font-size-sm); }
+    .font-size-md { font-size: var(--font-size-md); }
+    .font-size-lg { font-size: var(--font-size-lg); }
+    .font-size-xl { font-size: var(--font-size-xl); }
+    .font-size-2xl { font-size: var(--font-size-2xl); }
+    .font-size-3xl { font-size: var(--font-size-3xl); }
+    .font-size-4xl { font-size: var(--font-size-4xl); }
+
+    .font-weight-thin { font-weight: var(--font-weight-thin); }
+    .font-weight-light { font-weight: var(--font-weight-light); }
+    .font-weight-normal { font-weight: var(--font-weight-normal); }
+    .font-weight-medium { font-weight: var(--font-weight-medium); }
+    .font-weight-semibold { font-weight: var(--font-weight-semibold); }
+    .font-weight-bold { font-weight: var(--font-weight-bold); }
+    .font-weight-extrabold { font-weight: var(--font-weight-extrabold); }
+    .font-weight-black { font-weight: var(--font-weight-black); }
+
+    /* Spacing examples */
+    .spacing-demo {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-4);
+    }
+
+    .spacing-box {
+      background-color: var(--color-primary);
+      height: var(--spacing-6);
+    }
+
+    .dark-theme .spacing-box {
+      background-color: var(--color-dark-primary);
+    }
+
+    .spacing-0 { width: var(--spacing-0); }
+    .spacing-1 { width: var(--spacing-1); }
+    .spacing-2 { width: var(--spacing-2); }
+    .spacing-3 { width: var(--spacing-3); }
+    .spacing-4 { width: var(--spacing-4); }
+    .spacing-5 { width: var(--spacing-5); }
+    .spacing-6 { width: var(--spacing-6); }
+    .spacing-8 { width: var(--spacing-8); }
+    .spacing-10 { width: var(--spacing-10); }
+    .spacing-12 { width: var(--spacing-12); }
+    .spacing-16 { width: var(--spacing-16); }
+  </style>
+  <link rel="stylesheet" href="../../../styles/design-system/index.scss">
+</head>
+<body>
+  <button class="toggle-theme" onclick="document.body.classList.toggle('dark-theme')">Toggle Theme</button>
+  
+  <h1>Typography & Spacing Token Migration Test</h1>
+  
+  <div class="test-section">
+    <h2>Font Sizes</h2>
+    <p>This section demonstrates all available font size tokens:</p>
+    
+    <div class="typography-demo">
+      <div class="font-size-example">
+        <div class="token-name">--font-size-xs</div>
+        <div class="font-size-xs">The quick brown fox jumps over the lazy dog (Extra Small)</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-size-sm</div>
+        <div class="font-size-sm">The quick brown fox jumps over the lazy dog (Small)</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-size-md</div>
+        <div class="font-size-md">The quick brown fox jumps over the lazy dog (Medium)</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-size-lg</div>
+        <div class="font-size-lg">The quick brown fox jumps over the lazy dog (Large)</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-size-xl</div>
+        <div class="font-size-xl">The quick brown fox jumps over the lazy dog (XL)</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-size-2xl</div>
+        <div class="font-size-2xl">The quick brown fox jumps over the lazy dog (2XL)</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-size-3xl</div>
+        <div class="font-size-3xl">The quick brown fox jumps over the lazy dog (3XL)</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-size-4xl</div>
+        <div class="font-size-4xl">The quick brown fox jumps over the lazy dog (4XL)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>Font Weights</h2>
+    <p>This section demonstrates all available font weight tokens:</p>
+    
+    <div class="typography-demo">
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-thin (100)</div>
+        <div class="font-weight-thin font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-light (300)</div>
+        <div class="font-weight-light font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-normal (400)</div>
+        <div class="font-weight-normal font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-medium (500)</div>
+        <div class="font-weight-medium font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-semibold (600)</div>
+        <div class="font-weight-semibold font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-bold (700)</div>
+        <div class="font-weight-bold font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-extrabold (800)</div>
+        <div class="font-weight-extrabold font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+      
+      <div class="font-size-example">
+        <div class="token-name">--font-weight-black (900)</div>
+        <div class="font-weight-black font-size-xl">The quick brown fox jumps over the lazy dog</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>Spacing</h2>
+    <p>This section demonstrates all available spacing tokens:</p>
+    
+    <div class="spacing-demo">
+      <div>
+        <div class="token-name">--spacing-0 (0)</div>
+        <div class="spacing-box spacing-0"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-1 (0.25rem)</div>
+        <div class="spacing-box spacing-1"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-2 (0.5rem)</div>
+        <div class="spacing-box spacing-2"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-3 (0.75rem)</div>
+        <div class="spacing-box spacing-3"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-4 (1rem)</div>
+        <div class="spacing-box spacing-4"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-5 (1.25rem)</div>
+        <div class="spacing-box spacing-5"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-6 (1.5rem)</div>
+        <div class="spacing-box spacing-6"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-8 (2rem)</div>
+        <div class="spacing-box spacing-8"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-10 (2.5rem)</div>
+        <div class="spacing-box spacing-10"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-12 (3rem)</div>
+        <div class="spacing-box spacing-12"></div>
+      </div>
+      
+      <div>
+        <div class="token-name">--spacing-16 (4rem)</div>
+        <div class="spacing-box spacing-16"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Component Testing</h2>
+    <p>This section demonstrates components migrated to use the token system:</p>
+    
+    <div class="token-grid" style="margin-top: var(--spacing-6);">
+      <div class="token-card">
+        <h3 style="font-size: var(--font-size-lg); margin-top: 0; margin-bottom: var(--spacing-3);">Button</h3>
+        <button style="
+          background-color: var(--color-wg-primary);
+          color: white;
+          font-weight: var(--font-weight-medium);
+          padding: var(--spacing-3) var(--spacing-4);
+          border-radius: var(--radius-md);
+          border: none;
+          cursor: pointer;
+          font-size: var(--font-size-md);
+        ">Click Me</button>
+      </div>
+      
+      <div class="token-card">
+        <h3 style="font-size: var(--font-size-lg); margin-top: 0; margin-bottom: var(--spacing-3);">Form Element</h3>
+        <label style="
+          display: block; 
+          font-weight: var(--font-weight-medium);
+          margin-bottom: var(--spacing-2);
+        ">Input Label</label>
+        <input type="text" style="
+          width: 100%;
+          padding: var(--spacing-3) var(--spacing-4);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-md);
+          font-size: var(--font-size-md);
+        " placeholder="Input with token styling">
+      </div>
+      
+      <div class="token-card">
+        <h3 style="font-size: var(--font-size-lg); margin-top: 0; margin-bottom: var(--spacing-3);">Card</h3>
+        <div style="
+          background-color: var(--color-wg-goal-bg);
+          padding: var(--spacing-4);
+          border-radius: var(--radius-md);
+        ">
+          <div style="
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-2);
+          ">Card Label</div>
+          <div style="
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-lg);
+            color: var(--color-wg-goal-color);
+          ">Card Value</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Typography & Spacing Token Migration Test page loaded');
+      
+      // Set CSS variables for tokens if they don't exist in the CSS
+      const defaultValues = {
+        '--font-size-xs': '0.75rem',
+        '--font-size-sm': '0.875rem',
+        '--font-size-md': '1rem',
+        '--font-size-lg': '1.125rem',
+        '--font-size-xl': '1.25rem',
+        '--font-size-2xl': '1.5rem',
+        '--font-size-3xl': '1.875rem',
+        '--font-size-4xl': '2.25rem',
+        '--font-weight-thin': '100',
+        '--font-weight-light': '300',
+        '--font-weight-normal': '400',
+        '--font-weight-medium': '500',
+        '--font-weight-semibold': '600',
+        '--font-weight-bold': '700',
+        '--font-weight-extrabold': '800',
+        '--font-weight-black': '900',
+        '--spacing-0': '0',
+        '--spacing-1': '0.25rem',
+        '--spacing-2': '0.5rem',
+        '--spacing-3': '0.75rem',
+        '--spacing-4': '1rem',
+        '--spacing-5': '1.25rem',
+        '--spacing-6': '1.5rem',
+        '--spacing-8': '2rem',
+        '--spacing-10': '2.5rem',
+        '--spacing-12': '3rem',
+        '--spacing-16': '4rem',
+        '--radius-md': '0.5rem',
+        '--color-primary': '#84cc16',
+        '--color-text': '#1e293b',
+        '--color-text-muted': '#64748b',
+        '--color-border': '#e2e8f0',
+        '--color-surface': '#ffffff',
+        '--color-surface-accent': '#f1f5f9',
+        '--color-dark-primary': '#00b4d8',
+        '--color-dark-text': '#f8fafc',
+        '--color-dark-text-muted': '#94a3b8',
+        '--color-dark-border': '#334155',
+        '--color-dark-surface': '#1e1e1e',
+        '--color-dark-bg': '#0f172a',
+        '--font-base': "'Inter', system-ui, sans-serif",
+        '--font-mono': "'SFMono-Regular', Consolas, monospace",
+        '--color-wg-primary': '#2563eb',
+        '--color-wg-goal-bg': '#eff6ff',
+        '--color-wg-goal-color': '#2563eb'
+      };
+      
+      const style = document.documentElement.style;
+      for (const [key, value] of Object.entries(defaultValues)) {
+        if (!style.getPropertyValue(key)) {
+          style.setProperty(key, value);
+        }
+      }
+    });
+  </script>
+</body>
+</html> 

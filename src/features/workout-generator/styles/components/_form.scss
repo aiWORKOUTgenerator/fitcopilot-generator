@@ -29,7 +29,7 @@
 .form-label {
   display: block;
   color: var(--color-text);
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   margin-bottom: $wg-spacing-sm;
   
   .dark-theme & {
@@ -39,7 +39,7 @@
 
 .form-error {
   color: var(--color-wg-error);
-  font-size: 0.875rem;
+  font-size: $font-size-sm;
   margin-left: $wg-spacing-sm;
   
   .dark-theme & {
@@ -50,7 +50,7 @@
 .form-select {
   display: block;
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: $spacing-3 $spacing-4;
   border: 1px solid var(--color-border);
   border-radius: $wg-border-radius;
   background-color: var(--color-surface);
@@ -75,7 +75,7 @@
 .form-textarea {
   display: block;
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: $spacing-3 $spacing-4;
   border: 1px solid var(--color-border);
   border-radius: $wg-border-radius;
   background-color: var(--color-surface);
@@ -119,12 +119,12 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: $spacing-3 $spacing-4;
   background-color: var(--color-surface);
   border: 1px solid var(--color-wg-primary);
   border-radius: $wg-border-radius;
   color: var(--color-wg-primary);
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   cursor: pointer;
   text-align: left;
   
@@ -139,8 +139,8 @@
   background-color: var(--color-surface-accent);
   border: 1px solid var(--color-border);
   border-radius: $wg-border-radius;
-  padding: 1rem;
-  margin-top: -0.75rem;
+  padding: $spacing-4;
+  margin-top: -$spacing-3;
   margin-bottom: $wg-spacing-lg;
   
   .dark-theme & {
@@ -150,14 +150,14 @@
 }
 
 .advanced-options-icon {
-  font-size: 0.75rem;
+  font-size: $font-size-xs;
 }
 
 /* Equipment options */
 .equipment-options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
+  gap: $spacing-3;
   margin-top: $wg-spacing-sm;
 }
 

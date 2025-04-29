@@ -8,6 +8,12 @@
 // First, import the core color tokens
 @import './color-core';
 
+// Import the spacing tokens
+@import './core/spacing';
+
+// Import the typography tokens
+@import './core/typography';
+
 // Then the semantic color mappings
 @import './color-semantic';
 

@@ -10,10 +10,10 @@
   margin-bottom: $wg-spacing-xl;
   
   &__title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
     color: var(--color-text);
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-4;
     
     .dark-theme & {
       color: var(--color-dark-text);
@@ -22,13 +22,13 @@
   
   &__grid {
     display: flex;
-    gap: 0.75rem;
+    gap: $spacing-3;
     margin-bottom: $wg-spacing-lg;
   }
   
   &__card {
     flex: 1;
-    padding: 1rem;
+    padding: $spacing-4;
     border-radius: $wg-border-radius;
     text-align: center;
     
@@ -58,7 +58,7 @@
   }
   
   &__card-label {
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     color: var(--color-text-muted);
     margin-bottom: $wg-spacing-sm;
     
@@ -68,8 +68,8 @@
   }
   
   &__card-value {
-    font-weight: 600;
-    font-size: 1.125rem;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-lg;
     
     .dark-theme & {
       color: var(--color-dark-text);
@@ -105,7 +105,7 @@
   }
   
   &__section-title {
-    font-weight: 600;
+    font-weight: $font-weight-semibold;
     color: var(--color-text);
     margin-bottom: $wg-spacing-sm;
     
@@ -124,8 +124,8 @@
   &__equipment-tag {
     background-color: var(--color-surface-accent);
     color: var(--color-text);
-    font-size: 0.875rem;
-    padding: 0.375rem 0.75rem;
+    font-size: $font-size-sm;
+    padding: $spacing-1-5 $spacing-3;
     border-radius: 9999px;
     
     .dark-theme & {
@@ -136,7 +136,7 @@
   
   &__restrictions {
     background-color: var(--color-surface-accent);
-    padding: 0.75rem;
+    padding: $spacing-3;
     border-radius: $wg-border-radius;
     color: var(--color-text);
     margin-top: $wg-spacing-sm;
@@ -160,20 +160,20 @@
   max-width: 100%;
   
   &__header {
-    padding: 1rem;
+    padding: $spacing-4;
     background-color: var(--color-wg-primary);
     color: white;
   }
   
   &__title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
     color: white;
     margin: 0;
   }
   
   &__content {
-    padding: 1rem;
+    padding: $spacing-4;
   }
   
   &__section {
@@ -192,26 +192,26 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-4;
   }
   
   &__section-name {
-    font-size: 1.125rem;
-    font-weight: 600;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
     color: var(--color-dark-text);
     margin: 0;
   }
   
   &__section-duration {
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     color: var(--color-dark-text-muted);
     background-color: var(--color-dark-surface-hover);
-    padding: 0.25rem 0.5rem;
+    padding: $spacing-1 $spacing-2;
     border-radius: 9999px;
   }
   
   &__exercise-container {
-    margin-bottom: 1rem;
+    margin-bottom: $spacing-4;
     display: flex;
     
     &:last-child {
@@ -222,7 +222,7 @@
       content: "•";
       margin-right: $wg-spacing-sm;
       color: var(--color-dark-text-muted);
-      line-height: 1.5;
+      line-height: $line-height-normal;
     }
   }
   
@@ -231,25 +231,25 @@
   }
   
   &__exercise-name {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
     color: var(--color-dark-text);
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 $spacing-1 0;
   }
   
   &__exercise-details {
     display: inline-block;
     color: var(--color-dark-text-muted);
-    font-size: 0.875rem;
+    font-size: $font-size-sm;
     margin-bottom: $wg-spacing-sm;
     background-color: var(--color-dark-surface-hover);
-    padding: 0.125rem 0.5rem;
-    border-radius: 0.25rem;
+    padding: $spacing-0-5 $spacing-2;
+    border-radius: $spacing-1;
   }
   
   &__exercise-description {
     color: var(--color-dark-text-muted);
     margin: 0;
-    font-size: 0.9375rem;
+    font-size: $font-size-sm;
   }
 } 

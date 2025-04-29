@@ -10,13 +10,13 @@
   width: 100%;
   background-color: var(--color-wg-primary);
   color: white;
-  font-weight: 500;
-  padding: 0.75rem 1rem;
+  font-weight: $font-weight-medium;
+  padding: $spacing-3 $spacing-4;
   border-radius: $wg-border-radius;
   border: none;
   cursor: pointer;
   transition: background-color $wg-transition-speed;
-  font-size: 1rem;
+  font-size: $font-size-md;
   text-align: center;
   
   &:hover {
@@ -29,8 +29,8 @@
   &__edit-button {
     background-color: var(--color-wg-secondary);
     color: white;
-    font-weight: 500;
-    padding: 0.75rem 1rem;
+    font-weight: $font-weight-medium;
+    padding: $spacing-3 $spacing-4;
     border-radius: $wg-border-radius;
     border: none;
     cursor: pointer;
@@ -53,8 +53,8 @@
   &__generate-button {
     background-color: var(--color-wg-primary);
     color: white;
-    font-weight: 500;
-    padding: 0.75rem 1rem;
+    font-weight: $font-weight-medium;
+    padding: $spacing-3 $spacing-4;
     border-radius: $wg-border-radius;
     border: none;
     cursor: pointer;
@@ -73,8 +73,8 @@
   &__print-button, 
   &__new-button {
     width: 100%;
-    font-weight: 500;
-    padding: 0.75rem 1rem;
+    font-weight: $font-weight-medium;
+    padding: $spacing-3 $spacing-4;
     border-radius: $wg-border-radius;
     cursor: pointer;
     transition: background-color $wg-transition-speed;
@@ -128,14 +128,14 @@
   width: 100%;
   background-color: var(--color-wg-primary);
   color: white;
-  font-weight: 500;
-  padding: 0.75rem 1rem;
+  font-weight: $font-weight-medium;
+  padding: $spacing-3 $spacing-4;
   border-radius: $wg-border-radius;
   border: none;
   cursor: pointer;
   transition: background-color $wg-transition-speed;
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: $spacing-4;
   
   &:hover {
     background-color: var(--color-wg-primary-hover);
@@ -148,8 +148,8 @@
   width: 100%;
   background-color: var(--color-wg-secondary);
   color: white;
-  font-weight: 500;
-  padding: 0.75rem 1rem;
+  font-weight: $font-weight-medium;
+  padding: $spacing-3 $spacing-4;
   border-radius: $wg-border-radius;
   border: none;
   cursor: pointer;
