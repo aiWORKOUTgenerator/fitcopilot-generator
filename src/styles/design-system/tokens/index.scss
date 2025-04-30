@@ -40,23 +40,6 @@
 @import './semantic/status';
 
 // ----------------------------------------------------------------------------
-// COMPOSITE TOKENS
-// ----------------------------------------------------------------------------
-// These combine multiple token types for specific applications
-
-// DEPRECATED: The following imports are maintained for backward compatibility
-// In the future, these will be removed and all imports should use './core/colors' directly
-
-// Export CSS variables for use in styles
-@import './_color-variables';
-
-// Access helpers and functions
-@import './_color-maps';
-
-// Standardized color application mixins
-@import './_color-mixins';
-
-// ----------------------------------------------------------------------------
 // COMPONENT TOKENS
 // ----------------------------------------------------------------------------
 // Component-specific tokens (import last to avoid circular dependencies)

@@ -8,33 +8,14 @@ The color system has been consolidated to improve maintainability and reduce dup
 
 1. **Consolidated Color Files**:
    - Merged all color token definitions from multiple files into a single file
-   - Files consolidated: `_color-core.scss`, `_color-semantic.scss`, `_color-variables.scss`, `_color-maps.scss`, and the root `_colors.scss`
+   - Files consolidated and removed: `_color-core.scss`, `_color-semantic.scss`, `_color-variables.scss`, `_color-maps.scss`, and the root `_colors.scss`
    - Preserved all color values and relationships
 
-2. **Compatibility Layer**:
-   - Created compatibility forward files that import the consolidated file
-   - Maintained backward compatibility for existing imports
-   - No changes required to components that use color tokens
-
-3. **File Structure**:
+2. **File Structure**:
    - Primary color token file: `src/styles/design-system/tokens/core/_colors.scss`
-   - Legacy files that forward to the consolidated file:
-     - `src/styles/design-system/_colors.scss`
-     - `src/styles/design-system/tokens/_color-maps.scss`
-     - `src/styles/design-system/tokens/_color-mixins.scss`
-     - `src/styles/design-system/tokens/_color-variables.scss`
-     - `src/styles/design-system/tokens/_color-core.scss`
-     - `src/styles/design-system/tokens/_color-semantic.scss`
+   - All imports have been updated to reference this file directly
 
 ## Usage Guidelines
-
-### New Files
-
-Use the consolidated file for all color token needs:
-
-```scss
-@import 'src/styles/design-system/tokens/core/colors';
-```
 
 ### Accessing Color Tokens
 
@@ -64,10 +45,6 @@ There are multiple ways to access the color tokens:
 }
 ```
 
-## Migration Path
-
-The legacy files will be maintained for a period to ensure backward compatibility. In a future update, they will be removed and all imports will need to use the consolidated file directly.
-
 ## Benefits
 
 1. **Simplified Maintenance**: All color tokens in one place
@@ -75,47 +52,41 @@ The legacy files will be maintained for a period to ensure backward compatibilit
 3. **Better Organization**: Clear structure for core, semantic, and component-specific tokens
 4. **Improved Performance**: Fewer imports and file dependencies
 
-## Migration Steps
+## Import Instructions
 
-### 1. Update Import Statements
+To access color tokens in your stylesheets, import directly from the core tokens:
 
-**Old approach:**
+**Correct approach:**
 ```scss
-@import '../../../styles/design-system/_colors';
+@import '../../../styles/design-system/tokens/core/colors';
 ```
 
-**New approach:**
+Or import the complete token system if you need access to all tokens:
+
 ```scss
 @import '../../../styles/design-system/tokens/index';
 ```
 
-### 2. Replace Direct Variable References
+## Helper Functions
 
-**Old approach:**
+### Core Color Functions
+
+**To access colors by name and shade:**
 ```scss
-color: var(--color-primary);
-background-color: rgba(var(--color-primary-rgb), 0.1);
+color: color('primary'); // Default shade (500)
+background-color: color('primary', '100'); // Lighter shade
+border-color: color('gray', '300');
 ```
 
-**New approach (preferred):**
-```scss
-color: color('primary');
-background-color: rgba(var(--color-primary-rgb), 0.1);
-```
-
-### 3. Use Context-Specific Helper Functions
-
-**For global components:**
-```scss
-color: color('primary', 'dark');
-color: color('feedback', 'success');
-```
+### Themed Color Functions
 
 **For dark theme contexts:**
 ```scss
 color: dark-color('primary');
 color: dark-color('feedback', 'success');
 ```
+
+### Feature-Specific Color Functions
 
 **For Workout Generator components:**
 ```scss
@@ -137,11 +108,11 @@ border: 1px solid wg-result-color('exercise', 'border');
 
 ## Token Architecture
 
-The new system follows a 4-tier hierarchical approach:
+The color system follows a 4-tier hierarchical approach:
 
-1. **Core Color Tokens** - Raw RGB color values (`_color-core.scss`)
-2. **Semantic Color Tokens** - Mapping core colors to semantic roles (`_color-semantic.scss`)
-3. **CSS Variables** - Exporting semantic tokens as CSS variables (`_color-variables.scss`)
+1. **Core Color Tokens** - Raw RGB color values
+2. **Semantic Color Tokens** - Mapping core colors to semantic roles
+3. **CSS Variables** - Exporting semantic tokens as CSS variables
 4. **Component-Specific Tokens** - Feature and component specific color applications
 
 ## Benefits of the New System
@@ -200,10 +171,6 @@ The new system follows a 4-tier hierarchical approach:
 }
 ```
 
-## Backward Compatibility
-
-The new system maintains backward compatibility with existing variable references (`var(--color-*)`) while providing a more robust approach through helper functions. This allows for gradual migration of components without breaking existing functionality.
-
 ## Questions and Support
 
-For questions or assistance with migration, please contact the UI team or reference the detailed documentation in `src/styles/design-system/tokens/README.md`. 
+For questions or assistance, please reference this documentation or check other files in the design system directory. 
