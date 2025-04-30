@@ -1,0 +1,111 @@
+/**
+ * Theme Integration
+ * 
+ * This file maps the parent theme's color palette to our design system architecture.
+ * It ensures visual consistency between the theme and plugin while maintaining
+ * our design system's structure and utility functions.
+ */
+
+// ----------------------------------------------------------------------------
+// THEME COLOR MAPPINGS
+// ----------------------------------------------------------------------------
+
+// Import core color tokens first
+@import './colors';
+
+// Theme colors mapped to our system
+$theme-color-primary: #3498db; // Theme primary blue
+$theme-color-primary-dark: #2980b9;
+$theme-color-primary-light: #5dade2;
+
+$theme-color-secondary: #2ecc71; // Theme secondary green
+$theme-color-secondary-dark: #27ae60;
+$theme-color-secondary-light: #58d68d;
+
+$theme-color-lime: #a3e635;
+$theme-color-lime-light: #bef264;
+$theme-color-lime-medium: #84cc16;
+$theme-color-lime-dark: #65a30d;
+
+// ----------------------------------------------------------------------------
+// OVERRIDE CORE COLOR TOKENS
+// ----------------------------------------------------------------------------
+
+// Override primary color tokens with theme colors
+$color-primary-500: $theme-color-primary !default;
+$color-primary-600: $theme-color-primary-dark !default;
+$color-primary-400: $theme-color-primary-light !default;
+
+// Override secondary color tokens with theme colors
+$color-secondary-500: $theme-color-secondary !default;
+$color-secondary-600: $theme-color-secondary-dark !default;
+$color-secondary-400: $theme-color-secondary-light !default;
+
+// Map theme lime to our primary and adjust shade variants
+$color-primary-300: $theme-color-lime-light !default;
+$color-primary-500: $theme-color-lime-medium !default;
+$color-primary-700: $theme-color-lime-dark !default;
+$color-primary-400: $theme-color-lime !default;
+
+// Update RGB values for rgba() operations
+$color-primary-rgb: 132, 204, 22; // Lime medium RGB
+$color-secondary-rgb: 46, 204, 113; // Theme secondary RGB
+
+// ----------------------------------------------------------------------------
+// SEMANTIC COLORS OVERRIDES
+// ----------------------------------------------------------------------------
+
+// Update semantic color assignments
+$color-semantic: (
+  'text': #333333, // Theme text color
+  'text-light': #666666, // Theme muted color
+  'text-muted': #666666,
+  'text-dark': #111827, // Theme text-dark
+  'background': #f7f9fa, // Theme background
+  'border': rgba(0, 0, 0, 0.1), // Theme border
+  'surface': #ffffff, // Theme surface
+  'surface-accent': #f7f9fa, // Theme background as accent
+  'focus-ring': rgba($color-primary-rgb, 0.5),
+) !default;
+
+// ----------------------------------------------------------------------------
+// CSS VARIABLE OVERRIDES
+// ----------------------------------------------------------------------------
+
+// These will override the variables in _colors.scss
+:root {
+  // Primary theme colors
+  --color-primary: #{$theme-color-lime-medium};
+  --color-primary-light: #{$theme-color-lime};
+  --color-primary-lighter: #{$theme-color-lime-light};
+  --color-primary-dark: #{$theme-color-lime-dark};
+  
+  // Secondary theme colors
+  --color-secondary: #{$theme-color-secondary};
+  --color-secondary-light: #{$theme-color-secondary-light};
+  --color-secondary-dark: #{$theme-color-secondary-dark};
+  
+  // Theme text colors
+  --color-text: #333333;
+  --color-text-light: #666666;
+  --color-text-dark: #111827;
+  --color-text-inverse: #ffffff;
+  
+  // Theme background colors
+  --color-background: #f7f9fa;
+  --color-background-dark: #0f172a;
+  --color-surface: #ffffff;
+  
+  // Theme utility colors
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-hover-light: rgba(249, 250, 251, 0.05);
+  --color-active-light: rgba(249, 250, 251, 0.1);
+  --color-tooltip-bg: rgba(17, 24, 39, 0.95);
+  
+  // RGB values for alpha operations
+  --color-primary-rgb: #{$color-primary-rgb};
+  --color-secondary-rgb: #{$color-secondary-rgb};
+}
+
+// Flag to indicate theme integration is active
+$theme-integration-enabled: true; 
