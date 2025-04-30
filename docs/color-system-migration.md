@@ -1,8 +1,79 @@
-# Color System Migration Guide
+# Color System Migration
 
 ## Overview
 
-We've implemented a consolidated color token system to improve consistency, reduce redundancy, and establish a clear inheritance model for colors across the application. This document provides guidelines for migrating components to use the new system.
+The color system has been consolidated to improve maintainability and reduce duplication. All color tokens are now defined in a single location: `src/styles/design-system/tokens/core/_colors.scss`.
+
+## Changes Made
+
+1. **Consolidated Color Files**:
+   - Merged all color token definitions from multiple files into a single file
+   - Files consolidated: `_color-core.scss`, `_color-semantic.scss`, `_color-variables.scss`, `_color-maps.scss`, and the root `_colors.scss`
+   - Preserved all color values and relationships
+
+2. **Compatibility Layer**:
+   - Created compatibility forward files that import the consolidated file
+   - Maintained backward compatibility for existing imports
+   - No changes required to components that use color tokens
+
+3. **File Structure**:
+   - Primary color token file: `src/styles/design-system/tokens/core/_colors.scss`
+   - Legacy files that forward to the consolidated file:
+     - `src/styles/design-system/_colors.scss`
+     - `src/styles/design-system/tokens/_color-maps.scss`
+     - `src/styles/design-system/tokens/_color-mixins.scss`
+     - `src/styles/design-system/tokens/_color-variables.scss`
+     - `src/styles/design-system/tokens/_color-core.scss`
+     - `src/styles/design-system/tokens/_color-semantic.scss`
+
+## Usage Guidelines
+
+### New Files
+
+Use the consolidated file for all color token needs:
+
+```scss
+@import 'src/styles/design-system/tokens/core/colors';
+```
+
+### Accessing Color Tokens
+
+There are multiple ways to access the color tokens:
+
+1. **Direct SASS Variables**:
+```scss
+.example {
+  color: $color-primary-500;
+  background-color: $color-gray-100;
+}
+```
+
+2. **Color Helper Functions**:
+```scss
+.example {
+  color: color('primary', '500');
+  background-color: color('gray', '100');
+}
+```
+
+3. **CSS Variables**:
+```scss
+.example {
+  color: var(--color-primary);
+  background-color: var(--color-surface-accent);
+}
+```
+
+## Migration Path
+
+The legacy files will be maintained for a period to ensure backward compatibility. In a future update, they will be removed and all imports will need to use the consolidated file directly.
+
+## Benefits
+
+1. **Simplified Maintenance**: All color tokens in one place
+2. **Reduced Duplication**: No more redundant color declarations
+3. **Better Organization**: Clear structure for core, semantic, and component-specific tokens
+4. **Improved Performance**: Fewer imports and file dependencies
 
 ## Migration Steps
 

@@ -9,57 +9,5 @@
 // Note: We're not adding @warn here to avoid console noise during the transition
 // A warning might break builds or create too much noise in the console
 
-/**
- * Core Color Tokens
- * 
- * This file defines the foundational RGB color values used throughout the system.
- * All other token files should reference these core values.
- */
-
-// Primary Brand Colors
-$color-core-primary-rgb: 31, 173, 159; // Teal
-$color-core-primary-dark-rgb: 0, 122, 145;
-$color-core-primary-light-rgb: 51, 177, 201;
-
-// Accent Colors
-$color-core-accent-rgb: 212, 160, 23; // Gold
-$color-core-accent-dark-rgb: 230, 176, 34;
-$color-core-accent-light-rgb: 255, 225, 159;
-
-// Feature-Specific Primary Colors
-$color-core-wg-primary-rgb: 37, 99, 235; // Blue (Workout Generator)
-$color-core-wg-primary-dark-rgb: 29, 78, 216;
-$color-core-wg-primary-light-rgb: 59, 130, 246;
-
-// Grayscale
-$color-core-white-rgb: 255, 255, 255;
-$color-core-gray-50-rgb: 245, 247, 250;
-$color-core-gray-100-rgb: 240, 240, 240;
-$color-core-gray-200-rgb: 222, 226, 230;
-$color-core-gray-300-rgb: 206, 212, 218;
-$color-core-gray-400-rgb: 173, 181, 189;
-$color-core-gray-500-rgb: 108, 117, 125;
-$color-core-gray-600-rgb: 73, 80, 87;
-$color-core-gray-700-rgb: 51, 51, 51;
-$color-core-gray-800-rgb: 30, 30, 30;
-$color-core-gray-900-rgb: 18, 18, 18;
-
-// Feedback Colors 
-$color-core-success-rgb: 43, 174, 102; // Green
-$color-core-error-rgb: 217, 78, 78; // Red
-$color-core-warning-rgb: 240, 173, 78; // Orange
-$color-core-info-rgb: 77, 171, 245; // Blue
-
-// Dark Theme Specific Colors
-$color-core-dark-primary-rgb: 0, 180, 216; // Bright Cyan
-$color-core-dark-accent-rgb: 212, 255, 80; // Lime
-$color-core-dark-success-rgb: 6, 214, 160; // Aqua Green
-$color-core-dark-error-rgb: 239, 68, 68; // Bright Red
-$color-core-dark-warning-rgb: 251, 191, 36; // Amber
-$color-core-dark-info-rgb: 14, 165, 233; // Sky Blue
-
-// Specialty Cards
-$color-core-blue-50-rgb: 239, 246, 255; // Goal BG
-$color-core-green-50-rgb: 240, 253, 244; // Level BG
-$color-core-purple-50-rgb: 245, 243, 255; // Duration BG
-$color-core-purple-500-rgb: 124, 58, 237; // Duration Color 
+// Export a flag to indicate this file was imported
+$color-core-imported: true; 
