@@ -1,40 +1,30 @@
-@import '../../../../styles/design-system/tokens/index';
-@import '../../../../styles/design-system/tokens/components/button-tokens';
-@import '../../../../styles/design-system/tokens/core/spacing';
-@import '../../../../styles/design-system/themes/dark';
-@import '../../../../styles/design-system/mixins/index';
+/**
+ * Button Component Styles
+ * 
+ * Implements gradient styles with consistent patterns
+ */
+
+// Import only required mixins and avoid circular dependencies
+@import '../../../../styles/design-system/mixins/_button-mixins';
 @import '../../../../styles/design-system/compatibility/_compatibility';
 
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-base);
-  font-weight: 500;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  border: none;
-  position: relative;
-  text-decoration: none;
+  @include button-base;
   
   // Sizes
   &--sm {
-    padding: button-size('sm', 'padding');
-    font-size: button-size('sm', 'font-size');
+    @include button-size('sm');
   }
   
   &--md {
-    padding: button-size('md', 'padding');
-    font-size: button-size('md', 'font-size');
+    @include button-size('md');
   }
   
   &--lg {
-    padding: button-size('lg', 'padding');
-    font-size: button-size('lg', 'font-size');
+    @include button-size('lg');
   }
   
-  // Variants
+  // Variants with gradient support
   &--primary {
     @include button-styling('primary');
   }
@@ -55,7 +45,22 @@
   &--loading {
     cursor: wait;
     pointer-events: none;
-    opacity: 0.8;
+    
+    &.btn--primary {
+      @include loading-state('primary');
+    }
+    
+    &.btn--secondary {
+      @include loading-state('secondary');
+    }
+    
+    &.btn--outline {
+      @include loading-state('outline');
+    }
+    
+    &.btn--text {
+      @include loading-state('text');
+    }
   }
   
   &--disabled,
@@ -63,9 +68,11 @@
     @include disabled-state();
   }
   
-  // Icons
+  // Icons with consistent spacing
   &__icon {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
     
     &--start {
       margin-right: button-base('icon-spacing');
@@ -76,36 +83,39 @@
     }
   }
   
-  // Loading spinner
-  &__spinner {
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid button-token('primary', 'spinner', 'border-color');
-    border-radius: 50%;
-    border-top-color: button-token('primary', 'spinner', 'border-top-color');
-    animation: spin 0.8s linear infinite;
-    margin-right: 0.5rem;
+  // Content wrapper for proper alignment
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1; 
+    width: 100%;
+  }
+  
+  // Full width option
+  &--full-width {
+    width: 100%;
     
-    .dark-theme .btn--primary & {
-      border-color: button-token('primary', 'spinner', 'border-color', true);
-      border-top-color: button-token('primary', 'spinner', 'border-top-color', true);
-    }
-    
-    .dark-theme .btn--secondary & {
-      border-color: button-token('secondary', 'spinner', 'border-color', true);
-      border-top-color: button-token('secondary', 'spinner', 'border-top-color', true);
-    }
-    
-    .dark-theme .btn--outline &,
-    .dark-theme .btn--text & {
-      border-color: button-token('outline', 'spinner', 'border-color', true);
-      border-top-color: button-token('outline', 'spinner', 'border-top-color', true);
+    .btn__text {
+      flex: 1;
     }
   }
   
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
+  // Ensure content is centered and text wrapping is properly handled
+  &__text {
+    position: relative;
+    z-index: 1;
+  }
+  
+  // Add subtle active state for all buttons
+  &:active:not(:disabled):not(.btn--loading) {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes button-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

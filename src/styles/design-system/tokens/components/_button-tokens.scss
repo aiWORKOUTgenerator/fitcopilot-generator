@@ -1,60 +1,77 @@
 /**
  * Button Component Tokens
  * 
- * This file defines the component-specific tokens for buttons.
- * It maps to the existing button styles while providing a structured
- * way to access token values.
+ * Core token values for button styling with gradient support.
+ * IMPORTANT: Direct imports to avoid circular dependencies.
  */
 
-@import '../index';
+// Direct imports of core tokens instead of through tokens/index
+@import '../core/colors';
+@import '../core/spacing';
+@import '../core/typography';
 
-// Button tokens organized by variant and state
-$button-tokens: (
-  'base': (
-    'border-radius': var(--radius-md),
-    'font-weight': 500,
-    'transition': 'all 0.2s ease',
-    'disabled-opacity': 0.65,
-    'icon-spacing': 0.5rem
+// ----------------------------------------------------------------------------
+// BUTTON BASE TOKENS
+// ----------------------------------------------------------------------------
+$button-base-tokens: (
+  'border-radius': var(--radius-md),
+  'font-weight': 500,
+  'transition': 'all 0.2s ease-in-out',
+  'icon-spacing': 0.5rem,
+  'disabled-opacity': 0.65,
+  'focus-ring-width': 3px
+);
+
+// ----------------------------------------------------------------------------
+// BUTTON SIZE TOKENS
+// ----------------------------------------------------------------------------
+$button-size-tokens: (
+  'sm': (
+    'padding': '0.375rem 0.75rem',
+    'font-size': var(--text-sm),
+    'padding-x': var(--space-3),
+    'padding-y': var(--space-1-5)
   ),
-  'size': (
-    'sm': (
-      'padding': '0.375rem 0.75rem',
-      'font-size': var(--text-sm)
-    ),
-    'md': (
-      'padding': '0.625rem 1rem',
-      'font-size': var(--text-md)
-    ),
-    'lg': (
-      'padding': '0.75rem 1.5rem',
-      'font-size': var(--text-lg)
-    )
+  'md': (
+    'padding': '0.625rem 1rem',
+    'font-size': var(--text-md),
+    'padding-x': var(--space-4),
+    'padding-y': var(--space-2-5)
   ),
+  'lg': (
+    'padding': '0.75rem 1.5rem',
+    'font-size': var(--text-lg),
+    'padding-x': var(--space-6),
+    'padding-y': var(--space-3)
+  )
+);
+
+// ----------------------------------------------------------------------------
+// BUTTON VARIANT TOKENS
+// ----------------------------------------------------------------------------
+// Button tokens with gradient support
+$button-variant-tokens: (
   'primary': (
-    'bg': var(--color-primary),
+    'bg': $color-primary-500,
+    'gradient-start': $color-primary-500,
+    'gradient-end': $color-primary-600,
     'text': white,
     'border': none,
     'hover': (
-      'bg': var(--color-primary-dark),
-      'transform': 'translateY(-2px)'
+      'bg': $color-primary-600,
+      'shadow': '0 4px 8px -2px rgba(#{$color-primary-rgb}, 0.2)',
+      'transform': 'translateY(-1px)'
     ),
     'focus': (
-      'ring': rgba(var(--color-primary-rgb), 0.25)
+      'ring': rgba($color-primary-500, 0.25)
     ),
-    'dark': (
-      'bg': var(--color-dark-primary),
-      'hover': (
-        'bg': var(--color-dark-accent)
-      )
+    'active': (
+      'transform': 'translateY(0)',
+      'shadow': '0 2px 4px -1px rgba(#{$color-primary-rgb}, 0.2)'
     ),
     'spinner': (
       'border-color': rgba(255, 255, 255, 0.3),
-      'border-top-color': white,
-      'dark': (
-        'border-color': rgba(0, 0, 0, 0.3),
-        'border-top-color': black
-      )
+      'border-top-color': white
     )
   ),
   'secondary': (
@@ -62,7 +79,12 @@ $button-tokens: (
     'text': var(--color-text),
     'border': none,
     'hover': (
-      'bg': var(--color-border)
+      'bg': var(--color-border),
+      'transform': 'translateY(-1px)'
+    ),
+    'active': (
+      'transform': 'translateY(0)',
+      'bg': var(--color-border-dark)
     ),
     'dark': (
       'bg': var(--color-dark-surface-hover),
@@ -73,11 +95,7 @@ $button-tokens: (
     ),
     'spinner': (
       'border-color': rgba(var(--color-text-rgb), 0.3),
-      'border-top-color': var(--color-text),
-      'dark': (
-        'border-color': rgba(var(--color-dark-text-rgb), 0.3),
-        'border-top-color': var(--color-dark-text)
-      )
+      'border-top-color': var(--color-text)
     )
   ),
   'outline': (
@@ -85,7 +103,12 @@ $button-tokens: (
     'text': var(--color-primary),
     'border': '1px solid var(--color-primary)',
     'hover': (
-      'bg': rgba(var(--color-primary-rgb), 0.05)
+      'bg': rgba(var(--color-primary-rgb), 0.05),
+      'transform': 'translateY(-1px)'
+    ),
+    'active': (
+      'transform': 'translateY(0)',
+      'bg': rgba(var(--color-primary-rgb), 0.1)
     ),
     'dark': (
       'text': var(--color-dark-primary),
@@ -96,19 +119,19 @@ $button-tokens: (
     ),
     'spinner': (
       'border-color': rgba(var(--color-primary-rgb), 0.3),
-      'border-top-color': var(--color-primary),
-      'dark': (
-        'border-color': rgba(var(--color-dark-primary-rgb), 0.3),
-        'border-top-color': var(--color-dark-primary)
-      )
+      'border-top-color': var(--color-primary)
     )
   ),
   'text': (
     'bg': transparent,
     'text': var(--color-primary),
     'border': none,
+    'padding-adjustment': '-0.625rem -1rem', // Negative padding to maintain alignment
     'hover': (
       'bg': rgba(var(--color-primary-rgb), 0.05)
+    ),
+    'active': (
+      'bg': rgba(var(--color-primary-rgb), 0.1)
     ),
     'dark': (
       'text': var(--color-dark-primary),
@@ -118,67 +141,76 @@ $button-tokens: (
     ),
     'spinner': (
       'border-color': rgba(var(--color-primary-rgb), 0.3),
-      'border-top-color': var(--color-primary),
-      'dark': (
-        'border-color': rgba(var(--color-dark-primary-rgb), 0.3),
-        'border-top-color': var(--color-dark-primary)
-      )
+      'border-top-color': var(--color-primary)
     )
   )
 );
+
+// ----------------------------------------------------------------------------
+// TOKEN ACCESS FUNCTIONS
+// ----------------------------------------------------------------------------
 
 /**
  * Get button token value
  * 
  * @param {String} $variant - Button variant (primary, secondary, outline, text)
  * @param {String} $property - Property to access
- * @param {String} $state - Button state (optional)
- * @param {Boolean} $dark - Whether to use dark mode values (optional)
+ * @param {String} $state - Button state (null, hover, focus)
+ * @param {Boolean} $dark - Whether to use dark theme values
  * @return {*} Token value
  */
 @function button-token($variant, $property, $state: null, $dark: false) {
-  @if $dark {
-    // Handle dark mode variant tokens
-    @if map-has-key(map-get($button-tokens, $variant), 'dark') {
-      @if $state and map-has-key(map-get(map-get($button-tokens, $variant), 'dark'), $state) {
-        @if map-has-key(map-get(map-get(map-get($button-tokens, $variant), 'dark'), $state), $property) {
-          @return map-get(map-get(map-get(map-get($button-tokens, $variant), 'dark'), $state), $property);
-        }
-      } @else if map-has-key(map-get(map-get($button-tokens, $variant), 'dark'), $property) {
-        @return map-get(map-get(map-get($button-tokens, $variant), 'dark'), $property);
-      }
-    }
-    // If no specific dark mode token, fall back to regular tokens
+  @if not map-has-key($button-variant-tokens, $variant) {
+    @warn 'Unknown button variant: #{$variant}';
+    @return null;
   }
   
-  // Handle regular tokens
-  @if $state {
-    @if map-has-key(map-get($button-tokens, $variant), $state) {
-      @if map-has-key(map-get(map-get($button-tokens, $variant), $state), $property) {
-        @return map-get(map-get(map-get($button-tokens, $variant), $state), $property);
+  $variant-map: map-get($button-variant-tokens, $variant);
+  
+  // Handle dark theme with graceful fallback
+  @if $dark and map-has-key($variant-map, 'dark') {
+    $dark-map: map-get($variant-map, 'dark');
+    
+    @if $state and map-has-key($dark-map, $state) {
+      $state-map: map-get($dark-map, $state);
+      
+      @if map-has-key($state-map, $property) {
+        @return map-get($state-map, $property);
       }
+    } @else if map-has-key($dark-map, $property) {
+      @return map-get($dark-map, $property);
     }
-  } @else {
-    @if map-has-key(map-get($button-tokens, $variant), $property) {
-      @return map-get(map-get($button-tokens, $variant), $property);
-    }
+    
+    // If dark theme value not found, continue with regular lookup
   }
   
-  @warn 'Button token `#{$variant}: #{$property}` not found for state:#{$state}, dark:#{$dark}';
+  @if $state and map-has-key($variant-map, $state) {
+    $state-map: map-get($variant-map, $state);
+    
+    @if map-has-key($state-map, $property) {
+      @return map-get($state-map, $property);
+    }
+  } @else if map-has-key($variant-map, $property) {
+    @return map-get($variant-map, $property);
+  }
+  
+  @warn 'Unknown token: #{$variant}.#{$property} for state: #{$state}';
   @return null;
 }
 
 /**
  * Get button size token
  * 
- * @param {String} $size - Button size (sm, md, lg)
+ * @param {String} $size - Size variant (sm, md, lg)
  * @param {String} $property - Property to access
- * @return {*} Size token value
+ * @return {*} Size value
  */
 @function button-size($size, $property) {
-  @if map-has-key(map-get($button-tokens, 'size'), $size) {
-    @if map-has-key(map-get(map-get($button-tokens, 'size'), $size), $property) {
-      @return map-get(map-get(map-get($button-tokens, 'size'), $size), $property);
+  @if map-has-key($button-size-tokens, $size) {
+    $size-map: map-get($button-size-tokens, $size);
+    
+    @if map-has-key($size-map, $property) {
+      @return map-get($size-map, $property);
     }
   }
   
@@ -193,8 +225,8 @@ $button-tokens: (
  * @return {*} Base token value
  */
 @function button-base($property) {
-  @if map-has-key(map-get($button-tokens, 'base'), $property) {
-    @return map-get(map-get($button-tokens, 'base'), $property);
+  @if map-has-key($button-base-tokens, $property) {
+    @return map-get($button-base-tokens, $property);
   }
   
   @warn 'Button base token `#{$property}` not found';

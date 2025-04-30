@@ -2,7 +2,7 @@
  * Button UI component
  * 
  * A flexible and accessible button component that supports various visual styles,
- * sizes, loading states, and icon placement options.
+ * sizes, loading states, and icon placement options with gradient support.
  * 
  * @example
  * // Basic usage
@@ -24,7 +24,7 @@
  * <Button startIcon={<SearchIcon />}>Search</Button>
  * <Button endIcon={<ArrowRightIcon />}>Next</Button>
  */
-import React from 'react';
+import React, { forwardRef } from 'react';
 import './Button.scss';
 
 /** Button visual style variants */
@@ -63,6 +63,12 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   endIcon?: React.ReactNode;
   
   /**
+   * Make button take full width of container
+   * @default false
+   */
+  fullWidth?: boolean;
+  
+  /**
    * Button content
    */
   children: React.ReactNode;
@@ -94,47 +100,53 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
  *   Submit
  * </Button>
  */
-const Button: React.FC<ButtonProps> = ({
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   children,
   variant = 'primary',
   size = 'md',
   isLoading = false,
   startIcon,
   endIcon,
+  fullWidth = false,
   className = '',
   disabled,
+  type = 'button',
   ...props
-}) => {
+}, ref) => {
   const buttonClasses = [
     'btn',
     `btn--${variant}`,
     `btn--${size}`,
     isLoading ? 'btn--loading' : '',
+    fullWidth ? 'btn--full-width' : '',
     disabled ? 'btn--disabled' : '',
     className
   ].filter(Boolean).join(' ');
 
   return (
     <button
+      ref={ref}
       className={buttonClasses}
       disabled={disabled || isLoading}
+      type={type}
+      aria-busy={isLoading}
       {...props}
     >
-      {isLoading && (
-        <span className="btn__spinner" aria-hidden="true"></span>
-      )}
-      
-      {!isLoading && startIcon && (
-        <span className="btn__icon btn__icon--start">{startIcon}</span>
-      )}
-      
-      <span className="btn__text">{children}</span>
-      
-      {!isLoading && endIcon && (
-        <span className="btn__icon btn__icon--end">{endIcon}</span>
-      )}
+      <span className="btn__content">
+        {!isLoading && startIcon && (
+          <span className="btn__icon btn__icon--start">{startIcon}</span>
+        )}
+        
+        <span className="btn__text">{children}</span>
+        
+        {!isLoading && endIcon && (
+          <span className="btn__icon btn__icon--end">{endIcon}</span>
+        )}
+      </span>
     </button>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;
