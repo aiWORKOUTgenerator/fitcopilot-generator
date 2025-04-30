@@ -6,6 +6,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '../../../../../common/components/UI';
 import LoadingIndicator from '../../GenerationProcess/LoadingIndicator';
+import { CancellationButton } from '../../GenerationProcess';
 import ErrorBoundary from '../../common/ErrorBoundary';
 import { GenerationError } from '../../../types/errors';
 import './styles/generating-step.scss';
@@ -105,7 +106,7 @@ export const GeneratingStep: React.FC<GeneratingStepProps> = ({
         <div className="generation-error">
           <h3>Oops! Something went wrong</h3>
           <p>{error.message}</p>
-          <Button onClick={onCancel}>Try Again</Button>
+          <Button onClick={onCancel} variant="secondary">Try Again</Button>
         </div>
       </div>
     );
@@ -127,13 +128,10 @@ export const GeneratingStep: React.FC<GeneratingStepProps> = ({
           </p>
         </div>
         
-        <Button 
-          variant="secondary" 
-          onClick={onCancel} 
+        <CancellationButton 
+          onCancel={onCancel} 
           className="generating-step__cancel-button"
-        >
-          Cancel
-        </Button>
+        />
       </div>
     </ErrorBoundary>
   );
