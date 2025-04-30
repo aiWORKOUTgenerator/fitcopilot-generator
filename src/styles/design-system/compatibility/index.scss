@@ -1,0 +1,9 @@
+/**
+ * Compatibility Layer
+ * 
+ * This file provides backward compatibility for the design system migration.
+ * It points to the compatibility file in the new location.
+ */
+
+// Import compatibility file from the compatibility directory
+@import './_compatibility'; 

@@ -2,12 +2,12 @@
 @import '../../styles/design-system/tokens/core/spacing';
 @import '../../styles/design-system/tokens/semantic/surfaces';
 @import '../../styles/design-system/mixins/index';
-@import '../../styles/design-system/_compatibility';
+@import '../../styles/design-system/compatibility/_compatibility';
 
 .card {
   display: block;
   @include card-styling(false);
-  transition: compat-transition-preset('card');
+  transition: transition-preset('card');
   width: 100%;
 
   // Border styles
@@ -17,17 +17,17 @@
 
   // Elevation styles
   &--elevated {
-    @include card-shadow();
+    @include card-shadow('card');
     
     .dark-theme & {
-      @include card-shadow(null, null, true);
+      @include card-shadow('card', null, true);
     }
   }
 
   // Hover effect
   &--hoverable {
     cursor: pointer;
-    @include card-hover();
+    @include card-hover-effect('card');
   }
 
   // Padding variations
@@ -43,5 +43,38 @@
     padding: spacing('space-6');
   }
 
-  // Dark mode is handled by the mixins
+  // Height variations
+  &--height-auto {
+    height: auto;
+  }
+
+  &--height-full {
+    height: 100%;
+  }
+  
+  // Content layout
+  &__header {
+    margin-bottom: spacing('space-4');
+  }
+  
+  &__title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: spacing('space-2');
+  }
+  
+  &__subtitle {
+    font-size: var(--font-size-base);
+    color: var(--color-text-muted);
+  }
+  
+  &__content {
+    margin-bottom: spacing('space-4');
+  }
+  
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
 } 

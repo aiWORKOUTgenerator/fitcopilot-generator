@@ -1,0 +1,108 @@
+/**
+ * Input Mixins
+ * 
+ * This file provides reusable mixins for input field styles.
+ */
+
+@import '../../tokens/components/input-tokens';
+
+/// Base input styling
+/// @param {String} $variant [input] - Input variant (input, textarea)
+/// @example scss
+///   @include input-base();
+///   @include input-base('textarea');
+@mixin input-base($variant: 'input') {
+  display: block;
+  width: 100%;
+  padding: input-base('padding');
+  border-radius: input-base('border-radius');
+  font-weight: input-base('font-weight');
+  line-height: input-base('line-height');
+  background-color: input-token('bg');
+  color: input-token('text');
+  border: 1px solid input-token('border');
+  transition: input-base('transition');
+  
+  &::placeholder {
+    color: input-token('placeholder');
+  }
+  
+  &:hover:not(:disabled):not(.input--error) {
+    border-color: input-token('border', 'hover');
+  }
+  
+  &:focus:not(:disabled):not(.input--error) {
+    outline: none;
+    border-color: input-token('border', 'focus');
+    box-shadow: 0 0 0 3px input-token('ring', 'focus');
+  }
+  
+  &:disabled {
+    opacity: input-base('disabled-opacity');
+    background-color: input-token('bg', 'disabled');
+    color: input-token('text', 'disabled');
+    cursor: not-allowed;
+  }
+  
+  .dark-theme & {
+    background-color: input-token('bg', null, true);
+    color: input-token('text', null, true);
+    border-color: input-token('border', null, true);
+    
+    &::placeholder {
+      color: input-token('placeholder', null, true);
+    }
+    
+    &:hover:not(:disabled):not(.input--error) {
+      border-color: input-token('border', 'hover', true);
+    }
+    
+    &:focus:not(:disabled):not(.input--error) {
+      border-color: input-token('border', 'focus', true);
+      box-shadow: 0 0 0 3px input-token('ring', 'focus', true);
+    }
+    
+    &:disabled {
+      background-color: input-token('bg', 'disabled', true);
+      color: input-token('text', 'disabled', true);
+    }
+  }
+}
+
+/// Input error styling
+/// @example scss
+///   @include input-error();
+@mixin input-error() {
+  border-color: input-token('border', 'error');
+  
+  &:focus {
+    border-color: input-token('border', 'error');
+    box-shadow: 0 0 0 3px input-token('ring', 'error');
+  }
+  
+  .dark-theme & {
+    border-color: input-token('border', 'error', true);
+    
+    &:focus {
+      border-color: input-token('border', 'error', true);
+      box-shadow: 0 0 0 3px input-token('ring', 'error', true);
+    }
+  }
+}
+
+/// Input sizing mixins
+/// @param {String} $size [md] - Size variant (sm, md, lg)
+/// @example scss
+///   @include input-size('sm');
+@mixin input-size($size: 'md') {
+  @if $size == 'sm' {
+    padding: input-base('padding-sm');
+    font-size: input-base('font-size-sm');
+  } @else if $size == 'md' {
+    padding: input-base('padding');
+    font-size: input-base('font-size');
+  } @else if $size == 'lg' {
+    padding: input-base('padding-lg');
+    font-size: input-base('font-size-lg');
+  }
+} 

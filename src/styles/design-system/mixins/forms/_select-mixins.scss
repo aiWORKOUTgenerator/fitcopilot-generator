@@ -1,0 +1,108 @@
+/**
+ * Select Mixins
+ * 
+ * This file provides reusable mixins for select field styles.
+ */
+
+@import '../../tokens/components/select-tokens';
+
+/// Base select styling
+/// @example scss
+///   @include select-base();
+@mixin select-base() {
+  display: block;
+  width: 100%;
+  padding: select-base('padding');
+  border-radius: select-base('border-radius');
+  font-weight: select-base('font-weight');
+  line-height: select-base('line-height');
+  background-color: select-token('bg');
+  color: select-token('text');
+  border: 1px solid select-token('border');
+  transition: select-base('transition');
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  
+  &:hover:not(:disabled) {
+    border-color: select-token('border', 'hover');
+    background-color: select-token('bg', 'hover');
+    cursor: pointer;
+  }
+  
+  &:focus:not(:disabled) {
+    outline: none;
+    border-color: select-token('border', 'focus');
+    box-shadow: 0 0 0 3px select-token('ring', 'focus');
+  }
+  
+  &:disabled {
+    opacity: select-base('disabled-opacity');
+    background-color: select-token('bg', 'disabled');
+    color: select-token('text', 'disabled');
+    cursor: not-allowed;
+  }
+  
+  .dark-theme & {
+    background-color: select-token('bg', null, true);
+    color: select-token('text', null, true);
+    border-color: select-token('border', null, true);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a0aec0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    
+    &:hover:not(:disabled) {
+      border-color: select-token('border', 'hover', true);
+      background-color: select-token('bg', 'hover', true);
+    }
+    
+    &:focus:not(:disabled) {
+      border-color: select-token('border', 'focus', true);
+      box-shadow: 0 0 0 3px select-token('ring', 'focus', true);
+    }
+    
+    &:disabled {
+      background-color: select-token('bg', 'disabled', true);
+      color: select-token('text', 'disabled', true);
+    }
+  }
+}
+
+/// Select error styling
+/// @example scss
+///   @include select-error();
+@mixin select-error() {
+  border-color: select-token('border', 'error');
+  
+  &:focus {
+    border-color: select-token('border', 'error');
+    box-shadow: 0 0 0 3px select-token('ring', 'error');
+  }
+  
+  .dark-theme & {
+    border-color: select-token('border', 'error', true);
+    
+    &:focus {
+      border-color: select-token('border', 'error', true);
+      box-shadow: 0 0 0 3px select-token('ring', 'error', true);
+    }
+  }
+}
+
+/// Select sizing mixins
+/// @param {String} $size [md] - Size variant (sm, md, lg)
+/// @example scss
+///   @include select-size('sm');
+@mixin select-size($size: 'md') {
+  @if $size == 'sm' {
+    padding: select-base('padding-sm');
+    font-size: select-base('font-size-sm');
+  } @else if $size == 'md' {
+    padding: select-base('padding');
+    font-size: select-base('font-size');
+  } @else if $size == 'lg' {
+    padding: select-base('padding-lg');
+    font-size: select-base('font-size-lg');
+  }
+} 

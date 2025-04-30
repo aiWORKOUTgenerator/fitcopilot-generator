@@ -1,0 +1,136 @@
+/**
+ * Card Component Tokens
+ * 
+ * This file contains tokens specific to card components.
+ */
+
+@import '../semantic/surfaces';
+@import '../../mixins/card-mixins';
+
+// Card base tokens
+$card-base: (
+  'padding': 1.5rem,
+  'border-radius': 0.5rem,
+  'transition': 'all 0.2s ease-in-out'
+);
+
+// Card style tokens
+$card-tokens: (
+  'default': (
+    'bg': var(--color-surface),
+    'border': var(--color-border),
+    'shadow': var(--shadow-sm),
+    'hover': (
+      'bg': var(--color-surface-hover),
+      'shadow': var(--shadow-md),
+      'transform': 'translateY(-2px)'
+    )
+  ),
+  'elevated': (
+    'bg': var(--color-surface),
+    'border': transparent,
+    'shadow': var(--shadow-md),
+    'hover': (
+      'bg': var(--color-surface-hover),
+      'shadow': var(--shadow-lg),
+      'transform': 'translateY(-3px)'
+    )
+  ),
+  'highlighted': (
+    'bg': var(--color-surface),
+    'border': var(--color-primary),
+    'shadow': '0 0 15px rgba(var(--color-primary-rgb), 0.2)',
+    'hover': (
+      'bg': var(--color-surface-hover),
+      'shadow': '0 0 15px rgba(var(--color-primary-rgb), 0.3)',
+      'transform': 'translateY(-2px)'
+    )
+  ),
+  'accent': (
+    'bg': var(--color-surface),
+    'border': var(--color-border),
+    'border-top': '3px solid var(--color-primary)',
+    'hover': (
+      'bg': var(--color-surface-hover),
+      'shadow': var(--shadow-sm)
+    )
+  )
+);
+
+// Dark mode card tokens
+$card-tokens-dark: (
+  'default': (
+    'bg': var(--color-dark-surface),
+    'border': var(--color-dark-border),
+    'shadow': var(--dark-shadow-sm),
+    'hover': (
+      'bg': var(--color-dark-surface-hover),
+      'shadow': var(--dark-shadow-md)
+    )
+  ),
+  'elevated': (
+    'bg': var(--color-dark-surface),
+    'border': transparent,
+    'shadow': var(--dark-shadow-md),
+    'hover': (
+      'bg': var(--color-dark-surface-hover),
+      'shadow': var(--dark-shadow-lg)
+    )
+  ),
+  'highlighted': (
+    'bg': var(--color-dark-surface),
+    'border': var(--color-dark-primary),
+    'shadow': '0 0 15px rgba(var(--color-dark-primary-rgb), 0.2)',
+    'hover': (
+      'bg': var(--color-dark-surface-hover),
+      'shadow': '0 0 15px rgba(var(--color-dark-primary-rgb), 0.3)'
+    )
+  ),
+  'accent': (
+    'bg': var(--color-dark-surface),
+    'border': var(--color-dark-border),
+    'border-top': '3px solid var(--color-dark-primary)',
+    'hover': (
+      'bg': var(--color-dark-surface-hover),
+      'shadow': var(--dark-shadow-sm)
+    )
+  )
+);
+
+// Helpers to get card token values
+@function card-base($key) {
+  @if map-has-key($card-base, $key) {
+    @return map-get($card-base, $key);
+  }
+  
+  @warn 'Card base token `#{$key}` not found.';
+  @return null;
+}
+
+@function card-token($variant, $property, $state: null, $dark: false) {
+  $tokens: if($dark, $card-tokens-dark, $card-tokens);
+  
+  @if not map-has-key($tokens, $variant) {
+    $variant: 'default';
+  }
+  
+  $variant-tokens: map-get($tokens, $variant);
+  
+  @if $state and map-has-key($variant-tokens, $state) {
+    $state-tokens: map-get($variant-tokens, $state);
+    
+    @if map-has-key($state-tokens, $property) {
+      @return map-get($state-tokens, $property);
+    }
+  } @else if map-has-key($variant-tokens, $property) {
+    @return map-get($variant-tokens, $property);
+  }
+  
+  @if $state {
+    @warn 'Card token `#{$variant}.#{$state}.#{$property}` not found.';
+  } @else {
+    @warn 'Card token `#{$variant}.#{$property}` not found.';
+  }
+  
+  @return null;
+} 

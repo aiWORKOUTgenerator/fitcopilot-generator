@@ -3,8 +3,13 @@
  * Styles for form controls in workout generator
  */
 
+@use "sass:map";
+@use "sass:math";
+
+// Import design system tokens
+@import '../../../../styles/design-system/compatibility/_compatibility';
+
 @import '../_variables';
-@import '../../../../styles/design-system/_compatibility';
 
 /* Form container */
 .workout-generator-form {

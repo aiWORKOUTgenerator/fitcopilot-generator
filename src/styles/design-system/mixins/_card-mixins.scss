@@ -1,67 +1,100 @@
 /**
  * Card Mixins
- *
- * Mixins for styling cards with consistent theming
+ * 
+ * These mixins provide reusable styles for card components.
  */
 
 @import '../tokens/semantic/surfaces';
 
-/**
- * Card styling mixin - applies styling based on card type
- * 
- * @param {Boolean} $elevated - Whether the card should have elevation
- * @param {String} $type - Card type (default: card)
- */
-@mixin card-styling($elevated: false, $type: 'card') {
-  background-color: surface-style($type, 'bg');
-  border-radius: surface-style($type, 'border-radius');
-  padding: surface-style($type, 'padding');
-  
-  @if $elevated {
-    box-shadow: surface-style($type, 'shadow');
-  }
-  
-  .dark-theme & {
-    background-color: surface-style($type, 'bg', null, true);
-    
-    @if $elevated {
-      box-shadow: surface-style($type, 'shadow', null, true);
-    }
-  }
+/// Card styling mixin that applies all card styles at once
+/// @param {Boolean} $dark [false] - Whether to use dark theme styles
+@mixin card-styling($dark: false) {
+  @include card-bg-color(null, null, $dark);
+  @include card-border-radius();
+  @include card-shadow(null, null, $dark);
+  @include card-padding();
+  border: 1px solid if($dark, var(--color-dark-border), var(--color-border));
 }
 
-/**
- * Card hover effect mixin
- * 
- * @param {String} $type - Card type (default: card)
- */
-@mixin card-hover($type: 'card') {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
-  &:hover, &:focus {
+/// Card background color mixin
+/// @param {String} $type [card] - Surface type
+/// @param {String} $state [null] - State (hover, active, etc.)
+/// @param {Boolean} $dark [false] - Whether to use dark theme styles
+@mixin card-bg-color($type: 'card', $state: null, $dark: false) {
+  background-color: surface-style(if($type, $type, 'card'), 'bg', $state, $dark);
+}
+
+/// Card border radius mixin
+@mixin card-border-radius() {
+  border-radius: $card-border-radius;
+}
+
+/// Card shadow mixin
+/// @param {String} $type [card] - Surface type
+/// @param {String} $state [null] - State (hover, active, etc.)
+/// @param {Boolean} $dark [false] - Whether to use dark theme styles
+@mixin card-shadow($type: 'card', $state: null, $dark: false) {
+  box-shadow: surface-style(if($type, $type, 'card'), 'shadow', $state, $dark);
+}
+
+/// Card padding mixin
+@mixin card-padding() {
+  padding: $card-padding;
+}
+
+/// Card hover effect mixin
+@mixin card-hover() {
+  &:hover {
+    @include card-bg-color('card', 'hover');
+    @include card-shadow('card', 'hover');
     transform: translateY(-4px);
-    background-color: surface-style($type, 'bg', 'hover');
-    box-shadow: surface-style($type, 'shadow', 'hover');
     
     .dark-theme & {
-      background-color: surface-style($type, 'bg', 'hover', true);
-      box-shadow: surface-style($type, 'shadow', 'hover', true);
+      @include card-bg-color('card', 'hover', true);
+      @include card-shadow('card', 'hover', true);
     }
   }
 }
 
-/**
- * Border color mixin for cards
- * 
- * @param {String} $color - Border color token
- * @param {String} $width - Border width (default: 1px)
- * @param {String} $style - Border style (default: solid)
- */
-@mixin border-color($color, $width: 1px, $style: solid) {
-  border: $width $style var(--color-#{$color});
-  
-  .dark-theme & {
-    border-color: var(--color-dark-#{$color});
+/// Apply a border color based on semantic purpose
+/// @param {String} $type [border] - Border type (border, border-focus, etc.)
+@mixin border-color($type: 'border') {
+  @if $type == 'border' {
+    border-color: var(--color-border);
+    
+    .dark-theme & {
+      border-color: var(--color-dark-border);
+    }
+  } @else if $type == 'border-focus' {
+    border-color: var(--color-border-focus);
+    
+    .dark-theme & {
+      border-color: var(--color-dark-border-focus);
+    }
+  } @else if $type == 'border-error' {
+    border-color: var(--color-error);
+    
+    .dark-theme & {
+      border-color: var(--color-dark-error);
+    }
+  } @else if $type == 'border-success' {
+    border-color: var(--color-success);
+    
+    .dark-theme & {
+      border-color: var(--color-dark-success);
+    }
+  } @else if $type == 'border-warning' {
+    border-color: var(--color-warning);
+    
+    .dark-theme & {
+      border-color: var(--color-dark-warning);
+    }
+  } @else if $type == 'border-primary' {
+    border-color: var(--color-primary);
+    
+    .dark-theme & {
+      border-color: var(--color-dark-primary);
+    }
   }
 }
 

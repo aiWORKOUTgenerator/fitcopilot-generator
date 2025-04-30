@@ -21,7 +21,7 @@
 @import 'mixins/index';
 
 // Import compatibility layer for backward compatibility
-@import 'compatibility';
+@import 'compatibility/index';
 
 // Import components
 @import 'components/forms/index';

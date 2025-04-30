@@ -3,8 +3,12 @@
  * Card layouts and styles for workout generator
  */
 
+@use "sass:map";
+@use "sass:math";
+
 @import '../_variables';
-@import '../../../../styles/design-system/_compatibility';
+// Import design system tokens
+@import '../../../../styles/design-system/compatibility/_compatibility';
 @import '../../../../styles/design-system/tokens/semantic/surfaces';
 
 /* Workout preview card layout */

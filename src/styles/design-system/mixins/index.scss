@@ -1,0 +1,21 @@
+/**
+ * Mixins Index
+ * 
+ * This file serves as an entry point for all mixins.
+ * It imports all individual mixin files to provide
+ * a single import for consuming applications.
+ */
+
+// Import form mixins
+@import 'forms/index';
+
+// Import component mixins
+@import '_card-mixins';
+@import '_button-mixins';
+@import '_status-mixins';
+@import '_motion-mixins';
+@import '_interactive-states-mixins';
+@import '_form-mixins';
+
+// Import other mixins
+// Future mixin files will be imported here 

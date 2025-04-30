@@ -10,14 +10,14 @@
  */
 
 // Import the core tokens to ensure they're available
-@import 'tokens/core/colors';
-@import 'tokens/core/typography';
-@import 'tokens/core/spacing';
-@import 'tokens/semantic/feedback';
-@import 'tokens/semantic/surfaces';
-@import 'tokens/semantic/interactive-states';
-@import 'tokens/semantic/motion';
-@import 'tokens/semantic/status';
+@import '../tokens/core/colors';
+@import '../tokens/core/typography';
+@import '../tokens/core/spacing';
+@import '../tokens/semantic/feedback';
+@import '../tokens/semantic/surfaces';
+@import '../tokens/semantic/interactive-states';
+@import '../tokens/semantic/motion';
+@import '../tokens/semantic/status';
 
 // ----------------------------------------------------------------------------
 // COLOR MAPPINGS
@@ -230,7 +230,7 @@ $use-new-form-tokens: $use-new-token-system !default;
 /* ====== BUTTON COMPATIBILITY LAYER ====== */
 
 // Import button tokens to ensure they're available
-@import 'tokens/components/button-tokens';
+@import '../tokens/components/button-tokens';
 
 // Button background color mapping
 @mixin button-bg-color($variant, $state: null) {
@@ -308,7 +308,7 @@ $use-new-form-tokens: $use-new-token-system !default;
 /* ====== CARD COMPATIBILITY LAYER ====== */
 
 // Import surface tokens to ensure they're available
-@import 'tokens/semantic/surfaces';
+@import '../tokens/semantic/surfaces';
 
 // Card background color mapping
 @mixin card-bg-color($type: 'card', $state: null, $dark: false) {
@@ -409,7 +409,7 @@ $use-new-form-tokens: $use-new-token-system !default;
 /* ====== TRANSITION PRESETS COMPATIBILITY LAYER ====== */
 
 // Import motion tokens to ensure they're available
-@import 'tokens/semantic/motion';
+@import '../tokens/semantic/motion';
 
 // Transition preset function
 @function compat-transition-preset($type) {
@@ -458,7 +458,7 @@ $use-new-form-tokens: $use-new-token-system !default;
 /* ====== SPACING COMPATIBILITY LAYER ====== */
 
 // Import spacing tokens to ensure they're available
-@import 'tokens/core/spacing';
+@import '../tokens/core/spacing';
 
 // Map the old spacing values to the new token system
 $spacing-map: (
@@ -490,9 +490,9 @@ $spacing-map: (
 /* ====== FORM INPUT COMPATIBILITY LAYER ====== */
 
 // Import form tokens to ensure they're available
-@import 'tokens/components/input-tokens';
-@import 'tokens/components/select-tokens';
-@import 'tokens/components/form-controls-tokens';
+@import '../tokens/components/input-tokens';
+@import '../tokens/components/select-tokens';
+@import '../tokens/components/form-controls-tokens';
 
 // Form input background color mapping
 @mixin input-bg-color($state: null, $dark: false) {
