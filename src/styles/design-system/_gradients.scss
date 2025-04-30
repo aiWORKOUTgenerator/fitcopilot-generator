@@ -1,3 +1,16 @@
+/**
+ * @deprecated This file is deprecated. Use tokens/semantic/_surfaces.scss instead.
+ * All gradient tokens have been moved to the surfaces semantic token file.
+ */
+
+// Don't show warning during build to reduce console noise
+// @warn "The file _gradients.scss is deprecated. Import 'tokens/semantic/_surfaces.scss' directly instead.";
+
+// Import the surfaces semantic tokens file
+@import 'tokens/semantic/surfaces';
+
+// The gradient tokens are now defined in tokens/semantic/_surfaces.scss
+
 /* Gradients for use throughout the application */
 
 :root {

@@ -1,3 +1,16 @@
+/**
+ * @deprecated This file is deprecated. Use tokens/semantic/_motion.scss instead.
+ * All animation tokens have been moved to the semantic token file.
+ */
+
+// Don't show warning during build to reduce console noise
+// @warn "The file _animations.scss is deprecated. Import 'tokens/semantic/_motion.scss' directly instead.";
+
+// Import the motion semantic tokens file
+@import 'tokens/semantic/motion';
+
+// The animation tokens are now defined in tokens/semantic/_motion.scss
+
 /* Animation tokens for consistent motion throughout the application */
 
 /* Animation utilities */

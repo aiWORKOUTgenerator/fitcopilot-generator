@@ -1,4 +1,15 @@
 /**
+ * @deprecated This file is deprecated. Use mixins/forms/_index.scss instead.
+ * All form mixins have been moved to the form mixins directory.
+ */
+
+// Don't show warning during build to reduce console noise
+// @warn "The file _form-mixins.scss is deprecated. Import 'mixins/forms/_index.scss' directly instead.";
+
+// Import the form mixins index
+@import 'mixins/forms/index';
+
+/**
  * Form Mixins
  * 
  * This file provides reusable mixins for common form styles.

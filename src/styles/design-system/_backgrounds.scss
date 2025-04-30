@@ -1,3 +1,16 @@
+/**
+ * @deprecated This file is deprecated. Use tokens/semantic/_surfaces.scss instead.
+ * All background tokens have been moved to the surfaces semantic token file.
+ */
+
+// Don't show warning during build to reduce console noise
+// @warn "The file _backgrounds.scss is deprecated. Import 'tokens/semantic/_surfaces.scss' directly instead.";
+
+// Import the surfaces semantic tokens file
+@import 'tokens/semantic/surfaces';
+
+// The background tokens are now defined in tokens/semantic/_surfaces.scss
+
 :root {
   /* Light theme backgrounds */
   --bg-page:    var(--color-bg);

@@ -1,4 +1,15 @@
 /**
+ * @deprecated This file is deprecated. Use components/forms/_index.scss instead.
+ * All form control styles have been moved to the forms component directory.
+ */
+
+// Don't show warning during build to reduce console noise
+// @warn "The file _form-controls.scss is deprecated. Import 'components/forms/_index.scss' directly instead.";
+
+// Import the forms component index
+@import 'components/forms/index';
+
+/**
  * Form Controls Component Styles
  * 
  * This file provides styles for form controls like checkboxes and radio buttons
