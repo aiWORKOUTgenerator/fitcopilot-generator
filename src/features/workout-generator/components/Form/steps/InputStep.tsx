@@ -8,7 +8,7 @@ import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../common/components/UI';
 import { WorkoutFormParams, WorkoutDifficulty } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
-import { ChevronDown, Dumbbell } from 'lucide-react';
+import { ChevronDown, Dumbbell, ChevronRight } from 'lucide-react';
 import './InputStep.scss';
 
 /**
@@ -109,14 +109,24 @@ export const InputStep: React.FC<InputStepProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [intensity, setIntensity] = useState(3);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   /**
    * Handle form submission
    */
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onContinue();
+      setIsSubmitting(true);
+      try {
+        // Simulate a delay for demonstration purposes
+        await new Promise(resolve => setTimeout(resolve, 800));
+        onContinue();
+      } catch (error) {
+        console.error('Form submission error:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -323,7 +333,13 @@ export const InputStep: React.FC<InputStepProps> = ({
             <Button 
               type="submit" 
               variant="primary"
+              size="lg"
+              fullWidth
+              isLoading={isSubmitting}
               className="input-step__submit-button"
+              aria-label="Continue to next step"
+              disabled={!isValid || isSubmitting}
+              endIcon={<ChevronRight size={18} />}
             >
               Continue
             </Button>

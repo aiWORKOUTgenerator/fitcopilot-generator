@@ -497,55 +497,9 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 2rem;
-    
-    button {
-      min-width: 120px;
-    }
   }
   
-  &__submit-button {
-    display: block;
-    width: 100%;
-    padding: 1rem;
-    margin-top: 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    color: var(--color-bg, #fff);
-    border: none;
-    border-radius: 0.5rem;
-    background: linear-gradient(to right, var(--color-secondary, #22d3ee), var(--color-secondary-light, #67e8f9));
-    cursor: pointer;
-    transition: all 0.3s ease;
-    
-    &:hover, &:focus {
-      background: linear-gradient(to right, var(--color-secondary-light, #67e8f9), var(--color-secondary, #22d3ee));
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(var(--color-secondary, #22d3ee), 0.4);
-    }
-    
-    &:active {
-      transform: translateY(0);
-    }
-    
-    &:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: translateY(0);
-      box-shadow: none;
-    }
-    
-    .dark-theme & {
-      color: var(--color-dark-bg, #111827);
-      background: linear-gradient(to right, var(--color-dark-secondary, #8dd3f7), var(--color-dark-secondary-light, #22d3ee));
-      
-      &:hover, &:focus {
-        background: linear-gradient(to right, var(--color-dark-secondary-light, #22d3ee), var(--color-dark-secondary, #8dd3f7));
-        box-shadow: 0 4px 12px rgba(var(--color-dark-secondary, #8dd3f7), 0.4);
-      }
-    }
-  }
-  
+  /* Removing specific submit button styling to use our enhanced Button component styles */
   /* Responsive adjustments */
   @media (max-width: 768px) {
     padding: 1.5rem 0.5rem;

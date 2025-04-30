@@ -24,49 +24,6 @@
   }
 }
 
-/* Edit & Generate buttons for preview step */
-.preview-step {
-  &__edit-button {
-    background-color: var(--color-wg-secondary);
-    color: white;
-    font-weight: $font-weight-medium;
-    padding: $spacing-3 $spacing-4;
-    border-radius: $wg-border-radius;
-    border: none;
-    cursor: pointer;
-    transition: background-color $wg-transition-speed;
-    text-align: center;
-    
-    &:hover {
-      background-color: var(--color-wg-secondary-hover);
-    }
-    
-    .dark-theme & {
-      background-color: var(--color-dark-surface-hover);
-      
-      &:hover {
-        background-color: var(--color-dark-highlight);
-      }
-    }
-  }
-  
-  &__generate-button {
-    background-color: var(--color-wg-primary);
-    color: white;
-    font-weight: $font-weight-medium;
-    padding: $spacing-3 $spacing-4;
-    border-radius: $wg-border-radius;
-    border: none;
-    cursor: pointer;
-    transition: background-color $wg-transition-speed;
-    text-align: center;
-    
-    &:hover {
-      background-color: var(--color-wg-primary-hover);
-    }
-  }
-}
-
 /* Result step buttons */
 .result-step {
   &__save-button, 

@@ -171,6 +171,12 @@
   }
 }
 
+/* 
+ * Legacy button styles - DEPRECATED 
+ * These styles are now replaced by the Button component
+ * Keeping commented for reference
+ */
+/*
 .preview-step__edit-button,
 .generating-step__cancel-button {
   background-color: wg-form-color('button', 'secondary');
@@ -196,6 +202,7 @@
     }
   }
 }
+*/
 
 /* Radio & Checkbox Styles */
 .difficulty-options,

@@ -1,7 +1,7 @@
 /**
  * Button Mixins
  * 
- * Mixins for styling buttons with consistent theming and gradient support
+ * Refined mixins for styling buttons with enhanced gradient support and optimized transitions
  */
 
 // Import tokens directly - avoiding circular dependency
@@ -25,39 +25,64 @@
   line-height: 1.5;
   white-space: nowrap;
   overflow: hidden;
+  will-change: transform, box-shadow, background-color;
   
+  // Focus state handling
   &:focus {
     outline: none;
   }
   
   &:focus-visible {
-    box-shadow: 0 0 0 3px var(--color-focus-ring);
+    box-shadow: 0 0 0 button-base('focus-ring-width') var(--color-focus-ring);
+    outline: none;
   }
 }
 
 /**
- * Button gradient mixin - encapsulates gradient logic
+ * Button gradient mixin - encapsulates gradient logic with optimized transitions
  * 
  * @param {String} $start-color - Gradient start color
  * @param {String} $end-color - Gradient end color 
+ * @param {String} $hover-start-color - Hover gradient start color (optional)
+ * @param {String} $hover-end-color - Hover gradient end color (optional)
  */
-@mixin button-gradient($start-color, $end-color) {
+@mixin button-gradient($start-color, $end-color, $hover-start-color: null, $hover-end-color: null) {
   background: linear-gradient(to right, $start-color, $end-color);
   
-  // Subtle gradient shift on hover for better visual feedback
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, $end-color, $start-color);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 0;
-    border-radius: inherit;
-  }
-  
-  &:hover:not(:disabled)::before {
-    opacity: 1;
+  @if $hover-start-color and $hover-end-color {
+    // Enhanced gradient transition method for smoother hover effects
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, $hover-start-color, $hover-end-color);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+      border-radius: inherit;
+      will-change: opacity;
+    }
+    
+    &:hover:not(:disabled)::before {
+      opacity: 1;
+    }
+  } @else {
+    // Fallback hover method using the reverse gradient
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, $end-color, $start-color);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+      border-radius: inherit;
+      will-change: opacity;
+    }
+    
+    &:hover:not(:disabled)::before {
+      opacity: 1;
+    }
   }
   
   & > * {
@@ -67,17 +92,32 @@
 }
 
 /**
- * Button styling mixin - applies styling based on variant
+ * Button styling mixin - applies styling based on variant with enhanced state handling
  * 
  * @param {String} $variant - Button variant (primary, secondary, outline, text)
  */
 @mixin button-styling($variant) {
   @if $variant == 'primary' {
     // Apply gradient for primary buttons
-    @include button-gradient(
-      button-token($variant, 'gradient-start', null) or button-token($variant, 'bg'), 
-      button-token($variant, 'gradient-end', null) or darken(button-token($variant, 'bg'), 10%)
-    );
+    $start-color: button-token($variant, 'gradient-start');
+    $end-color: button-token($variant, 'gradient-end');
+    
+    // Create fallbacks if tokens are not available
+    @if not $start-color {
+      $start-color: button-token($variant, 'bg');
+    }
+    
+    @if not $end-color {
+      $end-color: button-token($variant, 'bg');
+      @if $end-color {
+        $end-color: darken($end-color, 10%);
+      }
+    }
+    
+    $hover-start: button-token($variant, 'gradient-start', 'hover');
+    $hover-end: button-token($variant, 'gradient-end', 'hover');
+    
+    @include button-gradient($start-color, $end-color, $hover-start, $hover-end);
     color: button-token($variant, 'text');
     border: button-token($variant, 'border');
     
@@ -97,6 +137,25 @@
       @if button-token($variant, 'shadow', 'active') {
         box-shadow: button-token($variant, 'shadow', 'active');
       }
+      
+      // Optional active state gradient override
+      @if button-token($variant, 'gradient-start', 'active') and button-token($variant, 'gradient-end', 'active') {
+        background: linear-gradient(
+          to right, 
+          button-token($variant, 'gradient-start', 'active'), 
+          button-token($variant, 'gradient-end', 'active')
+        );
+        
+        &::before {
+          opacity: 0;
+        }
+      }
+    }
+    
+    &:focus-visible {
+      @if button-token($variant, 'ring', 'focus') {
+        box-shadow: 0 0 0 button-base('focus-ring-width') button-token($variant, 'ring', 'focus');
+      }
     }
   } @else {
     // Non-gradient buttons
@@ -114,6 +173,10 @@
       @if button-token($variant, 'transform', 'hover') {
         transform: button-token($variant, 'transform', 'hover');
       }
+      
+      @if button-token($variant, 'shadow', 'hover') {
+        box-shadow: button-token($variant, 'shadow', 'hover');
+      }
     }
     
     &:active:not(:disabled) {
@@ -124,31 +187,89 @@
       @if button-token($variant, 'transform', 'active') {
         transform: button-token($variant, 'transform', 'active');
       }
+      
+      @if button-token($variant, 'shadow', 'active') {
+        box-shadow: button-token($variant, 'shadow', 'active');
+      }
+    }
+    
+    &:focus-visible {
+      @if button-token($variant, 'ring', 'focus') {
+        box-shadow: 0 0 0 button-base('focus-ring-width') button-token($variant, 'ring', 'focus');
+      }
     }
   }
   
   // Dark theme styles with automatic variant handling
   .dark-theme & {
-    @if $variant == 'primary' and button-token($variant, 'gradient-start', null, true) {
-      @include button-gradient(
-        button-token($variant, 'gradient-start', null, true), 
-        button-token($variant, 'gradient-end', null, true)
-      );
-    } @else if button-token($variant, 'bg', null, true) {
-      background-color: button-token($variant, 'bg', null, true);
-    }
-    
-    @if button-token($variant, 'text', null, true) {
-      color: button-token($variant, 'text', null, true);
-    }
-    
-    @if button-token($variant, 'border', null, true) {
-      border: button-token($variant, 'border', null, true);
-    }
-    
-    &:hover:not(:disabled) {
-      @if button-token($variant, 'bg', 'hover', true) {
-        background-color: button-token($variant, 'bg', 'hover', true);
+    @if $variant == 'primary' {
+      $dark-start: button-token($variant, 'gradient-start', null, true);
+      $dark-end: button-token($variant, 'gradient-end', null, true);
+      $dark-hover-start: button-token($variant, 'gradient-start', 'hover', true);
+      $dark-hover-end: button-token($variant, 'gradient-end', 'hover', true);
+      
+      @if $dark-start and $dark-end {
+        @include button-gradient($dark-start, $dark-end, $dark-hover-start, $dark-hover-end);
+      }
+      
+      &:hover:not(:disabled) {
+        @if button-token($variant, 'shadow', 'hover', true) {
+          box-shadow: button-token($variant, 'shadow', 'hover', true);
+        }
+      }
+      
+      &:active:not(:disabled) {
+        @if button-token($variant, 'gradient-start', 'active', true) and button-token($variant, 'gradient-end', 'active', true) {
+          background: linear-gradient(
+            to right, 
+            button-token($variant, 'gradient-start', 'active', true), 
+            button-token($variant, 'gradient-end', 'active', true)
+          );
+          
+          &::before {
+            opacity: 0;
+          }
+        }
+      }
+      
+      &:focus-visible {
+        @if button-token($variant, 'ring', 'focus', true) {
+          box-shadow: 0 0 0 button-base('focus-ring-width') button-token($variant, 'ring', 'focus', true);
+        }
+      }
+    } @else {
+      @if button-token($variant, 'bg', null, true) {
+        background-color: button-token($variant, 'bg', null, true);
+      }
+      
+      @if button-token($variant, 'text', null, true) {
+        color: button-token($variant, 'text', null, true);
+      }
+      
+      @if button-token($variant, 'border', null, true) {
+        border: button-token($variant, 'border', null, true);
+      }
+      
+      &:hover:not(:disabled) {
+        @if button-token($variant, 'bg', 'hover', true) {
+          background-color: button-token($variant, 'bg', 'hover', true);
+        }
+        
+        @if button-token($variant, 'shadow', 'hover', true) {
+          box-shadow: button-token($variant, 'shadow', 'hover', true);
+        }
+      }
+      
+      &:active:not(:disabled) {
+        @if button-token($variant, 'bg', 'active', true) {
+          background-color: button-token($variant, 'bg', 'active', true);
+        }
+      }
+      
+      &:focus-visible {
+        @if button-token($variant, 'ring', 'focus', true) {
+          box-shadow: 0 0 0 button-base('focus-ring-width') button-token($variant, 'ring', 'focus', true);
+        }
       }
     }
   }
@@ -165,12 +286,13 @@
 }
 
 /**
- * Disabled state mixin for buttons
+ * Disabled state mixin for buttons with optimized visuals
  */
 @mixin disabled-state() {
   opacity: button-base('disabled-opacity');
   cursor: not-allowed;
   pointer-events: none;
+  filter: grayscale(20%);
   
   &::before {
     display: none;
@@ -178,7 +300,7 @@
 }
 
 /**
- * Loading state mixin for buttons
+ * Loading state mixin for buttons with optimized spinner
  * 
  * @param {String} $variant - Button variant
  */
@@ -187,26 +309,90 @@
   
   .btn__text {
     visibility: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  
+  .btn__icon {
+    visibility: hidden;
+    opacity: 0;
   }
   
   &::after {
     content: '';
     position: absolute;
-    width: 1rem;
-    height: 1rem;
-    top: calc(50% - 0.5rem);
-    left: calc(50% - 0.5rem);
+    width: button-base('spinner-size');
+    height: button-base('spinner-size');
+    top: calc(50% - (#{button-base('spinner-size')} / 2));
+    left: calc(50% - (#{button-base('spinner-size')} / 2));
     border-radius: 50%;
-    border: 2px solid button-token($variant, 'border-color', 'spinner') or rgba(255, 255, 255, 0.3);
-    border-top-color: button-token($variant, 'border-top-color', 'spinner') or white;
+    $border-color: button-token($variant, 'border-color', 'spinner');
+    $border-top-color: button-token($variant, 'border-top-color', 'spinner');
+    
+    // Fallback for missing token values with appropriate defaults for each variant
+    @if $border-color {
+      border: 2px solid $border-color;
+    } @else {
+      @if $variant == 'primary' {
+        border: 2px solid rgba(26, 31, 43, 0.2);
+      } @else if $variant == 'secondary' {
+        border: 2px solid rgba(140, 216, 103, 0.2);
+      } @else if $variant == 'outline' or $variant == 'text' {
+        border: 2px solid rgba(var(--color-primary-rgb), 0.3);
+      } @else {
+        border: 2px solid rgba(0, 0, 0, 0.2);
+      }
+    }
+    
+    @if $border-top-color {
+      border-top-color: $border-top-color;
+    } @else {
+      @if $variant == 'primary' {
+        border-top-color: #1a1f2b;
+      } @else if $variant == 'secondary' {
+        border-top-color: #8cd867;
+      } @else if $variant == 'outline' or $variant == 'text' {
+        border-top-color: var(--color-primary);
+      } @else {
+        border-top-color: var(--color-text);
+      }
+    }
+    
     animation: button-spin 0.8s linear infinite;
     z-index: 2;
   }
   
   .dark-theme &::after {
-    @if button-token($variant, 'border-color', 'spinner', true) {
-      border-color: button-token($variant, 'border-color', 'spinner', true);
-      border-top-color: button-token($variant, 'border-top-color', 'spinner', true);
+    $dark-border-color: button-token($variant, 'border-color', 'spinner', true);
+    $dark-border-top-color: button-token($variant, 'border-top-color', 'spinner', true);
+    
+    @if $dark-border-color {
+      border-color: $dark-border-color;
+    } @else {
+      @if $variant == 'primary' {
+        border-color: rgba(26, 31, 43, 0.2);
+      } @else if $variant == 'secondary' {
+        border-color: rgba(140, 216, 103, 0.2);
+      } @else if $variant == 'outline' or $variant == 'text' {
+        border-color: rgba(var(--color-dark-primary-rgb), 0.3);
+      } @else {
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+    
+    @if $dark-border-top-color {
+      border-top-color: $dark-border-top-color;
+    } @else {
+      @if $variant == 'primary' {
+        border-top-color: #1a1f2b;
+      } @else if $variant == 'secondary' {
+        border-top-color: #8cd867;
+      } @else if $variant == 'outline' or $variant == 'text' {
+        border-top-color: var(--color-dark-primary);
+      } @else {
+        border-top-color: var(--color-dark-text);
+      }
     }
   }
 }

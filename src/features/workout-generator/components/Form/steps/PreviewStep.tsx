@@ -8,6 +8,7 @@ import React from 'react';
 import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../common/components/UI';
 import { WorkoutFormParams } from '../../../types/workout';
+import { ArrowLeft, Dumbbell } from 'lucide-react';
 import './PreviewStep.scss';
 
 interface PreviewStepProps {
@@ -145,9 +146,11 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
       <div className="preview-step__actions">
         <Button 
           onClick={onEditRequest}
-          variant="outline"
-          className="preview-step__edit-button"
+          variant="secondary"
+          size="lg"
           disabled={isLoading}
+          aria-label="Edit workout request"
+          startIcon={<ArrowLeft size={18} />}
         >
           Edit Request
         </Button>
@@ -155,9 +158,11 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
         <Button 
           onClick={onGenerateWorkout}
           variant="primary"
-          className="preview-step__generate-button"
+          size="lg"
           isLoading={isLoading}
           disabled={isLoading}
+          aria-label="Generate personalized workout"
+          endIcon={<Dumbbell size={18} />}
         >
           Generate Workout
         </Button>

@@ -1,152 +1,179 @@
 /**
- * Button UI component
+ * Button Component
  * 
- * A flexible and accessible button component that supports various visual styles,
- * sizes, loading states, and icon placement options with gradient support.
+ * A flexible, accessible button component that supports various visual styles,
+ * loading states, icon placement, and semantic variations.
  * 
- * @example
- * // Basic usage
- * <Button>Click me</Button>
+ * @usage
+ * ```jsx
+ * // Primary button with text
+ * <Button variant="primary">Click me</Button>
  * 
- * @example
- * // With different variants
- * <Button variant="primary">Primary Button</Button>
- * <Button variant="secondary">Secondary Button</Button>
- * <Button variant="outline">Outline Button</Button>
- * <Button variant="text">Text Button</Button>
+ * // Button with loading state
+ * <Button variant="primary" isLoading>Loading...</Button>
  * 
- * @example
- * // With loading state
- * <Button isLoading>Processing...</Button>
+ * // Button with leading icon
+ * <Button variant="secondary" startIcon={<Icon name="arrow" />}>Schedule Session</Button>
  * 
- * @example
- * // With icons
- * <Button startIcon={<SearchIcon />}>Search</Button>
- * <Button endIcon={<ArrowRightIcon />}>Next</Button>
+ * // Button with trailing icon
+ * <Button variant="primary" endIcon={<Icon name="arrow" />}>Schedule Session</Button>
+ * 
+ * // Text-only button
+ * <Button variant="text">View more</Button>
+ * 
+ * // Full width button
+ * <Button variant="primary" fullWidth>Schedule Session</Button>
+ * 
+ * // Button as another element (like a link)
+ * <Button variant="primary" as="a" href="/path">Go to Path</Button>
+ * ```
+ * 
+ * @features
+ * - Multiple visual variants (primary, secondary, outline, text)
+ * - Multiple size variants (sm, md, lg)
+ * - Loading states with spinner
+ * - Disabled states
+ * - Icon support (start and end positions)
+ * - Polymorphic component (can render as button, a, etc.)
+ * - Full accessibility support 
+ * - Full width option
  */
-import React, { forwardRef } from 'react';
+
+import React, { forwardRef, ButtonHTMLAttributes, ReactNode, ElementType } from 'react';
 import './Button.scss';
 
-/** Button visual style variants */
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
+// Button variants
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
 
-/** Button size variants */
-type ButtonSize = 'sm' | 'md' | 'lg';
+// Button sizes
+export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** 
-   * Visual variant of the button 
-   * @default 'primary'
-   */
+// Polymorphic component props
+export type PolymorphicProps<E extends ElementType = ElementType> = {
+  as?: E;
+};
+
+// Base button props
+export interface ButtonBaseProps {
+  /** Visual style variant */
   variant?: ButtonVariant;
   
-  /** 
-   * Size of the button
-   * @default 'md'
-   */
+  /** Size variant */
   size?: ButtonSize;
   
-  /** 
-   * Whether the button is in a loading state
-   * @default false
-   */
+  /** Shows loading spinner and disables button */
   isLoading?: boolean;
   
-  /** 
-   * Icon to display before the button text
-   */
-  startIcon?: React.ReactNode;
-  
-  /** 
-   * Icon to display after the button text
-   */
-  endIcon?: React.ReactNode;
-  
-  /**
-   * Make button take full width of container
-   * @default false
-   */
+  /** Full width button that expands to container width */
   fullWidth?: boolean;
   
-  /**
-   * Button content
-   */
-  children: React.ReactNode;
+  /** Icon element to display before button text */
+  startIcon?: ReactNode;
   
-  /**
-   * Additional CSS classes
-   */
+  /** Icon element to display after button text */
+  endIcon?: ReactNode;
+  
+  /** Button content */
+  children?: ReactNode;
+  
+  /** Additional CSS class names */
   className?: string;
+  
+  /** ID for form association */
+  form?: string;
+  
+  /** Data attributes (useful for testing) */
+  dataAttributes?: { [key: string]: string };
 }
 
+// Used for type inference with polymorphic components
+export type ButtonProps<E extends ElementType = 'button'> = 
+  ButtonBaseProps & 
+  PolymorphicProps<E> & 
+  Omit<React.ComponentPropsWithRef<E>, keyof ButtonBaseProps | keyof PolymorphicProps<E>>;
+
 /**
- * Button component for user interactions
- * 
- * @param {ButtonProps} props - Button component props
- * @returns {JSX.Element} Button component
- * 
- * @example
- * <Button variant="primary" onClick={handleClick}>
- *   Click me
- * </Button>
- * 
- * @example
- * <Button 
- *   variant="outline"
- *   size="lg"
- *   isLoading={isSubmitting}
- *   disabled={!isValid}
- * >
- *   Submit
- * </Button>
+ * Button component with enhanced features and accessibility support
  */
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
-  children,
-  variant = 'primary',
-  size = 'md',
-  isLoading = false,
-  startIcon,
-  endIcon,
-  fullWidth = false,
-  className = '',
-  disabled,
-  type = 'button',
-  ...props
-}, ref) => {
-  const buttonClasses = [
-    'btn',
-    `btn--${variant}`,
-    `btn--${size}`,
-    isLoading ? 'btn--loading' : '',
-    fullWidth ? 'btn--full-width' : '',
-    disabled ? 'btn--disabled' : '',
-    className
-  ].filter(Boolean).join(' ');
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      fullWidth = false,
+      startIcon,
+      endIcon,
+      children,
+      className,
+      disabled = false,
+      as: Component = 'button',
+      dataAttributes = {},
+      ...props
+    }, 
+    ref
+  ) => {
+    // Generate consistent class names manually without classnames dependency
+    const buttonClasses = [
+      'btn',
+      `btn--${variant}`,
+      `btn--${size}`,
+      isLoading ? 'btn--loading' : '',
+      disabled ? 'btn--disabled' : '',
+      fullWidth ? 'btn--full-width' : '',
+      className || ''
+    ].filter(Boolean).join(' ');
+    
+    // Generate data attributes for testing
+    const dataProps = Object.entries(dataAttributes).reduce(
+      (acc, [key, value]) => ({ ...acc, [`data-${key}`]: value }),
+      {}
+    );
+    
+    // Enhanced accessibility attributes
+    const accessibilityProps = {
+      disabled: disabled || isLoading,
+      'aria-busy': isLoading,
+      'aria-disabled': disabled || isLoading,
+      ...(isLoading ? { 
+        'aria-live': 'polite' as const,
+        'aria-label': `${typeof children === 'string' ? children : 'Button'} loading`
+      } : {})
+    };
+    
+    // Element type can be 'button', 'a' or any valid HTML element
+    return (
+      <Component
+        ref={ref}
+        className={buttonClasses}
+        {...accessibilityProps}
+        {...dataProps}
+        {...props}
+      >
+        <span className="btn__content">
+          {startIcon && (
+            <span className="btn__icon btn__icon--start">
+              {startIcon}
+            </span>
+          )}
+          
+          {children && (
+            <span className="btn__text">{children}</span>
+          )}
+          
+          {endIcon && (
+            <span className="btn__icon btn__icon--end">
+              {endIcon}
+            </span>
+          )}
+        </span>
+      </Component>
+    );
+  }
+);
 
-  return (
-    <button
-      ref={ref}
-      className={buttonClasses}
-      disabled={disabled || isLoading}
-      type={type}
-      aria-busy={isLoading}
-      {...props}
-    >
-      <span className="btn__content">
-        {!isLoading && startIcon && (
-          <span className="btn__icon btn__icon--start">{startIcon}</span>
-        )}
-        
-        <span className="btn__text">{children}</span>
-        
-        {!isLoading && endIcon && (
-          <span className="btn__icon btn__icon--end">{endIcon}</span>
-        )}
-      </span>
-    </button>
-  );
-});
-
+// Set display name for debugging
 Button.displayName = 'Button';
 
-export default Button;
+// Memoize for performance optimization
+export default React.memo(Button);
