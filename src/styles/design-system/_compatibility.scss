@@ -225,6 +225,7 @@ $badge-border-radius: badge-variant('filled', 'border-radius') !default;
 
 // Feature flag for gradual migration
 $use-new-token-system: true !default;
+$use-new-form-tokens: $use-new-token-system !default;
 
 /* ====== BUTTON COMPATIBILITY LAYER ====== */
 
@@ -422,6 +423,10 @@ $use-new-token-system: true !default;
       @return transition-preset('opacity');
     } @else if $type == 'slide' {
       @return transition-preset('transform');
+    } @else if $type == 'input' {
+      @return transition-preset('input');
+    } @else if $type == 'form-control' {
+      @return transition-preset('input');
     } @else {
       @return transition-preset($type);
     }
@@ -435,6 +440,10 @@ $use-new-token-system: true !default;
       @return opacity 0.15s var(--ease-out);
     } @else if $type == 'slide' {
       @return transform 0.3s var(--ease-out);
+    } @else if $type == 'input' {
+      @return border-color 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+    } @else if $type == 'form-control' {
+      @return background-color 0.15s var(--ease-out), border-color 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
     } @else {
       @return all 0.2s var(--ease-out);
     }
@@ -487,8 +496,21 @@ $spacing-map: (
 
 // Form input background color mapping
 @mixin input-bg-color($state: null, $dark: false) {
-  @if $use-new-token-system {
-    background-color: input-token('bg', $state, $dark);
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $state == 'disabled' {
+      @if $dark {
+        background-color: var(--color-dark-surface-disabled);
+      } @else {
+        background-color: var(--color-surface-disabled);
+      }
+    } @else {
+      @if $dark {
+        background-color: var(--color-dark-surface);
+      } @else {
+        background-color: var(--color-surface);
+      }
+    }
   } @else {
     // Legacy input background colors
     @if $state == 'disabled' {
@@ -509,8 +531,21 @@ $spacing-map: (
 
 // Form input text color mapping
 @mixin input-text-color($state: null, $dark: false) {
-  @if $use-new-token-system {
-    color: input-token('text', $state, $dark);
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $state == 'disabled' {
+      @if $dark {
+        color: var(--color-dark-text-muted);
+      } @else {
+        color: var(--color-text-muted);
+      }
+    } @else {
+      @if $dark {
+        color: var(--color-dark-text);
+      } @else {
+        color: var(--color-text);
+      }
+    }
   } @else {
     // Legacy input text colors
     @if $state == 'disabled' {
@@ -531,8 +566,39 @@ $spacing-map: (
 
 // Form input border mapping
 @mixin input-border($state: null, $dark: false) {
-  @if $use-new-token-system {
-    border-color: input-token('border', $state, $dark);
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $state == 'hover' {
+      @if $dark {
+        border-color: var(--color-dark-border-hover);
+      } @else {
+        border-color: var(--color-border-hover);
+      }
+    } @else if $state == 'focus' {
+      @if $dark {
+        border-color: var(--color-dark-primary);
+      } @else {
+        border-color: var(--color-primary);
+      }
+    } @else if $state == 'disabled' {
+      @if $dark {
+        border-color: var(--color-dark-border-muted);
+      } @else {
+        border-color: var(--color-border-muted);
+      }
+    } @else if $state == 'error' {
+      @if $dark {
+        border-color: var(--color-dark-error);
+      } @else {
+        border-color: var(--color-error);
+      }
+    } @else {
+      @if $dark {
+        border-color: var(--color-dark-border);
+      } @else {
+        border-color: var(--color-border);
+      }
+    }
   } @else {
     // Legacy input border colors
     @if $state == 'hover' {
@@ -553,6 +619,12 @@ $spacing-map: (
       } @else {
         border-color: var(--color-border-muted);
       }
+    } @else if $state == 'error' {
+      @if $dark {
+        border-color: var(--color-dark-error);
+      } @else {
+        border-color: var(--color-error);
+      }
     } @else {
       @if $dark {
         border-color: var(--color-dark-border);
@@ -564,23 +636,69 @@ $spacing-map: (
 }
 
 // Form input focus ring mapping
-@mixin input-focus-ring($dark: false) {
-  @if $use-new-token-system {
-    box-shadow: 0 0 0 3px input-token('ring', 'focus', $dark);
+@mixin input-focus-ring($state: null, $dark: false) {
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $state == 'error' {
+      @if $dark {
+        box-shadow: 0 0 0 3px rgba(var(--color-dark-error-rgb), 0.25);
+      } @else {
+        box-shadow: 0 0 0 3px rgba(var(--color-error-rgb), 0.25);
+      }
+    } @else {
+      @if $dark {
+        box-shadow: 0 0 0 3px rgba(var(--color-dark-primary-rgb), 0.25);
+      } @else {
+        box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+      }
+    }
   } @else {
     // Legacy input focus ring
-    @if $dark {
-      box-shadow: 0 0 0 3px rgba(var(--color-dark-primary-rgb), 0.25);
+    @if $state == 'error' {
+      @if $dark {
+        box-shadow: 0 0 0 3px rgba(var(--color-dark-error-rgb), 0.25);
+      } @else {
+        box-shadow: 0 0 0 3px rgba(var(--color-error-rgb), 0.25);
+      }
     } @else {
-      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+      @if $dark {
+        box-shadow: 0 0 0 3px rgba(var(--color-dark-primary-rgb), 0.25);
+      } @else {
+        box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+      }
     }
   }
 }
 
 // Form checkbox/radio mapping
 @mixin checkbox-bg-color($state: null, $dark: false) {
-  @if $use-new-token-system {
-    background-color: checkbox-token('bg', $state, $dark);
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $state == 'checked' {
+      @if $dark {
+        background-color: var(--color-dark-primary);
+      } @else {
+        background-color: var(--color-primary);
+      }
+    } @else if $state == 'hover' {
+      @if $dark {
+        background-color: var(--color-dark-surface-hover);
+      } @else {
+        background-color: var(--color-surface-hover);
+      }
+    } @else if $state == 'disabled' {
+      @if $dark {
+        background-color: var(--color-dark-surface-disabled);
+      } @else {
+        background-color: var(--color-surface-disabled);
+      }
+    } @else {
+      @if $dark {
+        background-color: var(--color-dark-surface);
+      } @else {
+        background-color: var(--color-surface);
+      }
+    }
   } @else {
     // Legacy checkbox background
     @if $state == 'checked' {
@@ -606,6 +724,157 @@ $spacing-map: (
         background-color: var(--color-dark-surface);
       } @else {
         background-color: var(--color-surface);
+      }
+    }
+  }
+}
+
+// Form input placeholder color mapping
+@mixin input-placeholder-color($dark: false) {
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $dark {
+      color: var(--color-dark-text-muted);
+    } @else {
+      color: var(--color-text-muted);
+    }
+  } @else {
+    // Legacy placeholder color
+    @if $dark {
+      color: var(--color-dark-text-muted);
+    } @else {
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+// Form label styling
+@mixin form-label-styling($dark: false) {
+  @if $use-new-form-tokens {
+    // Use fallback values since these tokens might not be available yet
+    @if function-exists('input-token') {
+      @if $dark {
+        color: var(--color-dark-text);
+      } @else {
+        color: var(--color-text);
+      }
+    } @else {
+      @if $dark {
+        color: var(--color-dark-text);
+      } @else {
+        color: var(--color-text);
+      }
+    }
+    font-weight: 500;
+    font-size: var(--font-size-base);
+  } @else {
+    // Legacy label styling
+    @if $dark {
+      color: var(--color-dark-text);
+    } @else {
+      color: var(--color-text);
+    }
+    font-weight: 500;
+    font-size: var(--font-size-base);
+  }
+}
+
+// Form error message styling
+@mixin form-error-styling($dark: false) {
+  @if $use-new-form-tokens {
+    // Use fallback values since these tokens might not be available yet
+    @if $dark {
+      color: var(--color-dark-error);
+    } @else {
+      color: var(--color-error);
+    }
+    font-size: var(--font-size-sm);
+  } @else {
+    // Legacy error styling
+    @if $dark {
+      color: var(--color-dark-error);
+    } @else {
+      color: var(--color-error);
+    }
+    font-size: var(--font-size-sm);
+  }
+}
+
+// Form select styling
+@mixin select-dropdown-styling($dark: false) {
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $dark {
+      background-color: var(--color-dark-surface-elevated);
+      border: 1px solid var(--color-dark-border);
+    } @else {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+    }
+    border-radius: var(--radius-md);
+  } @else {
+    // Legacy select dropdown styling
+    @if $dark {
+      background-color: var(--color-dark-surface-elevated);
+      border: 1px solid var(--color-dark-border);
+    } @else {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+    }
+    border-radius: var(--radius-md);
+  }
+}
+
+// Form select option styling
+@mixin select-option-styling($state: null, $dark: false) {
+  @if $use-new-form-tokens {
+    // Use fallback values since the token system is still being developed
+    @if $state == 'hover' {
+      @if $dark {
+        background-color: var(--color-dark-surface-hover);
+      } @else {
+        background-color: var(--color-surface-hover);
+      }
+    } @else if $state == 'selected' {
+      @if $dark {
+        background-color: rgba(var(--color-dark-primary-rgb), 0.1);
+        color: var(--color-dark-primary);
+      } @else {
+        background-color: rgba(var(--color-primary-rgb), 0.1);
+        color: var(--color-primary);
+      }
+    } @else {
+      @if $dark {
+        background-color: transparent;
+        color: var(--color-dark-text);
+      } @else {
+        background-color: transparent;
+        color: var(--color-text);
+      }
+    }
+  } @else {
+    // Legacy select option styling
+    @if $state == 'hover' {
+      @if $dark {
+        background-color: var(--color-dark-surface-hover);
+      } @else {
+        background-color: var(--color-surface-hover);
+      }
+    } @else if $state == 'selected' {
+      @if $dark {
+        background-color: rgba(var(--color-dark-primary-rgb), 0.1);
+        color: var(--color-dark-primary);
+      } @else {
+        background-color: rgba(var(--color-primary-rgb), 0.1);
+        color: var(--color-primary);
+      }
+    } @else {
+      @if $dark {
+        background-color: transparent;
+        color: var(--color-dark-text);
+      } @else {
+        background-color: transparent;
+        color: var(--color-text);
       }
     }
   }

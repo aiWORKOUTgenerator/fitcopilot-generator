@@ -4,6 +4,7 @@
  */
 
 @import '../_variables';
+@import '../../../../styles/design-system/_compatibility';
 
 /* Form container */
 .workout-generator-form {
@@ -28,22 +29,20 @@
 
 .form-label {
   display: block;
-  color: var(--color-text);
-  font-weight: $font-weight-medium;
+  @include form-label-styling();
   margin-bottom: $wg-spacing-sm;
   
   .dark-theme & {
-    color: var(--color-dark-text);
+    @include form-label-styling(true);
   }
 }
 
 .form-error {
-  color: var(--color-wg-error);
-  font-size: $font-size-sm;
+  @include form-error-styling();
   margin-left: $wg-spacing-sm;
   
   .dark-theme & {
-    color: var(--color-dark-error);
+    @include form-error-styling(true);
   }
 }
 
@@ -51,24 +50,70 @@
   display: block;
   width: 100%;
   padding: $spacing-3 $spacing-4;
-  border: 1px solid var(--color-border);
+  @include input-border();
   border-radius: $wg-border-radius;
-  background-color: var(--color-surface);
+  @include input-bg-color();
+  @include input-text-color();
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.5rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
+  transition: compat-transition-preset('input');
+  
+  &:hover:not(:disabled) {
+    @include input-border('hover');
+  }
+  
+  &:focus:not(:disabled) {
+    @include input-border('focus');
+    @include input-focus-ring();
+    outline: none;
+  }
+  
+  &:disabled {
+    @include input-bg-color('disabled');
+    @include input-text-color('disabled');
+    @include input-border('disabled');
+    cursor: not-allowed;
+  }
   
   .dark-theme & {
-    background-color: var(--color-dark-surface);
-    border-color: var(--color-dark-border);
-    color: var(--color-dark-text);
+    @include input-bg-color(null, true);
+    @include input-text-color(null, true);
+    @include input-border(null, true);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23aaaaaa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    
+    &:hover:not(:disabled) {
+      @include input-border('hover', true);
+    }
+    
+    &:focus:not(:disabled) {
+      @include input-border('focus', true);
+      @include input-focus-ring(null, true);
+    }
+    
+    &:disabled {
+      @include input-bg-color('disabled', true);
+      @include input-text-color('disabled', true);
+      @include input-border('disabled', true);
+    }
   }
   
   &--error {
-    border-color: var(--color-wg-error);
+    @include input-border('error');
+    
+    &:focus {
+      @include input-focus-ring('error');
+    }
+    
+    .dark-theme & {
+      @include input-border('error', true);
+      
+      &:focus {
+        @include input-focus-ring('error', true);
+      }
+    }
   }
 }
 
@@ -76,20 +121,74 @@
   display: block;
   width: 100%;
   padding: $spacing-3 $spacing-4;
-  border: 1px solid var(--color-border);
+  @include input-border();
   border-radius: $wg-border-radius;
-  background-color: var(--color-surface);
+  @include input-bg-color();
+  @include input-text-color();
   min-height: 100px;
   resize: vertical;
+  transition: compat-transition-preset('input');
+  
+  &:hover:not(:disabled) {
+    @include input-border('hover');
+  }
+  
+  &:focus:not(:disabled) {
+    @include input-border('focus');
+    @include input-focus-ring();
+    outline: none;
+  }
+  
+  &:disabled {
+    @include input-bg-color('disabled');
+    @include input-text-color('disabled');
+    @include input-border('disabled');
+    cursor: not-allowed;
+  }
+  
+  &::placeholder {
+    @include input-placeholder-color();
+  }
   
   .dark-theme & {
-    background-color: var(--color-dark-surface);
-    border-color: var(--color-dark-border);
-    color: var(--color-dark-text);
+    @include input-bg-color(null, true);
+    @include input-text-color(null, true);
+    @include input-border(null, true);
+    
+    &:hover:not(:disabled) {
+      @include input-border('hover', true);
+    }
+    
+    &:focus:not(:disabled) {
+      @include input-border('focus', true);
+      @include input-focus-ring(null, true);
+    }
+    
+    &:disabled {
+      @include input-bg-color('disabled', true);
+      @include input-text-color('disabled', true);
+      @include input-border('disabled', true);
+    }
+    
+    &::placeholder {
+      @include input-placeholder-color(true);
+    }
   }
   
   &--error {
-    border-color: var(--color-wg-error);
+    @include input-border('error');
+    
+    &:focus {
+      @include input-focus-ring('error');
+    }
+    
+    .dark-theme & {
+      @include input-border('error', true);
+      
+      &:focus {
+        @include input-focus-ring('error', true);
+      }
+    }
   }
 }
 
@@ -103,13 +202,25 @@
 .difficulty-option {
   display: flex;
   align-items: center;
+  @include input-text-color();
   
   .dark-theme & {
-    color: var(--color-dark-text);
+    @include input-text-color(null, true);
   }
   
   input[type="radio"] {
     margin-right: $wg-spacing-sm;
+    
+    &:focus {
+      outline: none;
+      @include input-focus-ring();
+    }
+    
+    .dark-theme & {
+      &:focus {
+        @include input-focus-ring(null, true);
+      }
+    }
   }
 }
 
@@ -127,11 +238,29 @@
   font-weight: $font-weight-medium;
   cursor: pointer;
   text-align: left;
+  transition: compat-transition-preset('button');
+  
+  &:hover {
+    background-color: rgba(var(--color-primary-rgb), 0.05);
+  }
+  
+  &:focus {
+    outline: none;
+    @include input-focus-ring();
+  }
   
   .dark-theme & {
     background-color: var(--color-dark-surface);
     border-color: var(--color-dark-primary);
     color: var(--color-dark-primary);
+    
+    &:hover {
+      background-color: rgba(var(--color-dark-primary-rgb), 0.1);
+    }
+    
+    &:focus {
+      @include input-focus-ring(null, true);
+    }
   }
 }
 
@@ -164,12 +293,24 @@
 .equipment-option {
   display: flex;
   align-items: center;
+  @include input-text-color();
   
   .dark-theme & {
-    color: var(--color-dark-text);
+    @include input-text-color(null, true);
   }
   
   input[type="checkbox"] {
     margin-right: $wg-spacing-sm;
+    
+    &:focus {
+      outline: none;
+      @include input-focus-ring();
+    }
+    
+    .dark-theme & {
+      &:focus {
+        @include input-focus-ring(null, true);
+      }
+    }
   }
 } 

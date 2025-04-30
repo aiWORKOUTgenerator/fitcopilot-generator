@@ -6,6 +6,7 @@
  */
 
 @import 'tokens/components/form-controls-tokens';
+@import '_compatibility';
 
 // Base form control styles
 .form-control {
@@ -17,22 +18,22 @@
   }
   
   &__label {
-    color: control-label-token('color');
+    @include form-label-styling();
     margin-left: 0.5rem;
     font-size: var(--text-md);
     line-height: 1.5;
     cursor: pointer;
     
     .dark-theme & {
-      color: control-label-token('color', true);
+      @include form-label-styling(true);
     }
     
     &--disabled {
-      color: control-label-token('disabled');
+      @include input-text-color('disabled');
       cursor: not-allowed;
       
       .dark-theme & {
-        color: control-label-token('disabled', true);
+        @include input-text-color('disabled', true);
       }
     }
   }
@@ -44,26 +45,28 @@
   position: relative;
   width: form-control-base('size');
   height: form-control-base('size');
-  border: checkbox-token('border-width') solid checkbox-token('border');
+  border-width: checkbox-token('border-width');
+  border-style: solid;
+  @include input-border();
   border-radius: checkbox-token('border-radius');
-  background-color: checkbox-token('bg');
+  @include checkbox-bg-color();
   cursor: pointer;
-  transition: form-control-base('transition');
+  transition: compat-transition-preset('form-control');
   
   &:hover:not(:disabled) {
-    border-color: checkbox-token('border', 'hover');
-    background-color: checkbox-token('bg', 'hover');
+    @include input-border('hover');
+    @include checkbox-bg-color('hover');
   }
   
   &:focus {
     outline: none;
-    border-color: checkbox-token('border', 'focus');
-    box-shadow: 0 0 0 3px checkbox-token('ring', 'focus');
+    @include input-border('focus');
+    @include input-focus-ring();
   }
   
   &:checked {
-    background-color: checkbox-token('bg', 'checked');
-    border-color: checkbox-token('border', 'checked');
+    @include checkbox-bg-color('checked');
+    @include input-border('checked');
     
     &::after {
       content: '';
@@ -81,8 +84,8 @@
   &:disabled {
     opacity: form-control-base('disabled-opacity');
     cursor: not-allowed;
-    background-color: checkbox-token('bg', 'disabled');
-    border-color: checkbox-token('border', 'disabled');
+    @include checkbox-bg-color('disabled');
+    @include input-border('disabled');
     
     &:checked {
       background-color: checkbox-token('checked-bg', 'disabled');
@@ -91,22 +94,22 @@
   
   // Dark theme
   .dark-theme & {
-    border-color: checkbox-token('border', null, true);
-    background-color: checkbox-token('bg', null, true);
+    @include input-border(null, true);
+    @include checkbox-bg-color(null, true);
     
     &:hover:not(:disabled) {
-      border-color: checkbox-token('border', 'hover', true);
-      background-color: checkbox-token('bg', 'hover', true);
+      @include input-border('hover', true);
+      @include checkbox-bg-color('hover', true);
     }
     
     &:focus {
-      border-color: checkbox-token('border', 'focus', true);
-      box-shadow: 0 0 0 3px checkbox-token('ring', 'focus', true);
+      @include input-border('focus', true);
+      @include input-focus-ring(null, true);
     }
     
     &:checked {
-      background-color: checkbox-token('bg', 'checked', true);
-      border-color: checkbox-token('border', 'checked', true);
+      @include checkbox-bg-color('checked', true);
+      @include input-border('checked', true);
       
       &::after {
         border-color: checkbox-token('indicator-color', 'checked', true);
@@ -114,8 +117,8 @@
     }
     
     &:disabled {
-      background-color: checkbox-token('bg', 'disabled', true);
-      border-color: checkbox-token('border', 'disabled', true);
+      @include checkbox-bg-color('disabled', true);
+      @include input-border('disabled', true);
       
       &:checked {
         background-color: checkbox-token('checked-bg', 'disabled', true);
@@ -130,26 +133,28 @@
   position: relative;
   width: form-control-base('size');
   height: form-control-base('size');
-  border: radio-token('border-width') solid radio-token('border');
+  border-width: radio-token('border-width');
+  border-style: solid;
+  @include input-border();
   border-radius: radio-token('border-radius');
-  background-color: radio-token('bg');
+  @include checkbox-bg-color();
   cursor: pointer;
-  transition: form-control-base('transition');
+  transition: compat-transition-preset('form-control');
   
   &:hover:not(:disabled) {
-    border-color: radio-token('border', 'hover');
-    background-color: radio-token('bg', 'hover');
+    @include input-border('hover');
+    @include checkbox-bg-color('hover');
   }
   
   &:focus {
     outline: none;
-    border-color: radio-token('border', 'focus');
-    box-shadow: 0 0 0 3px radio-token('ring', 'focus');
+    @include input-border('focus');
+    @include input-focus-ring();
   }
   
   &:checked {
-    background-color: radio-token('bg', 'checked');
-    border-color: radio-token('border', 'checked');
+    @include checkbox-bg-color('checked');
+    @include input-border('checked');
     
     &::after {
       content: '';
@@ -167,8 +172,8 @@
   &:disabled {
     opacity: form-control-base('disabled-opacity');
     cursor: not-allowed;
-    background-color: radio-token('bg', 'disabled');
-    border-color: radio-token('border', 'disabled');
+    @include checkbox-bg-color('disabled');
+    @include input-border('disabled');
     
     &:checked::after {
       background-color: radio-token('checked-indicator', 'disabled');
@@ -177,22 +182,22 @@
   
   // Dark theme
   .dark-theme & {
-    border-color: radio-token('border', null, true);
-    background-color: radio-token('bg', null, true);
+    @include input-border(null, true);
+    @include checkbox-bg-color(null, true);
     
     &:hover:not(:disabled) {
-      border-color: radio-token('border', 'hover', true);
-      background-color: radio-token('bg', 'hover', true);
+      @include input-border('hover', true);
+      @include checkbox-bg-color('hover', true);
     }
     
     &:focus {
-      border-color: radio-token('border', 'focus', true);
-      box-shadow: 0 0 0 3px radio-token('ring', 'focus', true);
+      @include input-border('focus', true);
+      @include input-focus-ring(null, true);
     }
     
     &:checked {
-      background-color: radio-token('bg', 'checked', true);
-      border-color: radio-token('border', 'checked', true);
+      @include checkbox-bg-color('checked', true);
+      @include input-border('checked', true);
       
       &::after {
         background-color: radio-token('indicator', 'checked', true);
@@ -200,8 +205,8 @@
     }
     
     &:disabled {
-      background-color: radio-token('bg', 'disabled', true);
-      border-color: radio-token('border', 'disabled', true);
+      @include checkbox-bg-color('disabled', true);
+      @include input-border('disabled', true);
       
       &:checked::after {
         background-color: radio-token('checked-indicator', 'disabled', true);
@@ -215,12 +220,11 @@
   margin: 0.5rem 0;
   
   &__title {
-    font-weight: 600;
+    @include form-label-styling();
     margin-bottom: 0.5rem;
-    color: var(--color-text);
     
     .dark-theme & {
-      color: var(--color-dark-text);
+      @include form-label-styling(true);
     }
   }
   

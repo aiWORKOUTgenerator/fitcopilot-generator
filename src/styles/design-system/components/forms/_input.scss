@@ -19,10 +19,10 @@
   @include input-text-color();
   border: 1px solid;
   @include input-border();
-  transition: input-base('transition');
+  transition: compat-transition-preset('input');
   
   &::placeholder {
-    color: input-token('placeholder');
+    @include input-placeholder-color();
   }
   
   &:hover:not(:disabled):not(.input--error) {
@@ -43,10 +43,10 @@
   }
   
   &--error {
-    border-color: input-token('border', 'error');
+    @include input-border('error');
     
     &:focus {
-      box-shadow: 0 0 0 3px rgba(var(--color-error-rgb), 0.25);
+      @include input-focus-ring('error');
     }
   }
   
@@ -57,7 +57,7 @@
     @include input-border(null, true);
     
     &::placeholder {
-      color: input-token('placeholder', null, true);
+      @include input-placeholder-color(true);
     }
     
     &:hover:not(:disabled):not(.input--error) {
@@ -66,7 +66,7 @@
     
     &:focus:not(:disabled):not(.input--error) {
       @include input-border('focus', true);
-      @include input-focus-ring(true);
+      @include input-focus-ring(null, true);
     }
     
     &:disabled {
@@ -75,10 +75,10 @@
     }
     
     &--error {
-      border-color: input-token('border', 'error', true);
+      @include input-border('error', true);
       
       &:focus {
-        box-shadow: 0 0 0 3px rgba(var(--color-dark-error-rgb), 0.25);
+        @include input-focus-ring('error', true);
       }
     }
   }
@@ -106,10 +106,10 @@
   font-size: var(--text-sm);
   
   &--error {
-    color: input-token('message', 'error');
+    @include form-error-styling();
     
     .dark-theme & {
-      color: input-token('message', 'error', true);
+      @include form-error-styling(true);
     }
   }
 }
@@ -125,15 +125,15 @@
     display: flex;
     align-items: center;
     padding: 0 0.75rem;
-    background-color: var(--color-surface-accent);
+    @include input-bg-color('accent');
     border: 1px solid;
     @include input-border();
-    color: var(--color-text-muted);
+    @include input-text-color('muted');
     
     .dark-theme & {
-      background-color: var(--color-dark-surface-accent);
+      @include input-bg-color('accent', true);
       @include input-border(null, true);
-      color: var(--color-dark-text-muted);
+      @include input-text-color('muted', true);
     }
   }
   

@@ -5,6 +5,7 @@
  */
 
 @import '../../tokens/components/select-tokens';
+@import '../../_compatibility';
 
 // Base select styles
 .select {
@@ -14,10 +15,11 @@
   border-radius: select-base('border-radius');
   font-weight: select-base('font-weight');
   line-height: select-base('line-height');
-  background-color: select-token('bg');
-  color: select-token('text');
-  border: 1px solid select-token('border');
-  transition: select-base('transition');
+  @include input-bg-color();
+  @include input-text-color();
+  border: 1px solid;
+  @include input-border();
+  transition: compat-transition-preset('input');
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.75rem center;
@@ -26,67 +28,67 @@
   padding-right: 2.5rem;
   
   &::placeholder {
-    color: select-token('placeholder');
+    @include input-placeholder-color();
   }
   
   &:hover:not(:disabled):not(.select--error) {
-    border-color: select-token('border', 'hover');
-    background-color: select-token('bg', 'hover');
+    @include input-border('hover');
+    @include input-bg-color('hover');
     cursor: pointer;
   }
   
   &:focus:not(:disabled):not(.select--error) {
     outline: none;
-    border-color: select-token('border', 'focus');
-    box-shadow: 0 0 0 3px select-token('ring', 'focus');
+    @include input-border('focus');
+    @include input-focus-ring();
   }
   
   &:disabled {
     opacity: select-base('disabled-opacity');
-    background-color: select-token('bg', 'disabled');
-    color: select-token('text', 'disabled');
+    @include input-bg-color('disabled');
+    @include input-text-color('disabled');
     cursor: not-allowed;
   }
   
   &--error {
-    border-color: select-token('border', 'error');
+    @include input-border('error');
     
     &:focus {
-      box-shadow: 0 0 0 3px rgba(var(--color-error-rgb), 0.25);
+      @include input-focus-ring('error');
     }
   }
   
   // Dark theme styles
   .dark-theme & {
-    background-color: select-token('bg', null, true);
-    color: select-token('text', null, true);
-    border-color: select-token('border', null, true);
+    @include input-bg-color(null, true);
+    @include input-text-color(null, true);
+    @include input-border(null, true);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a0aec0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     
     &::placeholder {
-      color: select-token('placeholder', null, true);
+      @include input-placeholder-color(true);
     }
     
     &:hover:not(:disabled):not(.select--error) {
-      border-color: select-token('border', 'hover', true);
-      background-color: select-token('bg', 'hover', true);
+      @include input-border('hover', true);
+      @include input-bg-color('hover', true);
     }
     
     &:focus:not(:disabled):not(.select--error) {
-      border-color: select-token('border', 'focus', true);
-      box-shadow: 0 0 0 3px select-token('ring', 'focus', true);
+      @include input-border('focus', true);
+      @include input-focus-ring(null, true);
     }
     
     &:disabled {
-      background-color: select-token('bg', 'disabled', true);
-      color: select-token('text', 'disabled', true);
+      @include input-bg-color('disabled', true);
+      @include input-text-color('disabled', true);
     }
     
     &--error {
-      border-color: select-token('border', 'error', true);
+      @include input-border('error', true);
       
       &:focus {
-        box-shadow: 0 0 0 3px rgba(var(--color-dark-error-rgb), 0.25);
+        @include input-focus-ring('error', true);
       }
     }
   }
@@ -116,10 +118,10 @@
   font-size: var(--text-sm);
   
   &--error {
-    color: select-token('message', 'error');
+    @include form-error-styling();
     
     .dark-theme & {
-      color: select-token('message', 'error', true);
+      @include form-error-styling(true);
     }
   }
 }
@@ -131,64 +133,53 @@
   width: 100%;
   max-height: 15rem;
   overflow-y: auto;
-  background-color: select-dropdown('bg');
-  border: 1px solid select-dropdown('border');
-  border-radius: select-base('border-radius');
-  box-shadow: select-dropdown('shadow');
+  @include select-dropdown-styling();
   margin-top: 0.25rem;
   
   .dark-theme & {
-    background-color: select-dropdown('bg', null, null, true);
-    border-color: select-dropdown('border', null, null, true);
-    box-shadow: select-dropdown('shadow', null, null, true);
+    @include select-dropdown-styling(true);
   }
   
   &__item {
     padding: 0.5rem 1rem;
     cursor: pointer;
-    color: select-dropdown('text', 'item');
-    transition: background-color 0.2s ease;
+    @include select-option-styling();
+    transition: compat-transition-preset('color');
     
     &:hover:not(&--disabled) {
-      background-color: select-dropdown('bg', 'item', 'hover');
-      color: select-dropdown('text', 'item', 'hover');
+      @include select-option-styling('hover');
     }
     
     &--selected {
-      background-color: select-dropdown('bg', 'item', 'selected');
-      color: select-dropdown('text', 'item', 'selected');
+      @include select-option-styling('selected');
       
       &:hover {
-        background-color: select-dropdown('bg', 'item', 'selected');
+        @include select-option-styling('selected');
       }
     }
     
     &--disabled {
-      color: select-dropdown('text', 'item', 'disabled');
-      background-color: select-dropdown('bg', 'item', 'disabled');
+      @include select-option-styling('disabled');
       cursor: not-allowed;
     }
     
     .dark-theme & {
-      color: select-dropdown('text', 'item', null, true);
+      @include select-option-styling(null, true);
       
       &:hover:not(&--disabled) {
-        background-color: select-dropdown('bg', 'item', 'hover', true);
-        color: select-dropdown('text', 'item', 'hover', true);
+        @include select-option-styling('hover', true);
       }
       
       &--selected {
-        background-color: select-dropdown('bg', 'item', 'selected', true);
-        color: select-dropdown('text', 'item', 'selected', true);
+        @include select-option-styling('selected', true);
         
         &:hover {
-          background-color: select-dropdown('bg', 'item', 'selected', true);
+          @include select-option-styling('selected', true);
         }
       }
       
       &--disabled {
-        color: select-dropdown('text', 'item', 'disabled', true);
-        background-color: select-dropdown('bg', 'item', 'disabled', true);
+        @include select-option-styling('disabled', true);
       }
     }
   }
