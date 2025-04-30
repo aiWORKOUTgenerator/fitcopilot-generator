@@ -12,6 +12,52 @@
  */
 
 // ----------------------------------------------------------------------------
+// CORE RGB VALUES
+// ----------------------------------------------------------------------------
+// Core color RGB values for use with rgba() function
+$color-primary-rgb: 132, 204, 22; // Lime green RGB
+$color-secondary-rgb: 6, 182, 212; // Cyan RGB
+
+// Gray scale RGB values
+$color-white-rgb: 255, 255, 255;
+$color-black-rgb: 0, 0, 0;
+$color-gray-50-rgb: 248, 250, 252;
+$color-gray-100-rgb: 241, 245, 249;
+$color-gray-200-rgb: 226, 232, 240;
+$color-gray-300-rgb: 203, 213, 225;
+$color-gray-400-rgb: 148, 163, 184;
+$color-gray-500-rgb: 100, 116, 139;
+$color-gray-600-rgb: 71, 85, 105;
+$color-gray-700-rgb: 51, 65, 85;
+$color-gray-800-rgb: 30, 41, 59;
+$color-gray-900-rgb: 15, 23, 42;
+
+// Feedback RGB values
+$color-success-rgb: 34, 197, 94; // Green RGB
+$color-error-rgb: 239, 68, 68; // Red RGB
+$color-warning-rgb: 245, 158, 11; // Amber RGB
+$color-info-rgb: 59, 130, 246; // Blue RGB
+
+// Feature-Specific Primary Colors
+$color-wg-primary-rgb: 37, 99, 235; // Blue (Workout Generator)
+$color-wg-primary-dark-rgb: 29, 78, 216;
+$color-wg-primary-light-rgb: 59, 130, 246;
+
+// Dark Theme Specific Colors
+$color-dark-primary-rgb: 0, 180, 216; // Bright Cyan
+$color-dark-accent-rgb: 212, 255, 80; // Lime
+$color-dark-success-rgb: 6, 214, 160; // Aqua Green
+$color-dark-error-rgb: 239, 68, 68; // Bright Red
+$color-dark-warning-rgb: 251, 191, 36; // Amber
+$color-dark-info-rgb: 14, 165, 233; // Sky Blue
+
+// Specialty Card Colors
+$color-blue-50-rgb: 239, 246, 255; // Goal BG
+$color-green-50-rgb: 240, 253, 244; // Level BG
+$color-purple-50-rgb: 245, 243, 255; // Duration BG
+$color-purple-500-rgb: 124, 58, 237; // Duration Color
+
+// ----------------------------------------------------------------------------
 // GRAYSCALE PALETTE
 // ----------------------------------------------------------------------------
 $color-white: #ffffff;
@@ -107,6 +153,475 @@ $color-info-600: #2563eb;
 $color-info-700: #1d4ed8;
 $color-info-800: #1e40af;
 $color-info-900: #1e3a8a;
+
+// ----------------------------------------------------------------------------
+// COLOR MAPS
+// ----------------------------------------------------------------------------
+
+// Primary color map
+$color-primary-map: (
+  '50': $color-primary-50,
+  '100': $color-primary-100,
+  '200': $color-primary-200,
+  '300': $color-primary-300,
+  '400': $color-primary-400,
+  '500': $color-primary-500,
+  '600': $color-primary-600,
+  '700': $color-primary-700,
+  '800': $color-primary-800,
+  '900': $color-primary-900,
+);
+
+// Secondary color map
+$color-secondary-map: (
+  '50': $color-secondary-50,
+  '100': $color-secondary-100,
+  '200': $color-secondary-200,
+  '300': $color-secondary-300,
+  '400': $color-secondary-400,
+  '500': $color-secondary-500,
+  '600': $color-secondary-600,
+  '700': $color-secondary-700,
+  '800': $color-secondary-800,
+  '900': $color-secondary-900,
+);
+
+// Gray color map
+$color-gray-map: (
+  '50': $color-gray-50,
+  '100': $color-gray-100,
+  '200': $color-gray-200,
+  '300': $color-gray-300,
+  '400': $color-gray-400,
+  '500': $color-gray-500,
+  '600': $color-gray-600,
+  '700': $color-gray-700,
+  '800': $color-gray-800,
+  '900': $color-gray-900,
+  'white': $color-white,
+  'black': $color-black,
+);
+
+// Success color map
+$color-success-map: (
+  '50': $color-success-50,
+  '100': $color-success-100,
+  '200': $color-success-200,
+  '300': $color-success-300,
+  '400': $color-success-400,
+  '500': $color-success-500,
+  '600': $color-success-600,
+  '700': $color-success-700,
+  '800': $color-success-800,
+  '900': $color-success-900,
+);
+
+// Error color map
+$color-error-map: (
+  '50': $color-error-50,
+  '100': $color-error-100,
+  '200': $color-error-200,
+  '300': $color-error-300,
+  '400': $color-error-400,
+  '500': $color-error-500,
+  '600': $color-error-600,
+  '700': $color-error-700,
+  '800': $color-error-800,
+  '900': $color-error-900,
+);
+
+// Warning color map
+$color-warning-map: (
+  '50': $color-warning-50,
+  '100': $color-warning-100,
+  '200': $color-warning-200,
+  '300': $color-warning-300,
+  '400': $color-warning-400,
+  '500': $color-warning-500,
+  '600': $color-warning-600,
+  '700': $color-warning-700,
+  '800': $color-warning-800,
+  '900': $color-warning-900,
+);
+
+// Info color map
+$color-info-map: (
+  '50': $color-info-50,
+  '100': $color-info-100,
+  '200': $color-info-200,
+  '300': $color-info-300,
+  '400': $color-info-400,
+  '500': $color-info-500,
+  '600': $color-info-600,
+  '700': $color-info-700,
+  '800': $color-info-800,
+  '900': $color-info-900,
+);
+
+// All colors map
+$color-palette: (
+  'primary': $color-primary-map,
+  'secondary': $color-secondary-map,
+  'gray': $color-gray-map,
+  'success': $color-success-map,
+  'error': $color-error-map,
+  'warning': $color-warning-map,
+  'info': $color-info-map,
+);
+
+// Semantic UI maps
+$color-semantic: (
+  'text': $color-gray-800,
+  'text-light': $color-gray-600,
+  'text-muted': $color-gray-500,
+  'background': $color-white,
+  'border': $color-gray-200,
+  'border-hover': $color-gray-400,
+  'border-focus': $color-primary-500,
+  'surface': $color-white,
+  'surface-accent': $color-gray-50,
+  'focus-ring': rgba($color-primary-500, 0.5),
+);
+
+// ----------------------------------------------------------------------------
+// CSS VARIABLES
+// ----------------------------------------------------------------------------
+// Export all colors as CSS variables for use in styles
+
+:root {
+  // ----------------------------------------------------------------------------
+  // GRAYSCALE VARIABLES
+  // ----------------------------------------------------------------------------
+  --color-white: #{$color-white};
+  --color-black: #{$color-black};
+  
+  --color-gray-50: #{$color-gray-50};
+  --color-gray-100: #{$color-gray-100};
+  --color-gray-200: #{$color-gray-200};
+  --color-gray-300: #{$color-gray-300};
+  --color-gray-400: #{$color-gray-400};
+  --color-gray-500: #{$color-gray-500};
+  --color-gray-600: #{$color-gray-600};
+  --color-gray-700: #{$color-gray-700};
+  --color-gray-800: #{$color-gray-800};
+  --color-gray-900: #{$color-gray-900};
+  
+  // ----------------------------------------------------------------------------
+  // BRAND COLOR VARIABLES
+  // ----------------------------------------------------------------------------
+  
+  // Primary
+  --color-primary-50: #{$color-primary-50};
+  --color-primary-100: #{$color-primary-100};
+  --color-primary-200: #{$color-primary-200};
+  --color-primary-300: #{$color-primary-300};
+  --color-primary-400: #{$color-primary-400};
+  --color-primary-500: #{$color-primary-500};
+  --color-primary-600: #{$color-primary-600};
+  --color-primary-700: #{$color-primary-700};
+  --color-primary-800: #{$color-primary-800};
+  --color-primary-900: #{$color-primary-900};
+  
+  // Main primary reference
+  --color-primary: var(--color-primary-500);
+  --color-primary-light: var(--color-primary-400);
+  --color-primary-lighter: var(--color-primary-300);
+  --color-primary-lightest: var(--color-primary-100);
+  --color-primary-dark: var(--color-primary-600);
+  --color-primary-darker: var(--color-primary-700);
+  --color-primary-darkest: var(--color-primary-900);
+  
+  // Secondary
+  --color-secondary-50: #{$color-secondary-50};
+  --color-secondary-100: #{$color-secondary-100};
+  --color-secondary-200: #{$color-secondary-200};
+  --color-secondary-300: #{$color-secondary-300};
+  --color-secondary-400: #{$color-secondary-400};
+  --color-secondary-500: #{$color-secondary-500};
+  --color-secondary-600: #{$color-secondary-600};
+  --color-secondary-700: #{$color-secondary-700};
+  --color-secondary-800: #{$color-secondary-800};
+  --color-secondary-900: #{$color-secondary-900};
+  
+  // Main secondary reference
+  --color-secondary: var(--color-secondary-500);
+  --color-secondary-light: var(--color-secondary-400);
+  --color-secondary-lighter: var(--color-secondary-300);
+  --color-secondary-lightest: var(--color-secondary-100);
+  --color-secondary-dark: var(--color-secondary-600);
+  --color-secondary-darker: var(--color-secondary-700);
+  --color-secondary-darkest: var(--color-secondary-900);
+  
+  // ----------------------------------------------------------------------------
+  // FEEDBACK COLOR VARIABLES
+  // ----------------------------------------------------------------------------
+  
+  // Success
+  --color-success-50: #{$color-success-50};
+  --color-success-100: #{$color-success-100};
+  --color-success-200: #{$color-success-200};
+  --color-success-300: #{$color-success-300};
+  --color-success-400: #{$color-success-400};
+  --color-success-500: #{$color-success-500};
+  --color-success-600: #{$color-success-600};
+  --color-success-700: #{$color-success-700};
+  --color-success-800: #{$color-success-800};
+  --color-success-900: #{$color-success-900};
+  
+  // Main success reference
+  --color-success: var(--color-success-500);
+  
+  // Error
+  --color-error-50: #{$color-error-50};
+  --color-error-100: #{$color-error-100};
+  --color-error-200: #{$color-error-200};
+  --color-error-300: #{$color-error-300};
+  --color-error-400: #{$color-error-400};
+  --color-error-500: #{$color-error-500};
+  --color-error-600: #{$color-error-600};
+  --color-error-700: #{$color-error-700};
+  --color-error-800: #{$color-error-800};
+  --color-error-900: #{$color-error-900};
+  
+  // Main error reference
+  --color-error: var(--color-error-500);
+  
+  // Warning
+  --color-warning-50: #{$color-warning-50};
+  --color-warning-100: #{$color-warning-100};
+  --color-warning-200: #{$color-warning-200};
+  --color-warning-300: #{$color-warning-300};
+  --color-warning-400: #{$color-warning-400};
+  --color-warning-500: #{$color-warning-500};
+  --color-warning-600: #{$color-warning-600};
+  --color-warning-700: #{$color-warning-700};
+  --color-warning-800: #{$color-warning-800};
+  --color-warning-900: #{$color-warning-900};
+  
+  // Main warning reference
+  --color-warning: var(--color-warning-500);
+  
+  // Info
+  --color-info-50: #{$color-info-50};
+  --color-info-100: #{$color-info-100};
+  --color-info-200: #{$color-info-200};
+  --color-info-300: #{$color-info-300};
+  --color-info-400: #{$color-info-400};
+  --color-info-500: #{$color-info-500};
+  --color-info-600: #{$color-info-600};
+  --color-info-700: #{$color-info-700};
+  --color-info-800: #{$color-info-800};
+  --color-info-900: #{$color-info-900};
+  
+  // Main info reference
+  --color-info: var(--color-info-500);
+  
+  // ----------------------------------------------------------------------------
+  // SEMANTIC UI VARIABLES
+  // ----------------------------------------------------------------------------
+  
+  // Text colors
+  --color-text: var(--color-gray-800);
+  --color-text-light: var(--color-gray-600);
+  --color-text-lighter: var(--color-gray-500);
+  --color-text-lightest: var(--color-gray-400);
+  --color-text-dark: var(--color-gray-900);
+  --color-text-muted: var(--color-gray-500);
+  --color-text-inverted: var(--color-white);
+  
+  // Background colors
+  --color-background: var(--color-white);
+  --color-background-light: var(--color-gray-50);
+  --color-background-dark: var(--color-gray-100);
+  
+  // Surface colors
+  --color-surface: var(--color-white);
+  --color-surface-accent: var(--color-gray-50);
+  --color-surface-hover: var(--color-gray-100);
+  --color-surface-active: var(--color-primary-50);
+  
+  // Border colors
+  --color-border: var(--color-gray-200);
+  --color-border-light: var(--color-gray-100);
+  --color-border-dark: var(--color-gray-300);
+  --color-border-hover: var(--color-gray-400);
+  --color-border-focus: var(--color-primary-500);
+  
+  // State colors
+  --color-focus-ring: rgba(#{$color-primary-rgb}, 0.5);
+  --color-overlay: rgba(#{$color-black-rgb}, 0.5);
+  --color-shadow: rgba(#{$color-black-rgb}, 0.1);
+}
+
+// ----------------------------------------------------------------------------
+// COLOR ACCESS FUNCTIONS
+// ----------------------------------------------------------------------------
+
+/**
+ * Get a color from the palette
+ *
+ * @param {String} $family - The color family (primary, secondary, etc.)
+ * @param {String} $shade - The shade of the color (50, 100, 200, etc.)
+ * @return {Color} The color value
+ */
+@function color($family, $shade: '500') {
+  @if map-has-key($color-palette, $family) {
+    $family-map: map-get($color-palette, $family);
+    
+    @if map-has-key($family-map, $shade) {
+      @return map-get($family-map, $shade);
+    }
+    
+    @warn "Color shade `#{$shade}` not found in family `#{$family}`.";
+    @return null;
+  }
+  
+  @warn "Color family `#{$family}` not found.";
+  @return null;
+}
+
+/**
+ * Get a semantic color
+ *
+ * @param {String} $name - The semantic color name
+ * @return {Color} The color value
+ */
+@function semantic-color($name) {
+  @if map-has-key($color-semantic, $name) {
+    @return map-get($color-semantic, $name);
+  }
+  
+  @warn "Semantic color `#{$name}` not found.";
+  @return null;
+}
+
+/**
+ * Get a specific shade of the primary color
+ *
+ * @param {String} $shade - The shade of the primary color
+ * @return {Color} The primary color at the specified shade
+ */
+@function primary($shade: '500') {
+  @return color('primary', $shade);
+}
+
+/**
+ * Get a specific shade of the secondary color
+ *
+ * @param {String} $shade - The shade of the secondary color
+ * @return {Color} The secondary color at the specified shade
+ */
+@function secondary($shade: '500') {
+  @return color('secondary', $shade);
+}
+
+/**
+ * Get a specific shade of gray
+ *
+ * @param {String} $shade - The shade of gray
+ * @return {Color} The gray color at the specified shade
+ */
+@function gray($shade: '500') {
+  @return color('gray', $shade);
+}
+
+// ----------------------------------------------------------------------------
+// COLOR MIXINS
+// ----------------------------------------------------------------------------
+
+/**
+ * Apply primary text color
+ * 
+ * @param {String} $shade - The shade of the primary color (default: 500)
+ */
+@mixin text-primary($shade: '500') {
+  color: color('primary', $shade);
+}
+
+/**
+ * Apply secondary text color
+ * 
+ * @param {String} $shade - The shade of the secondary color (default: 500)
+ */
+@mixin text-secondary($shade: '500') {
+  color: color('secondary', $shade);
+}
+
+/**
+ * Apply gray text color
+ * 
+ * @param {String} $shade - The shade of gray (default: 800)
+ */
+@mixin text-gray($shade: '800') {
+  color: color('gray', $shade);
+}
+
+/**
+ * Apply feedback text color
+ * 
+ * @param {String} $type - The feedback type (success, error, warning, info)
+ * @param {String} $shade - The shade of the feedback color (default: 700)
+ */
+@mixin text-feedback($type, $shade: '700') {
+  @if $type == 'success' {
+    color: color('success', $shade);
+  } @else if $type == 'error' {
+    color: color('error', $shade);
+  } @else if $type == 'warning' {
+    color: color('warning', $shade);
+  } @else if $type == 'info' {
+    color: color('info', $shade);
+  } @else {
+    @warn "Invalid feedback type: #{$type}";
+  }
+}
+
+/**
+ * Apply primary background color
+ * 
+ * @param {String} $shade - The shade of the primary color (default: 500)
+ */
+@mixin bg-primary($shade: '500') {
+  background-color: color('primary', $shade);
+}
+
+/**
+ * Apply secondary background color
+ * 
+ * @param {String} $shade - The shade of the secondary color (default: 500)
+ */
+@mixin bg-secondary($shade: '500') {
+  background-color: color('secondary', $shade);
+}
+
+/**
+ * Apply gray background color
+ * 
+ * @param {String} $shade - The shade of gray (default: 100)
+ */
+@mixin bg-gray($shade: '100') {
+  background-color: color('gray', $shade);
+}
+
+/**
+ * Apply feedback background color
+ * 
+ * @param {String} $type - The feedback type (success, error, warning, info)
+ * @param {String} $shade - The shade of the feedback color (default: 50)
+ */
+@mixin bg-feedback($type, $shade: '50') {
+  @if $type == 'success' {
+    background-color: color('success', $shade);
+  } @else if $type == 'error' {
+    background-color: color('error', $shade);
+  } @else if $type == 'warning' {
+    background-color: color('warning', $shade);
+  } @else if $type == 'info' {
+    background-color: color('info', $shade);
+  } @else {
+    @warn "Invalid feedback type: #{$type}";
+  }
+}
 
 // Export a flag to indicate this file was imported
 $core-colors-imported: true; 

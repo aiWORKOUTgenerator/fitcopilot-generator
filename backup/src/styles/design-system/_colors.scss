@@ -1,13 +1,12 @@
 /**
- * @deprecated This file is deprecated. Use tokens/core/colors instead.
- * All color utility classes should be moved to a separate utility file in the future.
+ * Color Utilities
+ * 
+ * This file provides utility classes for color application.
+ * Core color tokens are defined in the tokens directory.
  */
 
-// Just import the core file which now contains all the color tokens
-@import './tokens/core/colors';
-
-// Note: We're not adding @warn here to avoid console noise during the transition
-// A warning might break builds or create too much noise in the console
+// Import the token system
+@import './tokens/index';
 
 /* Color utilities */
 .text-primary { color: var(--color-primary); }
