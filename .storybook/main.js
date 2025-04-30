@@ -31,6 +31,7 @@ module.exports = {
           loader: 'sass-loader',
           options: {
             additionalData: `
+              @import "../src/styles/design-system/tokens/core/colors";
               @import "../src/features/workout-generator/styles/_variables.scss";
               @import "../src/features/workout-generator/styles/_color-tokens.scss";
             `
