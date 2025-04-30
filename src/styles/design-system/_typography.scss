@@ -1,9 +1,16 @@
-:root {
-  --font-base:    'Inter', sans-serif;
-  --font-heading: 'Bebas Neue', sans-serif;
+/**
+ * @deprecated This file is deprecated. Use tokens/core/typography instead.
+ * All typography tokens have been moved to the core typography file.
+ */
 
-  --text-sm:  0.875rem;
-  --text-md:  1rem;
-  --text-lg:  1.25rem;
-  --text-xl:  1.5rem;
+// Don't show warning during build to reduce console noise
+// @warn "The file _typography.scss is deprecated. Import 'tokens/core/typography' directly instead.";
+
+// Import the core typography file
+@import 'tokens/core/typography';
+
+// Re-export the typography variables for backward compatibility
+:root {
+  // These are now set in tokens/core/typography
+  // Keeping the empty declaration for backward compatibility
 }

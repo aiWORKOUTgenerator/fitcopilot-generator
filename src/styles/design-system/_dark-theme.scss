@@ -1,3 +1,16 @@
+/**
+ * @deprecated This file is deprecated. Use themes/_dark.scss instead.
+ * All dark theme styles have been moved to the themes directory.
+ */
+
+// Don't show warning during build to reduce console noise
+// @warn "The file _dark-theme.scss is deprecated. Import 'themes/_dark.scss' directly instead.";
+
+// Import the theme file
+@import 'themes/dark';
+
+// The dark theme styles are now defined in themes/_dark.scss
+
 /* Dark theme variables - applies common design elements to dark mode */
 
 :root {
