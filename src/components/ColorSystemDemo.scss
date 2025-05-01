@@ -33,12 +33,42 @@
       border-radius: 6px;
       border-bottom: 1px solid color('border');
     }
+    
+    h4 {
+      color: color('text');
+      margin: 1rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid color('border', 'light');
+    }
   }
   
   .color-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
+  }
+  
+  // Button Grid Styles
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+    
+    .button-section {
+      background-color: color('background', 'light');
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
   }
   
   .color-item {

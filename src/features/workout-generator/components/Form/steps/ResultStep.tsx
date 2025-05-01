@@ -77,7 +77,7 @@ export const ResultStep: React.FC<ResultStepProps> = ({
           
           <div className="result-step__actions">
             <Button 
-              variant="primary"
+              variant="gradient"
               size="lg"
               onClick={onGenerateNew}
               aria-label="Try generating a workout again"
@@ -104,7 +104,7 @@ export const ResultStep: React.FC<ResultStepProps> = ({
           
           <div className="result-step__actions">
             <Button 
-              variant="primary"
+              variant="gradient"
               size="lg"
               onClick={onGenerateNew}
               aria-label="Generate a new workout"
@@ -130,7 +130,7 @@ export const ResultStep: React.FC<ResultStepProps> = ({
         
         <div className="result-step__actions">
           <Button 
-            variant="primary"
+            variant="gradient"
             size="lg"
             onClick={handleViewFullWorkout}
             aria-label="View full workout details"

@@ -1,4 +1,6 @@
 import React from 'react';
+import Button from '../components/ui/Button/Button';
+import { ArrowRight, Play, Zap } from 'lucide-react';
 import './ColorSystemDemo.scss';
 
 /**
@@ -73,6 +75,47 @@ const ColorSystemDemo: React.FC = () => {
           <div className="color-item gradient-cyan">Cyan</div>
           <div className="color-item gradient-violet">Violet</div>
           <div className="color-item gradient-amber">Amber</div>
+        </div>
+      </section>
+      
+      <section className="demo-section">
+        <h3>Gradient Buttons</h3>
+        <div className="button-grid">
+          <div className="button-section">
+            <h4>Green Gradient Buttons</h4>
+            <div className="button-row">
+              <Button variant="gradient" size="sm">Small</Button>
+              <Button variant="gradient">Medium</Button>
+              <Button variant="gradient" size="lg">Large</Button>
+            </div>
+            <div className="button-row">
+              <Button variant="gradient" startIcon={<ArrowRight size={18} />}>
+                Start Icon
+              </Button>
+              <Button variant="gradient" endIcon={<Play size={18} />}>
+                End Icon
+              </Button>
+              <Button variant="gradient-secondary">Secondary</Button>
+            </div>
+          </div>
+          
+          <div className="button-section">
+            <h4>Violet Gradient Buttons</h4>
+            <div className="button-row">
+              <Button variant="gradient-violet" size="sm">Small</Button>
+              <Button variant="gradient-violet">Medium</Button>
+              <Button variant="gradient-violet" size="lg">Large</Button>
+            </div>
+            <div className="button-row">
+              <Button variant="gradient-violet" startIcon={<Zap size={18} />}>
+                Start Icon
+              </Button>
+              <Button variant="gradient-violet" endIcon={<ArrowRight size={18} />}>
+                End Icon
+              </Button>
+              <Button variant="gradient-violet-secondary">Secondary</Button>
+            </div>
+          </div>
         </div>
       </section>
       

@@ -157,7 +157,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
         
         <Button 
           onClick={onGenerateWorkout}
-          variant="primary"
+          variant="gradient"
           size="lg"
           isLoading={isLoading}
           disabled={isLoading}

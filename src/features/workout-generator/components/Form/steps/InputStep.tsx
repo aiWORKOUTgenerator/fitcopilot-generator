@@ -332,7 +332,7 @@ export const InputStep: React.FC<InputStepProps> = ({
           <div className="input-step__actions">
             <Button 
               type="submit" 
-              variant="primary"
+              variant="gradient"
               size="lg"
               fullWidth
               isLoading={isSubmitting}

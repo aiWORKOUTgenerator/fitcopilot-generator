@@ -7,29 +7,42 @@
  * @usage
  * ```jsx
  * // Primary button with text
- * <Button variant="primary">Click me</Button>
+ * <Button variant="gradient">Click me</Button>
  * 
  * // Button with loading state
- * <Button variant="primary" isLoading>Loading...</Button>
+ * <Button variant="gradient" isLoading>Loading...</Button>
  * 
  * // Button with leading icon
  * <Button variant="secondary" startIcon={<Icon name="arrow" />}>Schedule Session</Button>
  * 
  * // Button with trailing icon
- * <Button variant="primary" endIcon={<Icon name="arrow" />}>Schedule Session</Button>
+ * <Button variant="gradient" endIcon={<Icon name="arrow" />}>Schedule Session</Button>
  * 
  * // Text-only button
  * <Button variant="text">View more</Button>
  * 
  * // Full width button
- * <Button variant="primary" fullWidth>Schedule Session</Button>
+ * <Button variant="gradient" fullWidth>Schedule Session</Button>
  * 
  * // Button as another element (like a link)
- * <Button variant="primary" as="a" href="/path">Go to Path</Button>
+ * <Button variant="gradient" as="a" href="/path">Go to Path</Button>
+ * 
+ * // Success and danger variants
+ * <Button variant="success">Success</Button>
+ * <Button variant="danger">Danger</Button>
+ * 
+ * // Gradient button variants
+ * <Button variant="gradient">Get Started</Button>
+ * <Button variant="gradient-secondary">Learn More</Button>
+ * 
+ * // Purple gradient variants (for gym/fitness theme)
+ * <Button variant="gradient-violet">Join Now</Button>
+ * <Button variant="gradient-violet-secondary">Learn More</Button>
  * ```
  * 
  * @features
- * - Multiple visual variants (primary, secondary, outline, text)
+ * - Multiple visual variants (primary, secondary, outline, text, success, danger)
+ * - Gradient variants (lime-green and violet)
  * - Multiple size variants (sm, md, lg)
  * - Loading states with spinner
  * - Disabled states
@@ -43,7 +56,17 @@ import React, { forwardRef, ButtonHTMLAttributes, ReactNode, ElementType } from 
 import './Button.scss';
 
 // Button variants
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
+export type ButtonVariant = 
+  | 'primary' 
+  | 'secondary' 
+  | 'outline' 
+  | 'text' 
+  | 'success' 
+  | 'danger'
+  | 'gradient'
+  | 'gradient-secondary'
+  | 'gradient-violet'
+  | 'gradient-violet-secondary';
 
 // Button sizes
 export type ButtonSize = 'sm' | 'md' | 'lg';

@@ -29,42 +29,42 @@ const LightningIcon = () => (
 const ButtonDemo = () => {
   return (
     <div style={{ background: '#1a1f2b', padding: '24px', color: 'white', fontFamily: 'system-ui, sans-serif' }}>
-      <h2 style={{ marginBottom: '16px', fontSize: '24px' }}>Primary Variant</h2>
+      <h2 style={{ marginBottom: '16px', fontSize: '24px' }}>Gradient Variant</h2>
       
       <div style={{ marginBottom: '24px' }}>
         <p style={{ marginBottom: '8px', opacity: 0.7 }}>Small</p>
-        <Button variant="primary" size="sm">Small Button</Button>
+        <Button variant="gradient" size="sm">Small Button</Button>
       </div>
       
       <div style={{ marginBottom: '24px' }}>
         <p style={{ marginBottom: '8px', opacity: 0.7 }}>Medium</p>
-        <Button variant="primary" size="md">Medium Button</Button>
+        <Button variant="gradient" size="md">Medium Button</Button>
       </div>
       
       <div style={{ marginBottom: '32px' }}>
         <p style={{ marginBottom: '8px', opacity: 0.7 }}>Large</p>
-        <Button variant="primary" size="lg">Large Button</Button>
+        <Button variant="gradient" size="lg">Large Button</Button>
       </div>
       
       <h2 style={{ marginBottom: '16px', fontSize: '24px' }}>With Icons</h2>
       
       <div style={{ marginBottom: '24px' }}>
         <p style={{ marginBottom: '8px', opacity: 0.7 }}>Arrow Icon</p>
-        <Button variant="primary" endIcon={<ArrowIcon />}>
+        <Button variant="gradient" endIcon={<ArrowIcon />}>
           Schedule Session
         </Button>
       </div>
       
       <div style={{ marginBottom: '24px' }}>
         <p style={{ marginBottom: '8px', opacity: 0.7 }}>Play Icon</p>
-        <Button variant="primary" endIcon={<PlayIcon />}>
+        <Button variant="gradient" endIcon={<PlayIcon />}>
           Watch Demo
         </Button>
       </div>
       
       <div style={{ marginBottom: '32px' }}>
         <p style={{ marginBottom: '8px', opacity: 0.7 }}>Lightning Icon</p>
-        <Button variant="primary" endIcon={<LightningIcon />}>
+        <Button variant="gradient" endIcon={<LightningIcon />}>
           Get Started
         </Button>
       </div>
@@ -86,8 +86,8 @@ const ButtonDemo = () => {
       <h2 style={{ marginBottom: '16px', fontSize: '24px' }}>Full Width</h2>
       
       <div style={{ marginBottom: '24px', background: '#2a303c', padding: '24px' }}>
-        <p style={{ marginBottom: '8px', opacity: 0.7 }}>Primary Full Width</p>
-        <Button variant="primary" fullWidth endIcon={<ArrowIcon />}>
+        <p style={{ marginBottom: '8px', opacity: 0.7 }}>Gradient Full Width</p>
+        <Button variant="gradient" fullWidth endIcon={<ArrowIcon />}>
           Schedule Session
         </Button>
       </div>

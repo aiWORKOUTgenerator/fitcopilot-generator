@@ -8,21 +8,21 @@ import Button, { ButtonVariant, ButtonSize } from './Button';
 
 // Icon components for demonstration
 const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M7.33333 12.6667C10.2789 12.6667 12.6667 10.2789 12.6667 7.33333C12.6667 4.38781 10.2789 2 7.33333 2C4.38781 2 2 4.38781 2 7.33333C2 10.2789 4.38781 12.6667 7.33333 12.6667Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M14.0001 14.0001L11.1001 11.1001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
 const ArrowRightIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="5" y1="12" x2="19" y2="12" />
-    <polyline points="12 5 19 12 12 19" />
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3.33334 8.00008H12.6667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M8 3.33325L12.6667 7.99992L8 12.6666" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
 const ButtonTest: React.FC = () => {
-  const variants: ButtonVariant[] = ['primary', 'secondary', 'outline', 'text'];
+  const variants: ButtonVariant[] = ['gradient', 'primary', 'secondary', 'outline', 'text'];
   const sizes: ButtonSize[] = ['sm', 'md', 'lg'];
   
   // State for loading buttons
@@ -173,7 +173,7 @@ const ButtonTest: React.FC = () => {
       <section className="section">
         <h2>Full Width</h2>
         <div className="full-width-container">
-          <Button fullWidth>Full Width Button</Button>
+          <Button fullWidth variant="gradient">Full Width Button</Button>
         </div>
         <div className="full-width-container">
           <Button 
@@ -200,7 +200,7 @@ const ButtonTest: React.FC = () => {
           <h3>With Icons</h3>
           <div className="button-row">
             <Button 
-              variant="primary"
+              variant="gradient"
               startIcon={<SearchIcon />}
             >
               Search

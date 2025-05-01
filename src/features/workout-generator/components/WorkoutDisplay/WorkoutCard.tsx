@@ -131,7 +131,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
         {onSave && (
           <Button 
             onClick={onSave} 
-            variant="primary" 
+            variant="gradient" 
             size="md"
             isLoading={isSaving}
           >
