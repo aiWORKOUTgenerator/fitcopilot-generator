@@ -61,6 +61,8 @@ $dark-color-categories: (
     'accent': lighten($dark-card-bg, 10%),
     'hover': lighten($dark-card-bg, 7%),
     'disabled': darken($dark-card-bg, 5%),
+    'surface-accent': lighten($dark-card-bg, 10%),
+    'surface-disabled': darken($dark-card-bg, 5%),
   ),
   'success': (
     'base': lighten($success, 5%),
@@ -92,6 +94,24 @@ $dark-color-categories: (
   ),
   'text-muted': (
     'base': $gray-400
+  ),
+  'text-dark': (
+    'base': darken($text, 10%)
+  ),
+  'primary-light': (
+    'base': lighten($primary, 15%)
+  ),
+  'border-hover': (
+    'base': lighten($dark-border, 15%)
+  ),
+  'border-muted': (
+    'base': transparentize($dark-border, 0.3)
+  ),
+  'surface-accent': (
+    'base': lighten($dark-card-bg, 10%)
+  ),
+  'surface-disabled': (
+    'base': darken($dark-card-bg, 5%)
   ),
   // Add white for any direct color('white') usage
   'white': (

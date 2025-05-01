@@ -70,6 +70,21 @@ $color-categories: (
   'text': $color-category-text,
   'surface': $color-category-surface,
   'border': $color-category-border,
+  'surface-light': (
+    base: $surface-light
+  ),
+  'border-hover': (
+    base: $border-hover
+  ),
+  'border-muted': (
+    base: $border-muted
+  ),
+  'primary-light': (
+    base: $primary-light
+  ),
+  'primary-dark': (
+    base: $primary-dark
+  ),
 );
 
 // Feature-specific color map
@@ -200,7 +215,22 @@ $color-categories: (
     light: $surface-light,
     accent: $surface-accent,
     hover: $surface-hover,
-    disabled: darken($card-bg, 3%),
+    disabled: $surface-disabled,
+  ),
+  'surface-light': (
+    base: $surface-light
+  ),
+  'border-hover': (
+    base: $border-hover
+  ),
+  'border-muted': (
+    base: $border-muted
+  ),
+  'primary-light': (
+    base: $primary-light
+  ),
+  'primary-dark': (
+    base: $primary-dark
   ),
   text: (
     base: $text,
@@ -216,6 +246,8 @@ $color-categories: (
     light: lighten($border, 10%),
     hover: $border-hover,
     muted: $border-muted,
+    'border-hover': $border-hover,
+    'border-muted': $border-muted,
   ),
   success: (
     base: $success,
@@ -244,5 +276,20 @@ $color-categories: (
     light: lighten($error, 10%),
     hover: darken($error, 5%),
     muted: transparentize($error, 0.5),
+  ),
+  // Add separate text-muted category for direct access
+  'text-muted': (
+    base: $text-muted
+  ),
+  // Add surface-accent and surface-disabled for direct access
+  'surface-accent': (
+    base: $surface-accent
+  ),
+  'surface-disabled': (
+    base: $surface-disabled
+  ),
+  // Add white for direct access
+  'white': (
+    base: $white
   )
 ); 

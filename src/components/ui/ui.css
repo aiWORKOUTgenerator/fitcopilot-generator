@@ -3,9 +3,9 @@
 /* Local UI component styles */
 @import './Card.scss';
 @import './Card/Card.scss'; 
+@import './Button/Button.scss';
 
 /* Common UI component styles */
-@import '../../common/components/UI/Button/Button.scss';
 @import '../../common/components/UI/Card/Card.scss';
 @import '../../common/components/UI/Checkbox/Checkbox.scss';
 @import '../../common/components/UI/ProgressBar/ProgressBar.scss';

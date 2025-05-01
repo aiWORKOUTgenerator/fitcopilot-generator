@@ -6,8 +6,8 @@
  */
 
 // Export UI components
-export { default as Button } from './Button';
-export { default as Card } from './Card';
+export { default as Button } from '../../../components/ui/Button';
+export { default as Card } from '../../../components/ui/Card/Card';
 export { default as Checkbox } from './Checkbox';
 export { default as ProgressBar } from './ProgressBar';
 export { default as Select } from './Select';

@@ -1,2 +1,96 @@
-@import '../../../styles/design-system/components/card/index';
-@import '../../../styles/design-system/tokens/index'; 
+@import '../../../styles/design-system/tokens/index';
+@import '../../../styles/design-system/tokens/core/spacing';
+@import '../../../styles/design-system/tokens/semantic/surfaces';
+@import '../../../styles/design-system/mixins/index';
+@import '../../../styles/design-system/compatibility/_compatibility';
+@import '../../../styles/theme/index.scss';
+
+.card {
+  display: block;
+  @include card-styling(false);
+  transition: transition-preset('card');
+  width: 100%;
+  background-color: color('surface');
+  color: color('text');
+
+  // Border styles
+  &--bordered {
+    border: 1px solid color('border');
+  }
+
+  // Elevation styles
+  &--elevated {
+    @include card-shadow('card');
+    
+    .dark-theme & {
+      @include card-shadow('card', null, true);
+      background-color: dark-color('surface');
+      color: dark-color('text');
+    }
+  }
+
+  // Hover effect
+  &--hoverable {
+    cursor: pointer;
+    
+    &:hover {
+      background-color: color('surface', 'hover');
+      
+      .dark-theme & {
+        background-color: dark-color('surface', 'hover');
+      }
+    }
+  }
+
+  // Padding variations
+  &--padding-small {
+    padding: spacing('space-2');
+  }
+
+  &--padding-medium {
+    padding: spacing('space-4');
+  }
+
+  &--padding-large {
+    padding: spacing('space-6');
+  }
+
+  // Height variations
+  &--height-auto {
+    height: auto;
+  }
+
+  &--height-full {
+    height: 100%;
+  }
+  
+  // Content layout
+  &__header {
+    margin-bottom: spacing('space-4');
+  }
+  
+  &__title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: spacing('space-2');
+  }
+  
+  &__subtitle {
+    font-size: var(--font-size-base);
+    color: color('text', 'muted');
+    
+    .dark-theme & {
+      color: dark-color('text', 'muted');
+    }
+  }
+  
+  &__content {
+    margin-bottom: spacing('space-4');
+  }
+  
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+} 

@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import './WorkoutCard.scss';
-import Button from '../../../../common/components/UI/Button/Button';
+import Button from '../../../../components/ui/Button/Button';
 import { PrinterIcon, Save, Share2 } from 'lucide-react';
 import { GeneratedWorkout, WorkoutSection, Exercise } from '../../types/workout';
 
