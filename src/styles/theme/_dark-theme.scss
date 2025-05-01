@@ -1,0 +1,260 @@
+/**
+ * FitCopilot Theme - Dark Theme Colors
+ * 
+ * This file provides dark theme color tokens using the map-based architecture
+ * to ensure a consistent approach to dark theme implementation.
+ */
+
+@import 'colors';
+@import 'color-maps';
+
+// ========================================================================
+// DARK THEME COLOR CATEGORY MAPS
+// Maps dark theme color tokens to their semantic meanings and variants
+// ========================================================================
+
+// Primary dark theme color map
+$dark-color-categories: (
+  'primary': (
+    'base': $lime-300,
+    'dark': $lime-500,
+    'light': $lime-200
+  ),
+  'secondary': (
+    'base': $emerald-400,
+    'dark': $emerald-600,
+    'light': $emerald-300
+  ),
+  'background': (
+    'base': $background,
+    'dark': $darker-blue,
+    'light': $background-light,
+    'card': $card-bg
+  ),
+  'text': (
+    'base': $white,
+    'muted': $gray-400,
+    'light': $gray-300,
+    'dark': $gray-500
+  ),
+  'border': (
+    'base': $gray-700,
+    'light': $gray-600,
+    'dark': $gray-800
+  ),
+  'surface': (
+    'base': $card-bg,
+    'accent': $dark-blue,
+    'hover': $darker-blue
+  ),
+  'success': (
+    'base': $emerald-400
+  ),
+  'error': (
+    'base': $error
+  ),
+  'warning': (
+    'base': $amber-400
+  ),
+  'info': (
+    'base': $blue-400
+  )
+);
+
+// Feature-specific dark theme color map
+$dark-feature-categories: (
+  'virtual': (
+    'bg': to-rgba($lime-300, 0.15),
+    'accent': $lime-300
+  ),
+  'schedule': (
+    'bg': to-rgba($cyan-300, 0.15),
+    'accent': $cyan-300
+  ),
+  'progress': (
+    'bg': to-rgba($violet-300, 0.15),
+    'accent': $violet-300
+  ),
+  'support': (
+    'bg': to-rgba($amber-300, 0.15),
+    'accent': $amber-300
+  )
+);
+
+// ========================================================================
+// DARK THEME COLOR ACCESS FUNCTIONS
+// Functions to access dark theme colors consistently
+// ========================================================================
+
+/**
+ * Get a dark theme color from the semantic color system
+ * 
+ * @param {String} $category - The color category (primary, secondary, text, etc.)
+ * @param {String} $variant - The variant (base, light, dark, etc.)
+ * @return {Color} The requested dark theme color value
+ * 
+ * @example
+ * .dark-theme .element {
+ *   color: dark-color('text');
+ *   background-color: dark-color('primary', 'light');
+ * }
+ */
+@function dark-color($category, $variant: 'base') {
+  @if not map-has-key($dark-color-categories, $category) {
+    @warn "Unknown dark color category: #{$category}";
+    @return null;
+  }
+  
+  $category-map: map-get($dark-color-categories, $category);
+  
+  @if not map-has-key($category-map, $variant) {
+    @warn "Unknown variant #{$variant} for dark category #{$category}";
+    @return map-get($category-map, 'base');
+  }
+  
+  @return map-get($category-map, $variant);
+}
+
+/**
+ * Get a dark theme color value for a specific feature
+ * 
+ * @param {String} $feature - The feature name (virtual, schedule, progress, support)
+ * @param {String} $property - The property (bg, accent)
+ * @return {Color} The requested dark theme feature color
+ * 
+ * @example
+ * .dark-theme .feature-card {
+ *   background-color: dark-feature-color('virtual', 'bg');
+ *   border-color: dark-feature-color('virtual', 'accent');
+ * }
+ */
+@function dark-feature-color($feature, $property: 'accent') {
+  @if not map-has-key($dark-feature-categories, $feature) {
+    @warn "Unknown dark feature: #{$feature}";
+    @return null;
+  }
+  
+  $feature-map: map-get($dark-feature-categories, $feature);
+  
+  @if not map-has-key($feature-map, $property) {
+    @warn "Unknown property #{$property} for dark feature #{$feature}";
+    @return map-get($feature-map, 'accent');
+  }
+  
+  @return map-get($feature-map, $property);
+}
+
+/**
+ * Get a dark theme color with transparency
+ * 
+ * @param {String} $category - The color category
+ * @param {String} $variant - The variant
+ * @param {Number} $opacity - The opacity value (0-1)
+ * @return {Color} The dark theme color with applied opacity
+ * 
+ * @example
+ * .dark-theme .overlay {
+ *   background-color: dark-color-alpha('background', 'base', 0.8);
+ * }
+ */
+@function dark-color-alpha($category, $variant: 'base', $opacity: 0.5) {
+  $color: dark-color($category, $variant);
+  @if $color {
+    @return to-rgba($color, $opacity);
+  }
+  
+  @warn "Could not create transparent dark color for: #{$category}, #{$variant}";
+  @return null;
+}
+
+// ========================================================================
+// DARK THEME CSS VARIABLE EXPORTS
+// Makes dark theme color system available via CSS custom properties
+// ========================================================================
+
+.dark-theme {
+  // Primary semantic colors
+  --color-primary: #{dark-color('primary')};
+  --color-primary-dark: #{dark-color('primary', 'dark')};
+  --color-primary-light: #{dark-color('primary', 'light')};
+  --color-secondary: #{dark-color('secondary')};
+  --color-secondary-dark: #{dark-color('secondary', 'dark')};
+  --color-secondary-light: #{dark-color('secondary', 'light')};
+  
+  // Primary semantic RGB values
+  --color-primary-rgb: #{red(dark-color('primary'))}, #{green(dark-color('primary'))}, #{blue(dark-color('primary'))};
+  --color-primary-dark-rgb: #{red(dark-color('primary', 'dark'))}, #{green(dark-color('primary', 'dark'))}, #{blue(dark-color('primary', 'dark'))};
+  --color-primary-light-rgb: #{red(dark-color('primary', 'light'))}, #{green(dark-color('primary', 'light'))}, #{blue(dark-color('primary', 'light'))};
+  --color-secondary-rgb: #{red(dark-color('secondary'))}, #{green(dark-color('secondary'))}, #{blue(dark-color('secondary'))};
+  
+  // Background colors
+  --color-background: #{dark-color('background')};
+  --color-background-light: #{dark-color('background', 'light')};
+  --color-background-dark: #{dark-color('background', 'dark')};
+  --color-background-card: #{dark-color('background', 'card')};
+  
+  // Background RGB values
+  --color-background-rgb: #{red(dark-color('background'))}, #{green(dark-color('background'))}, #{blue(dark-color('background'))};
+  --color-background-card-rgb: #{red(dark-color('background', 'card'))}, #{green(dark-color('background', 'card'))}, #{blue(dark-color('background', 'card'))};
+  
+  // Text colors
+  --color-text: #{dark-color('text')};
+  --color-text-muted: #{dark-color('text', 'muted')};
+  --color-text-light: #{dark-color('text', 'light')};
+  --color-text-dark: #{dark-color('text', 'dark')};
+  
+  // Text RGB values
+  --color-text-rgb: #{red(dark-color('text'))}, #{green(dark-color('text'))}, #{blue(dark-color('text'))};
+  --color-text-muted-rgb: #{red(dark-color('text', 'muted'))}, #{green(dark-color('text', 'muted'))}, #{blue(dark-color('text', 'muted'))};
+  
+  // Border colors
+  --color-border: #{dark-color('border')};
+  --color-border-light: #{dark-color('border', 'light')};
+  --color-border-dark: #{dark-color('border', 'dark')};
+  
+  // Border RGB values
+  --color-border-rgb: #{red(dark-color('border'))}, #{green(dark-color('border'))}, #{blue(dark-color('border'))};
+  
+  // Surface colors
+  --color-surface: #{dark-color('surface')};
+  --color-surface-accent: #{dark-color('surface', 'accent')};
+  --color-surface-hover: #{dark-color('surface', 'hover')};
+  
+  // Surface RGB values
+  --color-surface-rgb: #{red(dark-color('surface'))}, #{green(dark-color('surface'))}, #{blue(dark-color('surface'))};
+  
+  // Status colors
+  --color-success: #{dark-color('success')};
+  --color-error: #{dark-color('error')};
+  --color-warning: #{dark-color('warning')};
+  --color-info: #{dark-color('info')};
+  
+  // Status RGB values
+  --color-success-rgb: #{red(dark-color('success'))}, #{green(dark-color('success'))}, #{blue(dark-color('success'))};
+  --color-error-rgb: #{red(dark-color('error'))}, #{green(dark-color('error'))}, #{blue(dark-color('error'))};
+  --color-warning-rgb: #{red(dark-color('warning'))}, #{green(dark-color('warning'))}, #{blue(dark-color('warning'))};
+  --color-info-rgb: #{red(dark-color('info'))}, #{green(dark-color('info'))}, #{blue(dark-color('info'))};
+  
+  // Feature-specific colors - virtual
+  --color-feature-virtual-bg: #{dark-feature-color('virtual', 'bg')};
+  --color-feature-virtual-accent: #{dark-feature-color('virtual', 'accent')};
+  --color-feature-virtual-accent-rgb: #{red(dark-feature-color('virtual', 'accent'))}, #{green(dark-feature-color('virtual', 'accent'))}, #{blue(dark-feature-color('virtual', 'accent'))};
+  
+  // Feature-specific colors - schedule
+  --color-feature-schedule-bg: #{dark-feature-color('schedule', 'bg')};
+  --color-feature-schedule-accent: #{dark-feature-color('schedule', 'accent')};
+  --color-feature-schedule-accent-rgb: #{red(dark-feature-color('schedule', 'accent'))}, #{green(dark-feature-color('schedule', 'accent'))}, #{blue(dark-feature-color('schedule', 'accent'))};
+  
+  // Feature-specific colors - progress
+  --color-feature-progress-bg: #{dark-feature-color('progress', 'bg')};
+  --color-feature-progress-accent: #{dark-feature-color('progress', 'accent')};
+  --color-feature-progress-accent-rgb: #{red(dark-feature-color('progress', 'accent'))}, #{green(dark-feature-color('progress', 'accent'))}, #{blue(dark-feature-color('progress', 'accent'))};
+  
+  // Feature-specific colors - support
+  --color-feature-support-bg: #{dark-feature-color('support', 'bg')};
+  --color-feature-support-accent: #{dark-feature-color('support', 'accent')};
+  --color-feature-support-accent-rgb: #{red(dark-feature-color('support', 'accent'))}, #{green(dark-feature-color('support', 'accent'))}, #{blue(dark-feature-color('support', 'accent'))};
+}
+
+// Export a flag to indicate this file was imported
+$dark-theme-imported: true; 

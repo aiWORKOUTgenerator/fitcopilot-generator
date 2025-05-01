@@ -1,184 +1,263 @@
-# FitCopilot Color System
+# FitCopilot Standardized Color System
 
-This directory contains the FitCopilot theme color system, which provides a standardized approach to colors across the application.
+This document outlines the standardized color token system implemented in Phase 1. The system provides a consistent, maintainable, and accessible approach to managing colors across the application.
 
-## File Structure
+## Directory Structure
 
-- `_colors.scss` - Core color definitions and CSS variables
-- `_color-functions.scss` - Function-based access to color tokens
-- `_compatibility.scss` - Compatibility layer for legacy code
-- `_index.scss` - Entry point that exports all theme files
-- `test-colors.scss` - Test file to validate color functions
+```
+src/styles/theme/
+├── _colors.scss         (Core color variables)
+├── _color-maps.scss     (Structured color maps)
+├── _color-functions.scss (Color access functions)
+├── _dark-theme.scss     (Dark theme implementation)
+├── index.scss           (Main entry point)
+├── README.md            (This documentation)
+```
 
-## Usage Guide
+## Core Concepts
 
-### Basic Usage
+### 1. Map-Based Architecture
+
+All color tokens are organized in structured maps for consistent access:
 
 ```scss
-@import 'styles/theme/index';
+$color-categories: (
+  'primary': (
+    'base': $primary,
+    'dark': $primary-dark,
+    'light': $primary-light
+  ),
+  // Additional categories
+);
+```
 
-.my-component {
-  // Using color functions
+### 2. Standardized Access Functions
+
+Colors should always be accessed through these functions, never directly:
+
+```scss
+// Primary function for accessing colors
+@function color($category, $variant: 'base') {
+  // Implementation details
+}
+
+// For dark theme colors
+@function dark-color($category, $variant: 'base') {
+  // Implementation details
+}
+
+// For feature-specific colors
+@function feature-color($feature, $property: 'accent') {
+  // Implementation details
+}
+```
+
+### 3. RGB Variables for Transparency
+
+All colors have corresponding RGB variables for use with opacity:
+
+```scss
+// In CSS files
+--color-primary: #1FAD9F;
+--color-primary-rgb: 31, 173, 159;
+
+// Usage with opacity
+background-color: rgba(var(--color-primary-rgb), 0.2);
+```
+
+## Usage Examples
+
+### Basic Color Access
+
+```scss
+// SCSS usage
+.element {
+  color: color('text');
+  background-color: color('primary', 'light');
+  border: 1px solid color('border');
+}
+
+// CSS variables usage
+.element {
+  color: var(--color-text);
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-border);
+}
+```
+
+### With Opacity
+
+```scss
+// SCSS usage
+.element-with-opacity {
+  background-color: color-alpha('primary', 'base', 0.2);
+  border: 1px solid color-alpha('border', 'base', 0.5);
+}
+
+// CSS variables usage
+.element-with-opacity {
+  background-color: rgba(var(--color-primary-rgb), 0.2);
+  border: 1px solid rgba(var(--color-border-rgb), 0.5);
+}
+```
+
+### Dark Theme
+
+```scss
+// SCSS usage
+.element {
   color: color('text');
   background-color: color('background');
-  border: 1px solid color('border');
   
-  // Using feature-specific colors
-  &.virtual-training {
-    background-color: feature-color('virtual', 'bg');
-    border-color: feature-color('virtual', 'accent');
+  .dark-theme & {
+    color: dark-color('text');
+    background-color: dark-color('background');
+  }
+}
+
+// CSS variables usage (automatic with .dark-theme class)
+.element {
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+```
+
+### Feature-Specific Colors
+
+```scss
+// SCSS usage
+.feature-element {
+  background-color: feature-color('virtual', 'bg');
+  border-color: feature-color('virtual', 'accent');
+}
+
+// CSS variables usage
+.feature-element {
+  background-color: var(--color-feature-virtual-bg);
+  border-color: var(--color-feature-virtual-accent);
+}
+```
+
+## Available Color Categories
+
+### Semantic Colors
+
+| Category | Variants | Description |
+|----------|----------|-------------|
+| `primary` | `base`, `dark`, `light` | Primary brand colors |
+| `secondary` | `base`, `dark`, `light` | Secondary brand colors |
+| `background` | `base`, `dark`, `light`, `card` | Background colors |
+| `text` | `base`, `muted`, `light`, `dark` | Text colors |
+| `border` | `base`, `light`, `dark` | Border colors |
+| `success` | `base` | Success indicator |
+| `error` | `base` | Error indicator |
+| `warning` | `base` | Warning indicator |
+| `info` | `base` | Information indicator |
+
+### Feature-Specific Colors
+
+| Feature | Properties | Description |
+|---------|------------|-------------|
+| `virtual` | `bg`, `accent` | Virtual training feature |
+| `schedule` | `bg`, `accent` | Scheduling feature |
+| `progress` | `bg`, `accent` | Progress tracking feature |
+| `support` | `bg`, `accent` | Support feature |
+
+## Helper Functions
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `color($category, $variant)` | Access semantic colors | `color('primary', 'dark')` |
+| `feature-color($feature, $property)` | Access feature colors | `feature-color('virtual', 'bg')` |
+| `dark-color($category, $variant)` | Access dark theme colors | `dark-color('text')` |
+| `color-alpha($category, $variant, $opacity)` | Get color with transparency | `color-alpha('primary', 'base', 0.2)` |
+| `dark-color-alpha($category, $variant, $opacity)` | Get dark color with transparency | `dark-color-alpha('primary', 'base', 0.2)` |
+| `gradient($type)` | Get predefined gradient | `gradient('lime')` |
+| `overlay($type, $custom-opacity)` | Get overlay color | `overlay('dark', 0.8)` |
+| `palette($palette, $shade)` | Access palette color directly | `palette('lime', '300')` |
+| `primary($variant)` | Shorthand for primary colors | `primary('light')` |
+| `secondary($variant)` | Shorthand for secondary colors | `secondary('dark')` |
+
+## CSS Variables
+
+All colors are exported as CSS custom properties for use in styles:
+
+```scss
+:root {
+  --color-primary: #1FAD9F;
+  --color-primary-dark: #007A91;
+  --color-primary-light: #33B1C9;
+  --color-primary-rgb: 31, 173, 159;
+  // Additional variables
+}
+```
+
+## Best Practices
+
+1. **Always use functions**: Never use direct color values or variables
+2. **Use with opacity**: Use `color-alpha()` or RGB variables for transparency
+3. **Consider dark theme**: Always provide dark theme alternatives
+4. **Use semantic tokens**: Choose tokens based on purpose, not appearance
+5. **Maintain consistency**: Use the same token for the same purpose across components
+
+## Common Patterns
+
+### Button Styles
+
+```scss
+.button {
+  background-color: color('primary');
+  color: color('text-light');
+  
+  &:hover {
+    background-color: color('primary', 'dark');
   }
   
-  // Using gradients
-  &.gradient-button {
-    background: gradient('lime');
+  .dark-theme & {
+    background-color: dark-color('primary');
+    color: dark-color('text');
   }
 }
 ```
 
-### Available Functions
-
-#### `color($category, $variant)`
-
-Access semantic color tokens:
+### Card Styles
 
 ```scss
-// Primary colors
-color('primary');        // $primary (lime-300)
-color('primary', 'dark'); // $primary-dark (lime-500)
-color('primary', 'light'); // $primary-light (lime-200)
-
-// Secondary colors
-color('secondary');       // $secondary (emerald-400)
-color('secondary', 'dark'); // $secondary-dark (emerald-600)
-color('secondary', 'light'); // $secondary-light (emerald-200)
-
-// Background colors
-color('background');      // $background (gray-900)
-color('background', 'light'); // $background-light (gray-800)
-color('background', 'dark'); // $background-dark (gray-950)
-color('background', 'card'); // $background-card (card-bg)
-
-// Text colors
-color('text');           // $text (white)
-color('text', 'muted');   // $text-muted (gray-400)
-color('text', 'light');   // $text-light (gray-300)
-color('text', 'dark');    // $text-dark (gray-600)
-
-// Border colors
-color('border');         // $border (gray-700)
-color('border', 'light'); // $border-light (gray-600)
-color('border', 'dark');  // $border-dark (gray-800)
-
-// Status colors
-color('success');        // $success (emerald-500)
-color('error');          // $error (ef4444)
-color('warning');        // $warning (amber-500)
-color('info');           // $info (blue-500)
+.card {
+  background-color: color('background', 'card');
+  border: 1px solid color('border');
+  color: color('text');
+  
+  .dark-theme & {
+    background-color: dark-color('background', 'card');
+    border-color: dark-color('border');
+    color: dark-color('text');
+  }
+}
 ```
 
-#### `feature-color($feature, $property)`
-
-Access feature-specific colors:
+### Form Elements
 
 ```scss
-// Virtual Training feature
-feature-color('virtual', 'bg');    // $feature-virtual-bg
-feature-color('virtual', 'accent'); // $feature-virtual-accent
-
-// Scheduling feature
-feature-color('schedule', 'bg');    // $feature-schedule-bg
-feature-color('schedule', 'accent'); // $feature-schedule-accent
-
-// Progress feature
-feature-color('progress', 'bg');    // $feature-progress-bg
-feature-color('progress', 'accent'); // $feature-progress-accent
-
-// Support feature
-feature-color('support', 'bg');    // $feature-support-bg
-feature-color('support', 'accent'); // $feature-support-accent
-```
-
-#### `gradient($type)`
-
-Access predefined gradients:
-
-```scss
-gradient('lime');    // $gradient-lime
-gradient('cyan');    // $gradient-cyan
-gradient('violet');  // $gradient-violet
-gradient('amber');   // $gradient-amber
-```
-
-#### `color-alpha($category, $variant, $opacity)`
-
-Create a transparent version of any color:
-
-```scss
-color-alpha('primary', 'base', 0.2);  // rgba version of primary color at 20% opacity
-color-alpha('text', 'muted', 0.5);     // rgba version of muted text at 50% opacity
-```
-
-#### `overlay($type, $custom-opacity)`
-
-Access overlay colors:
-
-```scss
-overlay('dark');           // $overlay-dark (rgba of gray-900 at 70% opacity)
-overlay('light');          // $overlay-light (rgba of white at 10% opacity)
-overlay('dark', 0.9);      // Custom dark overlay at 90% opacity
-```
-
-#### `palette($palette, $shade)`
-
-Access specific color from a palette:
-
-```scss
-palette('lime', 300);      // $lime-300
-palette('emerald', 500);    // $emerald-500
-```
-
-### Using CSS Variables
-
-For JavaScript and inline styles, use CSS variables:
-
-```jsx
-// In React component
-<div 
-  style={{
-    color: 'var(--color-text)',
-    backgroundColor: 'var(--color-background)',
-    border: '1px solid var(--color-border)'
-  }}
->
-  Content
-</div>
-
-// For opacity with RGB variables
-<div 
-  style={{
-    backgroundColor: 'rgba(var(--color-primary-rgb), 0.2)'
-  }}
->
-  Content with opacity
-</div>
-```
-
-## Extending the System
-
-When adding new colors or functions, follow these guidelines:
-
-1. Add base color definitions to `_colors.scss`
-2. Add semantic mappings to `_colors.scss`
-3. Export as CSS variables in `:root` in `_colors.scss`
-4. Add appropriate function access in `_color-functions.scss`
-5. Add backward compatibility mappings in `_compatibility.scss` if needed
-6. Document the new additions
-
-## Best Practices
-
-1. Always use the function-based approach rather than direct variable references
-2. Use semantic color names (`color('primary')`) instead of specific color names (`$lime-300`)
-3. For opacity/transparency, use the RGB CSS variables or the `color-alpha()` function
-4. For gradients, use the `gradient()` function instead of hardcoding values
-5. Run the token validator regularly to ensure no hardcoded values are introduced 
+.input {
+  background-color: color('background');
+  border: 1px solid color('border');
+  color: color('text');
+  
+  &:focus {
+    border-color: color('primary');
+    box-shadow: 0 0 0 3px color-alpha('primary', 'base', 0.3);
+  }
+  
+  .dark-theme & {
+    background-color: dark-color('background');
+    border-color: dark-color('border');
+    color: dark-color('text');
+    
+    &:focus {
+      border-color: dark-color('primary');
+      box-shadow: 0 0 0 3px dark-color-alpha('primary', 'base', 0.3);
+    }
+  }
+}
+``` 

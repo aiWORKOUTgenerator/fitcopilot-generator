@@ -1,19 +1,20 @@
 /**
  * Form Elements
  * Styles for form controls in workout generator
+ * Using standardized color token system
  */
 
 @use "sass:map";
 @use "sass:math";
 
-// Import design system tokens
-@import '../../../../styles/design-system/compatibility/_compatibility';
+// Import the theme color system
+@import '../../../../styles/theme/index.scss';
 
 @import '../_variables';
 
 /* Form container */
 .workout-generator-form {
-  background-color: var(--color-surface);
+  background-color: color('surface');
   padding: $wg-spacing-lg;
   border-radius: $wg-border-radius;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
@@ -22,7 +23,7 @@
   margin: 0 auto;
   
   .dark-theme & {
-    background-color: var(--color-dark-bg);
+    background-color: dark-color('surface');
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
   }
 }
@@ -34,20 +35,23 @@
 
 .form-label {
   display: block;
-  @include form-label-styling();
+  color: color('text');
+  font-weight: 500;
+  font-size: var(--font-size-base);
   margin-bottom: $wg-spacing-sm;
   
   .dark-theme & {
-    @include form-label-styling(true);
+    color: dark-color('text');
   }
 }
 
 .form-error {
-  @include form-error-styling();
+  color: color('error');
+  font-size: var(--font-size-sm);
   margin-left: $wg-spacing-sm;
   
   .dark-theme & {
-    @include form-error-styling(true);
+    color: dark-color('error');
   }
 }
 
@@ -55,68 +59,68 @@
   display: block;
   width: 100%;
   padding: $spacing-3 $spacing-4;
-  @include input-border();
+  border: 1px solid color('border');
   border-radius: $wg-border-radius;
-  @include input-bg-color();
-  @include input-text-color();
+  background-color: color('surface');
+  color: color('text');
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.5rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
-  transition: compat-transition-preset('input');
+  transition: all 0.2s ease;
   
   &:hover:not(:disabled) {
-    @include input-border('hover');
+    border-color: color('border-hover');
   }
   
   &:focus:not(:disabled) {
-    @include input-border('focus');
-    @include input-focus-ring();
+    border-color: color('primary');
+    box-shadow: 0 0 0 3px color-alpha('primary', 0.25);
     outline: none;
   }
   
   &:disabled {
-    @include input-bg-color('disabled');
-    @include input-text-color('disabled');
-    @include input-border('disabled');
+    background-color: color('surface-disabled');
+    color: color('text-muted');
+    border-color: color('border-muted');
     cursor: not-allowed;
   }
   
   .dark-theme & {
-    @include input-bg-color(null, true);
-    @include input-text-color(null, true);
-    @include input-border(null, true);
+    background-color: dark-color('surface');
+    color: dark-color('text');
+    border-color: dark-color('border');
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23aaaaaa' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     
     &:hover:not(:disabled) {
-      @include input-border('hover', true);
+      border-color: dark-color('border-hover');
     }
     
     &:focus:not(:disabled) {
-      @include input-border('focus', true);
-      @include input-focus-ring(null, true);
+      border-color: dark-color('primary');
+      box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.25);
     }
     
     &:disabled {
-      @include input-bg-color('disabled', true);
-      @include input-text-color('disabled', true);
-      @include input-border('disabled', true);
+      background-color: dark-color('surface-disabled');
+      color: dark-color('text-muted');
+      border-color: dark-color('border-muted');
     }
   }
   
   &--error {
-    @include input-border('error');
+    border-color: color('error');
     
     &:focus {
-      @include input-focus-ring('error');
+      box-shadow: 0 0 0 3px color-alpha('error', 0.25);
     }
     
     .dark-theme & {
-      @include input-border('error', true);
+      border-color: dark-color('error');
       
       &:focus {
-        @include input-focus-ring('error', true);
+        box-shadow: 0 0 0 3px dark-color-alpha('error', 0.25);
       }
     }
   }
@@ -126,72 +130,72 @@
   display: block;
   width: 100%;
   padding: $spacing-3 $spacing-4;
-  @include input-border();
+  border: 1px solid color('border');
   border-radius: $wg-border-radius;
-  @include input-bg-color();
-  @include input-text-color();
+  background-color: color('surface');
+  color: color('text');
   min-height: 100px;
   resize: vertical;
-  transition: compat-transition-preset('input');
+  transition: all 0.2s ease;
   
   &:hover:not(:disabled) {
-    @include input-border('hover');
+    border-color: color('border-hover');
   }
   
   &:focus:not(:disabled) {
-    @include input-border('focus');
-    @include input-focus-ring();
+    border-color: color('primary');
+    box-shadow: 0 0 0 3px color-alpha('primary', 0.25);
     outline: none;
   }
   
   &:disabled {
-    @include input-bg-color('disabled');
-    @include input-text-color('disabled');
-    @include input-border('disabled');
+    background-color: color('surface-disabled');
+    color: color('text-muted');
+    border-color: color('border-muted');
     cursor: not-allowed;
   }
   
   &::placeholder {
-    @include input-placeholder-color();
+    color: color('text-muted');
   }
   
   .dark-theme & {
-    @include input-bg-color(null, true);
-    @include input-text-color(null, true);
-    @include input-border(null, true);
+    background-color: dark-color('surface');
+    color: dark-color('text');
+    border-color: dark-color('border');
     
     &:hover:not(:disabled) {
-      @include input-border('hover', true);
+      border-color: dark-color('border-hover');
     }
     
     &:focus:not(:disabled) {
-      @include input-border('focus', true);
-      @include input-focus-ring(null, true);
+      border-color: dark-color('primary');
+      box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.25);
     }
     
     &:disabled {
-      @include input-bg-color('disabled', true);
-      @include input-text-color('disabled', true);
-      @include input-border('disabled', true);
+      background-color: dark-color('surface-disabled');
+      color: dark-color('text-muted');
+      border-color: dark-color('border-muted');
     }
     
     &::placeholder {
-      @include input-placeholder-color(true);
+      color: dark-color('text-muted');
     }
   }
   
   &--error {
-    @include input-border('error');
+    border-color: color('error');
     
     &:focus {
-      @include input-focus-ring('error');
+      box-shadow: 0 0 0 3px color-alpha('error', 0.25);
     }
     
     .dark-theme & {
-      @include input-border('error', true);
+      border-color: dark-color('error');
       
       &:focus {
-        @include input-focus-ring('error', true);
+        box-shadow: 0 0 0 3px dark-color-alpha('error', 0.25);
       }
     }
   }
@@ -200,31 +204,135 @@
 /* Difficulty options (radio buttons) */
 .difficulty-options {
   display: flex;
-  gap: $wg-spacing-lg;
-  margin-top: $wg-spacing-sm;
-}
-
-.difficulty-option {
-  display: flex;
-  align-items: center;
-  @include input-text-color();
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
   
-  .dark-theme & {
-    @include input-text-color(null, true);
+  &__option {
+    flex: 1;
+    min-width: 100px;
+    
+    @media (max-width: 640px) {
+      min-width: 80px;
+    }
   }
   
-  input[type="radio"] {
-    margin-right: $wg-spacing-sm;
+  &__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
     
-    &:focus {
-      outline: none;
-      @include input-focus-ring();
+    &:checked + .difficulty-options__label {
+      border-color: color('primary');
+      background-color: color-alpha('primary', 0.1);
+      
+      .difficulty-options__title {
+        color: color('primary');
+      }
+      
+      .difficulty-options__icon {
+        color: color('primary');
+      }
+    }
+    
+    &:focus + .difficulty-options__label {
+      box-shadow: 0 0 0 3px color-alpha('primary', 0.2);
+    }
+    
+    .dark-theme &:checked + .difficulty-options__label {
+      border-color: dark-color('primary');
+      background-color: dark-color-alpha('primary', 0.2);
+      
+      .difficulty-options__title {
+        color: dark-color('primary');
+      }
+      
+      .difficulty-options__icon {
+        color: dark-color('primary');
+      }
+    }
+    
+    .dark-theme &:focus + .difficulty-options__label {
+      box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.2);
+    }
+  }
+  
+  &__label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid color('border');
+    border-radius: $wg-border-radius;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      border-color: color('border-hover');
+      
+      .difficulty-options__title {
+        color: color('primary-light');
+      }
+      
+      .difficulty-options__icon {
+        color: color('primary-light');
+      }
     }
     
     .dark-theme & {
-      &:focus {
-        @include input-focus-ring(null, true);
+      border-color: dark-color('border');
+      background-color: dark-color('surface-accent');
+      
+      &:hover {
+        border-color: dark-color('border-hover');
+        
+        .difficulty-options__title {
+          color: dark-color('primary-light');
+        }
+        
+        .difficulty-options__icon {
+          color: dark-color('primary-light');
+        }
       }
+    }
+  }
+  
+  &__icon {
+    font-size: 1.5rem;
+    color: color('text-muted');
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+    
+    .dark-theme & {
+      color: dark-color('text-muted');
+    }
+  }
+  
+  &__title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: color('text');
+    transition: all 0.2s ease;
+    
+    .dark-theme & {
+      color: dark-color('text');
+    }
+  }
+  
+  &__description {
+    font-size: 0.8rem;
+    color: color('text-muted');
+    text-align: center;
+    margin-top: 0.25rem;
+    
+    .dark-theme & {
+      color: dark-color('text-muted');
     }
   }
 }
@@ -236,50 +344,50 @@
   justify-content: space-between;
   width: 100%;
   padding: $spacing-3 $spacing-4;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-wg-primary);
+  background-color: color('surface');
+  border: 1px solid color('primary');
   border-radius: $wg-border-radius;
-  color: var(--color-wg-primary);
+  color: color('primary');
   font-weight: $font-weight-medium;
   cursor: pointer;
   text-align: left;
-  transition: compat-transition-preset('button');
+  transition: all 0.2s ease;
   
   &:hover {
-    background-color: rgba(var(--color-primary-rgb), 0.05);
+    background-color: color-alpha('primary', 0.05);
   }
   
   &:focus {
     outline: none;
-    @include input-focus-ring();
+    box-shadow: 0 0 0 3px color-alpha('primary', 0.25);
   }
   
   .dark-theme & {
-    background-color: var(--color-dark-surface);
-    border-color: var(--color-dark-primary);
-    color: var(--color-dark-primary);
+    background-color: dark-color('surface');
+    border-color: dark-color('primary');
+    color: dark-color('primary');
     
     &:hover {
-      background-color: rgba(var(--color-dark-primary-rgb), 0.1);
+      background-color: dark-color-alpha('primary', 0.1);
     }
     
     &:focus {
-      @include input-focus-ring(null, true);
+      box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.25);
     }
   }
 }
 
 .advanced-options {
-  background-color: var(--color-surface-accent);
-  border: 1px solid var(--color-border);
+  background-color: color('surface-light');
+  border: 1px solid color('border');
   border-radius: $wg-border-radius;
   padding: $spacing-4;
   margin-top: -$spacing-3;
   margin-bottom: $wg-spacing-lg;
   
   .dark-theme & {
-    background-color: var(--color-dark-surface);
-    border-color: var(--color-dark-border);
+    background-color: dark-color('surface');
+    border-color: dark-color('border');
   }
 }
 
@@ -298,10 +406,10 @@
 .equipment-option {
   display: flex;
   align-items: center;
-  @include input-text-color();
+  color: color('text');
   
   .dark-theme & {
-    @include input-text-color(null, true);
+    color: dark-color('text');
   }
   
   input[type="checkbox"] {
@@ -309,12 +417,12 @@
     
     &:focus {
       outline: none;
-      @include input-focus-ring();
+      box-shadow: 0 0 0 3px color-alpha('primary', 0.25);
     }
     
     .dark-theme & {
       &:focus {
-        @include input-focus-ring(null, true);
+        box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.25);
       }
     }
   }

@@ -1,3 +1,10 @@
+/*
+ * Workout Generator Input Step Component
+ * Using standardized color token system for consistent styling
+ */
+
+// Import the theme color system
+@import '../../../../../styles/theme/index.scss';
 @import '../../../styles/components/component-tokens';
 
 .input-step {
@@ -11,16 +18,16 @@
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
     text-align: center;
-    color: wg-form-color('text', 'base');
+    color: color('text');
     font-weight: 600;
     
     .dark-theme & {
-      color: wg-form-color('text', 'dark');
+      color: dark-color('text');
     }
     
     // Gradient text for dark mode
     .dark-theme &.gradient-text {
-      background: linear-gradient(to right, var(--color-primary-light, #84cc16), var(--color-secondary, #22d3ee));
+      background: linear-gradient(to right, color('primary-light'), color('secondary'));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -28,15 +35,15 @@
   }
   
   &__form {
-    background-color: wg-form-color('background', 'base');
+    background-color: color('surface');
     border-radius: 12px;
     padding: 2rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     
     .dark-theme & {
-      background-color: wg-form-color('background', 'dark');
+      background-color: dark-color('surface');
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      border: 1px solid wg-form-color('border', 'dark');
+      border: 1px solid dark-color('border');
     }
   }
   
@@ -52,20 +59,20 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: wg-form-color('text', 'label');
+    color: color('text');
     font-size: 1.125rem;
     
     .dark-theme & {
-      color: wg-form-color('text', 'dark-label');
+      color: dark-color('text');
     }
   }
   
   &__required {
-    color: wg-semantic-color('feedback', 'error');
+    color: color('error');
     margin-left: 0.25rem;
     
     .dark-theme & {
-      color: wg-form-color('border', 'dark-error');
+      color: dark-color('error');
     }
   }
   
@@ -74,34 +81,34 @@
   &__textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid wg-form-color('border', 'base');
+    border: 1px solid color('border');
     border-radius: 8px;
-    background-color: var(--color-bg);
-    color: wg-form-color('text', 'base');
+    background-color: color('surface');
+    color: color('text');
     transition: all 0.2s ease;
     
     &:hover {
-      border-color: wg-form-color('border', 'hover');
+      border-color: color('border-hover');
     }
     
     &:focus {
       outline: none;
-      border-color: wg-color('primary');
-      box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
+      border-color: color('primary');
+      box-shadow: 0 0 0 3px color-alpha('primary', 0.2);
     }
     
     .dark-theme & {
-      background-color: rgba(var(--color-dark-surface-accent, #1f2937), 0.6);
-      border-color: wg-form-color('border', 'dark');
-      color: wg-form-color('text', 'dark');
+      background-color: dark-color('surface-accent');
+      border-color: dark-color('border');
+      color: dark-color('text');
       
       &:hover {
-        border-color: wg-form-color('border', 'dark-hover');
+        border-color: dark-color('border-hover');
       }
       
       &:focus {
-        border-color: wg-form-color('border', 'dark-focus');
-        box-shadow: 0 0 0 3px wg-form-color('shadow', 'dark-focus');
+        border-color: dark-color('primary');
+        box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.2);
       }
     }
   }
@@ -127,12 +134,12 @@
     }
     
     &--focused {
-      border-color: wg-color('primary');
-      box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
+      border-color: color('primary');
+      box-shadow: 0 0 0 3px color-alpha('primary', 0.2);
       
       .dark-theme & {
-        border-color: wg-form-color('border', 'dark-focus');
-        box-shadow: 0 0 0 3px wg-form-color('shadow', 'dark-focus');
+        border-color: dark-color('primary');
+        box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.2);
       }
     }
   }
@@ -153,11 +160,11 @@
     
     &:hover {
       .input-step__radio-button {
-        border-color: wg-form-color('border', 'hover');
+        border-color: color('border-hover');
       }
       
       .input-step__radio-text {
-        color: rgba(var(--color-primary-light, #84cc16), 0.8);
+        color: color-alpha('primary-light', 0.8);
       }
     }
   }
@@ -169,7 +176,7 @@
     height: 0;
     
     &:checked + .input-step__radio-button {
-      border-color: wg-color('primary');
+      border-color: color('primary');
       
       .input-step__radio-dot {
         transform: scale(1);
@@ -178,11 +185,11 @@
     }
     
     &:checked ~ .input-step__radio-text {
-      color: wg-color('primary');
+      color: color('primary');
     }
     
     &:focus + .input-step__radio-button {
-      box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
+      box-shadow: 0 0 0 3px color-alpha('primary', 0.2);
     }
   }
   
@@ -192,44 +199,45 @@
     justify-content: center;
     width: 1.5rem;
     height: 1.5rem;
-    border: 2px solid wg-form-color('border', 'base');
+    border: 2px solid color('border');
     border-radius: 50%;
     margin-right: 0.625rem;
     transition: all 0.2s ease;
     
     .dark-theme & {
-      border-color: wg-form-color('border', 'dark');
+      border-color: dark-color('border');
     }
+  }
+  
+  &__radio-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: color('primary');
+    transform: scale(0);
+    opacity: 0;
+    transition: all 0.2s ease;
     
-    .input-step__radio-dot {
-      width: 0.75rem;
-      height: 0.75rem;
-      background-color: var(--color-primary, #84cc16);
-      border-radius: 50%;
-      transform: scale(0);
-      opacity: 0;
-      transition: all 0.2s ease;
-      
-      .dark-theme & {
-        background-color: var(--color-dark-primary, #84cc16);
-      }
+    .dark-theme & {
+      background-color: dark-color('primary');
     }
   }
   
   &__radio-text {
-    font-size: 1rem;
-    transition: color 0.2s ease;
+    font-size: 1.125rem;
+    color: color('text');
+    transition: all 0.2s ease;
     
     .dark-theme & {
-      color: var(--color-dark-text);
+      color: dark-color('text');
     }
   }
   
-  // Checkboxes (new style)
-  &__checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 0.75rem;
+  // Checkbox inputs
+  &__checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
     margin-top: 0.5rem;
   }
   
@@ -237,14 +245,21 @@
     display: flex;
     align-items: center;
     cursor: pointer;
+    transition: all 0.2s ease;
+    width: calc(50% - 0.5rem);
+    margin-bottom: 0.5rem;
+    
+    @media (max-width: 768px) {
+      width: 100%;
+    }
     
     &:hover {
       .input-step__checkbox-box {
-        border-color: rgba(var(--color-primary-light, #84cc16), 0.5);
+        border-color: color('border-hover');
       }
       
       .input-step__checkbox-text {
-        color: rgba(var(--color-primary-light, #84cc16), 0.8);
+        color: color-alpha('primary-light', 0.8);
       }
     }
   }
@@ -256,16 +271,34 @@
     height: 0;
     
     &:checked + .input-step__checkbox-box {
-      border-color: var(--color-primary, #84cc16);
+      background-color: color('primary');
+      border-color: color('primary');
       
-      .input-step__checkbox-indicator {
-        transform: scale(1);
+      .input-step__checkbox-icon {
         opacity: 1;
+        transform: translateY(0);
       }
     }
     
+    &:checked ~ .input-step__checkbox-text {
+      color: color('primary');
+    }
+    
     &:focus + .input-step__checkbox-box {
-      box-shadow: 0 0 0 3px rgba(var(--color-primary-light, #84cc16), 0.2);
+      box-shadow: 0 0 0 3px color-alpha('primary', 0.2);
+    }
+    
+    .dark-theme &:checked + .input-step__checkbox-box {
+      background-color: dark-color('primary');
+      border-color: dark-color('primary');
+    }
+    
+    .dark-theme &:checked ~ .input-step__checkbox-text {
+      color: dark-color('primary');
+    }
+    
+    .dark-theme &:focus + .input-step__checkbox-box {
+      box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.2);
     }
   }
   
@@ -275,254 +308,122 @@
     justify-content: center;
     width: 1.25rem;
     height: 1.25rem;
-    border: 1px solid var(--color-border);
-    border-radius: 0.25rem;
-    margin-right: 0.5rem;
+    border: 2px solid color('border');
+    border-radius: 4px;
+    margin-right: 0.625rem;
     transition: all 0.2s ease;
+    flex-shrink: 0;
     
     .dark-theme & {
-      border-color: var(--color-dark-border);
-      background-color: rgba(var(--color-dark-surface-accent, #1f2937), 0.6);
+      border-color: dark-color('border');
     }
+  }
+  
+  &__checkbox-icon {
+    color: color('white');
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
     
-    .input-step__checkbox-indicator {
-      width: 0.75rem;
-      height: 0.75rem;
-      background-color: var(--color-primary, #84cc16);
-      border-radius: 0.125rem;
-      transform: scale(0);
-      opacity: 0;
-      transition: all 0.2s ease;
-      
-      .dark-theme & {
-        background-color: var(--color-dark-primary, #84cc16);
-      }
+    .dark-theme & {
+      color: dark-color('text');
     }
   }
   
   &__checkbox-text {
-    font-size: 0.875rem;
-    color: var(--color-text);
-    transition: color 0.2s ease;
+    font-size: 1rem;
+    color: color('text');
+    transition: all 0.2s ease;
+    line-height: 1.2;
     
     .dark-theme & {
-      color: var(--color-dark-text);
+      color: dark-color('text');
     }
   }
   
-  // Advanced options toggle
-  &__advanced-toggle {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background-color: rgba(var(--color-bg, #fff), 0.6);
-    border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 1.5rem;
-    
-    &:hover {
-      border-color: rgba(var(--color-primary-light, #84cc16), 0.5);
-      
-      .input-step__toggle-icon {
-        transform: rotate(12deg);
-      }
-    }
-    
-    &--open {
-      border-color: rgba(var(--color-primary-light, #84cc16), 0.5);
-      box-shadow: 0 4px 6px -1px rgba(var(--color-primary-light, #84cc16), 0.1);
-      
-      .input-step__toggle-icon,
-      .input-step__toggle-chevron {
-        color: var(--color-primary, #84cc16);
-      }
-      
-      .input-step__toggle-chevron {
-        transform: rotate(180deg);
-      }
-    }
-    
-    .dark-theme & {
-      background-color: rgba(var(--color-dark-surface-accent, #1f2937), 0.6);
-      border-color: var(--color-dark-border);
-    }
-  }
-  
-  &__toggle-left {
-    display: flex;
-    align-items: center;
-  }
-  
-  &__toggle-icon {
-    color: var(--color-secondary, #22d3ee);
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.5rem;
-    transition: color 0.3s ease, transform 0.3s ease;
-    
-    .dark-theme & {
-      color: var(--color-dark-secondary, #8dd3f7);
-    }
-  }
-  
-  &__toggle-text {
-    color: var(--color-secondary, #22d3ee);
-    font-weight: 600;
-    font-size: 0.875rem;
-    
-    .dark-theme & {
-      color: var(--color-dark-secondary, #8dd3f7);
-    }
-  }
-  
-  &__toggle-chevron {
-    color: var(--color-secondary, #22d3ee);
-    width: 1.25rem;
-    height: 1.25rem;
-    transition: transform 0.3s ease, color 0.3s ease;
-    
-    .dark-theme & {
-      color: var(--color-dark-secondary, #8dd3f7);
-    }
-  }
-  
-  &__advanced-content {
-    margin-top: 1rem;
-    padding: 1.25rem;
-    background-color: rgba(var(--color-bg, #fff), 0.3);
-    border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
-    animation: fadeIn 0.3s ease-out forwards;
-    margin-bottom: 1.5rem;
-    
-    .dark-theme & {
-      background-color: rgba(var(--color-dark-surface-accent, #1f2937), 0.3);
-      border-color: var(--color-dark-border);
-    }
-  }
-  
-  // Slider
-  &__slider-container {
-    padding-top: 0.25rem;
-  }
-  
-  &__slider {
-    width: 100%;
-    height: 0.5rem;
-    background-color: var(--color-border);
-    border-radius: 0.5rem;
-    appearance: none;
-    outline: none;
-    margin-bottom: 0.5rem;
-    
-    &::-webkit-slider-thumb {
-      appearance: none;
-      width: 1.125rem;
-      height: 1.125rem;
-      border-radius: 50%;
-      background-color: var(--color-primary, #84cc16);
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      
-      &:hover {
-        transform: scale(1.2);
-        box-shadow: 0 0 10px rgba(var(--color-primary-light, #84cc16), 0.5);
-      }
-    }
-    
-    &::-moz-range-thumb {
-      width: 1.125rem;
-      height: 1.125rem;
-      border: none;
-      border-radius: 50%;
-      background-color: var(--color-primary, #84cc16);
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      
-      &:hover {
-        transform: scale(1.2);
-        box-shadow: 0 0 10px rgba(var(--color-primary-light, #84cc16), 0.5);
-      }
-    }
-    
-    .dark-theme & {
-      background-color: var(--color-dark-border);
-      
-      &::-webkit-slider-thumb {
-        background-color: var(--color-dark-primary, #84cc16);
-      }
-      
-      &::-moz-range-thumb {
-        background-color: var(--color-dark-primary, #84cc16);
-      }
-    }
-  }
-  
-  &__slider-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: var(--color-muted);
-    
-    .dark-theme & {
-      color: var(--color-dark-muted);
-    }
-  }
-  
+  // Help text styles
   &__help-text {
+    font-size: 0.875rem;
+    color: color('text-muted');
     margin-top: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--color-muted);
     
     .dark-theme & {
-      color: var(--color-dark-muted);
+      color: dark-color('text-muted');
     }
   }
   
-  &__error {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--color-error);
+  // Form field states
+  &__input-wrapper {
+    position: relative;
     
-    .dark-theme & {
-      color: var(--color-dark-error);
+    &--error {
+      .input-step__input,
+      .input-step__select,
+      .input-step__textarea {
+        border-color: color('error');
+        
+        .dark-theme & {
+          border-color: dark-color('error');
+        }
+      }
     }
   }
   
+  &__error-message {
+    font-size: 0.875rem;
+    color: color('error');
+    margin-top: 0.375rem;
+    
+    .dark-theme & {
+      color: dark-color('error');
+    }
+  }
+  
+  // Info cards
+  &__info-card {
+    background-color: color-alpha('primary', 0.05);
+    border-left: 4px solid color('primary');
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    
+    .dark-theme & {
+      background-color: dark-color-alpha('primary', 0.1);
+      border-left-color: dark-color('primary');
+    }
+    
+    &-title {
+      font-weight: 600;
+      color: color('primary');
+      margin-bottom: 0.5rem;
+      
+      .dark-theme & {
+        color: dark-color('primary');
+      }
+    }
+    
+    &-text {
+      font-size: 0.875rem;
+      color: color('text');
+      
+      .dark-theme & {
+        color: dark-color('text');
+      }
+    }
+  }
+  
+  // Action buttons at the bottom of the form
   &__actions {
     display: flex;
     justify-content: flex-end;
+    gap: 1rem;
     margin-top: 2rem;
   }
   
-  /* Removing specific submit button styling to use our enhanced Button component styles */
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    padding: 1.5rem 0.5rem;
-    
-    &__form {
-      padding: 1.5rem 1rem;
-    }
-    
-    &__radio-group {
-      gap: 1rem;
-    }
-    
-    &__checkbox-grid {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    }
-    
-    &__advanced-toggle {
-      padding: 0.75rem;
-    }
-    
-    &__advanced-content {
-      padding: 1rem;
-    }
+  &__button {
+    // Using Button component styles (referenced in Button.scss)
+    min-width: 120px;
   }
 }
 

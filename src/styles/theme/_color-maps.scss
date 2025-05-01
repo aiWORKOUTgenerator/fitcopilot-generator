@@ -148,7 +148,9 @@ $color-palettes: (
 // Dark theme versions of color categories
 // ========================================================================
 
-// Dark theme versions will be implemented in the future
+// For dark theme color maps, see _dark-theme.scss
+// These will be properly imported when the dark theme file is included
+// This ensures separation of concerns between light and dark themes
 
 // Export a flag to indicate this file was imported
 $color-maps-imported: true; 

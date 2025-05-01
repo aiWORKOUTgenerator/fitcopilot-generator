@@ -1,0 +1,21 @@
+/**
+ * FitCopilot Theme - Index
+ * 
+ * This is the main entry point for the theme system.
+ * It imports all the necessary theme files in the correct order.
+ */
+
+// Import the core color variables
+@import '_colors';
+
+// Import the structured color maps
+@import '_color-maps';
+
+// Import the color access functions
+@import '_color-functions';
+
+// Import the dark theme color system
+@import '_dark-theme';
+
+// Export a flag to indicate the theme system was imported
+$theme-system-imported: true; 

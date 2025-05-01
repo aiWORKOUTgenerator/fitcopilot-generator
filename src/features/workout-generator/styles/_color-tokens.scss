@@ -8,11 +8,7 @@
 // Import the global token system
 @import '../../../styles/design-system/tokens/index';
 // Import the FitCopilot theme color system
-@import '../../../styles/theme/colors';
-// Import the standardized map architecture
-@import '../../../styles/theme/color-maps';
-// Import the standardized color functions
-@import '../../../styles/theme/color-functions';
+@import '../../../styles/theme/index.scss';
 
 // ========================================================================
 // WORKOUT GENERATOR COLOR MAPS

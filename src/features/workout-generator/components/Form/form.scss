@@ -1,4 +1,4 @@
-@import '../../../../styles/design-system/index';
+@import '../../../../styles/theme/index.scss';
 @import '../../styles/components/component-tokens';
 
 /* Form Container */
@@ -6,13 +6,13 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: var(--color-bg);
+  background-color: color('surface');
   transition: all 0.3s ease;
   border-radius: 0.5rem;
   
   &.dark-theme {
-    background-color: var(--color-dark-bg);
-    color: wg-form-color('text', 'dark');
+    background-color: dark-color('surface');
+    color: dark-color('text');
   }
 }
 
@@ -29,11 +29,11 @@
   border-radius: 9999px;
   
   .dark-theme & {
-    border-color: wg-form-color('border', 'dark-focus');
-    color: wg-form-color('border', 'dark-focus');
+    border-color: dark-color('primary');
+    color: dark-color('primary');
     
     &:hover {
-      background-color: rgba(var(--color-dark-primary-rgb), 0.1);
+      background-color: dark-color-alpha('primary', 0.1);
     }
   }
 }
@@ -50,10 +50,10 @@
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: calc(var(--text-xl) * 1.2);
-  color: wg-color('primary');
+  color: color('primary');
   
   .dark-theme & {
-    color: wg-form-color('border', 'dark-focus');
+    color: dark-color('primary');
   }
 }
 
@@ -62,7 +62,7 @@
   margin-bottom: 1.5rem;
   
   .dark-theme & {
-    color: wg-form-color('text', 'dark');
+    color: dark-color('text');
   }
 }
 
@@ -72,7 +72,7 @@
 .form-textarea {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid wg-form-color('border', 'base');
+  border: 1px solid color('border');
   border-radius: 0.375rem;
   font-family: var(--font-base);
   font-size: var(--text-md);
@@ -80,26 +80,26 @@
   
   &:focus {
     outline: none;
-    border-color: wg-color('primary');
-    box-shadow: 0 0 0 3px wg-form-color('shadow', 'focus');
+    border-color: color('primary');
+    box-shadow: 0 0 0 3px color-alpha('primary', 0.2);
   }
   
   &--error {
-    border-color: wg-semantic-color('feedback', 'error');
+    border-color: color('error');
   }
   
   .dark-theme & {
-    background-color: var(--color-dark-surface-accent);
-    border-color: wg-form-color('border', 'dark');
-    color: wg-form-color('text', 'dark');
+    background-color: dark-color('surface-accent');
+    border-color: dark-color('border');
+    color: dark-color('text');
     
     &:focus {
-      border-color: wg-form-color('border', 'dark-focus');
-      box-shadow: 0 0 0 3px wg-form-color('shadow', 'dark-focus');
+      border-color: dark-color('primary');
+      box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.2);
     }
     
     &--error {
-      border-color: wg-form-color('border', 'dark-error');
+      border-color: dark-color('error');
     }
   }
 }
@@ -114,21 +114,22 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: color('text');
   
   .dark-theme & {
-    color: wg-form-color('text', 'dark-label');
+    color: dark-color('text');
   }
 }
 
 /* Error Message */
 .form-error {
-  color: wg-semantic-color('feedback', 'error');
+  color: color('error');
   font-size: var(--text-sm);
   margin-top: 0.25rem;
   display: block;
   
   .dark-theme & {
-    color: wg-form-color('border', 'dark-error');
+    color: dark-color('error');
   }
 }
 
@@ -136,8 +137,8 @@
 .form-button,
 .continue-button,
 .preview-step__generate-button {
-  background-color: wg-form-color('button', 'primary');
-  color: white;
+  background-color: color('primary');
+  color: color('white');
   border: none;
   border-radius: 0.375rem;
   padding: 0.75rem 1.5rem;
@@ -147,9 +148,9 @@
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: wg-form-color('button', 'primary-hover');
+    background-color: color('primary-dark');
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(var(--color-text-rgb), 0.1);
+    box-shadow: 0 4px 8px color-alpha('text', 0.1);
   }
   
   &:disabled {
@@ -160,12 +161,12 @@
   }
   
   .dark-theme & {
-    background-color: wg-form-color('button', 'dark-primary');
-    color: wg-form-color('text', 'dark');
+    background-color: dark-color('primary');
+    color: dark-color('text');
     
     &:hover {
-      background-color: wg-form-color('button', 'dark-primary-hover');
-      color: #000;
+      background-color: dark-color('primary-light');
+      color: dark-color('text-dark');
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
   }
