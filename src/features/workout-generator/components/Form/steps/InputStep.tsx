@@ -8,7 +8,7 @@ import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
 import { WorkoutFormParams, WorkoutDifficulty } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
-import { ChevronDown, Dumbbell, ChevronRight } from 'lucide-react';
+import { ChevronDown, Dumbbell, ChevronRight, CheckSquare } from 'lucide-react';
 import './InputStep.scss';
 
 /**
@@ -168,8 +168,8 @@ export const InputStep: React.FC<InputStepProps> = ({
 
   return (
     <div className="input-step">
-      <Card padding="large">
-        <h2 className="input-step__title">Create Your Custom Workout</h2>
+      <Card padding="large" primary elevated>
+        <h2 className="input-step__title gradient-text">Create Your Custom Workout</h2>
         <form onSubmit={handleSubmit} className="input-step__form">
           {/* Goals Selection */}
           <div className="input-step__form-group">
@@ -285,7 +285,7 @@ export const InputStep: React.FC<InputStepProps> = ({
                         onChange={() => handleEquipmentChange(option.id)}
                       />
                       <div className="input-step__checkbox-box">
-                        <div className="input-step__checkbox-indicator"></div>
+                        <CheckSquare size={14} className="input-step__checkbox-indicator" />
                       </div>
                       <span className="input-step__checkbox-text">{option.label}</span>
                     </label>
@@ -322,7 +322,7 @@ export const InputStep: React.FC<InputStepProps> = ({
                   value={formValues.restrictions || ''}
                   onChange={e => setRestrictions(e.target.value)}
                   placeholder="Enter any injuries, limitations, or preferences (e.g., knee injury, prefer machine exercises, etc.)"
-                  rows={3}
+                  rows={4}
                 />
               </div>
             </div>
