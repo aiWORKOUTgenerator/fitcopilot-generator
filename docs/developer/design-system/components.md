@@ -472,7 +472,7 @@ Cards container related content and actions.
 
 ```tsx
 <Button 
-  variant="primary" 
+  variant="gradient" 
   size="md" 
   onClick={handleAction}
   disabled={isLoading}
@@ -488,7 +488,7 @@ Cards container related content and actions.
   <h3 className="h3">Workout Summary</h3>
   <p className="body">A high-intensity workout targeting major muscle groups.</p>
   <div className="card-actions">
-    <Button variant="primary">View Details</Button>
+    <Button variant="gradient">View Details</Button>
   </div>
 </Card>
 ```
