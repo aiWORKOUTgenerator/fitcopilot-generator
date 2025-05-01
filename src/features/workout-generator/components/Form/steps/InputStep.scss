@@ -25,9 +25,10 @@
       color: dark-color('text');
     }
     
-    // Gradient text for dark mode
-    .dark-theme &.gradient-text {
-      background: linear-gradient(to right, color('primary-light'), color('secondary'));
+    // Gradient text for title
+    &.gradient-text,
+    .dark-theme & {
+      background: linear-gradient(to right, color('primary'), color('secondary'));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -35,15 +36,10 @@
   }
   
   &__form {
-    background-color: color('surface');
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 0.5rem 0; // Reduce internal padding since card provides padding
     
     .dark-theme & {
-      background-color: dark-color('surface');
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      border: 1px solid dark-color('border');
+      border: none; // Remove border as Card component provides styling
     }
   }
   
@@ -213,7 +209,7 @@
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 50%;
-    background-color: color('primary');
+    background-color: color('primary'); // Use primary lime color
     transform: scale(0);
     opacity: 0;
     transition: all 0.2s ease;
@@ -271,7 +267,7 @@
     height: 0;
     
     &:checked + .input-step__checkbox-box {
-      background-color: color('primary');
+      background-color: color('primary'); // Use primary lime color
       border-color: color('primary');
       
       .input-step__checkbox-icon {
@@ -281,7 +277,7 @@
     }
     
     &:checked ~ .input-step__checkbox-text {
-      color: color('primary');
+      color: color('primary'); // Use primary lime color
     }
     
     &:focus + .input-step__checkbox-box {
@@ -416,14 +412,15 @@
   // Action buttons at the bottom of the form
   &__actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center; // Center the continue button
     gap: 1rem;
     margin-top: 2rem;
   }
   
-  &__button {
-    // Using Button component styles (referenced in Button.scss)
-    min-width: 120px;
+  &__submit-button {
+    // Style to match website's gradient buttons
+    background: gradient('lime') !important;
+    font-weight: 600;
   }
 }
 

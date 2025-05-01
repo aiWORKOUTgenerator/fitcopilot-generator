@@ -22,6 +22,14 @@
     text-align: center;
   }
   
+  .card-demo-container {
+    margin-top: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: color('background', 'light');
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
   .demo-section {
     margin-bottom: 3rem;
     

@@ -71,6 +71,30 @@ const CardThemeTest: React.FC = () => {
             <p>Hover over this card to see the effect.</p>
           </Card>
           
+          {/* Primary Card with Lime Accent */}
+          <Card primary bordered>
+            <h3>Primary Card</h3>
+            <p>This card showcases the new lime accent color.</p>
+          </Card>
+          
+          {/* Primary Elevated Card */}
+          <Card primary elevated>
+            <h3>Primary Elevated</h3>
+            <p>Primary card with elevation (special shadow).</p>
+          </Card>
+          
+          {/* Primary Hoverable Card */}
+          <Card primary hoverable>
+            <h3>Primary Hoverable</h3>
+            <p>Hover over this card to see the lime accent effects.</p>
+          </Card>
+          
+          {/* Primary Elevated & Hoverable Card */}
+          <Card primary elevated hoverable>
+            <h3>Primary Elevated & Hoverable</h3>
+            <p>This card has the complete lime accent styling.</p>
+          </Card>
+          
           {/* Elevated & Hoverable Card */}
           <Card elevated hoverable>
             <h3>Elevated & Hoverable</h3>

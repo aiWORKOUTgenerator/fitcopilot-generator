@@ -29,6 +29,31 @@
     }
   }
 
+  // Primary variant with lime accent
+  &--primary {
+    border-top: 3px solid color('primary');
+    
+    &.card--elevated {
+      box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
+    }
+    
+    .dark-theme & {
+      border-top: 3px solid dark-color('primary');
+    }
+  }
+  
+  // Hover effect with lime accent for primary cards
+  &--primary.card--hoverable {
+    &:hover {
+      border-color: color('primary');
+      box-shadow: 0 8px 16px rgba(var(--color-primary-rgb), 0.2);
+      
+      .dark-theme & {
+        border-color: dark-color('primary');
+      }
+    }
+  }
+
   // Hover effect
   &--hoverable {
     cursor: pointer;

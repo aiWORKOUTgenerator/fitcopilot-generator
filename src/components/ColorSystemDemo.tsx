@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../components/ui/Button/Button';
+import { CardThemeTest } from '../components/ui/Card';
 import { ArrowRight, Play, Zap } from 'lucide-react';
 import './ColorSystemDemo.scss';
 
@@ -13,6 +14,13 @@ const ColorSystemDemo: React.FC = () => {
   return (
     <div className="color-system-demo">
       <h2>FitCopilot Color System</h2>
+      
+      <section className="demo-section">
+        <h3>Card Component</h3>
+        <div className="card-demo-container">
+          <CardThemeTest />
+        </div>
+      </section>
       
       <section className="demo-section">
         <h3>Semantic Colors</h3>
