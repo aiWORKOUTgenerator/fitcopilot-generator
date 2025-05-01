@@ -70,6 +70,27 @@ function enqueue_frontend_assets() {
             [],
             FITCOPILOT_VERSION
         );
+        
+        // Add fullwidth styles inline
+        wp_add_inline_style('fitcopilot-styles', '
+            .fitcopilot-fullwidth-container {
+                width: 100vw;
+                position: relative;
+                left: 50%;
+                right: 50%;
+                margin-left: -50vw;
+                margin-right: -50vw;
+                box-sizing: border-box;
+                padding: 0;
+            }
+            
+            .fitcopilot-container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        ');
 
         // Localize script with necessary data
         wp_localize_script(
@@ -104,22 +125,24 @@ function render_generator_shortcode() {
     $plugin_url = FITCOPILOT_URL;
     $version = FITCOPILOT_VERSION;
     ?>
-    <div id="fitcopilot-generator-root" class="fitcopilot-container"></div>
-    
-    <div id="fitcopilot-debug-info" style="display:none; margin-top: 20px; padding: 15px; background: #f8f8f8; border: 1px solid #ddd; border-radius: 4px;">
-        <h3>FitCopilot Workout Generator Troubleshooting</h3>
-        <p>The workout generator component failed to load. Here are some possible reasons:</p>
-        <ul>
-            <li>JavaScript files didn't load properly</li>
-            <li>React couldn't initialize the component</li>
-            <li>A JavaScript error occurred during initialization</li>
-        </ul>
-        <p>Required scripts:</p>
-        <ul>
-            <li>vendors.js: <span id="fitcopilot-check-vendors">❓</span></li>
-            <li>frontend.js: <span id="fitcopilot-check-frontend">❓</span></li>
-        </ul>
-        <p>Please check the browser console for detailed error messages.</p>
+    <div class="fitcopilot-fullwidth-container">
+        <div id="fitcopilot-generator-root" class="fitcopilot-container"></div>
+        
+        <div id="fitcopilot-debug-info" style="display:none; margin-top: 20px; padding: 15px; background: #f8f8f8; border: 1px solid #ddd; border-radius: 4px;">
+            <h3>FitCopilot Workout Generator Troubleshooting</h3>
+            <p>The workout generator component failed to load. Here are some possible reasons:</p>
+            <ul>
+                <li>JavaScript files didn't load properly</li>
+                <li>React couldn't initialize the component</li>
+                <li>A JavaScript error occurred during initialization</li>
+            </ul>
+            <p>Required scripts:</p>
+            <ul>
+                <li>vendors.js: <span id="fitcopilot-check-vendors">❓</span></li>
+                <li>frontend.js: <span id="fitcopilot-check-frontend">❓</span></li>
+            </ul>
+            <p>Please check the browser console for detailed error messages.</p>
+        </div>
     </div>
     
     <script>
@@ -218,4 +241,7 @@ require_once FITCOPILOT_DIR . 'src/php/API/APITrackerEndpoints.php';
 // Load admin pages
 require_once FITCOPILOT_DIR . 'src/php/Admin/AdminMenu.php';
 require_once FITCOPILOT_DIR . 'src/php/Admin/APITrackerPage.php';
-require_once FITCOPILOT_DIR . 'src/php/Admin/TokenUsagePage.php'; 
+require_once FITCOPILOT_DIR . 'src/php/Admin/TokenUsagePage.php';
+
+// Load shortcodes
+require_once FITCOPILOT_DIR . 'includes/shortcodes.php'; 

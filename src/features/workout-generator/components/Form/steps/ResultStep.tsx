@@ -10,6 +10,7 @@ import { Button } from '../../../../../common/components/UI';
 import { GeneratedWorkout } from '../../../types/workout';
 import WorkoutCard from '../../WorkoutDisplay/WorkoutCard';
 import ErrorBoundary from '../../common/ErrorBoundary';
+import { RefreshCw, Eye, PlusCircle } from 'lucide-react';
 import '../form.scss';
 
 interface ResultStepProps {
@@ -77,8 +78,10 @@ export const ResultStep: React.FC<ResultStepProps> = ({
           <div className="result-step__actions">
             <Button 
               variant="primary"
+              size="lg"
               onClick={onGenerateNew}
-              className="result-step__retry-button"
+              aria-label="Try generating a workout again"
+              startIcon={<RefreshCw size={18} />}
             >
               Try Again
             </Button>
@@ -102,8 +105,10 @@ export const ResultStep: React.FC<ResultStepProps> = ({
           <div className="result-step__actions">
             <Button 
               variant="primary"
+              size="lg"
               onClick={onGenerateNew}
-              className="result-step__retry-button"
+              aria-label="Generate a new workout"
+              startIcon={<RefreshCw size={18} />}
             >
               Generate New Workout
             </Button>
@@ -126,16 +131,20 @@ export const ResultStep: React.FC<ResultStepProps> = ({
         <div className="result-step__actions">
           <Button 
             variant="primary"
+            size="lg"
             onClick={handleViewFullWorkout}
-            className="view-full-workout-button"
+            aria-label="View full workout details"
+            startIcon={<Eye size={18} />}
           >
             View Full Workout
           </Button>
           
           <Button
-            variant="outline"
+            variant="secondary"
+            size="lg"
             onClick={onGenerateNew}
-            className="generate-another-button"
+            aria-label="Generate another workout"
+            startIcon={<PlusCircle size={18} />}
           >
             Generate Another Workout
           </Button>

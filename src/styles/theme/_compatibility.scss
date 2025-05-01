@@ -1,0 +1,63 @@
+/**
+ * FitCopilot Theme - Color System Compatibility Layer
+ * 
+ * This file provides compatibility mappings from the old color system to the new FitCopilot theme.
+ * It ensures that components using the old system will work with the new colors.
+ */
+
+@import 'colors';
+
+// Map old color variables to the new system
+:root {
+  // Primary color mapping
+  --color-wg-primary: #{$primary};
+  --color-wg-primary-hover: #{$primary-dark};
+  --color-wg-primary-rgb: #{red($primary)}, #{green($primary)}, #{blue($primary)};
+  
+  // Secondary color mapping
+  --color-wg-secondary: #{$secondary};
+  --color-wg-secondary-hover: #{$secondary-dark};
+  --color-wg-secondary-rgb: #{red($secondary)}, #{green($secondary)}, #{blue($secondary)};
+  
+  // Surface colors
+  --color-surface: #{$background-card};
+  --color-surface-accent: #{$background-light};
+  
+  // Feedback colors
+  --color-wg-success: #{$success};
+  --color-wg-error: #{$error};
+  --color-warning: #{$warning};
+  --color-info: #{$info};
+  
+  // Text colors
+  --color-text: #{$text};
+  --color-text-muted: #{$text-muted};
+  --color-text-rgb: #{red($text)}, #{green($text)}, #{blue($text)};
+  
+  // Dark theme colors
+  --color-dark-surface: #{$dark-blue};
+  --color-dark-surface-hover: #{$darker-blue};
+  --color-dark-text: #{$text};
+  --color-dark-text-muted: #{$text-muted};
+  
+  // Card specific colors
+  --color-wg-goal-bg: #{$feature-virtual-bg};
+  --color-wg-goal-color: #{$feature-virtual-accent};
+  --color-wg-level-bg: #{$feature-schedule-bg};
+  --color-wg-level-color: #{$feature-schedule-accent};
+  --color-wg-duration-bg: #{$feature-progress-bg};
+  --color-wg-duration-color: #{$feature-progress-accent};
+  
+  // Dark card colors
+  --color-wg-dark-goal-bg: rgba(#{red($lime-300)}, #{green($lime-300)}, #{blue($lime-300)}, 0.1);
+  --color-wg-dark-goal-color: #{$lime-300};
+  --color-wg-dark-level-bg: rgba(#{red($cyan-300)}, #{green($cyan-300)}, #{blue($cyan-300)}, 0.1);
+  --color-wg-dark-level-color: #{$cyan-300};
+  --color-wg-dark-duration-bg: rgba(#{red($violet-300)}, #{green($violet-300)}, #{blue($violet-300)}, 0.1);
+  --color-wg-dark-duration-color: #{$violet-300};
+  
+  // Background colors
+  --bg-page: #{$background};
+  --bg-card: #{$background-card};
+  --bg-input: #{$background-light};
+} 

@@ -5,6 +5,9 @@
  * Provides a clean, structured layout for viewing workout details.
  */
 import React from 'react';
+import './WorkoutCard.scss';
+import Button from '../../../../common/components/UI/Button/Button';
+import { PrinterIcon, Save, Share2 } from 'lucide-react';
 import { GeneratedWorkout, WorkoutSection, Exercise } from '../../types/workout';
 
 interface WorkoutCardProps {
@@ -12,14 +15,26 @@ interface WorkoutCardProps {
   workout: GeneratedWorkout;
   /** Optional class name for additional styling */
   className?: string;
+  /** Callback for saving the workout */
+  onSave?: () => void;
+  /** Callback for printing the workout */
+  onPrint?: () => void;
+  /** Callback for sharing the workout */
+  onShare?: () => void;
+  /** Indicates if the save operation is in progress */
+  isSaving?: boolean;
 }
 
 /**
  * Component that displays the details of a generated workout
  */
-export const WorkoutCard: React.FC<WorkoutCardProps> = ({
+const WorkoutCard: React.FC<WorkoutCardProps> = ({
   workout,
   className = '',
+  onSave,
+  onPrint,
+  onShare,
+  isSaving = false,
 }) => {
   /**
    * Render an exercise based on its type
@@ -88,6 +103,42 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({
       
       <div className="workout-card__content">
         {workout.sections.map(section => renderSection(section))}
+      </div>
+      
+      <div className="workout-card__actions">
+        {onPrint && (
+          <Button 
+            onClick={onPrint} 
+            variant="secondary" 
+            size="md"
+          >
+            <PrinterIcon size={18} />
+            Print Workout
+          </Button>
+        )}
+        
+        {onShare && (
+          <Button 
+            onClick={onShare} 
+            variant="secondary" 
+            size="md"
+          >
+            <Share2 size={18} />
+            Share
+          </Button>
+        )}
+        
+        {onSave && (
+          <Button 
+            onClick={onSave} 
+            variant="primary" 
+            size="md"
+            isLoading={isSaving}
+          >
+            <Save size={18} />
+            Save Workout
+          </Button>
+        )}
       </div>
     </div>
   );

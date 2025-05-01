@@ -2,154 +2,236 @@
  * Workout Generator Color Token System
  * 
  * This file provides feature-specific color tokens that integrate with the global token system.
- * New components should use these tokens via the helper functions.
+ * Uses the standardized map-based architecture for consistent color access patterns.
  */
 
 // Import the global token system
 @import '../../../styles/design-system/tokens/index';
+// Import the FitCopilot theme color system
+@import '../../../styles/theme/colors';
+// Import the standardized map architecture
+@import '../../../styles/theme/color-maps';
+// Import the standardized color functions
+@import '../../../styles/theme/color-functions';
 
-// Base color tokens - now using the global functions
-$wg-colors: (
+// ========================================================================
+// WORKOUT GENERATOR COLOR MAPS
+// Feature-specific color categories using map architecture
+// ========================================================================
+
+// Core color tokens for Workout Generator
+$wg-color-categories: (
   'primary': (
-    'base': var(--color-wg-primary),
-    'hover': var(--color-wg-primary-hover),
-    'active': var(--color-wg-primary-hover),
-    'disabled': rgba(var(--color-wg-primary-rgb), 0.5)
+    'base': $primary,
+    'hover': $primary-dark,
+    'active': $primary-dark,
+    'disabled': to-rgba($lime-300, 0.5)
   ),
   'secondary': (
-    'base': var(--color-wg-secondary),
-    'hover': var(--color-wg-secondary-hover),
-    'active': var(--color-wg-secondary-hover),
-    'disabled': rgba(var(--color-wg-secondary-rgb), 0.5)
+    'base': $secondary,
+    'hover': $secondary-dark,
+    'active': $secondary-dark,
+    'disabled': to-rgba($emerald-400, 0.5)
   ),
   'surface': (
-    'base': var(--color-surface),
-    'hover': var(--color-surface-accent),
-    'active': var(--color-surface-accent)
+    'base': $background-card,
+    'hover': $background-light,
+    'active': $background-light
   )
 );
 
-// Semantic usage tokens - streamlined to avoid duplication
-$wg-semantic-colors: (
+// Semantic usage tokens for Workout Generator
+$wg-semantic-categories: (
   'interactive': (
-    'primary': wg-color('primary', 'base'),
-    'secondary': wg-color('secondary', 'base')
+    'primary': map-get(map-get($wg-color-categories, 'primary'), 'base'),
+    'secondary': map-get(map-get($wg-color-categories, 'secondary'), 'base')
   ),
   'feedback': (
-    'success': var(--color-wg-success),
-    'error': var(--color-wg-error),
-    'warning': var(--color-warning),
-    'info': var(--color-info)
+    'success': $success,
+    'error': $error,
+    'warning': $warning,
+    'info': $info
   ),
   'text': (
-    'primary': var(--color-text),
-    'secondary': var(--color-text-muted),
-    'disabled': rgba(var(--color-text-rgb), 0.5)
+    'primary': $text,
+    'secondary': $text-muted,
+    'disabled': to-rgba($white, 0.5)
   )
 );
 
 // State colors with contrast guarantees
-$wg-state-colors: (
+$wg-state-categories: (
   'focus': (
-    'outline': rgba(var(--color-wg-primary-rgb), 0.5),
-    'background': rgba(var(--color-wg-primary-rgb), 0.1)
+    'outline': to-rgba($lime-300, 0.5),
+    'background': to-rgba($lime-300, 0.1)
   ),
   'hover': (
-    'background': rgba(var(--color-wg-primary-rgb), 0.05),
-    'text': var(--color-wg-primary)
+    'background': to-rgba($lime-300, 0.05),
+    'text': $primary
   )
 );
 
-// Dark mode color mapping - consolidated
-$wg-dark-mode-colors: (
+// Dark mode color mapping for Workout Generator
+$wg-dark-categories: (
   'surface': (
-    'base': var(--color-dark-surface),
-    'hover': var(--color-dark-surface-hover)
+    'base': $dark-blue,
+    'hover': $darker-blue
   ),
   'text': (
-    'primary': var(--color-dark-text),
-    'secondary': var(--color-dark-text-muted)
+    'primary': $text,
+    'secondary': $text-muted
   )
 );
 
-// Card colors - using the global system
-$wg-card-colors: (
+// Card colors using the FitCopilot color system
+$wg-card-categories: (
   'goal': (
-    'bg': var(--color-wg-goal-bg),
-    'color': var(--color-wg-goal-color),
-    'dark-bg': var(--color-wg-dark-goal-bg),
-    'dark-color': var(--color-wg-dark-goal-color)
+    'bg': $feature-virtual-bg,
+    'color': $feature-virtual-accent,
+    'dark-bg': to-rgba($lime-300, 0.1),
+    'dark-color': $lime-300
   ),
   'level': (
-    'bg': var(--color-wg-level-bg),
-    'color': var(--color-wg-level-color),
-    'dark-bg': var(--color-wg-dark-level-bg),
-    'dark-color': var(--color-wg-dark-level-color)
+    'bg': $feature-schedule-bg,
+    'color': $feature-schedule-accent,
+    'dark-bg': to-rgba($cyan-300, 0.1),
+    'dark-color': $cyan-300
   ),
   'duration': (
-    'bg': var(--color-wg-duration-bg),
-    'color': var(--color-wg-duration-color),
-    'dark-bg': var(--color-wg-dark-duration-bg),
-    'dark-color': var(--color-wg-dark-duration-color)
+    'bg': $feature-progress-bg,
+    'color': $feature-progress-accent,
+    'dark-bg': to-rgba($violet-300, 0.1),
+    'dark-color': $violet-300
   )
 );
 
-// Backward compatibility aliases
+// ========================================================================
+// WORKOUT GENERATOR COLOR ACCESS FUNCTIONS
+// Functions to access feature-specific colors consistently
+// ========================================================================
+
+/**
+ * Get a Workout Generator specific color
+ * 
+ * @param {String} $category - The color category
+ * @param {String} $variant - The variant
+ * @return {Color} The color value
+ */
+@function wg-color($category, $variant: 'base') {
+  @if not map-has-key($wg-color-categories, $category) {
+    @warn "Unknown WG color category: #{$category}";
+    @return null;
+  }
+  
+  $category-map: map-get($wg-color-categories, $category);
+  
+  @if not map-has-key($category-map, $variant) {
+    @warn "Unknown variant #{$variant} for WG category #{$category}";
+    @return map-get($category-map, 'base');
+  }
+  
+  @return map-get($category-map, $variant);
+}
+
+/**
+ * Get a Workout Generator semantic color
+ * 
+ * @param {String} $category - The semantic category
+ * @param {String} $variant - The variant
+ * @return {Color} The color value
+ */
+@function wg-semantic-color($category, $variant: 'primary') {
+  @if not map-has-key($wg-semantic-categories, $category) {
+    @warn "Unknown WG semantic category: #{$category}";
+    @return null;
+  }
+  
+  $category-map: map-get($wg-semantic-categories, $category);
+  
+  @if not map-has-key($category-map, $variant) {
+    @warn "Unknown variant #{$variant} for WG semantic category #{$category}";
+    @return map-get($category-map, 'primary');
+  }
+  
+  @return map-get($category-map, $variant);
+}
+
+/**
+ * Get a card specific color
+ * 
+ * @param {String} $card-type - The card type (goal, level, duration)
+ * @param {String} $property - The property (bg, color, dark-bg, dark-color)
+ * @return {Color} The color value
+ */
+@function wg-card-color($card-type, $property: 'bg') {
+  @if not map-has-key($wg-card-categories, $card-type) {
+    @warn "Unknown WG card type: #{$card-type}";
+    @return null;
+  }
+  
+  $type-map: map-get($wg-card-categories, $card-type);
+  
+  @if not map-has-key($type-map, $property) {
+    @warn "Unknown property #{$property} for WG card type #{$card-type}";
+    @return map-get($type-map, 'bg');
+  }
+  
+  @return map-get($type-map, $property);
+}
+
+/**
+ * Get a state color for interactive elements
+ * 
+ * @param {String} $state - The state (focus, hover)
+ * @param {String} $property - The property
+ * @return {Color} The color value
+ */
+@function wg-state-color($state, $property) {
+  @if not map-has-key($wg-state-categories, $state) {
+    @warn "Unknown WG state: #{$state}";
+    @return null;
+  }
+  
+  $state-map: map-get($wg-state-categories, $state);
+  
+  @if not map-has-key($state-map, $property) {
+    @warn "Unknown property #{$property} for WG state #{$state}";
+    @return null;
+  }
+  
+  @return map-get($state-map, $property);
+}
+
+// ========================================================================
+// BACKWARD COMPATIBILITY VARIABLES
+// Maintains backward compatibility with existing code
+// ========================================================================
+
+// Primary core colors
 $wg-primary-color: wg-color('primary', 'base');
 $wg-primary-hover: wg-color('primary', 'hover');
 $wg-secondary-color: wg-color('secondary', 'base');
 $wg-secondary-hover: wg-color('secondary', 'hover');
-$wg-success-color: map-get(map-get($wg-semantic-colors, 'feedback'), 'success');
-$wg-error-color: map-get(map-get($wg-semantic-colors, 'feedback'), 'error');
 
-// Card colors (maintaining backward compatibility)
-$wg-goal-bg: map-get(map-get($wg-card-colors, 'goal'), 'bg');
-$wg-level-bg: map-get(map-get($wg-card-colors, 'level'), 'bg');
-$wg-duration-bg: map-get(map-get($wg-card-colors, 'duration'), 'bg');
-$wg-goal-color: map-get(map-get($wg-card-colors, 'goal'), 'color');
-$wg-level-color: map-get(map-get($wg-card-colors, 'level'), 'color');
-$wg-duration-color: map-get(map-get($wg-card-colors, 'duration'), 'color');
+// Feedback colors
+$wg-success-color: wg-semantic-color('feedback', 'success');
+$wg-error-color: wg-semantic-color('feedback', 'error');
 
-// Dark mode colors (maintaining backward compatibility)
-$wg-dark-goal-bg: map-get(map-get($wg-card-colors, 'goal'), 'dark-bg');
-$wg-dark-level-bg: map-get(map-get($wg-card-colors, 'level'), 'dark-bg');
-$wg-dark-duration-bg: map-get(map-get($wg-card-colors, 'duration'), 'dark-bg');
-$wg-dark-goal-color: map-get(map-get($wg-card-colors, 'goal'), 'dark-color');
-$wg-dark-level-color: map-get(map-get($wg-card-colors, 'level'), 'dark-color');
-$wg-dark-duration-color: map-get(map-get($wg-card-colors, 'duration'), 'dark-color');
+// Card colors
+$wg-goal-bg: wg-card-color('goal', 'bg');
+$wg-level-bg: wg-card-color('level', 'bg');
+$wg-duration-bg: wg-card-color('duration', 'bg');
+$wg-goal-color: wg-card-color('goal', 'color');
+$wg-level-color: wg-card-color('level', 'color');
+$wg-duration-color: wg-card-color('duration', 'color');
 
-// Helper functions for accessing color tokens
-@function wg-color($category, $variant: 'base') {
-  @if not map-has-key($wg-colors, $category) {
-    @error "Color category '#{$category}' not found in $wg-colors";
-  }
-  @return map-get(map-get($wg-colors, $category), $variant);
-}
+// Dark mode colors
+$wg-dark-goal-bg: wg-card-color('goal', 'dark-bg');
+$wg-dark-level-bg: wg-card-color('level', 'dark-bg');
+$wg-dark-duration-bg: wg-card-color('duration', 'dark-bg');
+$wg-dark-goal-color: wg-card-color('goal', 'dark-color');
+$wg-dark-level-color: wg-card-color('level', 'dark-color');
+$wg-dark-duration-color: wg-card-color('duration', 'dark-color');
 
-@function wg-semantic-color($category, $variant) {
-  @if not map-has-key($wg-semantic-colors, $category) {
-    @error "Semantic color category '#{$category}' not found in $wg-semantic-colors";
-  }
-  @return map-get(map-get($wg-semantic-colors, $category), $variant);
-}
-
-@function wg-state-color($state, $property) {
-  @if not map-has-key($wg-state-colors, $state) {
-    @error "State '#{$state}' not found in $wg-state-colors";
-  }
-  @return map-get(map-get($wg-state-colors, $state), $property);
-}
-
-@function wg-dark-color($category, $variant: 'base') {
-  @if not map-has-key($wg-dark-mode-colors, $category) {
-    @error "Dark mode color category '#{$category}' not found in $wg-dark-mode-colors";
-  }
-  @return map-get(map-get($wg-dark-mode-colors, $category), $variant);
-}
-
-@function wg-card-color($card, $property) {
-  @if not map-has-key($wg-card-colors, $card) {
-    @error "Card type '#{$card}' not found in $wg-card-colors";
-  }
-  @return map-get(map-get($wg-card-colors, $card), $property);
-} 
+// Export a flag to indicate this file was imported
+$wg-color-tokens-imported: true; 

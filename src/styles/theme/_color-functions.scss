@@ -1,0 +1,232 @@
+/**
+ * FitCopilot Theme - Color Functions
+ * 
+ * This file provides unified functions for accessing the color tokens in a
+ * standardized way, ensuring consistency across the application.
+ */
+
+@import 'color-maps';
+
+// ========================================================================
+// CORE COLOR ACCESS FUNCTIONS
+// Standard functions for accessing color tokens
+// ========================================================================
+
+/**
+ * Get a color from the semantic color system
+ * 
+ * @param {String} $category - The color category (primary, secondary, text, etc.)
+ * @param {String} $variant - The variant (base, light, dark, etc.)
+ * @return {Color} The requested color value
+ * 
+ * @example
+ * .element {
+ *   color: color('text');
+ *   background-color: color('primary', 'light');
+ * }
+ */
+@function color($category, $variant: 'base') {
+  @if not map-has-key($color-categories, $category) {
+    @warn "Unknown color category: #{$category}";
+    @return null;
+  }
+  
+  $category-map: map-get($color-categories, $category);
+  
+  @if not map-has-key($category-map, $variant) {
+    @warn "Unknown variant #{$variant} for category #{$category}";
+    @return map-get($category-map, 'base');
+  }
+  
+  @return map-get($category-map, $variant);
+}
+
+/**
+ * Get a color value for a specific feature
+ * 
+ * @param {String} $feature - The feature name (virtual, schedule, progress, support)
+ * @param {String} $property - The property (bg, accent)
+ * @return {Color} The requested feature color
+ * 
+ * @example
+ * .feature-card {
+ *   background-color: feature-color('virtual', 'bg');
+ *   border-color: feature-color('virtual', 'accent');
+ * }
+ */
+@function feature-color($feature, $property: 'accent') {
+  @if not map-has-key($feature-categories, $feature) {
+    @warn "Unknown feature: #{$feature}";
+    @return null;
+  }
+  
+  $feature-map: map-get($feature-categories, $feature);
+  
+  @if not map-has-key($feature-map, $property) {
+    @warn "Unknown property #{$property} for feature #{$feature}";
+    @return map-get($feature-map, 'accent');
+  }
+  
+  @return map-get($feature-map, $property);
+}
+
+/**
+ * Get a predefined gradient
+ * 
+ * @param {String} $type - The gradient type (lime, cyan, violet, amber)
+ * @return {Gradient} The requested gradient
+ * 
+ * @example
+ * .gradient-button {
+ *   background: gradient('lime');
+ * }
+ */
+@function gradient($type) {
+  @if not map-has-key($gradient-types, $type) {
+    @warn "Unknown gradient type: #{$type}";
+    @return null;
+  }
+  
+  @return map-get($gradient-types, $type);
+}
+
+/**
+ * Get a color with transparency
+ * 
+ * @param {String} $category - The color category
+ * @param {String} $variant - The variant
+ * @param {Number} $opacity - The opacity value (0-1)
+ * @return {Color} The color with applied opacity
+ * 
+ * @example
+ * .overlay {
+ *   background-color: color-alpha('background', 'base', 0.8);
+ * }
+ */
+@function color-alpha($category, $variant: 'base', $opacity: 0.5) {
+  $color: color($category, $variant);
+  @if $color {
+    @return to-rgba($color, $opacity);
+  }
+  
+  @warn "Could not create transparent color for: #{$category}, #{$variant}";
+  @return null;
+}
+
+/**
+ * Get an overlay color
+ * 
+ * @param {String} $type - The overlay type (dark, light)
+ * @param {Number} $custom-opacity - Optional custom opacity
+ * @return {Color} The overlay color
+ * 
+ * @example
+ * .modal-backdrop {
+ *   background-color: overlay('dark');
+ * }
+ */
+@function overlay($type, $custom-opacity: null) {
+  @if not map-has-key($overlay-types, $type) {
+    @warn "Unknown overlay type: #{$type}";
+    @return null;
+  }
+  
+  $overlay: map-get($overlay-types, $type);
+  
+  @if $custom-opacity != null {
+    @if $type == 'dark' {
+      @return to-rgba($gray-900, $custom-opacity);
+    } @else if $type == 'light' {
+      @return to-rgba($white, $custom-opacity);
+    }
+  }
+  
+  @return $overlay;
+}
+
+/**
+ * Get a specific color from a palette
+ * 
+ * @param {String} $palette - The color palette (lime, emerald, cyan, etc.)
+ * @param {String} $shade - The shade number (100-900)
+ * @return {Color} The palette color
+ * 
+ * @example
+ * .custom-element {
+ *   color: palette('lime', '300');
+ * }
+ */
+@function palette($palette, $shade: '500') {
+  @if not map-has-key($color-palettes, $palette) {
+    @warn "Unknown palette: #{$palette}";
+    @return null;
+  }
+  
+  $palette-map: map-get($color-palettes, $palette);
+  
+  @if not map-has-key($palette-map, $shade) {
+    @warn "Unknown shade #{$shade} for palette #{$palette}";
+    @return null;
+  }
+  
+  @return map-get($palette-map, $shade);
+}
+
+// ========================================================================
+// FUNCTION ALIASES & SHORTHANDS
+// Convenience functions for common color access patterns
+// ========================================================================
+
+/**
+ * Get a primary color with optional shade
+ * 
+ * @param {String} $variant - Variant of primary color
+ * @return {Color} The primary color
+ */
+@function primary($variant: 'base') {
+  @return color('primary', $variant);
+}
+
+/**
+ * Get a secondary color with optional shade
+ * 
+ * @param {String} $variant - Variant of secondary color
+ * @return {Color} The secondary color
+ */
+@function secondary($variant: 'base') {
+  @return color('secondary', $variant);
+}
+
+/**
+ * Get a text color with optional shade
+ * 
+ * @param {String} $variant - Variant of text color
+ * @return {Color} The text color
+ */
+@function text($variant: 'base') {
+  @return color('text', $variant);
+}
+
+/**
+ * Get a background color with optional shade
+ * 
+ * @param {String} $variant - Variant of background color
+ * @return {Color} The background color
+ */
+@function background($variant: 'base') {
+  @return color('background', $variant);
+}
+
+// ========================================================================
+// COMPATIBILITY LAYER
+// To maintain backward compatibility with old function calls
+// ========================================================================
+
+// The original color function used different parameter structure
+// This is maintained for backward compatibility
+@function _legacy_color($category, $variant: 'base') {
+  @return color($category, $variant);
+}
+
+// Export a flag to indicate this file was imported
+$color-functions-imported: true; 

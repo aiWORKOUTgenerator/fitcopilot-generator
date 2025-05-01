@@ -5,7 +5,12 @@
 
 /* Global styles */
 .fitcopilot-container {
-  @apply max-w-5xl mx-auto p-4;
+  @apply w-full max-w-full mx-0 p-0;
+}
+
+/* Main workout generator container styling */
+.workout-generator-feature {
+  @apply w-full max-w-full;
 }
 
 /* Form elements */

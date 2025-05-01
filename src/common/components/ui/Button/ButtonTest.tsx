@@ -35,7 +35,7 @@ const ButtonTest: React.FC = () => {
   
   return (
     <div className="button-test-page">
-      <style jsx>{`
+      <style>{`
         .button-test-page {
           padding: 2rem;
           font-family: system-ui, sans-serif;

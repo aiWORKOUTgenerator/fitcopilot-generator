@@ -9,6 +9,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { WorkoutGeneratorFeature } from './features/workout-generator/WorkoutGeneratorFeature';
 
+// Import shortcodes
+import './shortcodes/color-system-demo';
+
 /**
  * Debug logging function
  */

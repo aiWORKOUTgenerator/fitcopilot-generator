@@ -172,55 +172,6 @@
     }
   }
   
-  &__button {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    
-    &--primary {
-      background-color: wg-form-color('button', 'primary');
-      color: white;
-      border: none;
-      
-      &:hover {
-        background-color: wg-form-color('button', 'primary-hover');
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(var(--color-text-rgb), 0.1);
-      }
-      
-      .dark-theme & {
-        background-color: wg-form-color('button', 'dark-primary');
-        color: white;
-        
-        &:hover {
-          background-color: wg-form-color('button', 'dark-primary-hover');
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-      }
-    }
-    
-    &--secondary {
-      background-color: wg-form-color('button', 'secondary');
-      color: wg-form-color('button', 'secondary-text');
-      border: 1px solid wg-form-color('button', 'secondary-border');
-      
-      &:hover {
-        background-color: wg-form-color('button', 'secondary-hover');
-      }
-      
-      .dark-theme & {
-        color: wg-form-color('button', 'dark-secondary-text');
-        border-color: wg-form-color('button', 'dark-secondary-border');
-        
-        &:hover {
-          background-color: wg-form-color('button', 'dark-secondary-hover');
-        }
-      }
-    }
-  }
-  
   &__success-animation {
     display: flex;
     justify-content: center;

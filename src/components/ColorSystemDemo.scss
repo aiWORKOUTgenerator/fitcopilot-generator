@@ -1,0 +1,277 @@
+@import '../styles/theme/index';
+
+.color-system-demo-wrapper {
+  padding: 0;
+  background-color: #ffffff;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.color-system-demo {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  h2 {
+    color: color('primary');
+    margin-bottom: 2rem;
+    background-color: color('background', 'dark');
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .demo-section {
+    margin-bottom: 3rem;
+    
+    h3 {
+      color: color('text');
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background-color: color('background', 'dark');
+      border-radius: 6px;
+      border-bottom: 1px solid color('border');
+    }
+  }
+  
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .color-item {
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  // Semantic Colors
+  .primary {
+    background-color: color('primary');
+    color: color('text-dark');
+  }
+  
+  .primary-light {
+    background-color: color('primary', 'light');
+    color: color('text-dark');
+  }
+  
+  .primary-dark {
+    background-color: color('primary', 'dark');
+    color: color('text');
+  }
+  
+  .secondary {
+    background-color: color('secondary');
+    color: color('text-dark');
+  }
+  
+  .secondary-light {
+    background-color: color('secondary', 'light');
+    color: color('text-dark');
+  }
+  
+  .secondary-dark {
+    background-color: color('secondary', 'dark');
+    color: color('text');
+  }
+  
+  .background {
+    background-color: color('background');
+    color: color('text');
+  }
+  
+  .background-light {
+    background-color: color('background', 'light');
+    color: color('text');
+  }
+  
+  .background-dark {
+    background-color: color('background', 'dark');
+    color: color('text');
+  }
+  
+  .background-card {
+    background-color: color('background', 'card');
+    color: color('text');
+  }
+  
+  .text {
+    background-color: color('text');
+    color: color('background');
+  }
+  
+  .text-muted {
+    background-color: color('text', 'muted');
+    color: color('background');
+  }
+  
+  .text-light {
+    background-color: color('text', 'light');
+    color: color('background');
+  }
+  
+  .text-dark {
+    background-color: color('text', 'dark');
+    color: color('text');
+  }
+  
+  .border {
+    background-color: color('border');
+    color: color('text');
+  }
+  
+  .border-light {
+    background-color: color('border', 'light');
+    color: color('text');
+  }
+  
+  .border-dark {
+    background-color: color('border', 'dark');
+    color: color('text');
+  }
+  
+  // Status Colors
+  .success {
+    background-color: color('success');
+    color: color('text-dark');
+  }
+  
+  .error {
+    background-color: color('error');
+    color: color('text');
+  }
+  
+  .warning {
+    background-color: color('warning');
+    color: color('text-dark');
+  }
+  
+  .info {
+    background-color: color('info');
+    color: color('text');
+  }
+  
+  // Feature Colors
+  .feature-virtual-bg {
+    background-color: feature-color('virtual', 'bg');
+    color: color('text');
+  }
+  
+  .feature-virtual-accent {
+    background-color: feature-color('virtual', 'accent');
+    color: color('text-dark');
+  }
+  
+  .feature-schedule-bg {
+    background-color: feature-color('schedule', 'bg');
+    color: color('text');
+  }
+  
+  .feature-schedule-accent {
+    background-color: feature-color('schedule', 'accent');
+    color: color('text-dark');
+  }
+  
+  .feature-progress-bg {
+    background-color: feature-color('progress', 'bg');
+    color: color('text');
+  }
+  
+  .feature-progress-accent {
+    background-color: feature-color('progress', 'accent');
+    color: color('text-dark');
+  }
+  
+  .feature-support-bg {
+    background-color: feature-color('support', 'bg');
+    color: color('text');
+  }
+  
+  .feature-support-accent {
+    background-color: feature-color('support', 'accent');
+    color: color('text-dark');
+  }
+  
+  // Gradients
+  .gradient-lime {
+    background: gradient('lime');
+    color: color('text-dark');
+  }
+  
+  .gradient-cyan {
+    background: gradient('cyan');
+    color: color('text-dark');
+  }
+  
+  .gradient-violet {
+    background: gradient('violet');
+    color: color('text');
+  }
+  
+  .gradient-amber {
+    background: gradient('amber');
+    color: color('text-dark');
+  }
+  
+  // Overlays
+  .overlay-dark {
+    background-color: overlay('dark');
+    color: color('text');
+  }
+  
+  .overlay-light {
+    background-color: overlay('light');
+    color: color('text-dark');
+  }
+  
+  .overlay-custom {
+    background-color: overlay('dark', 0.5);
+    color: color('text');
+  }
+  
+  // Alpha Transparency
+  .primary-alpha-20 {
+    background-color: color-alpha('primary', 'base', 0.2);
+    color: color('text');
+  }
+  
+  .primary-alpha-50 {
+    background-color: color-alpha('primary', 'base', 0.5);
+    color: color('text-dark');
+  }
+  
+  .primary-alpha-80 {
+    background-color: color-alpha('primary', 'base', 0.8);
+    color: color('text-dark');
+  }
+  
+  .text-alpha-20 {
+    background-color: color-alpha('text', 'base', 0.2);
+    color: color('text');
+  }
+  
+  .text-alpha-50 {
+    background-color: color-alpha('text', 'base', 0.5);
+    color: color('text');
+  }
+  
+  .text-alpha-80 {
+    background-color: color-alpha('text', 'base', 0.8);
+    color: color('text-dark');
+  }
+  
+  // CSS Variables Demo
+  .css-variables-demo {
+    max-width: 500px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+} 

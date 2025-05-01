@@ -1,0 +1,92 @@
+/**
+ * FitCopilot Theme - Color System Test
+ * 
+ * This file tests the color system functions to ensure they work as expected.
+ * It's meant only for testing and validation.
+ */
+
+@import 'index';
+
+// Test component using the color functions
+.color-function-test {
+  // Basic color function usage
+  color: color('text');
+  background-color: color('background');
+  border: 1px solid color('border');
+  
+  // Color variants
+  &__primary {
+    color: color('text', 'dark');
+    background-color: color('primary');
+    border-color: color('primary', 'dark');
+  }
+  
+  &__secondary {
+    color: color('text', 'dark');
+    background-color: color('secondary');
+    border-color: color('secondary', 'dark');
+  }
+  
+  // Feature-specific colors
+  &__feature-virtual {
+    background-color: feature-color('virtual', 'bg');
+    border-color: feature-color('virtual', 'accent');
+  }
+  
+  &__feature-schedule {
+    background-color: feature-color('schedule', 'bg');
+    border-color: feature-color('schedule', 'accent');
+  }
+  
+  // Gradients
+  &__gradient-lime {
+    background: gradient('lime');
+  }
+  
+  &__gradient-cyan {
+    background: gradient('cyan');
+  }
+  
+  // Overlays
+  &__overlay {
+    background-color: overlay('dark');
+    color: color('text');
+  }
+  
+  &__overlay-custom {
+    background-color: overlay('light', 0.3);
+  }
+  
+  // Palette colors
+  &__palette {
+    color: palette('lime', 300);
+    background-color: palette('emerald', 200);
+  }
+  
+  // Color with transparency
+  &__transparency {
+    background-color: color-alpha('primary', 'base', 0.2);
+    border-color: color-alpha('secondary', 'base', 0.5);
+  }
+  
+  // Status colors
+  &__status-success {
+    color: color('success');
+  }
+  
+  &__status-error {
+    color: color('error');
+  }
+}
+
+// CSS Variables usage example (showing both approaches)
+.css-variables-test {
+  // Using CSS variables directly
+  color: var(--color-text);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  
+  // Using CSS variables with RGB values for opacity
+  background-color: rgba(var(--color-primary-rgb), 0.2);
+  box-shadow: 0 0 10px rgba(var(--color-black-rgb), 0.1);
+} 

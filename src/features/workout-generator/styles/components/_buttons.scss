@@ -77,43 +77,4 @@
       background-color: var(--color-wg-secondary-hover);
     }
   }
-}
-
-/* View Full Workout button */
-.view-full-workout-button {
-  display: block;
-  width: 100%;
-  background-color: var(--color-wg-primary);
-  color: white;
-  font-weight: $font-weight-medium;
-  padding: $spacing-3 $spacing-4;
-  border-radius: $wg-border-radius;
-  border: none;
-  cursor: pointer;
-  transition: background-color $wg-transition-speed;
-  text-align: center;
-  margin-bottom: $spacing-4;
-  
-  &:hover {
-    background-color: var(--color-wg-primary-hover);
-  }
-}
-
-/* Generate Another Workout button */
-.generate-another-button {
-  display: block;
-  width: 100%;
-  background-color: var(--color-wg-secondary);
-  color: white;
-  font-weight: $font-weight-medium;
-  padding: $spacing-3 $spacing-4;
-  border-radius: $wg-border-radius;
-  border: none;
-  cursor: pointer;
-  transition: background-color $wg-transition-speed;
-  text-align: center;
-  
-  &:hover {
-    background-color: var(--color-wg-secondary-hover);
-  }
 } 

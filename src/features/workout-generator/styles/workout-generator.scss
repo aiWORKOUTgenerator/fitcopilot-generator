@@ -15,3 +15,21 @@
 @import 'components/_cards';
 @import 'components/_steps';
 @import 'components/_loading';
+
+// Full width styles
+.workout-generator-feature {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 2rem;
+  
+  &__title {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  &__description {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+}

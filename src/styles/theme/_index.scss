@@ -1,0 +1,15 @@
+/**
+ * FitCopilot Theme
+ * 
+ * This file imports all theme-related files and re-exports them.
+ * The colors are imported first, followed by functions and compatibility layer.
+ */
+
+// Import base color definitions
+@import 'colors';
+
+// Import color functions for accessing tokens
+@import 'color-functions';
+
+// Import compatibility layer for legacy code
+@import 'compatibility'; 

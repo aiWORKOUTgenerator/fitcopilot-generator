@@ -1,0 +1,401 @@
+/**
+ * FitCopilot Theme - Core Color System
+ * 
+ * This file contains all the color variables used throughout the application.
+ * The color system follows a structured approach with base colors, semantic tokens,
+ * and CSS custom properties to ensure consistency across the application.
+ */
+
+// ========================================================================
+// HELPER FUNCTIONS
+// ========================================================================
+
+/**
+ * Convert color to rgba format with specified opacity
+ * @param {Color} $color - Source color
+ * @param {Number} $opacity - Opacity value between 0 and 1
+ * @return {Color} RGBA color
+ */
+@function to-rgba($color, $opacity) {
+  @return rgba(red($color), green($color), blue($color), $opacity);
+}
+
+// ========================================================================
+// BASE COLORS
+// Primary foundational colors that all other tokens reference
+// ========================================================================
+
+// Base neutral colors
+$black: #000000;
+$white: #ffffff;
+
+// Grayscale palette
+$gray-50: #f9fafb;  // Lightest gray - background
+$gray-100: #f3f4f6; // Very light gray - subtle backgrounds
+$gray-200: #e5e7eb; // Light gray - subtle borders
+$gray-300: #d1d5db; // Medium-light gray - strong borders
+$gray-400: #9ca3af; // Medium gray - muted text
+$gray-500: #6b7280; // Medium-medium gray - secondary text
+$gray-600: #4b5563; // Medium-dark gray - body text (light mode)
+$gray-700: #374151; // Dark gray - headings (light mode)
+$gray-800: #1f2937; // Very dark gray - body text (dark mode)
+$gray-900: #111827; // Darkest gray - primary background (dark mode)
+$gray-950: #030712; // Near black - deepest background (dark mode)
+
+// ========================================================================
+// PRIMARY COLOR PALETTES
+// Brand & feature color scales
+// ========================================================================
+
+// Primary Brand (Lime)
+$lime-100: #ecfccb; // Very light lime
+$lime-200: #d9f99d; // Light lime
+$lime-300: #a3e635; // Primary accent color
+$lime-400: #84cc16; // Medium lime
+$lime-500: #65a30d; // Medium-dark lime
+$lime-600: #4d7c0f; // Dark lime
+$lime-700: #3f6212; // Very dark lime
+$lime-800: #365314; // Extra dark lime
+$lime-900: #1a2e05; // Deepest lime
+
+// Secondary Brand (Emerald)
+$emerald-100: #d1fae5; // Very light emerald
+$emerald-200: #a7f3d0; // Light emerald
+$emerald-300: #6ee7b7; // Medium-light emerald
+$emerald-400: #34d399; // Secondary accent color
+$emerald-500: #10b981; // Medium emerald
+$emerald-600: #059669; // Medium-dark emerald
+$emerald-700: #047857; // Dark emerald
+$emerald-800: #065f46; // Very dark emerald
+$emerald-900: #064e3b; // Deepest emerald
+
+// ========================================================================
+// FEATURE COLOR PALETTES
+// Color palettes for specific features
+// ========================================================================
+
+// Cyan/Blue palette (used for Scheduling features)
+$cyan-100: #cffafe;
+$cyan-200: #a5f3fc;
+$cyan-300: #67e8f9;
+$cyan-400: #22d3ee;
+$cyan-500: #06b6d4;
+$cyan-600: #0891b2;
+$cyan-700: #0e7490;
+$cyan-800: #155e75;
+$cyan-900: #164e63;
+
+// Blue palette (complementary to Cyan)
+$blue-100: #dbeafe;
+$blue-200: #bfdbfe;
+$blue-300: #93c5fd;
+$blue-400: #60a5fa;
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+$blue-700: #1d4ed8;
+$blue-800: #1e40af;
+$blue-900: #1e3a8a;
+
+// Violet/Purple palette (used for Progress features)
+$violet-100: #ede9fe;
+$violet-200: #ddd6fe;
+$violet-300: #c4b5fd;
+$violet-400: #a78bfa;
+$violet-500: #8b5cf6;
+$violet-600: #7c3aed;
+$violet-700: #6d28d9;
+$violet-800: #5b21b6;
+$violet-900: #4c1d95;
+
+// Purple palette (complementary to Violet)
+$purple-100: #f3e8ff;
+$purple-200: #e9d5ff;
+$purple-300: #d8b4fe;
+$purple-400: #c084fc;
+$purple-500: #a855f7;
+$purple-600: #9333ea;
+$purple-700: #7e22ce;
+$purple-800: #6b21a8;
+$purple-900: #581c87;
+
+// Amber/Orange palette (used for Support features)
+$amber-100: #fef3c7;
+$amber-200: #fde68a;
+$amber-300: #fcd34d;
+$amber-400: #fbbf24;
+$amber-500: #f59e0b;
+$amber-600: #d97706;
+$amber-700: #b45309;
+$amber-800: #92400e;
+$amber-900: #78350f;
+
+// Orange palette (complementary to Amber)
+$orange-100: #ffedd5;
+$orange-200: #fed7aa;
+$orange-300: #fdba74;
+$orange-400: #fb923c;
+$orange-500: #f97316;
+$orange-600: #ea580c;
+$orange-700: #c2410c;
+$orange-800: #9a3412;
+$orange-900: #7c2d12;
+
+// ========================================================================
+// SEMANTIC COLOR VARIABLES
+// Purpose-specific color tokens
+// ========================================================================
+
+// Theme-specific background variations
+$dark-blue: #0e1524;     // Alternative dark background
+$darker-blue: #0B1121;   // Deeper background color
+$card-bg: #141a2b;       // Card background
+
+// Primary semantic colors
+$primary: $lime-300;
+$primary-dark: $lime-500;
+$primary-light: $lime-200;
+
+// Secondary semantic colors
+$secondary: $emerald-400;
+$secondary-dark: $emerald-600;
+$secondary-light: $emerald-200;
+
+// Background colors
+$background: $gray-900;
+$background-light: $gray-800;
+$background-dark: $gray-950;
+$background-card: $card-bg;
+
+// Text colors
+$text: $white;
+$text-muted: $gray-400;
+$text-light: $gray-300;
+$text-dark: $gray-600;
+
+// Border colors
+$border: $gray-700;
+$border-light: $gray-600;
+$border-dark: $gray-800;
+
+// Status colors
+$success: $emerald-500;
+$error: #ef4444;         // Red-500
+$warning: $amber-500;
+$info: $blue-500;
+
+// ========================================================================
+// FEATURE-SPECIFIC COLOR SCHEMES
+// Colors for specific feature categories
+// ========================================================================
+
+// Virtual Training Feature
+$feature-virtual-bg: to-rgba($lime-300, 0.2);
+$feature-virtual-accent: $lime-300;
+
+// Scheduling Feature
+$feature-schedule-bg: to-rgba($cyan-300, 0.2);
+$feature-schedule-accent: $cyan-300;
+
+// Progress Feature
+$feature-progress-bg: to-rgba($violet-300, 0.2);
+$feature-progress-accent: $violet-300;
+
+// Support Feature
+$feature-support-bg: to-rgba($amber-300, 0.2); 
+$feature-support-accent: $amber-300;
+
+// ========================================================================
+// GRADIENTS & OVERLAYS
+// Effect-specific color values
+// ========================================================================
+
+// Gradient definitions
+$gradient-lime: linear-gradient(90deg, $lime-300, $emerald-400);
+$gradient-cyan: linear-gradient(90deg, $cyan-300, $blue-400);
+$gradient-violet: linear-gradient(90deg, $violet-300, $purple-400);
+$gradient-amber: linear-gradient(90deg, $amber-300, $orange-400);
+
+// Overlay colors
+$overlay-dark: to-rgba($gray-900, 0.7);
+$overlay-light: to-rgba($white, 0.1);
+
+// ========================================================================
+// CSS VARIABLE EXPORTS
+// Makes color system available via CSS custom properties
+// ========================================================================
+
+:root {
+  // Base colors
+  --color-black: #{$black};
+  --color-white: #{$white};
+  --color-black-rgb: #{red($black)}, #{green($black)}, #{blue($black)};
+  --color-white-rgb: #{red($white)}, #{green($white)}, #{blue($white)};
+  
+  // Grayscale palette
+  --color-gray-50: #{$gray-50};
+  --color-gray-100: #{$gray-100};
+  --color-gray-200: #{$gray-200};
+  --color-gray-300: #{$gray-300};
+  --color-gray-400: #{$gray-400};
+  --color-gray-500: #{$gray-500};
+  --color-gray-600: #{$gray-600};
+  --color-gray-700: #{$gray-700};
+  --color-gray-800: #{$gray-800};
+  --color-gray-900: #{$gray-900};
+  --color-gray-950: #{$gray-950};
+  
+  // Primary palette (Lime)
+  --color-lime-100: #{$lime-100};
+  --color-lime-200: #{$lime-200};
+  --color-lime-300: #{$lime-300};
+  --color-lime-400: #{$lime-400};
+  --color-lime-500: #{$lime-500};
+  --color-lime-600: #{$lime-600};
+  --color-lime-700: #{$lime-700};
+  --color-lime-800: #{$lime-800};
+  --color-lime-900: #{$lime-900};
+  --color-lime-300-rgb: #{red($lime-300)}, #{green($lime-300)}, #{blue($lime-300)};
+  
+  // Secondary palette (Emerald)
+  --color-emerald-100: #{$emerald-100};
+  --color-emerald-200: #{$emerald-200};
+  --color-emerald-300: #{$emerald-300};
+  --color-emerald-400: #{$emerald-400};
+  --color-emerald-500: #{$emerald-500};
+  --color-emerald-600: #{$emerald-600};
+  --color-emerald-700: #{$emerald-700};
+  --color-emerald-800: #{$emerald-800};
+  --color-emerald-900: #{$emerald-900};
+  --color-emerald-400-rgb: #{red($emerald-400)}, #{green($emerald-400)}, #{blue($emerald-400)};
+  
+  // Cyan palette
+  --color-cyan-100: #{$cyan-100};
+  --color-cyan-200: #{$cyan-200};
+  --color-cyan-300: #{$cyan-300};
+  --color-cyan-400: #{$cyan-400};
+  --color-cyan-500: #{$cyan-500};
+  --color-cyan-600: #{$cyan-600};
+  --color-cyan-700: #{$cyan-700};
+  --color-cyan-800: #{$cyan-800};
+  --color-cyan-900: #{$cyan-900};
+  --color-cyan-300-rgb: #{red($cyan-300)}, #{green($cyan-300)}, #{blue($cyan-300)};
+  
+  // Blue palette
+  --color-blue-100: #{$blue-100};
+  --color-blue-200: #{$blue-200};
+  --color-blue-300: #{$blue-300};
+  --color-blue-400: #{$blue-400};
+  --color-blue-500: #{$blue-500};
+  --color-blue-600: #{$blue-600};
+  --color-blue-700: #{$blue-700};
+  --color-blue-800: #{$blue-800};
+  --color-blue-900: #{$blue-900};
+  
+  // Violet palette
+  --color-violet-100: #{$violet-100};
+  --color-violet-200: #{$violet-200};
+  --color-violet-300: #{$violet-300};
+  --color-violet-400: #{$violet-400};
+  --color-violet-500: #{$violet-500};
+  --color-violet-600: #{$violet-600};
+  --color-violet-700: #{$violet-700};
+  --color-violet-800: #{$violet-800};
+  --color-violet-900: #{$violet-900};
+  --color-violet-300-rgb: #{red($violet-300)}, #{green($violet-300)}, #{blue($violet-300)};
+  
+  // Purple palette
+  --color-purple-100: #{$purple-100};
+  --color-purple-200: #{$purple-200};
+  --color-purple-300: #{$purple-300};
+  --color-purple-400: #{$purple-400};
+  --color-purple-500: #{$purple-500};
+  --color-purple-600: #{$purple-600};
+  --color-purple-700: #{$purple-700};
+  --color-purple-800: #{$purple-800};
+  --color-purple-900: #{$purple-900};
+  
+  // Amber palette
+  --color-amber-100: #{$amber-100};
+  --color-amber-200: #{$amber-200};
+  --color-amber-300: #{$amber-300};
+  --color-amber-400: #{$amber-400};
+  --color-amber-500: #{$amber-500};
+  --color-amber-600: #{$amber-600};
+  --color-amber-700: #{$amber-700};
+  --color-amber-800: #{$amber-800};
+  --color-amber-900: #{$amber-900};
+  --color-amber-300-rgb: #{red($amber-300)}, #{green($amber-300)}, #{blue($amber-300)};
+  
+  // Orange palette
+  --color-orange-100: #{$orange-100};
+  --color-orange-200: #{$orange-200};
+  --color-orange-300: #{$orange-300};
+  --color-orange-400: #{$orange-400};
+  --color-orange-500: #{$orange-500};
+  --color-orange-600: #{$orange-600};
+  --color-orange-700: #{$orange-700};
+  --color-orange-800: #{$orange-800};
+  --color-orange-900: #{$orange-900};
+  
+  // Theme-specific background variables
+  --color-dark-blue: #{$dark-blue};
+  --color-darker-blue: #{$darker-blue};
+  --color-card-bg: #{$card-bg};
+  
+  // Semantic variables
+  --color-primary: #{$primary};
+  --color-primary-dark: #{$primary-dark};
+  --color-primary-light: #{$primary-light};
+  --color-primary-rgb: #{red($primary)}, #{green($primary)}, #{blue($primary)};
+  
+  --color-secondary: #{$secondary};
+  --color-secondary-dark: #{$secondary-dark};
+  --color-secondary-light: #{$secondary-light};
+  --color-secondary-rgb: #{red($secondary)}, #{green($secondary)}, #{blue($secondary)};
+  
+  --color-background: #{$background};
+  --color-background-light: #{$background-light};
+  --color-background-dark: #{$background-dark};
+  --color-background-card: #{$background-card};
+  --color-background-rgb: #{red($background)}, #{green($background)}, #{blue($background)};
+  
+  --color-text: #{$text};
+  --color-text-muted: #{$text-muted};
+  --color-text-light: #{$text-light};
+  --color-text-dark: #{$text-dark};
+  --color-text-rgb: #{red($text)}, #{green($text)}, #{blue($text)};
+  
+  --color-border: #{$border};
+  --color-border-light: #{$border-light};
+  --color-border-dark: #{$border-dark};
+  
+  // Feature-specific colors
+  --color-feature-virtual-bg: #{$feature-virtual-bg};
+  --color-feature-virtual-accent: #{$feature-virtual-accent};
+  --color-feature-schedule-bg: #{$feature-schedule-bg};
+  --color-feature-schedule-accent: #{$feature-schedule-accent};
+  --color-feature-progress-bg: #{$feature-progress-bg};
+  --color-feature-progress-accent: #{$feature-progress-accent};
+  --color-feature-support-bg: #{$feature-support-bg};
+  --color-feature-support-accent: #{$feature-support-accent};
+  
+  // Gradient variables
+  --gradient-lime: #{$gradient-lime};
+  --gradient-cyan: #{$gradient-cyan};
+  --gradient-violet: #{$gradient-violet};
+  --gradient-amber: #{$gradient-amber};
+  
+  // Overlay colors
+  --color-overlay-dark: #{$overlay-dark};
+  --color-overlay-light: #{$overlay-light};
+  
+  // Status colors
+  --color-success: #{$success};
+  --color-success-rgb: #{red($success)}, #{green($success)}, #{blue($success)};
+  --color-error: #{$error};
+  --color-error-rgb: #{red($error)}, #{green($error)}, #{blue($error)};
+  --color-warning: #{$warning};
+  --color-warning-rgb: #{red($warning)}, #{green($warning)}, #{blue($warning)};
+  --color-info: #{$info};
+  --color-info-rgb: #{red($info)}, #{green($info)}, #{blue($info)};
+} 

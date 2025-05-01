@@ -1,0 +1,154 @@
+/**
+ * FitCopilot Theme - Color Maps
+ * 
+ * This file provides structured maps for accessing color tokens programmatically.
+ * It creates the foundation for the standardized map-based color system.
+ */
+
+@import 'colors';
+
+// ========================================================================
+// COLOR CATEGORY MAPS
+// Maps color tokens to their semantic meanings and variants
+// ========================================================================
+
+// Primary semantic color map
+$color-categories: (
+  'primary': (
+    'base': $primary,
+    'dark': $primary-dark,
+    'light': $primary-light
+  ),
+  'secondary': (
+    'base': $secondary,
+    'dark': $secondary-dark,
+    'light': $secondary-light
+  ),
+  'background': (
+    'base': $background,
+    'dark': $background-dark,
+    'light': $background-light,
+    'card': $background-card
+  ),
+  'text': (
+    'base': $text,
+    'muted': $text-muted,
+    'light': $text-light,
+    'dark': $text-dark
+  ),
+  'border': (
+    'base': $border,
+    'light': $border-light,
+    'dark': $border-dark
+  ),
+  'success': (
+    'base': $success
+  ),
+  'error': (
+    'base': $error
+  ),
+  'warning': (
+    'base': $warning
+  ),
+  'info': (
+    'base': $info
+  )
+);
+
+// Feature-specific color map
+$feature-categories: (
+  'virtual': (
+    'bg': $feature-virtual-bg,
+    'accent': $feature-virtual-accent
+  ),
+  'schedule': (
+    'bg': $feature-schedule-bg,
+    'accent': $feature-schedule-accent
+  ),
+  'progress': (
+    'bg': $feature-progress-bg,
+    'accent': $feature-progress-accent
+  ),
+  'support': (
+    'bg': $feature-support-bg,
+    'accent': $feature-support-accent
+  )
+);
+
+// Gradient type map
+$gradient-types: (
+  'lime': $gradient-lime,
+  'cyan': $gradient-cyan,
+  'violet': $gradient-violet,
+  'amber': $gradient-amber
+);
+
+// Overlay map
+$overlay-types: (
+  'dark': $overlay-dark,
+  'light': $overlay-light
+);
+
+// ========================================================================
+// PALETTE MAPS
+// Color scale mappings for direct palette access
+// ========================================================================
+
+// Lime palette map
+$lime-palette: (
+  '100': $lime-100,
+  '200': $lime-200,
+  '300': $lime-300,
+  '400': $lime-400,
+  '500': $lime-500,
+  '600': $lime-600,
+  '700': $lime-700,
+  '800': $lime-800,
+  '900': $lime-900
+);
+
+// Emerald palette map
+$emerald-palette: (
+  '100': $emerald-100,
+  '200': $emerald-200,
+  '300': $emerald-300,
+  '400': $emerald-400,
+  '500': $emerald-500,
+  '600': $emerald-600,
+  '700': $emerald-700,
+  '800': $emerald-800,
+  '900': $emerald-900
+);
+
+// Gray palette map
+$gray-palette: (
+  '50': $gray-50,
+  '100': $gray-100,
+  '200': $gray-200,
+  '300': $gray-300,
+  '400': $gray-400,
+  '500': $gray-500,
+  '600': $gray-600,
+  '700': $gray-700,
+  '800': $gray-800,
+  '900': $gray-900,
+  '950': $gray-950
+);
+
+// All color palettes map
+$color-palettes: (
+  'lime': $lime-palette,
+  'emerald': $emerald-palette,
+  'gray': $gray-palette,
+  // Additional palettes can be added as needed
+);
+
+// ========================================================================
+// DARK THEME COLOR MAPS
+// Dark theme versions of color categories
+// ========================================================================
+
+// Dark theme versions will be implemented in the future
+
+// Export a flag to indicate this file was imported
+$color-maps-imported: true; 
