@@ -16,14 +16,20 @@
 // Primary dark theme color map
 $dark-color-categories: (
   'primary': (
-    'base': $lime-300,
-    'dark': $lime-500,
-    'light': $lime-200
+    'base': lighten($primary, 5%),
+    'dark': $primary,
+    'light': lighten($primary, 15%),
+    'hover': lighten($primary, 10%),
+    'muted': transparentize(lighten($primary, 5%), 0.5),
+    'accent': lighten($primary, 5%),
+    'primary-light': lighten($primary, 15%),
   ),
   'secondary': (
-    'base': $emerald-400,
-    'dark': $emerald-600,
-    'light': $emerald-300
+    'base': lighten($secondary, 5%),
+    'dark': $secondary,
+    'light': lighten($secondary, 15%),
+    'hover': lighten($secondary, 10%),
+    'muted': transparentize(lighten($secondary, 5%), 0.5),
   ),
   'background': (
     'base': $background,
@@ -32,32 +38,64 @@ $dark-color-categories: (
     'card': $card-bg
   ),
   'text': (
-    'base': $white,
-    'muted': $gray-400,
-    'light': $gray-300,
-    'dark': $gray-500
+    'base': $text,
+    'dark': darken($text, 10%),
+    'light': lighten($text, 10%),
+    'hover': lighten($text, 20%),
+    'muted': $text-muted,
+    'disabled': transparentize($text, 0.5),
   ),
   'border': (
-    'base': $gray-700,
-    'light': $gray-600,
-    'dark': $gray-800
+    'base': $dark-border,
+    'dark': darken($dark-border, 10%),
+    'light': lighten($dark-border, 10%),
+    'hover': lighten($dark-border, 15%),
+    'muted': transparentize($dark-border, 0.3),
+    'border-hover': lighten($dark-border, 15%),
+    'border-muted': transparentize($dark-border, 0.3),
   ),
   'surface': (
-    'base': $card-bg,
-    'accent': $dark-blue,
-    'hover': $darker-blue
+    'base': $dark-card-bg,
+    'dark': darken($dark-card-bg, 3%),
+    'light': lighten($dark-card-bg, 5%),
+    'accent': lighten($dark-card-bg, 10%),
+    'hover': lighten($dark-card-bg, 7%),
+    'disabled': darken($dark-card-bg, 5%),
   ),
   'success': (
-    'base': $emerald-400
+    'base': lighten($success, 5%),
+    'dark': $success,
+    'light': lighten($success, 15%),
+    'hover': lighten($success, 10%),
+    'muted': transparentize(lighten($success, 5%), 0.5),
   ),
   'error': (
-    'base': $error
+    'base': lighten($error, 5%),
+    'dark': $error,
+    'light': lighten($error, 15%),
+    'hover': lighten($error, 10%),
+    'muted': transparentize(lighten($error, 5%), 0.5),
   ),
   'warning': (
-    'base': $amber-400
+    'base': lighten($warning, 5%),
+    'dark': $warning,
+    'light': lighten($warning, 15%),
+    'hover': lighten($warning, 10%),
+    'muted': transparentize(lighten($warning, 5%), 0.5),
   ),
   'info': (
-    'base': $blue-400
+    'base': lighten($info, 5%),
+    'dark': $info,
+    'light': lighten($info, 15%),
+    'hover': lighten($info, 10%),
+    'muted': transparentize(lighten($info, 5%), 0.5),
+  ),
+  'text-muted': (
+    'base': $gray-400
+  ),
+  // Add white for any direct color('white') usage
+  'white': (
+    'base': $white
   )
 );
 
@@ -148,19 +186,42 @@ $dark-feature-categories: (
  * Get a dark theme color with transparency
  * 
  * @param {String} $category - The color category
- * @param {String} $variant - The variant
- * @param {Number} $opacity - The opacity value (0-1)
+ * @param {Number|String} $variant_or_opacity - Either the variant name or opacity value
+ * @param {Number|null} $opacity_or_null - The opacity value if $variant_or_opacity is a string variant
  * @return {Color} The dark theme color with applied opacity
  * 
  * @example
- * .dark-theme .overlay {
- *   background-color: dark-color-alpha('background', 'base', 0.8);
+ * // Both formats are supported:
+ * .dark-theme .element-1 {
+ *   // New format (preferred)
+ *   background-color: dark-color-alpha('background', 0.8);
+ * }
+ * .dark-theme .element-2 {
+ *   // Legacy format (still supported)
+ *   background-color: dark-color-alpha('primary', 'light', 0.5);
  * }
  */
-@function dark-color-alpha($category, $variant: 'base', $opacity: 0.5) {
+@function dark-color-alpha($category, $variant_or_opacity, $opacity_or_null: null) {
+  $variant: 'base';
+  $opacity: 0.5;
+  
+  // Determine if the second parameter is opacity or variant
+  @if type-of($variant_or_opacity) == 'number' {
+    // New format: dark-color-alpha('primary', 0.5)
+    $variant: 'base';
+    $opacity: $variant_or_opacity;
+  } @else {
+    // Old format: dark-color-alpha('primary', 'light', 0.5)
+    $variant: $variant_or_opacity;
+    
+    @if $opacity_or_null != null {
+      $opacity: $opacity_or_null;
+    }
+  }
+  
   $color: dark-color($category, $variant);
   @if $color {
-    @return to-rgba($color, $opacity);
+    @return to-rgba($color, validate-alpha($opacity));
   }
   
   @warn "Could not create transparent dark color for: #{$category}, #{$variant}";

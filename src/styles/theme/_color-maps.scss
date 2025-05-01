@@ -12,47 +12,64 @@
 // Maps color tokens to their semantic meanings and variants
 // ========================================================================
 
-// Primary semantic color map
+// Primary color maps
+$color-category-primary: (
+  'primary': $primary,
+  'primary-hover': $primary-dark,
+  'primary-dark': $primary-dark,
+  'primary-light': lighten($primary, 15%),
+  'primary-accent': $primary,
+  'primary-muted': rgba($primary, 0.5),
+  'secondary': $secondary,
+  'secondary-hover': $secondary-dark,
+  'success': $success,
+  'success-hover': darken($success, 5%),
+  'warning': $warning,
+  'warning-hover': darken($warning, 5%),
+  'danger': $error,
+  'danger-hover': darken($error, 5%),
+  'info': $info,
+  'info-hover': darken($info, 5%),
+);
+
+// Text color maps
+$color-category-text: (
+  'text': $text,
+  'text-muted': $text-muted,
+  'text-light': $text-light,
+  'text-inverse': $white,
+  'text-link': $primary,
+  'text-heading': $text,
+);
+
+// Surface color maps
+$color-category-surface: (
+  'surface': $card-bg,
+  'surface-dark': $surface-dark,
+  'surface-light': $surface-light,
+  'surface-accent': $surface-accent,
+  'surface-hover': $surface-hover,
+  'surface-disabled': $surface-disabled,
+  'background': $background,
+  'background-alt': $background-light,
+  'backdrop': rgba($black, 0.7)
+);
+
+// Border color maps
+$color-category-border: (
+  'border': $border,
+  'border-light': $border-light,
+  'border-hover': $border-hover,
+  'border-muted': rgba($border, 0.5),
+  'border-focus': $border-focus,
+);
+
+// Master map of color categories
 $color-categories: (
-  'primary': (
-    'base': $primary,
-    'dark': $primary-dark,
-    'light': $primary-light
-  ),
-  'secondary': (
-    'base': $secondary,
-    'dark': $secondary-dark,
-    'light': $secondary-light
-  ),
-  'background': (
-    'base': $background,
-    'dark': $background-dark,
-    'light': $background-light,
-    'card': $background-card
-  ),
-  'text': (
-    'base': $text,
-    'muted': $text-muted,
-    'light': $text-light,
-    'dark': $text-dark
-  ),
-  'border': (
-    'base': $border,
-    'light': $border-light,
-    'dark': $border-dark
-  ),
-  'success': (
-    'base': $success
-  ),
-  'error': (
-    'base': $error
-  ),
-  'warning': (
-    'base': $warning
-  ),
-  'info': (
-    'base': $info
-  )
+  'primary': $color-category-primary,
+  'text': $color-category-text,
+  'surface': $color-category-surface,
+  'border': $color-category-border,
 );
 
 // Feature-specific color map
@@ -153,4 +170,79 @@ $color-palettes: (
 // This ensures separation of concerns between light and dark themes
 
 // Export a flag to indicate this file was imported
-$color-maps-imported: true; 
+$color-maps-imported: true;
+
+// Color maps for the theme-based color system
+// Maps each color category to a base color and its variants
+// Use the color() and dark-color() functions to access these colors
+
+// Base color categories map
+$color-categories: (
+  primary: (
+    base: $primary,
+    dark: darken($primary, 10%),
+    light: lighten($primary, 10%),
+    hover: lighten($primary, 5%),
+    muted: transparentize($primary, 0.5),
+    accent: $primary,
+    'primary-light': lighten($primary, 15%),
+  ),
+  secondary: (
+    base: $secondary,
+    dark: darken($secondary, 10%),
+    light: lighten($secondary, 10%),
+    hover: lighten($secondary, 5%),
+    muted: transparentize($secondary, 0.5),
+  ),
+  surface: (
+    base: $card-bg,
+    dark: $surface-dark,
+    light: $surface-light,
+    accent: $surface-accent,
+    hover: $surface-hover,
+    disabled: darken($card-bg, 3%),
+  ),
+  text: (
+    base: $text,
+    dark: darken($text, 10%),
+    light: lighten($text, 10%),
+    hover: darken($text, 20%),
+    muted: $text-muted,
+    disabled: transparentize($text, 0.5),
+  ),
+  border: (
+    base: $border,
+    dark: darken($border, 10%),
+    light: lighten($border, 10%),
+    hover: $border-hover,
+    muted: $border-muted,
+  ),
+  success: (
+    base: $success,
+    dark: darken($success, 10%),
+    light: lighten($success, 10%),
+    hover: darken($success, 5%),
+    muted: transparentize($success, 0.5),
+  ),
+  info: (
+    base: $info,
+    dark: darken($info, 10%),
+    light: lighten($info, 10%),
+    hover: darken($info, 5%),
+    muted: transparentize($info, 0.5),
+  ),
+  warning: (
+    base: $warning,
+    dark: darken($warning, 10%),
+    light: lighten($warning, 10%),
+    hover: darken($warning, 5%),
+    muted: transparentize($warning, 0.5),
+  ),
+  error: (
+    base: $error,
+    dark: darken($error, 10%),
+    light: lighten($error, 10%),
+    hover: darken($error, 5%),
+    muted: transparentize($error, 0.5),
+  )
+); 

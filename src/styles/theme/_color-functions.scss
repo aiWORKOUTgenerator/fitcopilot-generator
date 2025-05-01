@@ -91,22 +91,61 @@
 }
 
 /**
+ * Validate alpha value to ensure consistent alpha usage across the codebase
+ * 
+ * @param {Number} $alpha - The alpha value to validate (0-1)
+ * @return {Number} The validated alpha value
+ */
+@function validate-alpha($alpha) {
+  $standard-alphas: (0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1);
+  
+  @if index($standard-alphas, $alpha) == null {
+    @warn "Non-standard alpha value: #{$alpha}. Recommended values: #{$standard-alphas}";
+  }
+  
+  @return $alpha;
+}
+
+/**
  * Get a color with transparency
  * 
  * @param {String} $category - The color category
- * @param {String} $variant - The variant
- * @param {Number} $opacity - The opacity value (0-1)
+ * @param {Number|String} $variant_or_opacity - Either the variant name or opacity value
+ * @param {Number|null} $opacity_or_null - The opacity value if $variant_or_opacity is a string variant
  * @return {Color} The color with applied opacity
  * 
  * @example
- * .overlay {
- *   background-color: color-alpha('background', 'base', 0.8);
+ * // Both formats are supported:
+ * .element-1 {
+ *   // New format (preferred)
+ *   background-color: color-alpha('primary', 0.8);
+ * }
+ * .element-2 {
+ *   // Legacy format (still supported)
+ *   background-color: color-alpha('primary', 'light', 0.5);
  * }
  */
-@function color-alpha($category, $variant: 'base', $opacity: 0.5) {
+@function color-alpha($category, $variant_or_opacity, $opacity_or_null: null) {
+  $variant: 'base';
+  $opacity: 0.5;
+  
+  // Determine if the second parameter is opacity or variant
+  @if type-of($variant_or_opacity) == 'number' {
+    // New format: color-alpha('primary', 0.5)
+    $variant: 'base';
+    $opacity: $variant_or_opacity;
+  } @else {
+    // Old format: color-alpha('primary', 'light', 0.5)
+    $variant: $variant_or_opacity;
+    
+    @if $opacity_or_null != null {
+      $opacity: $opacity_or_null;
+    }
+  }
+  
   $color: color($category, $variant);
   @if $color {
-    @return to-rgba($color, $opacity);
+    @return to-rgba($color, validate-alpha($opacity));
   }
   
   @warn "Could not create transparent color for: #{$category}, #{$variant}";
@@ -135,9 +174,9 @@
   
   @if $custom-opacity != null {
     @if $type == 'dark' {
-      @return to-rgba($gray-900, $custom-opacity);
+      @return to-rgba($gray-900, validate-alpha($custom-opacity));
     } @else if $type == 'light' {
-      @return to-rgba($white, $custom-opacity);
+      @return to-rgba($white, validate-alpha($custom-opacity));
     }
   }
   

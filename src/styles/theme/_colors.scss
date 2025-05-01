@@ -140,6 +140,17 @@ $orange-700: #c2410c;
 $orange-800: #9a3412;
 $orange-900: #7c2d12;
 
+// Rose palette (used for Error states)
+$rose-100: #ffe4e6;
+$rose-200: #fecdd3;
+$rose-300: #fda4af;
+$rose-400: #fb7185;
+$rose-500: #f43f5e;
+$rose-600: #e11d48;
+$rose-700: #be123c;
+$rose-800: #9f1239;
+$rose-900: #881337;
+
 // ========================================================================
 // SEMANTIC COLOR VARIABLES
 // Purpose-specific color tokens
@@ -149,14 +160,16 @@ $orange-900: #7c2d12;
 $dark-blue: #0e1524;     // Alternative dark background
 $darker-blue: #0B1121;   // Deeper background color
 $card-bg: #141a2b;       // Card background
+$dark-card-bg: #0f141e;  // Dark theme card background
 
 // Primary semantic colors
-$primary: $lime-300;
+$primary: $lime-400;
 $primary-dark: $lime-500;
 $primary-light: $lime-200;
+$primary-lighter: $lime-100;
 
 // Secondary semantic colors
-$secondary: $emerald-400;
+$secondary: $emerald-500;
 $secondary-dark: $emerald-600;
 $secondary-light: $emerald-200;
 
@@ -166,20 +179,32 @@ $background-light: $gray-800;
 $background-dark: $gray-950;
 $background-card: $card-bg;
 
+// Surface colors
+$surface: $card-bg;
+$surface-light: lighten($card-bg, 5%);
+$surface-dark: darken($card-bg, 5%);
+$surface-accent: lighten($card-bg, 10%);
+$surface-hover: lighten($card-bg, 15%);
+$surface-disabled: mix($card-bg, $gray-800, 90%);
+
 // Text colors
 $text: $white;
-$text-muted: $gray-400;
+$text-muted: $gray-500;
 $text-light: $gray-300;
 $text-dark: $gray-600;
 
 // Border colors
-$border: $gray-700;
+$border: $gray-200;
 $border-light: $gray-600;
 $border-dark: $gray-800;
+$border-hover: darken($border, 10%);
+$border-muted: lighten($border, 10%);
+$border-focus: $primary;
+$dark-border: $gray-600; // Dark theme border color
 
 // Status colors
 $success: $emerald-500;
-$error: #ef4444;         // Red-500
+$error: $rose-500;
 $warning: $amber-500;
 $info: $blue-500;
 

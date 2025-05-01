@@ -107,38 +107,38 @@
   
   // Success button style
   &--success {
-    background-color: color('success');
+    background-color: $success;
     color: color('text-light');
     
     &:hover:not(:disabled) {
-      background-color: darken(color('success'), 5%);
+      background-color: darken($success, 5%);
     }
     
     .dark-theme & {
-      background-color: dark-color('success');
+      background-color: dark-color('primary');
       color: dark-color('text');
       
       &:hover:not(:disabled) {
-        background-color: darken(dark-color('success'), 5%);
+        background-color: lighten(dark-color('primary'), 5%);
       }
     }
   }
   
   // Danger button style
   &--danger {
-    background-color: color('error');
+    background-color: $error;
     color: color('text-light');
     
     &:hover:not(:disabled) {
-      background-color: darken(color('error'), 5%);
+      background-color: darken($error, 5%);
     }
     
     .dark-theme & {
-      background-color: dark-color('error');
+      background-color: $error;
       color: dark-color('text');
       
       &:hover:not(:disabled) {
-        background-color: darken(dark-color('error'), 5%);
+        background-color: darken($error, 10%);
       }
     }
   }
