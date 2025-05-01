@@ -5,6 +5,7 @@
  */
 
 @import '../tokens/semantic/surfaces';
+@import '../tokens/semantic/motion';
 
 /// Card styling mixin that applies all card styles at once
 /// @param {Boolean} $dark [false] - Whether to use dark theme styles
@@ -106,7 +107,7 @@
  * @param {Boolean} $dark - Whether to include dark mode styles
  */
 @mixin hover-state($color, $opacity: 0.05, $dark: false) {
-  transition: background-color 0.2s ease;
+  transition: transition-preset('color');
   
   &:hover, &:focus {
     background-color: rgba(var(--color-#{$color}-rgb), $opacity);

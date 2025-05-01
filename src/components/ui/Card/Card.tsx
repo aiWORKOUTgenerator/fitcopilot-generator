@@ -41,6 +41,22 @@ export interface CardProps {
 /**
  * Card component for displaying content in a contained box with consistent styling
  * 
+ * The Card component uses the following color tokens:
+ * - `color('surface')` - For the background color
+ * - `color('border')` - For the border in bordered variant
+ * - `color('text')` - For the text color
+ * - `color('surface', 'hover')` - For hover state background
+ * 
+ * In dark mode:
+ * - `dark-color('surface')` - Dark mode background
+ * - `dark-color('border')` - Dark mode border
+ * - `dark-color('text')` - Dark mode text color
+ * - `dark-color('surface', 'hover')` - Dark mode hover background
+ * 
+ * Shadows and motion:
+ * - Uses `card-shadow('card')` for elevation
+ * - Uses `transition-preset('card')` for hover/interaction transitions
+ * 
  * @param {CardProps} props - Card component props
  * @returns {JSX.Element} Card component
  * 
