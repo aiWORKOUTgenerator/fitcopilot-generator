@@ -4,11 +4,11 @@
 @import './Card.scss';
 @import './Card/Card.scss'; 
 @import './Button/Button.scss';
+@import './ThemeToggle/ThemeToggle.scss';
 
 /* Common UI component styles */
 @import '../../common/components/UI/Card/Card.scss';
 @import '../../common/components/UI/Checkbox/Checkbox.scss';
 @import '../../common/components/UI/ProgressBar/ProgressBar.scss';
 @import '../../common/components/UI/Select/Select.scss';
-@import '../../common/components/UI/Textarea/Textarea.scss';
-@import '../../common/components/UI/ThemeToggle/ThemeToggle.scss'; 
+@import '../../common/components/UI/Textarea/Textarea.scss'; 
