@@ -6,9 +6,11 @@
 import React, { useState } from 'react';
 import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
+import { Textarea } from '../../../../../components/ui/Textarea';
+import { AdvancedOptionsPanel } from '../../../../../components/ui';
 import { WorkoutFormParams, WorkoutDifficulty } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
-import { ChevronDown, Dumbbell, ChevronRight, CheckSquare } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import './InputStep.scss';
 
 /**
@@ -83,6 +85,8 @@ interface InputStepProps {
   setEquipment: (equipment: string[]) => void;
   /** Update restrictions field */
   setRestrictions: (restrictions: string) => void;
+  /** Update preferences field */
+  setPreferences: (preferences: string) => void;
   /** Validate the form */
   validateForm: () => boolean;
   /** Continue to next step */
@@ -103,10 +107,10 @@ export const InputStep: React.FC<InputStepProps> = ({
   setDuration,
   setEquipment,
   setRestrictions,
+  setPreferences,
   validateForm,
   onContinue,
 }) => {
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [intensity, setIntensity] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -128,28 +132,6 @@ export const InputStep: React.FC<InputStepProps> = ({
         setIsSubmitting(false);
       }
     }
-  };
-
-  /**
-   * Handle equipment selection
-   */
-  const handleEquipmentChange = (id: string) => {
-    const currentEquipment = formValues.equipment || [];
-    
-    if (currentEquipment.includes(id)) {
-      // Remove from selection
-      setEquipment(currentEquipment.filter(item => item !== id));
-    } else {
-      // Add to selection
-      setEquipment([...currentEquipment, id]);
-    }
-  };
-
-  /**
-   * Toggle advanced options
-   */
-  const toggleAdvancedOptions = () => {
-    setShowAdvanced(!showAdvanced);
   };
 
   /**
@@ -255,78 +237,19 @@ export const InputStep: React.FC<InputStepProps> = ({
             </div>
           </div>
 
-          {/* Advanced Options Toggle */}
-          <button 
-            type="button" 
-            className={`input-step__advanced-toggle ${showAdvanced ? 'input-step__advanced-toggle--open' : ''}`}
-            onClick={toggleAdvancedOptions}
-          >
-            <div className="input-step__toggle-left">
-              <Dumbbell className="input-step__toggle-icon" />
-              <span className="input-step__toggle-text">Advanced Options</span>
-            </div>
-            <ChevronDown className="input-step__toggle-chevron" />
-          </button>
-          
-          {/* Advanced Options Content */}
-          {showAdvanced && (
-            <div className="input-step__advanced-content">
-              {/* Equipment Selection */}
-              <div className="input-step__form-group">
-                <h3 className="input-step__label">Available Equipment</h3>
-                <div className="input-step__checkbox-grid">
-                  {EQUIPMENT_OPTIONS.map(option => (
-                    <label key={option.id} className="input-step__checkbox-label">
-                      <input
-                        type="checkbox"
-                        className="input-step__checkbox-input"
-                        value={option.id}
-                        checked={(formValues.equipment || []).includes(option.id)}
-                        onChange={() => handleEquipmentChange(option.id)}
-                      />
-                      <div className="input-step__checkbox-box">
-                        <CheckSquare size={14} className="input-step__checkbox-indicator" />
-                      </div>
-                      <span className="input-step__checkbox-text">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Workout Intensity */}
-              <div className="input-step__form-group">
-                <h3 className="input-step__label">Workout Intensity</h3>
-                <div className="input-step__slider-container">
-                  <input
-                    type="range"
-                    className="input-step__slider"
-                    min="1"
-                    max="5"
-                    value={intensity}
-                    onChange={(e) => setIntensity(parseInt(e.target.value))}
-                  />
-                  <div className="input-step__slider-labels">
-                    <span>Low</span>
-                    <span>Moderate</span>
-                    <span>High</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Restrictions Input */}
-              <div className="input-step__form-group">
-                <h3 className="input-step__label">Restrictions or Preferences</h3>
-                <textarea
-                  id="restrictions"
-                  className="input-step__textarea"
-                  value={formValues.restrictions || ''}
-                  onChange={e => setRestrictions(e.target.value)}
-                  placeholder="Enter any injuries, limitations, or preferences (e.g., knee injury, prefer machine exercises, etc.)"
-                  rows={4}
-                />
-              </div>
-            </div>
-          )}
+          {/* Advanced Options */}
+          <AdvancedOptionsPanel 
+            equipmentOptions={EQUIPMENT_OPTIONS}
+            selectedEquipment={formValues.equipment || []}
+            onEquipmentChange={setEquipment}
+            intensity={intensity}
+            onIntensityChange={setIntensity}
+            preferences={formValues.preferences || ''}
+            onPreferencesChange={setPreferences}
+            restrictions={formValues.restrictions || ''}
+            onRestrictionsChange={setRestrictions}
+            className="input-step__advanced-options"
+          />
 
           {/* Submit Button */}
           <div className="input-step__actions">

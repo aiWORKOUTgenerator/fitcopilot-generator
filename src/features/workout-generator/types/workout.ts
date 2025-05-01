@@ -58,6 +58,7 @@ export interface WorkoutFormParams {
   equipment?: string[];
   goals: string;
   restrictions?: string;
+  preferences?: string;
 }
 
 /**

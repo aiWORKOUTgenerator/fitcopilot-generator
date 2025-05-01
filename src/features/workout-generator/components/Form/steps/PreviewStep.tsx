@@ -80,6 +80,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
   // Format any restrictions or preferences
   const restrictionsPreferences = [
     ...(formValues.restrictions ? [`Restrictions: ${formValues.restrictions}`] : []),
+    ...(formValues.preferences ? [`Preferences: ${formValues.preferences}`] : []),
   ];
 
   return (

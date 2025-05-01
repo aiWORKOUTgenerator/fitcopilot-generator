@@ -743,6 +743,14 @@
     background: gradient('lime') !important;
     font-weight: 600;
   }
+
+  &__select-icon {
+    // existing styles...
+  }
+
+  &__advanced-options {
+    margin-bottom: 1.5rem;
+  }
 }
 
 /* Animation for form elements */

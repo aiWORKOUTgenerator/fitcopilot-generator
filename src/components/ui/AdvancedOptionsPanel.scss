@@ -1,0 +1,364 @@
+/*
+ * Advanced Options Panel Component
+ * Using standardized color token system for consistent styling
+ */
+
+@import '../../styles/theme/index.scss';
+@import '../../styles/design-system/tokens/index';
+
+.advanced-options-panel {
+  width: 100%;
+  margin-bottom: 1.5rem;
+
+  &__toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: color-alpha('primary', 0.1);
+    border: 1px solid color-alpha('primary', 0.2);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    
+    .dark-theme & {
+      background-color: dark-color-alpha('primary', 0.15);
+      border-color: dark-color-alpha('primary', 0.3);
+    }
+    
+    &:hover {
+      background-color: color-alpha('primary', 0.15);
+      
+      .dark-theme & {
+        background-color: dark-color-alpha('primary', 0.2);
+      }
+    }
+    
+    &:focus-visible {
+      outline: 2px solid color('primary');
+      outline-offset: 2px;
+      
+      .dark-theme & {
+        outline-color: dark-color('primary');
+      }
+    }
+    
+    &--open {
+      background-color: color-alpha('primary', 0.15);
+      border-color: color-alpha('primary', 0.3);
+      border-radius: 8px 8px 0 0;
+      
+      .advanced-options-panel__toggle-chevron {
+        transform: rotate(180deg);
+      }
+      
+      .dark-theme & {
+        background-color: dark-color-alpha('primary', 0.2);
+        border-color: dark-color-alpha('primary', 0.4);
+      }
+    }
+  }
+
+  &__toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__toggle-icon {
+    color: color('primary');
+    
+    .dark-theme & {
+      color: dark-color('primary');
+    }
+  }
+
+  &__toggle-text {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: color('text');
+    
+    .dark-theme & {
+      color: dark-color('text');
+    }
+  }
+
+  &__toggle-chevron {
+    color: color('primary');
+    transition: transform 0.3s ease;
+    
+    .dark-theme & {
+      color: dark-color('primary');
+    }
+  }
+
+  &__content {
+    border: 1px solid color-alpha('primary', 0.2);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background-color: color-alpha('primary', 0.05);
+    padding: 1.5rem;
+    margin-top: -0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: fadeIn 0.3s ease-out;
+    
+    .dark-theme & {
+      background-color: dark-color-alpha('primary', 0.1);
+      border-color: dark-color-alpha('primary', 0.3);
+    }
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__textarea-wrapper {
+    width: 100%;
+  }
+
+  &__textarea {
+    width: 100% !important;
+    background-color: color('white') !important;
+    border-color: color('border') !important;
+
+    &:focus {
+      border-color: color('primary') !important;
+      box-shadow: 0 0 0 3px color-alpha('primary', 0.2) !important;
+    }
+
+    .dark-theme & {
+      background-color: dark-color('surface-accent') !important;
+      border-color: dark-color('border') !important;
+      color: dark-color('text') !important;
+
+      &:focus {
+        border-color: dark-color('primary') !important;
+        box-shadow: 0 0 0 3px dark-color-alpha('primary', 0.2) !important;
+      }
+    }
+  }
+
+  &__heading {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: color('text');
+    margin: 0;
+    
+    .dark-theme & {
+      color: dark-color('text');
+    }
+  }
+
+  &__checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+    
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.25rem;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 0.25rem;
+    user-select: none;
+    
+    &:hover {
+      background-color: color-alpha('primary', 0.1);
+      
+      .advanced-options-panel__checkbox-box {
+        border-color: color('primary');
+      }
+      
+      .advanced-options-panel__checkbox-text {
+        color: color('primary');
+      }
+      
+      .dark-theme & {
+        background-color: dark-color-alpha('primary', 0.15);
+      }
+    }
+  }
+
+  &__checkbox-input {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+    
+    &:checked + .advanced-options-panel__checkbox-box {
+      background-color: color('primary');
+      border-color: color('primary');
+      
+      .advanced-options-panel__checkbox-indicator {
+        opacity: 1;
+        transform: scale(1);
+        color: color('white');
+      }
+    }
+    
+    &:checked ~ .advanced-options-panel__checkbox-text {
+      color: color('primary');
+      font-weight: 500;
+    }
+    
+    &:focus-visible + .advanced-options-panel__checkbox-box {
+      outline: 2px solid color('primary');
+      outline-offset: 2px;
+    }
+    
+    .dark-theme &:checked + .advanced-options-panel__checkbox-box {
+      background-color: dark-color('primary');
+      border-color: dark-color('primary');
+      
+      .advanced-options-panel__checkbox-indicator {
+        color: dark-color('text');
+      }
+    }
+    
+    .dark-theme &:checked ~ .advanced-options-panel__checkbox-text {
+      color: dark-color('primary');
+    }
+    
+    .dark-theme &:focus-visible + .advanced-options-panel__checkbox-box {
+      outline-color: dark-color('primary');
+    }
+  }
+
+  &__checkbox-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid color('border');
+    border-radius: 4px;
+    margin-right: 0.625rem;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    
+    .dark-theme & {
+      border-color: dark-color('border');
+    }
+  }
+
+  &__checkbox-indicator {
+    color: color('white');
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.15s ease;
+    
+    .dark-theme & {
+      color: dark-color('text');
+    }
+  }
+
+  &__checkbox-text {
+    font-size: 1rem;
+    color: color('text');
+    transition: all 0.2s ease;
+    line-height: 1.2;
+    
+    .dark-theme & {
+      color: dark-color('text');
+    }
+  }
+
+  &__slider-container {
+    padding: 0.75rem 0 1.5rem;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  &__slider {
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(to right, color('primary-light'), color('primary-dark'));
+    outline: none;
+    border-radius: 10px;
+    appearance: none;
+    cursor: pointer;
+    
+    &::-webkit-slider-thumb {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: color('primary');
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+      }
+      
+      .dark-theme & {
+        background: dark-color('primary');
+        border-color: dark-color('background');
+      }
+    }
+    
+    &::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: color('primary');
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+      }
+      
+      .dark-theme & {
+        background: dark-color('primary');
+        border-color: dark-color('background');
+      }
+    }
+    
+    .dark-theme & {
+      background: linear-gradient(to right, dark-color('primary'), dark-color('primary-light'));
+    }
+  }
+
+  &__slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    color: color('text-muted');
+    font-size: 0.875rem;
+    
+    .dark-theme & {
+      color: dark-color('text-muted');
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

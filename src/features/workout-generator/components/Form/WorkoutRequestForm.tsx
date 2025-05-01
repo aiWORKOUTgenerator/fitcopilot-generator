@@ -374,6 +374,7 @@ function WorkoutRequestFormInner({ className = '' }: WorkoutRequestFormProps) {
               setDuration={(duration) => workoutForm.updateField('duration', duration)}
               setEquipment={(equipment) => workoutForm.updateField('equipment', equipment)}
               setRestrictions={(restrictions) => workoutForm.updateField('restrictions', restrictions)}
+              setPreferences={(preferences) => workoutForm.updateField('preferences', preferences)}
               validateForm={workoutForm.validateForm}
               onContinue={handlePreviewStep}
             />
@@ -386,7 +387,8 @@ function WorkoutRequestFormInner({ className = '' }: WorkoutRequestFormProps) {
                 difficulty: workoutForm.formValues.difficulty || 'beginner',
                 equipment: workoutForm.formValues.equipment || [],
                 goals: workoutForm.formValues.goals || '',
-                restrictions: workoutForm.formValues.restrictions
+                restrictions: workoutForm.formValues.restrictions,
+                preferences: workoutForm.formValues.preferences
               }} 
               onEditRequest={handleEditForm}
               onGenerateWorkout={handleSubmitForm}
