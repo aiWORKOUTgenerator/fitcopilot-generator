@@ -5,7 +5,7 @@
  */
 import React, { useState } from 'react';
 import { Card } from '../../../../../components/ui';
-import { Button } from '../../../../../common/components/UI';
+import { Button } from '../../../../../components/ui';
 import { WorkoutFormParams, WorkoutDifficulty } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
 import { ChevronDown, Dumbbell, ChevronRight } from 'lucide-react';

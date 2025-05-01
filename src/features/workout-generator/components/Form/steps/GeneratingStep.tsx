@@ -4,7 +4,7 @@
  * Displays an enhanced visualization of the workout generation process with realistic progress feedback.
  */
 import React, { useEffect, useState, useRef } from 'react';
-import { Button } from '../../../../../common/components/UI';
+import { Button } from '../../../../../components/ui';
 import LoadingIndicator from '../../GenerationProcess/LoadingIndicator';
 import { CancellationButton } from '../../GenerationProcess';
 import ErrorBoundary from '../../common/ErrorBoundary';

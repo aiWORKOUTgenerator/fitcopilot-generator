@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { Card } from '../../../../../components/ui';
-import { Button } from '../../../../../common/components/UI';
+import { Button } from '../../../../../components/ui';
 import { WorkoutFormParams } from '../../../types/workout';
 import { ArrowLeft, Dumbbell } from 'lucide-react';
 import './PreviewStep.scss';

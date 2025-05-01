@@ -4,7 +4,7 @@
  * Provides developer controls for debugging workout generation
  */
 import React from 'react';
-import { Button } from '../../../../common/components/UI';
+import { Button } from '../../../../components/ui';
 import { useWorkoutGenerator } from '../../../workout-generator/context';
 import { WorkoutActionType } from '../../../workout-generator/context/actions';
 

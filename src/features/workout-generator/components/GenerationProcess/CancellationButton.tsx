@@ -5,7 +5,7 @@
  * Uses the design system's Button component with consistent styling.
  */
 import React from 'react';
-import { Button } from '../../../../common/components/UI';
+import { Button } from '../../../../components/ui';
 import { X } from 'lucide-react';
 
 interface CancellationButtonProps {
