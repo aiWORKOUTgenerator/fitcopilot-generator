@@ -18,21 +18,21 @@
 // Core color tokens for Workout Generator
 $wg-color-categories: (
   'primary': (
-    'base': $primary,
-    'hover': $primary-dark,
-    'active': $primary-dark,
+    'base': $lime-400,
+    'hover': $lime-500,
+    'active': $lime-500,
     'disabled': to-rgba($lime-300, 0.5)
   ),
   'secondary': (
-    'base': $secondary,
-    'hover': $secondary-dark,
-    'active': $secondary-dark,
+    'base': $emerald-400,
+    'hover': $emerald-500,
+    'active': $emerald-500,
     'disabled': to-rgba($emerald-400, 0.5)
   ),
   'surface': (
-    'base': $background-card,
-    'hover': $background-light,
-    'active': $background-light
+    'base': $gray-800,  // Dark background for cards as per mockup
+    'hover': $gray-700,
+    'active': $gray-700
   )
 );
 
@@ -49,8 +49,8 @@ $wg-semantic-categories: (
     'info': $info
   ),
   'text': (
-    'primary': $text,
-    'secondary': $text-muted,
+    'primary': $white,
+    'secondary': $gray-400,
     'disabled': to-rgba($white, 0.5)
   )
 );
@@ -58,48 +58,71 @@ $wg-semantic-categories: (
 // State colors with contrast guarantees
 $wg-state-categories: (
   'focus': (
-    'outline': to-rgba($lime-300, 0.5),
-    'background': to-rgba($lime-300, 0.1)
+    'outline': to-rgba($lime-400, 0.5),
+    'background': to-rgba($lime-400, 0.1)
   ),
   'hover': (
-    'background': to-rgba($lime-300, 0.05),
-    'text': $primary
+    'background': to-rgba($lime-400, 0.05),
+    'text': $lime-400
   )
 );
 
-// Dark mode color mapping for Workout Generator
+// Dark mode is the default in the mockup
 $wg-dark-categories: (
   'surface': (
-    'base': $dark-blue,
-    'hover': $darker-blue
+    'base': $gray-800,
+    'hover': $gray-700
   ),
   'text': (
-    'primary': $text,
-    'secondary': $text-muted
+    'primary': $white,
+    'secondary': $gray-400
   )
 );
 
-// Card colors using the FitCopilot color system
+// Updated card colors using the lime/emerald gradient system
 $wg-card-categories: (
   'goal': (
-    'bg': $feature-virtual-bg,
-    'color': $feature-virtual-accent,
-    'dark-bg': to-rgba($lime-300, 0.1),
-    'dark-color': $lime-300
+    'bg': $gray-800,
+    'color': $emerald-400,
+    'border': to-rgba($emerald-400, 0.3),
+    'hover-bg': $gray-700
   ),
   'level': (
-    'bg': $feature-schedule-bg,
-    'color': $feature-schedule-accent,
-    'dark-bg': to-rgba($cyan-300, 0.1),
-    'dark-color': $cyan-300
+    'bg': $gray-800,
+    'color': $violet-400,
+    'border': to-rgba($violet-400, 0.3),
+    'hover-bg': $gray-700
   ),
   'duration': (
-    'bg': $feature-progress-bg,
-    'color': $feature-progress-accent,
-    'dark-bg': to-rgba($violet-300, 0.1),
-    'dark-color': $violet-300
+    'bg': $gray-800,
+    'color': $blue-400,
+    'border': to-rgba($blue-400, 0.3),
+    'hover-bg': $gray-700
   )
 );
+
+// Equipment tag styling
+$equipment-tag-styles: (
+  'bg': to-rgba($lime-400, 0.1),
+  'border': to-rgba($lime-400, 0.3),
+  'color': $lime-400,
+  'hover-bg': to-rgba($lime-400, 0.2)
+);
+
+// Primary action button gradient
+$generate-button-gradient: linear-gradient(90deg, $lime-400, $emerald-400);
+$generate-button-shadow: 0 4px 12px to-rgba($lime-500, 0.3);
+$generate-button-hover-shadow: 0 6px 16px to-rgba($lime-500, 0.4);
+
+// Secondary/edit button styling
+$edit-button-bg: transparent;
+$edit-button-border: 1px solid $gray-700;
+$edit-button-hover-bg: to-rgba($gray-700, 0.1);
+
+// Notice styling
+$notice-bg: to-rgba($lime-400, 0.05);
+$notice-border: $lime-400;
+$notice-text: $gray-300;
 
 // ========================================================================
 // WORKOUT GENERATOR COLOR ACCESS FUNCTIONS
@@ -156,7 +179,7 @@ $wg-card-categories: (
  * Get a card specific color
  * 
  * @param {String} $card-type - The card type (goal, level, duration)
- * @param {String} $property - The property (bg, color, dark-bg, dark-color)
+ * @param {String} $property - The property (bg, color, border, hover-bg)
  * @return {Color} The color value
  */
 @function wg-card-color($card-type, $property: 'bg') {
@@ -198,6 +221,21 @@ $wg-card-categories: (
   @return map-get($state-map, $property);
 }
 
+/**
+ * Get equipment tag styling property
+ * 
+ * @param {String} $property - The styling property (bg, border, color, hover-bg)
+ * @return {Color} The style value
+ */
+@function equipment-tag-style($property) {
+  @if not map-has-key($equipment-tag-styles, $property) {
+    @warn "Unknown equipment tag style property: #{$property}";
+    @return null;
+  }
+  
+  @return map-get($equipment-tag-styles, $property);
+}
+
 // ========================================================================
 // BACKWARD COMPATIBILITY VARIABLES
 // Maintains backward compatibility with existing code
@@ -220,14 +258,25 @@ $wg-duration-bg: wg-card-color('duration', 'bg');
 $wg-goal-color: wg-card-color('goal', 'color');
 $wg-level-color: wg-card-color('level', 'color');
 $wg-duration-color: wg-card-color('duration', 'color');
+$wg-goal-border: wg-card-color('goal', 'border');
+$wg-level-border: wg-card-color('level', 'border');
+$wg-duration-border: wg-card-color('duration', 'border');
 
-// Dark mode colors
-$wg-dark-goal-bg: wg-card-color('goal', 'dark-bg');
-$wg-dark-level-bg: wg-card-color('level', 'dark-bg');
-$wg-dark-duration-bg: wg-card-color('duration', 'dark-bg');
-$wg-dark-goal-color: wg-card-color('goal', 'dark-color');
-$wg-dark-level-color: wg-card-color('level', 'dark-color');
-$wg-dark-duration-color: wg-card-color('duration', 'dark-color');
+// Equipment tag styling
+$wg-equipment-tag-bg: equipment-tag-style('bg');
+$wg-equipment-tag-border: equipment-tag-style('border');
+$wg-equipment-tag-color: equipment-tag-style('color');
+$wg-equipment-tag-hover-bg: equipment-tag-style('hover-bg');
+
+// Notice styling
+$wg-notice-bg: $notice-bg;
+$wg-notice-border: $notice-border;
+$wg-notice-text: $notice-text;
+
+// Button styling
+$wg-generate-button-gradient: $generate-button-gradient;
+$wg-generate-button-shadow: $generate-button-shadow;
+$wg-generate-button-hover-shadow: $generate-button-hover-shadow;
 
 // Export a flag to indicate this file was imported
 $wg-color-tokens-imported: true; 

@@ -7,8 +7,10 @@
 import React from 'react';
 import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
+import ThemeToggle from '../../../../../components/ui/ThemeToggle';
 import { WorkoutFormParams } from '../../../types/workout';
-import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
+import { EquipmentIcon } from '../../../utils/EquipmentIcons';
 import './PreviewStep.scss';
 
 interface PreviewStepProps {
@@ -59,6 +61,8 @@ const EQUIPMENT_LABELS: Record<string, string> = {
   'stationary-bike': 'Stationary Bike',
   'elliptical': 'Elliptical',
   'rowing-machine': 'Rowing Machine',
+  'trx': 'TRX',
+  'jump-rope': 'Jump Rope',
 };
 
 /**
@@ -74,8 +78,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
   const goalDisplay = formValues.goals ? GOAL_LABELS[formValues.goals] || formValues.goals : '';
   const difficultyDisplay = formValues.difficulty ? DIFFICULTY_LABELS[formValues.difficulty] : '';
   const durationDisplay = formValues.duration ? `${formValues.duration} minutes` : '';
-  
-  const equipmentDisplay = formValues.equipment?.map((item: string) => EQUIPMENT_LABELS[item] || item) || [];
+  const equipment = formValues.equipment || [];
   
   // Format any restrictions or preferences
   const restrictionsPreferences = [
@@ -85,41 +88,45 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
 
   return (
     <div className="preview-step">
-      <h2 className="preview-step__title">Workout Summary</h2>
+      <div className="preview-step__header">
+        <h2 className="preview-step__title">Workout Summary</h2>
+        <ThemeToggle />
+      </div>
       
       <div className="workout-preview">
         <h3 className="workout-preview__title">Your Workout Request</h3>
         
         <div className="workout-preview__grid">
-          <div className="workout-preview__card">
+          <Card className="workout-preview__card workout-preview__card--goal">
             <div className="workout-preview__card-label">Goal</div>
-            <div className="workout-preview__card-value workout-preview__card-value--goal">
+            <div className="workout-preview__card-value">
               {goalDisplay}
             </div>
-          </div>
+          </Card>
           
-          <div className="workout-preview__card">
+          <Card className="workout-preview__card workout-preview__card--level">
             <div className="workout-preview__card-label">Difficulty</div>
-            <div className="workout-preview__card-value workout-preview__card-value--level">
+            <div className="workout-preview__card-value">
               {difficultyDisplay}
             </div>
-          </div>
+          </Card>
           
-          <div className="workout-preview__card">
+          <Card className="workout-preview__card workout-preview__card--duration">
             <div className="workout-preview__card-label">Duration</div>
-            <div className="workout-preview__card-value workout-preview__card-value--duration">
+            <div className="workout-preview__card-value">
               {durationDisplay}
             </div>
-          </div>
+          </Card>
         </div>
         
-        {equipmentDisplay.length > 0 && (
+        {equipment.length > 0 && (
           <div className="workout-preview__section">
             <h4 className="workout-preview__section-title">Equipment</h4>
             <div className="workout-preview__equipment">
-              {equipmentDisplay.map((item: string, index: number) => (
-                <span key={index} className="workout-preview__equipment-tag">
-                  {item}
+              {equipment.map((item: string, index: number) => (
+                <span key={index} className="equipment-tag">
+                  <EquipmentIcon type={item} />
+                  {EQUIPMENT_LABELS[item] || item}
                 </span>
               ))}
             </div>
@@ -140,7 +147,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
         )}
       </div>
       
-      <div className="preview-step__message">
+      <div className="preview-step__notice">
         Please review your workout request details before generating your personalized workout.
       </div>
       
@@ -151,19 +158,21 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
           size="lg"
           disabled={isLoading}
           aria-label="Edit workout request"
-          startIcon={<ArrowLeft size={18} />}
+          className="preview-step__edit-button"
+          startIcon={<ArrowLeft size={20} />}
         >
           Edit Request
         </Button>
         
         <Button 
           onClick={onGenerateWorkout}
-          variant="gradient"
+          variant="primary"
           size="lg"
           isLoading={isLoading}
           disabled={isLoading}
           aria-label="Generate personalized workout"
-          endIcon={<Dumbbell size={18} />}
+          className="preview-step__generate-button"
+          endIcon={<Plus size={20} className="generate-icon" />}
         >
           Generate Workout
         </Button>

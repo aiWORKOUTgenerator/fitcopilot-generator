@@ -3,5 +3,5 @@
  */
 
 export { default as ErrorBoundary } from './ErrorBoundary';
-export { default as TipsCard } from './TipsCard';
+export { default as TipsCard } from './TipsCard/TipsCard';
 export { default as DebugControls } from './DebugControls'; 

@@ -16,10 +16,16 @@
 @import 'components/_steps';
 @import 'components/_loading';
 
+// Define global variables
+:root {
+  --workout-generator-max-width: 800px;
+}
+
 // Full width styles
 .workout-generator-feature {
   width: 100%;
-  max-width: 100%;
+  max-width: var(--workout-generator-max-width);
+  margin: 0 auto;
   box-sizing: border-box;
   padding: 2rem;
   
