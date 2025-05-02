@@ -1,0 +1,79 @@
+/* Profile Form Component Styles - Dark Theme */
+
+.profile-form {
+  @apply space-y-6;
+}
+
+/* Form section styles */
+.form-section {
+  @apply mb-8;
+}
+
+.form-section-title {
+  @apply text-lg font-medium text-white mb-4 pb-2 border-b border-gray-700;
+}
+
+/* Form fields */
+.field-group {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-6;
+}
+
+.field-row {
+  @apply mb-4;
+}
+
+.field-full {
+  @apply col-span-1 md:col-span-2;
+}
+
+/* Field validation */
+.field-error {
+  @apply mt-1 text-sm text-red-400;
+}
+
+.field-hint {
+  @apply mt-1 text-sm text-gray-400;
+}
+
+/* Radio buttons and checkboxes */
+.option-group {
+  @apply mt-2 space-y-2;
+}
+
+.radio-option, .checkbox-option {
+  @apply flex items-center;
+}
+
+.radio-option input[type="radio"], .checkbox-option input[type="checkbox"] {
+  @apply h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-600 bg-gray-700;
+}
+
+.radio-label, .checkbox-label {
+  @apply ml-2 block text-sm text-gray-300;
+}
+
+/* Toggle switch */
+.toggle-switch {
+  @apply relative inline-flex items-center cursor-pointer;
+}
+
+.toggle-switch-input {
+  @apply sr-only;
+}
+
+.toggle-switch-label {
+  @apply w-11 h-6 bg-gray-700 rounded-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600 peer-checked:after:translate-x-full;
+}
+
+/* Submit area */
+.submit-area {
+  @apply flex justify-end space-x-3 border-t border-gray-700 pt-4 mt-8;
+}
+
+.submit-button {
+  @apply inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:ring-offset-gray-800;
+}
+
+.cancel-button {
+  @apply inline-flex justify-center py-2 px-4 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:ring-offset-gray-800;
+} 

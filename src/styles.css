@@ -1,3 +1,9 @@
+/* Import Dashboard Styles */
+@import './styles/dashboard.css';
+
+/* Import Profile Feature Styles */
+@import './features/profile/styles/profile.css';
+
 /* Tailwind base styles */
 @tailwind base;
 @tailwind components;

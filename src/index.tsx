@@ -8,6 +8,7 @@ import './styles.css';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { WorkoutGeneratorFeature } from './features/workout-generator/WorkoutGeneratorFeature';
+import { ProfileFeature } from './features/profile';
 
 // Import shortcodes
 import './shortcodes/color-system-demo';
@@ -22,6 +23,32 @@ function debugLog(message: string): void {
 // ENHANCEMENT: Track initialization state to prevent double initialization
 // This is a global flag to ensure we only initialize once
 let isInitialized = false;
+
+/**
+ * Dashboard component that integrates all features
+ */
+const FitCopilotDashboard: React.FC = () => {
+  return (
+    <div className="fitcopilot-dashboard">
+      <div className="fitcopilot-dashboard-header">
+        <h1 className="fitcopilot-dashboard-title">FitCopilot Dashboard</h1>
+        <p className="fitcopilot-dashboard-subtitle">Manage your fitness profile and generate workouts</p>
+      </div>
+      
+      <div className="fitcopilot-dashboard-grid">
+        {/* Profile Feature */}
+        <div className="fitcopilot-dashboard-card profile-card">
+          <ProfileFeature />
+        </div>
+        
+        {/* Workout Generator Feature */}
+        <div className="fitcopilot-dashboard-card generator-card">
+          <WorkoutGeneratorFeature />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 /**
  * Initialize the application
@@ -54,10 +81,10 @@ function initializeApp(): void {
     debugLog('Creating React root...');
     const root = createRoot(container);
     
-    debugLog('Rendering workout generator component...');
-    root.render(<WorkoutGeneratorFeature />);
+    debugLog('Rendering dashboard component...');
+    root.render(<FitCopilotDashboard />);
     
-    debugLog('Workout generator mounted successfully!');
+    debugLog('Dashboard mounted successfully!');
   } catch (error) {
     debugLog('Error mounting React application: ' + (error instanceof Error ? error.message : String(error)));
     console.error(error);

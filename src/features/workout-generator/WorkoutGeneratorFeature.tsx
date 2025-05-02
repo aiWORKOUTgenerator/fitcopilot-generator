@@ -48,12 +48,9 @@ export const WorkoutGeneratorFeature: React.FC = () => {
     <ErrorBoundary>
       <WorkoutGeneratorProvider>
         <div className="workout-generator-feature">
-          <h2 className="workout-generator-feature__title">
-            AI Workout Generator
-          </h2>
-          <p className="workout-generator-feature__description">
+          <h3 className="workout-generator-feature__subtitle">
             Generate personalized workout plans based on your goals, experience level, and available equipment.
-          </p>
+          </h3>
           
           <DebugControls />
           <WorkoutRequestForm />

@@ -234,6 +234,9 @@ function render_generator_shortcode() {
 // Load API endpoints
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints.php';
 
+// Load Profile endpoints
+require_once FITCOPILOT_DIR . 'src/php/API/ProfileEndpoints.php';
+
 // Load API Tracker
 require_once FITCOPILOT_DIR . 'src/php/API/APITracker.php';
 require_once FITCOPILOT_DIR . 'src/php/API/APITrackerEndpoints.php';
@@ -244,4 +247,54 @@ require_once FITCOPILOT_DIR . 'src/php/Admin/APITrackerPage.php';
 require_once FITCOPILOT_DIR . 'src/php/Admin/TokenUsagePage.php';
 
 // Load shortcodes
-require_once FITCOPILOT_DIR . 'includes/shortcodes.php'; 
+require_once FITCOPILOT_DIR . 'includes/shortcodes.php';
+
+/**
+ * Enqueue admin dashboard assets
+ */
+function enqueue_admin_dashboard_assets() {
+    // Check if we're on the FitCopilot dashboard page
+    $screen = get_current_screen();
+    if (!$screen || $screen->id !== 'toplevel_page_fitcopilot') {
+        return;
+    }
+
+    // Enqueue vendors script
+    wp_enqueue_script(
+        'fitcopilot-vendors-admin',
+        FITCOPILOT_URL . 'dist/js/vendors.js',
+        [],
+        FITCOPILOT_VERSION,
+        true
+    );
+    
+    // Enqueue profile feature script
+    wp_enqueue_script(
+        'fitcopilot-profile',
+        FITCOPILOT_URL . 'dist/js/profile.js',
+        ['wp-element', 'wp-api-fetch', 'fitcopilot-vendors-admin'],
+        FITCOPILOT_VERSION,
+        true
+    );
+
+    // Enqueue profile feature styles
+    wp_enqueue_style(
+        'fitcopilot-profile-styles',
+        FITCOPILOT_URL . 'dist/css/profile.css',
+        [],
+        FITCOPILOT_VERSION
+    );
+    
+    // Localize script with necessary data
+    wp_localize_script(
+        'fitcopilot-profile',
+        'fitcopilotData',
+        [
+            'nonce' => wp_create_nonce('wp_rest'),
+            'apiBase' => rest_url('fitcopilot/v1'),
+            'isLoggedIn' => is_user_logged_in(),
+            'debug' => true, // Enable debug mode
+        ]
+    );
+}
+add_action('admin_enqueue_scripts', 'FitCopilot\\enqueue_admin_dashboard_assets'); 

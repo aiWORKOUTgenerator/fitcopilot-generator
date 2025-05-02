@@ -1,0 +1,13 @@
+/**
+ * Profile Feature Styles Index
+ * Main entry point for all profile-related styles
+ */
+
+/* Import base profile styles */
+@import './profile.css';
+
+/* Import component-specific styles */
+@import './components/profile-form.css';
+@import './components/profile-card.css';
+
+/* Additional imports can be added as the feature grows */ 

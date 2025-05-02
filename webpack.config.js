@@ -9,6 +9,7 @@ module.exports = (env, argv) => {
       frontend: './src/index.tsx',
       'api-tracker': './src/features/api-tracker/index.tsx',
       'token-usage': './src/features/token-usage/index.tsx',
+      'profile': './src/features/profile/index.tsx',
     },
     output: {
       path: path.resolve(__dirname, 'dist'),

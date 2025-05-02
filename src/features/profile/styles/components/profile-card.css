@@ -1,0 +1,93 @@
+/* Profile Card Component Styles - Dark Theme */
+
+.profile-card {
+  @apply bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-200;
+}
+
+.profile-card-header {
+  @apply px-5 py-4 border-b border-gray-700 flex justify-between items-center;
+}
+
+.profile-card-title {
+  @apply text-lg font-semibold text-white;
+}
+
+.profile-card-subtitle {
+  @apply text-sm text-gray-400 mt-1;
+}
+
+.profile-card-avatar {
+  @apply w-12 h-12 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-lg font-medium text-gray-300;
+}
+
+.profile-card-body {
+  @apply p-5;
+}
+
+.profile-card-footer {
+  @apply px-5 py-3 bg-gray-700 border-t border-gray-600 flex justify-between items-center;
+}
+
+/* Profile stat blocks inside cards */
+.profile-stat-group {
+  @apply grid grid-cols-2 gap-4 sm:grid-cols-3 mt-2;
+}
+
+.profile-stat-block {
+  @apply bg-gray-700 p-3 rounded-md text-center;
+}
+
+.profile-stat-value {
+  @apply text-lg font-semibold text-white;
+}
+
+.profile-stat-label {
+  @apply text-xs text-gray-400 mt-1;
+}
+
+/* Profile action buttons */
+.profile-card-actions {
+  @apply flex space-x-2 items-center;
+}
+
+.profile-action-button {
+  @apply inline-flex items-center p-1.5 border border-gray-600 rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:ring-offset-gray-800;
+}
+
+.profile-action-icon {
+  @apply h-4 w-4;
+}
+
+/* Profile badges */
+.profile-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.profile-badge-primary {
+  @apply bg-primary-900 text-primary-200;
+}
+
+.profile-badge-gray {
+  @apply bg-gray-700 text-gray-300;
+}
+
+.profile-badge-green {
+  @apply bg-green-900 text-green-200;
+}
+
+.profile-badge-red {
+  @apply bg-red-900 text-red-200;
+}
+
+/* Profile skeleton loading state */
+.profile-skeleton {
+  @apply animate-pulse;
+}
+
+.profile-skeleton-line {
+  @apply h-4 bg-gray-700 rounded;
+}
+
+.profile-skeleton-circle {
+  @apply h-10 w-10 bg-gray-700 rounded-full;
+} 

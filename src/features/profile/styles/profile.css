@@ -1,0 +1,455 @@
+/**
+ * Profile Feature Styles
+ */
+
+.profile-feature {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.profile-feature__subtitle {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.profile-container {
+  width: 100%;
+}
+
+.profile-form-container {
+  width: 100%;
+}
+
+.profile-form {
+  width: 100%;
+}
+
+/* Form components */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-step {
+  margin-bottom: 1.5rem;
+}
+
+.form-step h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.form-step h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.step-description {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+/* Progress bar */
+.form-progress {
+  margin-bottom: 2rem;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4a90e2;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.step-indicators {
+  display: flex;
+  justify-content: space-between;
+}
+
+.step-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.step-number {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0e0e0;
+  color: #666;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.step-label {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+  max-width: 80px;
+}
+
+.step-indicator.active .step-number {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.step-indicator.completed .step-number {
+  background-color: #4caf50;
+  color: white;
+}
+
+/* Form navigation */
+.form-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Success message */
+.profile-success {
+  text-align: center;
+  padding: 2rem;
+}
+
+.profile-success h2 {
+  color: #4caf50;
+  margin-bottom: 1rem;
+}
+
+.profile-success p {
+  margin-bottom: 1.5rem;
+}
+
+/* Form fields */
+.form-field {
+  margin-bottom: 1.5rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-field input[type="text"],
+.form-field input[type="number"],
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.input-with-unit {
+  display: flex;
+}
+
+.input-with-unit input {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-with-unit select {
+  width: auto;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Radio and checkbox groups */
+.radio-group,
+.checkbox-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 576px) {
+  .radio-group,
+  .checkbox-group {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.radio-option,
+.checkbox-option {
+  display: flex;
+  align-items: flex-start;
+}
+
+.radio-option input,
+.checkbox-option input {
+  margin-top: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+/* Error messages */
+.error-message {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Range slider */
+.range-slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.range-slider input[type="range"] {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.duration-display {
+  font-weight: bold;
+  color: #4a90e2;
+}
+
+/* Buttons */
+.button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-primary {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.button-primary:hover {
+  background-color: #3a7bc8;
+}
+
+.button-secondary {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.button-secondary:hover {
+  background-color: #d0d0d0;
+}
+
+.button-success {
+  background-color: #4caf50;
+  color: white;
+}
+
+.button-success:hover {
+  background-color: #3d9140;
+}
+
+.button-text {
+  background-color: transparent;
+  color: #666;
+  padding: 0.5rem;
+}
+
+.button-text:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Notes */
+.form-note {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.form-note p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Dark mode support */
+.dark-theme .profile-feature__subtitle {
+  color: #b0b0b0;
+}
+
+.dark-theme .form-step h2 {
+  color: #e0e0e0;
+}
+
+.dark-theme .form-step h3 {
+  color: #d0d0d0;
+}
+
+.dark-theme .step-description {
+  color: #b0b0b0;
+}
+
+.dark-theme .progress-bar-container {
+  background-color: #444;
+}
+
+.dark-theme .progress-bar {
+  background-color: #4a90e2;
+}
+
+.dark-theme .step-number {
+  background-color: #444;
+  color: #e0e0e0;
+}
+
+.dark-theme .step-label {
+  color: #b0b0b0;
+}
+
+.dark-theme .form-field label {
+  color: #d0d0d0;
+}
+
+.dark-theme .form-field input[type="text"],
+.dark-theme .form-field input[type="number"],
+.dark-theme .form-field textarea,
+.dark-theme .form-field select {
+  background-color: #333;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+.dark-theme .form-note {
+  background-color: #3a3a3a;
+}
+
+.dark-theme .form-note p {
+  color: #b0b0b0;
+}
+
+/* Profile Feature Styles - Dark Theme */
+
+.profile-container {
+  @apply max-w-3xl mx-auto p-6 rounded-lg bg-gray-800 shadow-md;
+}
+
+.profile-header {
+  @apply mb-6 text-center;
+}
+
+.profile-title {
+  @apply text-2xl font-bold text-white;
+}
+
+.profile-subtitle {
+  @apply text-base text-gray-400 mt-1;
+}
+
+.profile-form {
+  @apply space-y-6;
+}
+
+.profile-form-group {
+  @apply grid grid-cols-1 gap-4 md:grid-cols-2;
+}
+
+.profile-form-field {
+  @apply flex flex-col;
+}
+
+.profile-label {
+  @apply block text-sm font-medium text-gray-300 mb-1;
+}
+
+.profile-input {
+  @apply block w-full rounded-md border-gray-600 bg-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-white;
+}
+
+.profile-select {
+  @apply block w-full rounded-md border-gray-600 bg-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-white;
+}
+
+.profile-textarea {
+  @apply block w-full rounded-md border-gray-600 bg-gray-700 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-white;
+}
+
+.profile-action-bar {
+  @apply mt-8 flex justify-end space-x-4;
+}
+
+.profile-button-primary {
+  @apply inline-flex justify-center rounded-md border border-transparent bg-primary-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-800;
+}
+
+.profile-button-secondary {
+  @apply inline-flex justify-center rounded-md border border-gray-600 bg-gray-700 py-2 px-4 text-sm font-medium text-gray-300 shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-800;
+}
+
+/* Profile card styles */
+.profile-card {
+  @apply bg-gray-800 rounded-lg shadow-md p-5;
+}
+
+.profile-card-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.profile-card-title {
+  @apply text-lg font-semibold text-white;
+}
+
+.profile-card-actions {
+  @apply flex space-x-2;
+}
+
+/* Profile stats component */
+.profile-stats {
+  @apply flex flex-col space-y-4;
+}
+
+.profile-stat-item {
+  @apply flex justify-between items-center;
+}
+
+.profile-stat-label {
+  @apply text-sm text-gray-400;
+}
+
+.profile-stat-value {
+  @apply text-base font-medium text-white;
+}
+
+/* Error handling */
+.http-error {
+  @apply bg-red-900/50 text-red-200 p-3 rounded-md mb-4 flex items-center;
+}
+
+.http-error::before {
+  content: "⚠️";
+  @apply mr-2;
+} 
