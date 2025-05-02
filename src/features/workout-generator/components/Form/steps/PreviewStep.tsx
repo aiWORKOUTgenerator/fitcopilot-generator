@@ -98,21 +98,21 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
         
         <div className="workout-preview__grid">
           <Card className="workout-preview__card workout-preview__card--goal">
-            <div className="workout-preview__card-label">Goal</div>
+            <div className="workout-preview__card-label">GOAL</div>
             <div className="workout-preview__card-value">
               {goalDisplay}
             </div>
           </Card>
           
           <Card className="workout-preview__card workout-preview__card--level">
-            <div className="workout-preview__card-label">Difficulty</div>
+            <div className="workout-preview__card-label">DIFFICULTY</div>
             <div className="workout-preview__card-value">
               {difficultyDisplay}
             </div>
           </Card>
           
           <Card className="workout-preview__card workout-preview__card--duration">
-            <div className="workout-preview__card-label">Duration</div>
+            <div className="workout-preview__card-label">DURATION</div>
             <div className="workout-preview__card-value">
               {durationDisplay}
             </div>
@@ -125,7 +125,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
             <div className="workout-preview__equipment">
               {equipment.map((item: string, index: number) => (
                 <span key={index} className="equipment-tag">
-                  <EquipmentIcon type={item} />
+                  <EquipmentIcon type={item} size={20} />
                   {EQUIPMENT_LABELS[item] || item}
                 </span>
               ))}

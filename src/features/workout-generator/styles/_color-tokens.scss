@@ -30,9 +30,9 @@ $wg-color-categories: (
     'disabled': to-rgba($emerald-400, 0.5)
   ),
   'surface': (
-    'base': $gray-800,  // Dark background for cards as per mockup
-    'hover': $gray-700,
-    'active': $gray-700
+    'base': $gray-900,  // Darker background for cards as per mockup
+    'hover': $gray-800,
+    'active': $gray-800
   )
 );
 
@@ -70,8 +70,8 @@ $wg-state-categories: (
 // Dark mode is the default in the mockup
 $wg-dark-categories: (
   'surface': (
-    'base': $gray-800,
-    'hover': $gray-700
+    'base': $gray-900,
+    'hover': $gray-800
   ),
   'text': (
     'primary': $white,
@@ -79,29 +79,38 @@ $wg-dark-categories: (
   )
 );
 
-// Updated card colors using the lime/emerald gradient system
+// Page/container background - very dark blue/navy
+$background-dark-navy: #1a202e;
+
+// Title/heading colors
+$heading-lime: #a4e052;
+
+// Updated card colors - darker backgrounds with colored text
 $wg-card-categories: (
   'goal': (
-    'bg': $gray-800,
-    'color': $emerald-400,
-    'border': to-rgba($emerald-400, 0.3),
-    'hover-bg': $gray-700
+    'bg': #1e2432,       // Darker card background
+    'color': $emerald-400, // Emerald text
+    'border': transparent,
+    'hover-bg': #212736,
+    'label-color': $gray-400
   ),
   'level': (
-    'bg': $gray-800,
-    'color': $violet-400,
-    'border': to-rgba($violet-400, 0.3),
-    'hover-bg': $gray-700
+    'bg': #1e2432,
+    'color': $violet-400,  // Purple text
+    'border': transparent,
+    'hover-bg': #212736,
+    'label-color': $gray-400
   ),
   'duration': (
-    'bg': $gray-800,
-    'color': $blue-400,
-    'border': to-rgba($blue-400, 0.3),
-    'hover-bg': $gray-700
+    'bg': #1e2432,
+    'color': $blue-400,    // Blue text
+    'border': transparent,
+    'hover-bg': #212736,
+    'label-color': $gray-400
   )
 );
 
-// Equipment tag styling
+// Equipment tag styling - brighter lime with proper opacity
 $equipment-tag-styles: (
   'bg': to-rgba($lime-400, 0.1),
   'border': to-rgba($lime-400, 0.3),
@@ -119,8 +128,8 @@ $edit-button-bg: transparent;
 $edit-button-border: 1px solid $gray-700;
 $edit-button-hover-bg: to-rgba($gray-700, 0.1);
 
-// Notice styling
-$notice-bg: to-rgba($lime-400, 0.05);
+// Notice styling - left green border
+$notice-bg: to-rgba(#1a2133, 0.6);
 $notice-border: $lime-400;
 $notice-text: $gray-300;
 
@@ -179,7 +188,7 @@ $notice-text: $gray-300;
  * Get a card specific color
  * 
  * @param {String} $card-type - The card type (goal, level, duration)
- * @param {String} $property - The property (bg, color, border, hover-bg)
+ * @param {String} $property - The property (bg, color, border, hover-bg, label-color)
  * @return {Color} The color value
  */
 @function wg-card-color($card-type, $property: 'bg') {
@@ -261,6 +270,9 @@ $wg-duration-color: wg-card-color('duration', 'color');
 $wg-goal-border: wg-card-color('goal', 'border');
 $wg-level-border: wg-card-color('level', 'border');
 $wg-duration-border: wg-card-color('duration', 'border');
+$wg-goal-label-color: wg-card-color('goal', 'label-color');
+$wg-level-label-color: wg-card-color('level', 'label-color');
+$wg-duration-label-color: wg-card-color('duration', 'label-color');
 
 // Equipment tag styling
 $wg-equipment-tag-bg: equipment-tag-style('bg');
