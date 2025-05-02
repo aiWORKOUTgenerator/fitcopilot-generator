@@ -7,7 +7,6 @@
 import React from 'react';
 import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
-import ThemeToggle from '../../../../../components/ui/ThemeToggle';
 import { WorkoutFormParams } from '../../../types/workout';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { EquipmentIcon } from '../../../utils/EquipmentIcons';
@@ -90,7 +89,6 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
     <div className="preview-step">
       <div className="preview-step__header">
         <h2 className="preview-step__title">Workout Summary</h2>
-        <ThemeToggle />
       </div>
       
       <div className="workout-preview">

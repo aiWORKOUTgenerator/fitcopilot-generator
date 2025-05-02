@@ -19,6 +19,18 @@
     box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.3);
   }
   
+  /* Light mode (default in our context) */
+  .light-theme & {
+    background-color: #1a3c4d; /* Dark cyan background */
+    border-color: #255667;
+    color: #f5f8fa;
+    
+    &:hover {
+      background-color: #234a5d;
+      border-color: #2e6e85;
+    }
+  }
+  
   &--dark {
     background-color: var(--color-dark-surface);
     border-color: var(--color-dark-border);
@@ -42,6 +54,10 @@
     
     .dark-theme & {
       color: var(--color-dark-primary);
+    }
+    
+    .light-theme & {
+      color: #a4e052; /* Match the lime color from our design */
     }
     
     .theme-toggle:not(.theme-toggle--dark) & {

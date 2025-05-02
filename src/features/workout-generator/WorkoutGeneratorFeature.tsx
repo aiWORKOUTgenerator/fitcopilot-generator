@@ -4,11 +4,14 @@
  * Main entry point for the workout generator feature.
  * Wraps the form with necessary providers and imports styles.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WorkoutGeneratorProvider, FormFlowProvider } from './context';
 import { WorkoutRequestForm } from './components/Form';
 import { ErrorBoundary, DebugControls, TipsCard } from './components/common';
 import { SubscriptionModalWrapper, ProfileSetupPrompt } from './components/Modals';
+
+// Import theme initialization
+import './utils/themeInit';
 
 // Import styles
 import './styles/workout-generator.scss';
@@ -29,6 +32,17 @@ import './styles/workout-generator.scss';
 export const WorkoutGeneratorFeature: React.FC = () => {
   const [isSubscriptionOpen, setSubscriptionOpen] = useState(false);
   const [isProfilePromptOpen, setProfilePromptOpen] = useState(false);
+
+  // Apply dark theme class to body for full background coverage
+  useEffect(() => {
+    // Apply the theme class to the body for better coverage
+    document.body.classList.add('dark-theme');
+    
+    return () => {
+      // Clean up when component unmounts
+      document.body.classList.remove('dark-theme');
+    };
+  }, []);
 
   return (
     <ErrorBoundary>

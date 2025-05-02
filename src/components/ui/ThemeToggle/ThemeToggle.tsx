@@ -15,22 +15,24 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
     }
     
     // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
     }
     
-    // Default to light theme
-    return 'light';
+    // Default to dark theme
+    return 'dark';
   };
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => getInitialTheme());
 
   // Apply theme to document when it changes
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark-theme');
-    } else {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light-theme');
       document.documentElement.classList.remove('dark-theme');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+      document.documentElement.classList.add('dark-theme');
     }
     
     // Save to localStorage

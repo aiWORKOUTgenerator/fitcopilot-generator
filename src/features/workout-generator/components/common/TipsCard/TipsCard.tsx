@@ -3,8 +3,8 @@
  * 
  * This component displays helpful tips for creating better workouts.
  */
-import React, { useState } from 'react';
-import Card from '../../../../../components/ui/Card';
+import React, { useState, CSSProperties } from 'react';
+import './TipsCard.scss';
 
 /**
  * List of helpful workout tips to show users
@@ -17,6 +17,40 @@ const workoutTips = [
   'List equipment you want to use or avoid.',
 ];
 
+// Direct inline styles to match Edit Request button 
+const headerStyle: CSSProperties = {
+  backgroundColor: '#1a1f2e',
+  color: '#bef264',
+  border: '1px solid #2a3342',
+  borderRadius: '0.5rem',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
+  padding: '0.75rem 1.25rem',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  textAlign: 'left' as const,
+};
+
+const titleStyle: CSSProperties = {
+  margin: 0,
+  fontSize: '1rem',
+  fontWeight: 600,
+  color: '#bef264',
+};
+
+const iconStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '1.25rem',
+  fontWeight: 'bold',
+  height: '24px',
+  width: '24px',
+  color: '#bef264',
+};
+
 /**
  * TipsCard displays a collapsible card with workout tips
  */
@@ -25,21 +59,20 @@ export const TipsCard: React.FC = () => {
   
   return (
     <div className="tips-card-container">
-      <Card 
-        className="tips-card" 
-        bordered 
-        elevated
-      >
-        <div className="tips-card-header" onClick={() => setIsOpen(!isOpen)}>
-          <h3>Tips for Great Workouts</h3>
-          <button 
-            className="collapse-button"
-            aria-expanded={isOpen}
-            aria-label={isOpen ? 'Collapse tips' : 'Expand tips'}
+      <div className="tips-card">
+        <button 
+          style={headerStyle}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+        >
+          <h3 style={titleStyle}>Tips for Great Workouts</h3>
+          <span 
+            style={iconStyle}
+            aria-hidden="true"
           >
             {isOpen ? '−' : '+'}
-          </button>
-        </div>
+          </span>
+        </button>
         
         {isOpen && (
           <ul className="tips-list">
@@ -48,7 +81,7 @@ export const TipsCard: React.FC = () => {
             ))}
           </ul>
         )}
-      </Card>
+      </div>
     </div>
   );
 };
