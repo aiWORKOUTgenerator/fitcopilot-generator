@@ -75,6 +75,9 @@ class AdminMenu {
                     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
                     gap: 20px;
                     margin-top: 20px;
+                    max-width: 1600px;
+                    margin-left: auto;
+                    margin-right: auto;
                 }
                 .dashboard-card {
                     background: white;
@@ -115,9 +118,12 @@ class AdminMenu {
                     flex-wrap: wrap;
                     gap: 20px;
                     margin-bottom: 30px;
+                    max-width: 1600px;
+                    margin-left: auto;
+                    margin-right: auto;
                 }
                 .dashboard-profile-container {
-                    flex: 1;
+                    flex: 2;
                     min-width: 300px;
                     background: #1e293b;
                     color: white;
@@ -138,8 +144,8 @@ class AdminMenu {
                     margin-bottom: 20px;
                 }
                 .dashboard-workout-container {
-                    flex: 2;
-                    min-width: 400px;
+                    flex: 3;
+                    min-width: 450px;
                     background: #1e293b;
                     color: white;
                     border-radius: 8px;

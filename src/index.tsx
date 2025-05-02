@@ -37,12 +37,12 @@ const FitCopilotDashboard: React.FC = () => {
       
       <div className="fitcopilot-dashboard-grid">
         {/* Profile Feature */}
-        <div className="fitcopilot-dashboard-card profile-card">
+        <div className="fitcopilot-dashboard-card profile-card col-span-2">
           <ProfileFeature />
         </div>
         
         {/* Workout Generator Feature */}
-        <div className="fitcopilot-dashboard-card generator-card">
+        <div className="fitcopilot-dashboard-card generator-card col-span-3">
           <WorkoutGeneratorFeature />
         </div>
       </div>
