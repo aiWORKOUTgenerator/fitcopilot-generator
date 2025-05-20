@@ -11,6 +11,8 @@ All endpoints are accessible via the WordPress REST API under the namespace `/wp
 - [Get Single Workout](#get-single-workout)
 - [Update Workout](#update-workout)
 - [Complete Workout](#complete-workout)
+- [Get User Profile](#get-user-profile)
+- [Update User Profile](#update-user-profile)
 
 ---
 
@@ -462,12 +464,199 @@ async function completeWorkout(id, data) {
 }
 ```
 
+---
+
+## Get User Profile
+
+Retrieve the current user's fitness profile.
+
+**Endpoint:** `GET /wp-json/fitcopilot/v1/profile`
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 123,
+    "userId": 123,
+    "fitnessLevel": "intermediate",
+    "workoutGoals": ["strength", "endurance"],
+    "equipmentAvailable": "minimal",
+    "workoutFrequency": 3,
+    "workoutDuration": 30,
+    "medicalConditions": [],
+    "preferences": {
+      "darkMode": false,
+      "notifications": true,
+      "metrics": "imperial"
+    },
+    "createdAt": "2023-07-15T14:30:00",
+    "updatedAt": "2023-07-15T14:30:00"
+  },
+  "message": "Profile retrieved successfully"
+}
+```
+
+### Error Response (401)
+
+```json
+{
+  "code": "rest_forbidden",
+  "message": "You are not currently logged in.",
+  "data": {
+    "status": 401
+  }
+}
+```
+
+### Code Example
+
+```javascript
+// Example using fetch API
+async function getProfile() {
+  const response = await fetch('/wp-json/fitcopilot/v1/profile', {
+    method: 'GET',
+    headers: {
+      'X-WP-Nonce': wpApiSettings.nonce
+    }
+  });
+  
+  const data = await response.json();
+  return data;
+}
+```
+
+---
+
+## Update User Profile
+
+Update the current user's fitness profile.
+
+**Endpoint:** `PUT /wp-json/fitcopilot/v1/profile`
+
+### Request Formats
+
+Both formats are supported for backward compatibility, but the wrapped format is preferred according to our API Design Guidelines.
+
+#### Preferred Format (Wrapped)
+
+```json
+{
+  "profile": {
+    "fitnessLevel": "advanced",
+    "workoutGoals": ["muscle-building"],
+    "equipmentAvailable": "full",
+    "workoutFrequency": 4,
+    "workoutDuration": 45,
+    "medicalConditions": ["lower back pain"],
+    "preferences": {
+      "darkMode": true,
+      "notifications": true,
+      "metrics": "metric"
+    }
+  }
+}
+```
+
+#### Legacy Format (Direct)
+
+```json
+{
+  "fitnessLevel": "advanced",
+  "workoutGoals": ["muscle-building"],
+  "equipmentAvailable": "full",
+  "workoutFrequency": 4,
+  "workoutDuration": 45,
+  "medicalConditions": ["lower back pain"],
+  "preferences": {
+    "darkMode": true,
+    "notifications": true,
+    "metrics": "metric"
+  }
+}
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 123,
+    "userId": 123,
+    "fitnessLevel": "advanced",
+    "workoutGoals": ["muscle-building"],
+    "equipmentAvailable": "full",
+    "workoutFrequency": 4,
+    "workoutDuration": 45,
+    "medicalConditions": ["lower back pain"],
+    "preferences": {
+      "darkMode": true,
+      "notifications": true,
+      "metrics": "metric"
+    },
+    "createdAt": "2023-07-15T14:30:00",
+    "updatedAt": "2023-07-16T09:15:00"
+  },
+  "message": "Profile updated successfully"
+}
+```
+
+### Error Responses
+
+**Invalid Parameters (400)**
+```json
+{
+  "success": false,
+  "message": "Invalid parameters.",
+  "code": "invalid_params"
+}
+```
+
+**Unauthorized (401)**
+```json
+{
+  "code": "rest_forbidden",
+  "message": "You are not currently logged in.",
+  "data": {
+    "status": 401
+  }
+}
+```
+
+### Code Example
+
+```javascript
+// Example using fetch API with preferred wrapped format
+async function updateProfile(profileData) {
+  const response = await fetch('/wp-json/fitcopilot/v1/profile', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': wpApiSettings.nonce
+    },
+    body: JSON.stringify({
+      profile: profileData
+    })
+  });
+  
+  const data = await response.json();
+  return data;
+}
+```
+
 ## Implementation Details
 
-The API endpoints are implemented in the [`WorkoutEndpoints.php`](../../src/php/API/WorkoutEndpoints.php) file. The class uses WordPress REST API functions to register endpoints and handle requests.
+The API endpoints are implemented in the files:
+- [`WorkoutEndpoints.php`](../../src/php/API/WorkoutEndpoints.php) - For workout-related endpoints
+- [`ProfileEndpoints.php`](../../src/php/API/ProfileEndpoints.php) - For profile-related endpoints
+
+These files use WordPress REST API functions to register endpoints and handle requests according to the [API Design Guidelines](./api-design-guidelines.md).
 
 ## See Also
 
+- [API Design Guidelines](./api-design-guidelines.md)
 - [Authentication](./authentication.md)
 - [Error Handling](./error-handling.md)
 - [OpenAPI Specification](./openapi-spec.md) 

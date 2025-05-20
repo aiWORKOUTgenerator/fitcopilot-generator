@@ -126,6 +126,11 @@ function update_user_profile($request) {
         ], 400);
     }
     
+    // Extract profile data from wrapper if present (following API Design Guidelines)
+    if (isset($params['profile']) && is_array($params['profile'])) {
+        $params = $params['profile'];
+    }
+    
     // Update profile data in user meta
     if (isset($params['fitnessLevel'])) {
         update_user_meta($user_id, 'fitness_level', sanitize_text_field($params['fitnessLevel']));

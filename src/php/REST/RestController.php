@@ -417,7 +417,12 @@ function get_profile(\WP_REST_Request $request) {
  */
 function update_profile(\WP_REST_Request $request) {
     $user_id = get_current_user_id();
-    $params = $request->get_params();
+    $params = json_decode($request->get_body(), true);
+    
+    // Extract profile data from wrapper if present (following API Design Guidelines)
+    if (isset($params['profile']) && is_array($params['profile'])) {
+        $params = $params['profile'];
+    }
     
     $fields = [
         'fitness_level' => 'sanitize_text_field',
