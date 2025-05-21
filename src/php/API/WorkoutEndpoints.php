@@ -54,8 +54,18 @@ class WorkoutEndpoints {
             'methods'             => 'POST',
             'callback'            => [$this, 'generate_workout'],
             'permission_callback' => [$this, 'user_permissions_check'],
+            // Remove schema validation since we handle it in the callback
         ]);
         error_log('FitCopilot registered endpoint: ' . self::API_NAMESPACE . '/generate');
+        
+        // Compatibility endpoint for generate-workout (maps to /generate)
+        register_rest_route(self::API_NAMESPACE, '/generate-workout', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'generate_workout'],
+            'permission_callback' => [$this, 'user_permissions_check'],
+            // Remove schema validation
+        ]);
+        error_log('FitCopilot registered compatibility endpoint: ' . self::API_NAMESPACE . '/generate-workout');
         
         // Get workouts list
         register_rest_route(self::API_NAMESPACE, '/workouts', [
@@ -84,6 +94,20 @@ class WorkoutEndpoints {
             'callback'            => [$this, 'complete_workout'],
             'permission_callback' => [$this, 'user_permissions_check'],
         ]);
+        
+        // Debug endpoint for request parameters (TEMPORARY - REMOVE IN PRODUCTION)
+        register_rest_route(self::API_NAMESPACE, '/debug-request', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'debug_request'],
+            'permission_callback' => [$this, 'user_permissions_check'],
+        ]);
+        
+        // Direct generate endpoint with no WordPress validation (TEMPORARY - FOR TESTING)
+        register_rest_route(self::API_NAMESPACE, '/generate-direct', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'direct_generate_workout'],
+            'permission_callback' => function() { return true; }, // Allow anyone to access for testing
+        ]);
     }
     
     /**
@@ -93,6 +117,144 @@ class WorkoutEndpoints {
      */
     public function user_permissions_check() {
         return is_user_logged_in();
+    }
+    
+    /**
+     * Get the schema for workout generation API
+     * This schema allows both direct and wrapped formats
+     * 
+     * @return array The schema
+     */
+    public function get_workout_schema() {
+        $direct_props = [
+            'duration' => [
+                'type' => 'integer',
+                'required' => false,
+                'description' => 'Workout duration in minutes',
+                'default' => 30,
+            ],
+            'difficulty' => [
+                'type' => 'string',
+                'required' => false,
+                'enum' => ['beginner', 'intermediate', 'advanced'],
+                'description' => 'Workout difficulty level',
+                'default' => 'intermediate',
+            ],
+            'goals' => [
+                'type' => ['string', 'array'],
+                'required' => false,
+                'description' => 'Training goals',
+                'default' => 'general fitness',
+            ],
+            'equipment' => [
+                'type' => 'array',
+                'required' => false,
+                'description' => 'Available equipment',
+                'default' => [],
+                'items' => [
+                    'type' => 'string',
+                ],
+            ],
+            'restrictions' => [
+                'type' => 'string',
+                'required' => false,
+                'description' => 'Health restrictions or limitations',
+                'default' => '',
+            ],
+            'specific_request' => [
+                'type' => 'string',
+                'required' => false,
+                'description' => 'Specific workout request',
+            ],
+        ];
+        
+        // Return a schema that accepts either format
+        // NOTE: We need to disable the automatic validation in the endpoint definition
+        // and handle it ourselves in the callback
+        return [
+            '$schema' => 'http://json-schema.org/draft-04/schema#',
+            'title' => 'workout',
+            'type' => 'object'
+        ];
+    }
+    
+    /**
+     * Extract workout parameters from the request, handling both direct and wrapped formats
+     *
+     * @param \WP_REST_Request $request The request object
+     * @return array Extracted parameters
+     */
+    private function extract_workout_params(\WP_REST_Request $request) {
+        // Get body as JSON
+        $body_raw = $request->get_body();
+        error_log('Raw request body: ' . $body_raw);
+        
+        // Get JSON body params (WordPress parsed)
+        $body_params = $request->get_json_params() ?: [];
+        
+        // Get URL query params
+        $url_params = $request->get_query_params();
+        
+        // Debug logs
+        error_log('Body params (WP parsed): ' . print_r($body_params, true));
+        error_log('URL params: ' . print_r($url_params, true));
+        
+        // Try to parse JSON ourselves to ensure WordPress didn't mess with it
+        $manual_json = json_decode($body_raw, true);
+        error_log('Manual JSON parse: ' . print_r($manual_json, true));
+        
+        $workout_params = [];
+        
+        // Option 1: Try using APIUtils normalize_request_data
+        if (class_exists('\\FitCopilot\\API\\APIUtils')) {
+            error_log('Using APIUtils to normalize request data');
+            $workout_params = \FitCopilot\API\APIUtils::normalize_request_data($manual_json ?: $body_params, 'workout');
+        } 
+        // Option 2: Fall back to manual extraction
+        else {
+            error_log('APIUtils not available, extracting params manually');
+            
+            // First check manually parsed JSON for wrapped format
+            if ($manual_json && isset($manual_json['workout']) && is_array($manual_json['workout'])) {
+                error_log('Found wrapped workout format in manually parsed JSON');
+                $workout_params = $manual_json['workout'];
+            }
+            // Then check WordPress parsed JSON for wrapped format
+            else if (isset($body_params['workout']) && is_array($body_params['workout'])) {
+                error_log('Found wrapped workout format in WP parsed JSON');
+                $workout_params = $body_params['workout'];
+            }
+            // Finally fall back to direct format
+            else {
+                error_log('Using direct format params');
+                $workout_params = $body_params;
+            }
+        }
+        
+        // Apply defaults for required fields
+        $defaults = [
+            'duration' => 30,
+            'difficulty' => 'intermediate',
+            'goals' => 'general fitness',
+            'equipment' => [],
+            'restrictions' => '',
+        ];
+        
+        // Merge in defaults for missing fields
+        foreach ($defaults as $key => $default_value) {
+            if (empty($workout_params[$key])) {
+                error_log("Setting default for $key: " . print_r($default_value, true));
+                $workout_params[$key] = $default_value;
+            }
+        }
+        
+        // Merge in any URL parameters (they override body params)
+        $params = array_merge($workout_params, $url_params);
+        
+        // Debug log
+        error_log('Final merged params with defaults: ' . print_r($params, true));
+        
+        return $params;
     }
     
     /**
@@ -115,15 +277,39 @@ class WorkoutEndpoints {
         }
 
         // Parse & validate the JSON parameters
-        $params = $request->get_json_params();
+        $params = $this->extract_workout_params($request);
         
-        // Normalize request data to support both direct and wrapped formats
-        $params = APIUtils::normalize_request_data($params, 'workout');
+        // Debug log - show what we received
+        error_log('Raw request params: ' . print_r($params, true));
         
-        if (empty($params['specific_request'])) {
+        // For extremely detailed debugging - dump the entire request
+        error_log('Full request details: ' . print_r([
+            'method' => $request->get_method(),
+            'url' => $request->get_route(),
+            'headers' => $request->get_headers(),
+            'params' => $request->get_params(),
+            'json_params' => $request->get_json_params(),
+            'body' => $request->get_body(),
+        ], true));
+        
+        // Validate required fields
+        $validation_errors = [];
+        $required_fields = [
+            'specific_request' => __('Specific request is required.', 'fitcopilot')
+        ];
+        
+        foreach ($required_fields as $field => $error_message) {
+            if (empty($params[$field])) {
+                $validation_errors[$field] = $error_message;
+            }
+        }
+        
+        // Return validation errors if any
+        if (!empty($validation_errors)) {
+            error_log('Validation errors: ' . print_r($validation_errors, true));
             return APIUtils::create_validation_error(
-                ['specific_request' => __('Specific request is required.', 'fitcopilot')],
-                __('Missing required parameters.', 'fitcopilot')
+                $validation_errors,
+                __('Missing required parameter(s)', 'fitcopilot')
             );
         }
 
@@ -140,6 +326,9 @@ class WorkoutEndpoints {
                 'restrictions'    => $params['restrictions'] ?? '',
                 'specific_request' => $params['specific_request'],
             ];
+            
+            // Debug log - parameters sent to generator
+            error_log('Parameters sent to generator: ' . print_r($generation_params, true));
             
             // Generate the workout
             $workout = $provider->generateWorkout($generation_params);
@@ -160,6 +349,7 @@ class WorkoutEndpoints {
                 APIUtils::get_success_message('create', 'workout')
             );
         } catch (\Exception $e) {
+            error_log('Workout generation error: ' . $e->getMessage());
             return APIUtils::create_api_response(
                 null,
                 $e->getMessage(),
@@ -377,6 +567,157 @@ class WorkoutEndpoints {
         update_post_meta($post_id, '_workout_specific_request', $params['specific_request']);
         
         return $post_id;
+    }
+
+    /**
+     * Debug request parameters
+     *
+     * @param \WP_REST_Request $request The request
+     * @return \WP_REST_Response REST response
+     */
+    public function debug_request(\WP_REST_Request $request) {
+        // Get raw data
+        $raw_data = $request->get_body();
+        
+        // Parse JSON parameters (direct)
+        $params = $request->get_json_params();
+        
+        // Extract params using our helper (handles wrapped format)
+        $extracted_params = $this->extract_workout_params($request);
+        
+        // Try normalizing with different wrapper keys
+        $normalized_workout = APIUtils::normalize_request_data($params, 'workout');
+        
+        // Return all the data for debugging
+        return APIUtils::create_api_response([
+            'raw_data' => $raw_data,
+            'request_params' => $params,
+            'extracted_params' => $extracted_params,
+            'normalized_workout' => $normalized_workout,
+            'content_type' => $request->get_content_type(),
+            'headers' => $request->get_headers(),
+            'query_params' => $request->get_query_params(),
+            'url_params' => $request->get_url_params()
+        ], 'Debug information');
+    }
+    
+    /**
+     * Direct workout generator with no WordPress validation
+     * TEMPORARY - FOR TESTING ONLY
+     *
+     * @param \WP_REST_Request $request The request
+     * @return \WP_REST_Response REST response
+     */
+    public function direct_generate_workout(\WP_REST_Request $request) {
+        // Get raw request body
+        $body = $request->get_body();
+        
+        // Log raw request for debugging
+        error_log('Raw request to direct-generate: ' . $body);
+        
+        try {
+            // Parse JSON manually
+            $data = json_decode($body, true);
+            if (!$data) {
+                throw new \Exception('Invalid JSON format');
+            }
+            
+            // Extract workout data from wrapper if it exists
+            $workout_data = isset($data['workout']) ? $data['workout'] : $data;
+            
+            // Apply defaults for missing fields
+            $defaults = [
+                'duration' => 30,
+                'difficulty' => 'intermediate',
+                'goals' => 'general fitness',
+                'equipment' => [],
+                'restrictions' => '',
+                'specific_request' => 'A general full-body workout'
+            ];
+            
+            // Merge with defaults
+            $params = array_merge($defaults, $workout_data);
+            
+            // Create a test workout response
+            $workout = [
+                'title' => 'Direct ' . ucfirst($params['difficulty']) . ' ' . $params['duration'] . '-Minute Workout',
+                'description' => 'Workout based on: ' . $params['specific_request'],
+                'difficulty' => $params['difficulty'],
+                'duration' => $params['duration'],
+                'sections' => [
+                    [
+                        'name' => 'Warm-up',
+                        'duration' => 5,
+                        'exercises' => [
+                            [
+                                'name' => 'Jumping Jacks',
+                                'duration' => '2 minutes',
+                                'description' => 'Jump your feet out wide while raising your arms overhead'
+                            ],
+                            [
+                                'name' => 'Arm Circles',
+                                'duration' => '1 minute',
+                                'description' => 'Circle your arms forward, then backward'
+                            ],
+                        ],
+                    ],
+                    [
+                        'name' => 'Main Workout',
+                        'duration' => $params['duration'] - 10,
+                        'exercises' => [
+                            [
+                                'name' => 'Push-ups',
+                                'sets' => 3,
+                                'reps' => 10,
+                                'description' => 'Keep your body straight and lower to the ground'
+                            ],
+                            [
+                                'name' => 'Squats',
+                                'sets' => 3,
+                                'reps' => 15,
+                                'description' => 'Lower your body as if sitting in a chair'
+                            ],
+                        ],
+                    ],
+                    [
+                        'name' => 'Cool Down',
+                        'duration' => 5,
+                        'exercises' => [
+                            [
+                                'name' => 'Stretching',
+                                'duration' => '5 minutes',
+                                'description' => 'Various full-body stretches'
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+            
+            // Create a post ID for the generated workout
+            $post_id = wp_insert_post([
+                'post_title' => $workout['title'],
+                'post_content' => 'This is a test workout generated by the direct endpoint.',
+                'post_status' => 'publish',
+                'post_type' => 'wg_workout',
+            ]);
+            
+            // Add post_id directly to the data object
+            $workout['post_id'] = $post_id;
+            
+            // Return success response with the workout data
+            return APIUtils::create_api_response(
+                $workout,
+                'Direct workout created successfully'
+            );
+        } catch (\Exception $e) {
+            return APIUtils::create_api_response(
+                null,
+                'Error: ' . $e->getMessage(),
+                false,
+                'direct_generation_error',
+                400
+            );
+        }
     }
 }
 

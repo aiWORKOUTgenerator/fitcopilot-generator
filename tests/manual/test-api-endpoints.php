@@ -370,8 +370,7 @@ header('Content-Type: text/html; charset=utf-8');
                     const alternateEndpoints = [
                         `${baseUrl}/generate-workout`,  // Try the legacy endpoint
                         `${baseUrl}generate`,           // Try without leading slash
-                        `${baseUrl.replace('/generate', '/generate')}`, // Try with explicit path
-                        `${baseUrl}/emergency-generate` // Try our emergency endpoint
+                        `${baseUrl.replace('/generate', '/generate')}` // Try with explicit path
                     ];
                     
                     for (const endpoint of alternateEndpoints) {

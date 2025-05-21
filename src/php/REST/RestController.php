@@ -14,44 +14,7 @@ if (!defined('ABSPATH')) {
  * Initialize REST API endpoints
  */
 function register_rest_routes() {
-    // Register API namespace
-    register_rest_route(
-        'fitcopilot/v1',
-        '/generate',
-        [
-            'methods' => 'POST',
-            'callback' => 'FitCopilot\\REST\\generate_workout',
-            'permission_callback' => 'FitCopilot\\REST\\check_permission',
-            'args' => [
-                'duration' => [
-                    'required' => true,
-                    'type' => 'integer',
-                    'sanitize_callback' => 'absint',
-                ],
-                'difficulty' => [
-                    'required' => true,
-                    'type' => 'string',
-                    'enum' => ['beginner', 'intermediate', 'advanced'],
-                ],
-                'equipment' => [
-                    'required' => false,
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'string',
-                    ],
-                ],
-                'goals' => [
-                    'required' => true,
-                    'type' => 'string',
-                ],
-                'restrictions' => [
-                    'required' => false,
-                    'type' => 'string',
-                ],
-            ],
-        ]
-    );
-
+    // Register other endpoints
     register_rest_route(
         'fitcopilot/v1',
         '/workouts',
@@ -159,47 +122,6 @@ add_action('rest_api_init', 'FitCopilot\\REST\\register_rest_routes');
  */
 function check_permission() {
     return is_user_logged_in();
-}
-
-/**
- * Generate a workout via AI
- *
- * @param \WP_REST_Request $request The request object
- * @return \WP_REST_Response
- */
-function generate_workout(\WP_REST_Request $request) {
-    // Check for API key first
-    $api_key = get_option('fitcopilot_openai_api_key', '');
-    if (empty($api_key)) {
-        return new \WP_REST_Response([
-            'success' => false,
-            'message' => 'OpenAI API key not configured. Please set it in the FitCopilot settings.',
-            'code' => 'missing_api_key'
-        ], 400);
-    }
-
-    $params = $request->get_params();
-
-    try {
-        // Use the OpenAI provider to generate the workout
-        $provider = new \FitCopilot\Service\AI\OpenAIProvider($api_key);
-        $workout = $provider->generateWorkout($params);
-        
-        // Optional: Save the workout if needed
-        // $workout_id = save_workout($workout, $params);
-        
-        return new \WP_REST_Response([
-            'success' => true,
-            'data' => $workout,
-            'message' => 'Workout generated successfully',
-        ]);
-    } catch (\Exception $e) {
-        return new \WP_REST_Response([
-            'success' => false,
-            'message' => $e->getMessage(),
-            'code' => 'generation_error'
-        ], 500);
-    }
 }
 
 /**

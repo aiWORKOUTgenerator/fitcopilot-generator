@@ -29,10 +29,16 @@ class APIUtils {
             return [];
         }
         
+        // Check if parameters are wrapped in the wrapper_key (e.g., 'workout')
         if (isset($params[$wrapper_key]) && is_array($params[$wrapper_key])) {
+            // Debug log to help troubleshoot
+            error_log('Unwrapping params from wrapper: ' . $wrapper_key);
+            error_log('Wrapped params: ' . print_r($params[$wrapper_key], true));
             return $params[$wrapper_key];
         }
         
+        // If not wrapped, return params as is
+        error_log('Using direct params format');
         return $params;
     }
     

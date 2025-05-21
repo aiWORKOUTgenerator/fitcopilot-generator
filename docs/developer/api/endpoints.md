@@ -16,25 +16,27 @@ All endpoints are accessible via the WordPress REST API under the namespace `/wp
 
 ---
 
-## Generate Workout
+## Workout Generator API
 
-Generate a new AI-powered workout plan based on user preferences.
+### Generate Workout
 
-**Endpoint:** `POST /wp-json/fitcopilot/v1/generate`
+**Endpoint:** `POST /fitcopilot/v1/generate`
 
-> **Note:** There is also a legacy endpoint at `/wp-json/fitcopilot/v1/generate-workout` which is still supported for backward compatibility but should be considered deprecated.
+Generates a new AI workout based on the provided parameters.
 
-### Request Parameters
+**Request Parameters:**
+
+This endpoint supports both direct and wrapped parameter formats:
 
 **Direct Format:**
 ```json
 {
   "duration": 30,
-  "difficulty": "intermediate",
-  "equipment": ["dumbbells", "bench"],
+  "difficulty": "intermediate", 
   "goals": "strength",
-  "restrictions": "lower back pain",
-  "specific_request": "A quick upper body workout focusing on shoulders"
+  "equipment": ["dumbbells", "resistance bands"],
+  "restrictions": "knee injury",
+  "specific_request": "A full body workout focused on strength building"
 }
 ```
 
@@ -43,40 +45,115 @@ Generate a new AI-powered workout plan based on user preferences.
 {
   "workout": {
     "duration": 30,
-    "difficulty": "intermediate",
-    "equipment": ["dumbbells", "bench"],
+    "difficulty": "intermediate", 
     "goals": "strength",
-    "restrictions": "lower back pain",
-    "specific_request": "A quick upper body workout focusing on shoulders"
+    "equipment": ["dumbbells", "resistance bands"],
+    "restrictions": "knee injury",
+    "specific_request": "A full body workout focused on strength building"
   }
 }
 ```
 
-### Response Format
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| duration | integer | Yes | Workout duration in minutes |
+| difficulty | string | Yes | Workout difficulty level ("beginner", "intermediate", "advanced") |
+| goals | string | Yes | Training goal(s) (e.g., "strength", "cardio", "weight loss") |
+| equipment | array | No | Available equipment as an array of strings |
+| restrictions | string | No | Any health restrictions or limitations |
+| specific_request | string | Yes | Specific workout request or description |
+
+**Response:**
 
 ```json
 {
   "success": true,
+  "message": "Workout created successfully",
   "data": {
-    "title": "30-Minute Intermediate Strength Workout",
+    "title": "30-Minute Full Body Strength Workout",
+    "description": "A challenging intermediate workout focusing on building strength with minimal equipment.",
+    "duration": 30,
+    "difficulty": "intermediate",
+    "equipment_required": ["dumbbells", "resistance bands"],
     "sections": [
       {
-        "name": "Warm Up",
+        "name": "Warm-up",
         "duration": 5,
         "exercises": [
           {
-            "name": "Arm Circles",
-            "duration": "1 minute",
-            "description": "Stand with feet shoulder-width apart, extend arms out to the sides at shoulder height, and make small circles."
-          },
-          // Additional exercises...
+            "name": "Dynamic Stretching",
+            "duration": "5 minutes",
+            "description": "Perform arm circles, leg swings, hip rotations, and light jogging in place."
+          }
         ]
       },
-      // Additional sections...
+      {
+        "name": "Main Workout",
+        "duration": 20,
+        "exercises": [
+          {
+            "name": "Dumbbell Squat",
+            "sets": 3,
+            "reps": 12,
+            "description": "Hold dumbbells at shoulders, squat down until thighs are parallel to floor, then push back up."
+          },
+          {
+            "name": "Resistance Band Row",
+            "sets": 3,
+            "reps": 15,
+            "description": "Secure band to a sturdy object, hold handles with arms extended, pull elbows back squeezing shoulder blades."
+          }
+        ]
+      },
+      {
+        "name": "Cool Down",
+        "duration": 5,
+        "exercises": [
+          {
+            "name": "Static Stretching",
+            "duration": "5 minutes",
+            "description": "Hold each stretch for 30 seconds targeting major muscle groups worked."
+          }
+        ]
+      }
     ],
     "post_id": 123
-  },
-  "message": "Workout created successfully"
+  }
+}
+```
+
+**Error Responses:**
+
+Missing API Key:
+```json
+{
+  "success": false,
+  "message": "OpenAI API key not configured. Please set it in the FitCopilot settings.",
+  "code": "missing_api_key"
+}
+```
+
+Missing Parameters:
+```json
+{
+  "success": false,
+  "message": "Missing parameter(s): duration, goals",
+  "code": "validation_error",
+  "data": {
+    "validation_errors": {
+      "duration": "Duration is required.",
+      "goals": "Goals is required."
+    }
+  }
+}
+```
+
+Generation Error:
+```json
+{
+  "success": false,
+  "message": "Error communicating with AI provider: Rate limit exceeded",
+  "code": "generation_error"
 }
 ```
 

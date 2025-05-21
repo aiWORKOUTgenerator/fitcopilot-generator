@@ -19,7 +19,6 @@ require_once FITCOPILOT_DIR . 'src/php/Domain/WorkoutPostType.php';
 // Register REST API endpoints
 require_once FITCOPILOT_DIR . 'src/php/REST/RestController.php';
 require_once FITCOPILOT_DIR . 'src/php/REST/AnalyticsController.php';
-require_once FITCOPILOT_DIR . 'src/php/REST/WorkoutController.php';
 
 // Register Service components
 require_once FITCOPILOT_DIR . 'src/php/Service/AI/OpenAIProvider.php';
@@ -232,6 +231,7 @@ function render_generator_shortcode() {
 }
 
 // Load API endpoints
+require_once FITCOPILOT_DIR . 'src/php/API/APIUtils.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints.php';
 
 // Load Profile endpoints
@@ -240,9 +240,6 @@ require_once FITCOPILOT_DIR . 'src/php/API/ProfileEndpoints.php';
 // Load API Tracker
 require_once FITCOPILOT_DIR . 'src/php/API/APITracker.php';
 require_once FITCOPILOT_DIR . 'src/php/API/APITrackerEndpoints.php';
-
-// Load API Compatibility endpoints
-require_once FITCOPILOT_DIR . 'src/php/API/CompatibilityEndpoints.php';
 
 // Load admin pages
 require_once FITCOPILOT_DIR . 'src/php/Admin/AdminMenu.php';
@@ -294,40 +291,6 @@ add_action('rest_api_init', function() {
                     'time' => current_time('mysql'),
                     'plugin_version' => FITCOPILOT_VERSION,
                 ],
-            ]);
-        },
-        'permission_callback' => function() {
-            return true; // Public endpoint for testing
-        },
-    ]);
-    
-    // Emergency generate endpoint
-    register_rest_route('fitcopilot/v1', '/emergency-generate', [
-        'methods' => 'POST',
-        'callback' => function(\WP_REST_Request $request) {
-            $params = $request->get_json_params();
-            
-            // Return a mock response for testing
-            return new \WP_REST_Response([
-                'success' => true,
-                'data' => [
-                    'title' => 'Emergency Test Workout',
-                    'sections' => [
-                        [
-                            'name' => 'Warmup',
-                            'duration' => 5,
-                            'exercises' => [
-                                [
-                                    'name' => 'Jumping Jacks',
-                                    'duration' => '1 minute',
-                                    'description' => 'Stand with feet together, jump while spreading legs and raising arms.'
-                                ]
-                            ]
-                        ]
-                    ],
-                    'post_id' => 999 // Mock post ID
-                ],
-                'message' => 'Emergency workout generated successfully'
             ]);
         },
         'permission_callback' => function() {
