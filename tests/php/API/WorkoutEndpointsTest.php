@@ -47,7 +47,7 @@ class WorkoutEndpointsTest extends WP_UnitTestCase {
         // Create a test workout
         $this->workout_id = wp_insert_post([
             'post_title'  => 'Test Workout',
-            'post_type'   => 'wg_workout',
+            'post_type'   => 'fc_workout',
             'post_status' => 'publish',
             'post_author' => $this->user_id,
         ]);

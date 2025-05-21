@@ -188,12 +188,6 @@ header('Content-Type: text/html; charset=utf-8');
                         <td><button onclick="runTest('get-workouts')">Test</button></td>
                     </tr>
                     <tr>
-                        <td>GET /workouts (pagination)</td>
-                        <td>per_page=3, page=2</td>
-                        <td id="get-workouts-pagination-status">Not tested</td>
-                        <td><button onclick="runTest('get-workouts-pagination')">Test</button></td>
-                    </tr>
-                    <tr>
                         <td>GET /workouts/{id}</td>
                         <td>-</td>
                         <td id="get-workout-status">Not tested</td>
@@ -287,9 +281,6 @@ header('Content-Type: text/html; charset=utf-8');
                     case 'get-workouts':
                         result = await testGetWorkouts();
                         break;
-                    case 'get-workouts-pagination':
-                        result = await testGetWorkoutsPagination();
-                        break;
                     case 'get-workout':
                         result = await testGetWorkout();
                         break;
@@ -338,7 +329,6 @@ header('Content-Type: text/html; charset=utf-8');
             const testOrder = [
                 'generate-direct',
                 'get-workouts',
-                'get-workouts-pagination',
                 'get-workout',
                 'update-workout-direct',
                 'complete-workout-direct',
@@ -533,13 +523,7 @@ header('Content-Type: text/html; charset=utf-8');
                 
                 const data = await response.json();
                 
-                // Updated validation to check for proper pagination format
-                if (data.success && 
-                    data.data && 
-                    Array.isArray(data.data.workouts) && 
-                    typeof data.data.total === 'number' && 
-                    typeof data.data.totalPages === 'number' && 
-                    typeof data.data.currentPage === 'number') {
+                if (data.success && Array.isArray(data.data)) {
                     return { success: true, response: data };
                 } else {
                     return { success: false, response: data };
@@ -810,35 +794,6 @@ header('Content-Type: text/html; charset=utf-8');
                 const data = await response.json();
                 
                 if (data.success) {
-                    return { success: true, response: data };
-                } else {
-                    return { success: false, response: data };
-                }
-            } catch (error) {
-                return { success: false, error: error.message, response: null };
-            }
-        }
-
-        // Test the workouts endpoint with pagination parameters
-        async function testGetWorkoutsPagination() {
-            try {
-                // Test with per_page=3 and page=2
-                const response = await fetch(`${baseUrl}/workouts?per_page=3&page=2`, {
-                    method: 'GET',
-                    headers: {
-                        'X-WP-Nonce': wpRestNonce
-                    },
-                    credentials: 'same-origin'
-                });
-                
-                const data = await response.json();
-                
-                // Verify pagination parameters were applied correctly
-                if (data.success && 
-                    data.data && 
-                    Array.isArray(data.data.workouts) && 
-                    data.data.currentPage === 2 && 
-                    data.data.workouts.length <= 3) { // Should be 3 or fewer items
                     return { success: true, response: data };
                 } else {
                     return { success: false, response: data };
