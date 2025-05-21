@@ -6,7 +6,7 @@
 import { useCallback } from 'react';
 import { PartialUserProfile } from '../types';
 
-type ValidationErrors = Record<string, string>;
+export type ValidationErrors = Record<string, string>;
 
 /**
  * Hook to validate user profile data
@@ -63,52 +63,36 @@ export const useProfileValidation = () => {
       errors.limitations = 'Please select any physical limitations (select "none" if none apply)';
     }
     
-    // If 'other' limitation is selected, validate limitation notes
-    if (profile.limitations?.includes('other') && !profile.limitationNotes) {
-      errors.limitationNotes = 'Please provide details about your limitations';
-    }
-
-    // Optional field validations
+    // Remove validations that shouldn't block progression through the form
+    // Favorite exercises are optional and shouldn't produce validation errors
+    delete errors.favoriteExercises;
+    delete errors.dislikedExercises;
     
-    // Weight validation if provided
-    if (profile.weight !== undefined) {
-      if (isNaN(profile.weight) || profile.weight <= 0) {
-        errors.weight = 'Please enter a valid weight';
-      }
-      
-      if (!profile.weightUnit) {
-        errors.weightUnit = 'Please select a weight unit';
-      }
-    }
-    
-    // Height validation if provided
-    if (profile.height !== undefined) {
-      if (isNaN(profile.height) || profile.height <= 0) {
-        errors.height = 'Please enter a valid height';
-      }
-      
-      if (!profile.heightUnit) {
-        errors.heightUnit = 'Please select a height unit';
-      }
-    }
-    
-    // Age validation if provided
-    if (profile.age !== undefined) {
-      if (isNaN(profile.age) || profile.age <= 0 || profile.age > 120) {
-        errors.age = 'Please enter a valid age between 1-120';
-      }
-    }
+    // Don't validate preferredExerciseTypes as it's handled in a different section
+    delete errors.preferredExerciseTypes;
 
     return errors;
   }, []);
 
   /**
-   * Check if profile has all required fields
+   * Check if profile is complete enough to be used
    */
   const isProfileComplete = useCallback((profile: PartialUserProfile): boolean => {
-    const errors = validateProfile(profile);
-    return Object.keys(errors).length === 0;
-  }, [validateProfile]);
+    return Boolean(
+      profile.fitnessLevel &&
+      profile.goals &&
+      profile.goals.length > 0 &&
+      (!profile.goals.includes('custom') || Boolean(profile.customGoal)) &&
+      profile.availableEquipment &&
+      profile.availableEquipment.length > 0 &&
+      (!profile.availableEquipment.includes('other') || Boolean(profile.customEquipment)) &&
+      profile.preferredLocation &&
+      profile.workoutFrequency &&
+      (!profile.workoutFrequency === 'custom' || Boolean(profile.customFrequency)) &&
+      profile.limitations &&
+      profile.limitations.length > 0
+    );
+  }, []);
 
   return {
     validateProfile,

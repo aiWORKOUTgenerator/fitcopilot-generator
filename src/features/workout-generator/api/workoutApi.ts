@@ -141,7 +141,9 @@ const useGenerateWorkout = () => {
       url: API_ENDPOINTS.GENERATE,
       options: {
         method: 'POST',
-        body: JSON.stringify(params)
+        body: JSON.stringify({
+          workout: params
+        })
       },
       handleUnauthorized: true
     });
@@ -241,7 +243,9 @@ const useSaveWorkout = () => {
         url: API_ENDPOINTS.WORKOUT(id),
         options: {
           method: 'PUT',
-          body: JSON.stringify(workoutData)
+          body: JSON.stringify({
+            workout: workoutData
+          })
         },
         handleUnauthorized: true
       });
@@ -251,7 +255,9 @@ const useSaveWorkout = () => {
         url: API_ENDPOINTS.WORKOUTS,
         options: {
           method: 'POST',
-          body: JSON.stringify(workoutData)
+          body: JSON.stringify({
+            workout: workoutData
+          })
         },
         handleUnauthorized: true
       });
@@ -269,24 +275,26 @@ const useSaveWorkout = () => {
 };
 
 /**
- * Hook for marking a workout as completed
+ * Hook for logging workout completion
  */
 const useCompleteWorkout = () => {
   const {
     request,
-    data: response,
+    data: completion,
     error,
     isLoading,
     abort,
     reset
-  } = useApiRequest<{ success: boolean }>();
+  } = useApiRequest<Workout>();
 
   const completeWorkout = async (id: number, completionData: WorkoutCompletionData) => {
     return await request({
       url: API_ENDPOINTS.COMPLETE_WORKOUT(id),
       options: {
         method: 'POST',
-        body: JSON.stringify(completionData)
+        body: JSON.stringify({
+          completion: completionData
+        })
       },
       handleUnauthorized: true
     });
@@ -296,7 +304,7 @@ const useCompleteWorkout = () => {
     completeWorkout,
     abortRequest: abort,
     resetState: reset,
-    response,
+    completion,
     error,
     isLoading
   };
@@ -393,11 +401,14 @@ export async function generateWorkout(params: WorkoutFormParams): Promise<Genera
       specific_request: params.specific_request || `A ${params.difficulty} level ${params.duration}-minute workout focusing on ${params.goals}${params.restrictions ? ` with restrictions: ${params.restrictions}` : ''}`
     };
 
+    // Use wrapped format for request body
     return await apiFetch<GeneratedWorkout>(
       API_ENDPOINTS.GENERATE,
       {
         method: 'POST',
-        body: JSON.stringify(enhancedParams)
+        body: JSON.stringify({
+          workout: enhancedParams
+        })
       }
     );
   } catch (error) {
@@ -423,11 +434,14 @@ export async function generateWorkoutDirect(
       ...options
     };
 
+    // Use wrapped format for request body
     return await apiFetch<WorkoutResponse>(
       API_ENDPOINTS.GENERATE,
       {
         method: 'POST',
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          workout: body
+        })
       }
     );
   } catch (error) {
@@ -483,7 +497,9 @@ export async function completeWorkout(
       API_ENDPOINTS.COMPLETE_WORKOUT(id),
       {
         method: 'POST',
-        body: JSON.stringify(completionData)
+        body: JSON.stringify({
+          completion: completionData
+        })
       }
     );
     return response.data;
@@ -509,7 +525,9 @@ export async function updateWorkout(
       API_ENDPOINTS.WORKOUT(id),
       {
         method: 'PUT',
-        body: JSON.stringify(metadata)
+        body: JSON.stringify({
+          workout: metadata
+        })
       }
     );
     return response.data;

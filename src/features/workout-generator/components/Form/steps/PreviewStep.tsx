@@ -7,7 +7,7 @@
 import React from 'react';
 import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
-import { WorkoutFormParams } from '../../../types/workout';
+import { WorkoutFormParams, SessionSpecificInputs } from '../../../types/workout';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { EquipmentIcon } from '../../../utils/EquipmentIcons';
 import './PreviewStep.scss';
@@ -64,6 +64,15 @@ const EQUIPMENT_LABELS: Record<string, string> = {
   'jump-rope': 'Jump Rope',
 };
 
+// Map environment keys to human-readable labels
+const ENVIRONMENT_LABELS: Record<string, string> = {
+  'gym': 'Gym',
+  'home': 'Home',
+  'outdoors': 'Outdoors',
+  'travel': 'Travel',
+  'limited-space': 'Limited Space',
+};
+
 /**
  * Component for previewing workout parameters before generation
  */
@@ -78,6 +87,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
   const difficultyDisplay = formValues.difficulty ? DIFFICULTY_LABELS[formValues.difficulty] : '';
   const durationDisplay = formValues.duration ? `${formValues.duration} minutes` : '';
   const equipment = formValues.equipment || [];
+  const sessionInputs = formValues.sessionInputs || {};
   
   // Format any restrictions or preferences
   const restrictionsPreferences = [
@@ -140,6 +150,69 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
               {restrictionsPreferences.map((item: string, index: number) => (
                 <div key={index}>{item}</div>
               ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Session-specific inputs */}
+        {Object.keys(sessionInputs).length > 0 && (
+          <div className="workout-preview__section">
+            <h4 className="workout-preview__section-title">
+              Today's Workout Factors
+            </h4>
+            <div className="workout-preview__session-inputs">
+              {sessionInputs.availableTime && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Available Time:</span> 
+                  <span className="workout-preview__session-value">{sessionInputs.availableTime} minutes</span>
+                </div>
+              )}
+              
+              {sessionInputs.energyLevel && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Energy Level:</span> 
+                  <span className="workout-preview__session-value">{sessionInputs.energyLevel}/5</span>
+                </div>
+              )}
+              
+              {sessionInputs.moodLevel && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Stress Level:</span> 
+                  <span className="workout-preview__session-value">{sessionInputs.moodLevel}/5</span>
+                </div>
+              )}
+              
+              {sessionInputs.sleepQuality && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Sleep Quality:</span> 
+                  <span className="workout-preview__session-value">{sessionInputs.sleepQuality}/5</span>
+                </div>
+              )}
+              
+              {sessionInputs.environment && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Environment:</span> 
+                  <span className="workout-preview__session-value">{ENVIRONMENT_LABELS[sessionInputs.environment]}</span>
+                </div>
+              )}
+              
+              {sessionInputs.focusArea && sessionInputs.focusArea.length > 0 && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Focus Areas:</span> 
+                  <span className="workout-preview__session-value">
+                    {sessionInputs.focusArea.join(', ')}
+                  </span>
+                </div>
+              )}
+              
+              {sessionInputs.currentSoreness && sessionInputs.currentSoreness.length > 0 && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Current Soreness:</span> 
+                  <span className="workout-preview__session-value">
+                    {sessionInputs.currentSoreness.join(', ')}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -51,15 +51,42 @@
     }
   }
   
+  &__label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
   &__label {
     display: block;
-    margin-bottom: 0.5rem;
     font-weight: 600;
     color: color('text');
     font-size: 1.125rem;
     
     .dark-theme & {
       color: dark-color('text');
+    }
+  }
+  
+  &__note {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: color('text-muted');
+    font-style: italic;
+    
+    svg {
+      color: color('info');
+    }
+    
+    .dark-theme & {
+      color: dark-color('text-muted');
+      
+      svg {
+        color: dark-color('info');
+      }
     }
   }
   

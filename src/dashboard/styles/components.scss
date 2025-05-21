@@ -1,0 +1,327 @@
+/* Dashboard Component Styles */
+
+/* User Profile Styles */
+.user-profile {
+  --avatar-bg: #6366f1;
+  --avatar-text: #ffffff;
+  --tag-bg: #2d2d2d;
+  --tag-text: #b3b3b3;
+  --section-border: #333333;
+  --button-primary: #6366f1;
+  --button-text: #ffffff;
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--avatar-bg);
+      color: var(--avatar-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+    }
+    
+    .profile-name-email {
+      flex: 1;
+      
+      .profile-name {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .profile-email {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+    }
+    
+    .edit-profile-button,
+    .save-profile-button {
+      background-color: var(--button-primary);
+      color: var(--button-text);
+      border: none;
+      border-radius: 4px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+  
+  .profile-details {
+    .profile-section {
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--section-border);
+      
+      &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      
+      .section-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        color: var(--text-secondary);
+      }
+      
+      .section-content {
+        font-size: 0.9rem;
+        
+        select {
+          width: 100%;
+          padding: 0.4rem;
+          background-color: var(--card-bg);
+          color: var(--text-primary);
+          border: 1px solid var(--section-border);
+          border-radius: 4px;
+        }
+      }
+      
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        
+        .tag {
+          background-color: var(--tag-bg);
+          color: var(--tag-text);
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}
+
+/* API Usage Styles */
+.api-usage {
+  --progress-bg: #2d2d2d;
+  --progress-fill: #6366f1;
+  
+  .usage-metric {
+    margin-bottom: 1rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .usage-label {
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .usage-bar {
+      height: 8px;
+      background-color: var(--progress-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.3rem;
+      
+      .usage-progress {
+        height: 100%;
+        background-color: var(--progress-fill);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+    }
+    
+    .usage-stats {
+      display: flex;
+      justify-content: flex-end;
+      font-size: 0.8rem;
+      
+      .usage-value {
+        font-weight: 600;
+      }
+      
+      .usage-total {
+        color: var(--text-secondary);
+      }
+    }
+  }
+  
+  .api-usage-loading {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem 0;
+  }
+}
+
+/* Recent Workouts Styles */
+.recent-workouts-list {
+  --separator: #333333;
+  --status-completed: #4ade80;
+  --status-pending: #f59e0b;
+  --button-view: #2d2d2d;
+  --button-complete: #6366f1;
+  
+  .workout-item {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--separator);
+    
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0;
+    }
+    
+    .workout-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      
+      .workout-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .workout-status {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        
+        &.completed {
+          background-color: rgba(74, 222, 128, 0.2);
+          color: var(--status-completed);
+        }
+        
+        &.pending {
+          background-color: rgba(245, 158, 11, 0.2);
+          color: var(--status-pending);
+        }
+      }
+    }
+    
+    .workout-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      
+      @media (min-width: 768px) {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      
+      .workout-detail {
+        .detail-label {
+          font-size: 0.75rem;
+          color: var(--text-secondary);
+          display: block;
+        }
+        
+        .detail-value {
+          font-size: 0.9rem;
+        }
+      }
+    }
+    
+    .workout-actions {
+      display: flex;
+      gap: 0.5rem;
+      
+      button {
+        border: none;
+        border-radius: 4px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        
+        &:hover {
+          opacity: 0.9;
+        }
+      }
+      
+      .view-button {
+        background-color: var(--button-view);
+        color: var(--text-primary);
+      }
+      
+      .complete-button {
+        background-color: var(--button-complete);
+        color: var(--button-text);
+      }
+    }
+  }
+  
+  .view-all-link {
+    text-align: center;
+    margin-top: 1rem;
+    
+    a {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .recent-workouts-loading,
+  .no-workouts {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1rem 0;
+  }
+}
+
+/* Create Workout Button */
+.create-workout-button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: block;
+  margin: 1rem auto;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+/* Refresh Button */
+.refresh-button {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+} 

@@ -8,9 +8,10 @@ import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
 import { Textarea } from '../../../../../components/ui/Textarea';
 import { AdvancedOptionsPanel } from '../../../../../components/ui';
-import { WorkoutFormParams, WorkoutDifficulty } from '../../../types/workout';
+import { WorkoutFormParams, WorkoutDifficulty, SessionSpecificInputs } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import SessionInputsPanel from '../SessionInputsPanel';
 import './InputStep.scss';
 
 /**
@@ -87,6 +88,8 @@ interface InputStepProps {
   setRestrictions: (restrictions: string) => void;
   /** Update preferences field */
   setPreferences: (preferences: string) => void;
+  /** Update session inputs */
+  setSessionInputs?: (sessionInputs: SessionSpecificInputs) => void;
   /** Validate the form */
   validateForm: () => boolean;
   /** Continue to next step */
@@ -108,12 +111,14 @@ export const InputStep: React.FC<InputStepProps> = ({
   setEquipment,
   setRestrictions,
   setPreferences,
+  setSessionInputs,
   validateForm,
   onContinue,
 }) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [intensity, setIntensity] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSessionInputsExpanded, setIsSessionInputsExpanded] = useState(true);
 
   /**
    * Handle form submission
@@ -235,8 +240,20 @@ export const InputStep: React.FC<InputStepProps> = ({
               </select>
               <ChevronDown className="input-step__select-icon" />
             </div>
-          </div>
-
+                    </div>
+          
+          {/* Session-Specific Inputs */}
+          <SessionInputsPanel
+            sessionInputs={formValues.sessionInputs || {}}
+            onSessionInputsChange={inputs => {
+              if (setSessionInputs) {
+                setSessionInputs(inputs);
+              }
+            }}
+            isExpanded={isSessionInputsExpanded}
+            onToggleExpand={() => setIsSessionInputsExpanded(!isSessionInputsExpanded)}
+          />
+          
           {/* Advanced Options */}
           <AdvancedOptionsPanel 
             equipmentOptions={EQUIPMENT_OPTIONS}

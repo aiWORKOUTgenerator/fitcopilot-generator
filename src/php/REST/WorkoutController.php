@@ -74,13 +74,14 @@ function handle_generate_workout(\WP_REST_Request $request) {
         // Save the workout to the database if needed
         $post_id = save_generated_workout($workout, $user_id, $generation_params);
         
+        // Create the response data with post_id directly in the data object
+        $response_data = $workout;
+        $response_data['post_id'] = $post_id;
+        
         // Return the success response
         return new \WP_REST_Response([
             'success' => true,
-            'data' => [
-                'workout' => $workout,
-                'post_id' => $post_id
-            ],
+            'data' => $response_data,
             'message' => 'Workout generated successfully'
         ]);
     } catch (\Exception $e) {

@@ -75,6 +75,15 @@ const initialState: WorkoutGeneratorState = {
       equipment: [],
       goals: '',
       restrictions: '',
+      sessionInputs: {
+        availableTime: undefined,
+        energyLevel: undefined,
+        focusArea: [],
+        currentSoreness: [],
+        moodLevel: undefined,
+        sleepQuality: undefined,
+        environment: undefined,
+      },
     },
     generatedWorkout: null,
   },
@@ -308,7 +317,8 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
         difficulty: formData.difficulty,
         goals: formData.goals,
         equipment: formData.equipment || [],
-        restrictions: formData.restrictions || ''
+        restrictions: formData.restrictions || '',
+        session_inputs: formData.sessionInputs || {}
       };
       
       // Make API request to generate workout

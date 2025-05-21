@@ -8,6 +8,7 @@
 namespace FitCopilot\API;
 
 use FitCopilot\Service\AI\OpenAIProvider;
+use FitCopilot\API\APIUtils;
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
@@ -28,20 +29,33 @@ class WorkoutEndpoints {
      * Constructor
      */
     public function __construct() {
+        // Debug log to verify initialization
+        error_log('FitCopilot WorkoutEndpoints initialized');
+        
         // Register REST API endpoints
         add_action('rest_api_init', [$this, 'register_endpoints']);
+        
+        // Execute the action immediately if it's already fired
+        if (did_action('rest_api_init')) {
+            error_log('rest_api_init already fired, registering endpoints immediately');
+            $this->register_endpoints();
+        }
     }
     
     /**
      * Register REST API endpoints
      */
     public function register_endpoints() {
+        // Debug log to verify route registration
+        error_log('FitCopilot WorkoutEndpoints registering endpoints');
+        
         // Generate workout endpoint
         register_rest_route(self::API_NAMESPACE, '/generate', [
             'methods'             => 'POST',
             'callback'            => [$this, 'generate_workout'],
             'permission_callback' => [$this, 'user_permissions_check'],
         ]);
+        error_log('FitCopilot registered endpoint: ' . self::API_NAMESPACE . '/generate');
         
         // Get workouts list
         register_rest_route(self::API_NAMESPACE, '/workouts', [
@@ -91,22 +105,26 @@ class WorkoutEndpoints {
         // Get the OpenAI API key
         $api_key = get_option('fitcopilot_openai_api_key', '');
         if (empty($api_key)) {
-            return rest_ensure_response([
-                'success' => false,
-                'message' => __('OpenAI API key not configured. Please set it in the FitCopilot settings.', 'fitcopilot'),
-                'code'    => 'missing_api_key',
-            ]);
+            return APIUtils::create_api_response(
+                null,
+                __('OpenAI API key not configured. Please set it in the FitCopilot settings.', 'fitcopilot'),
+                false,
+                'missing_api_key',
+                400
+            );
         }
 
         // Parse & validate the JSON parameters
         $params = $request->get_json_params();
         
+        // Normalize request data to support both direct and wrapped formats
+        $params = APIUtils::normalize_request_data($params, 'workout');
+        
         if (empty($params['specific_request'])) {
-            return rest_ensure_response([
-                'success' => false,
-                'message' => __('Missing required parameters.', 'fitcopilot'),
-                'code'    => 'invalid_params',
-            ]);
+            return APIUtils::create_validation_error(
+                ['specific_request' => __('Specific request is required.', 'fitcopilot')],
+                __('Missing required parameters.', 'fitcopilot')
+            );
         }
 
         try {
@@ -129,21 +147,26 @@ class WorkoutEndpoints {
             // Save the workout to the database
             $post_id = $this->save_workout($workout, $generation_params);
             
+            // Add post_id directly to the data object (not nested inside workout)
+            $response_data = $workout;
+            $response_data['post_id'] = $post_id;
+            
+            // Apply wg_after_generate_workout filter for extensibility
+            do_action('wg_after_generate_workout', $post_id, $workout, $generation_params);
+            
             // Return the success response
-            return rest_ensure_response([
-                'success' => true,
-                'data'    => [
-                    'workout' => $workout,
-                    'post_id' => $post_id,
-                ],
-                'message' => __('Workout generated successfully.', 'fitcopilot'),
-            ]);
+            return APIUtils::create_api_response(
+                $response_data,
+                APIUtils::get_success_message('create', 'workout')
+            );
         } catch (\Exception $e) {
-            return rest_ensure_response([
-                'success' => false,
-                'message' => $e->getMessage(),
-                'code'    => 'generation_error',
-            ]);
+            return APIUtils::create_api_response(
+                null,
+                $e->getMessage(),
+                false,
+                'generation_error',
+                500
+            );
         }
     }
     
@@ -186,10 +209,10 @@ class WorkoutEndpoints {
             wp_reset_postdata();
         }
         
-        return rest_ensure_response([
-            'success' => true,
-            'data'    => $workouts,
-        ]);
+        return APIUtils::create_api_response(
+            $workouts, 
+            APIUtils::get_success_message('list', 'workout')
+        );
     }
     
     /**
@@ -203,11 +226,7 @@ class WorkoutEndpoints {
         $post = get_post($post_id);
         
         if (!$post || $post->post_type !== 'wg_workout' || $post->post_author != get_current_user_id()) {
-            return rest_ensure_response([
-                'success' => false,
-                'message' => __('Workout not found.', 'fitcopilot'),
-                'code'    => 'not_found',
-            ]);
+            return APIUtils::create_not_found_error(__('Workout not found.', 'fitcopilot'));
         }
         
         $workout_data = json_decode(get_post_meta($post_id, '_workout_data', true), true);
@@ -224,10 +243,10 @@ class WorkoutEndpoints {
             'workout_data' => $workout_data,
         ];
         
-        return rest_ensure_response([
-            'success' => true,
-            'data'    => $workout,
-        ]);
+        return APIUtils::create_api_response(
+            $workout, 
+            APIUtils::get_success_message('get', 'workout')
+        );
     }
     
     /**
@@ -241,14 +260,13 @@ class WorkoutEndpoints {
         $post = get_post($post_id);
         
         if (!$post || $post->post_type !== 'wg_workout' || $post->post_author != get_current_user_id()) {
-            return rest_ensure_response([
-                'success' => false,
-                'message' => __('Workout not found.', 'fitcopilot'),
-                'code'    => 'not_found',
-            ]);
+            return APIUtils::create_not_found_error(__('Workout not found.', 'fitcopilot'));
         }
         
         $params = $request->get_json_params();
+        
+        // Normalize request data to support both direct and wrapped formats
+        $params = APIUtils::normalize_request_data($params, 'workout');
         
         // Update title if provided
         if (!empty($params['title'])) {
@@ -269,10 +287,10 @@ class WorkoutEndpoints {
             }
         }
         
-        return rest_ensure_response([
-            'success' => true,
-            'message' => __('Workout updated successfully.', 'fitcopilot'),
-        ]);
+        return APIUtils::create_api_response(
+            ['id' => $post_id], 
+            APIUtils::get_success_message('update', 'workout')
+        );
     }
     
     /**
@@ -286,12 +304,13 @@ class WorkoutEndpoints {
         $post = get_post($post_id);
         
         if (!$post || $post->post_type !== 'wg_workout' || $post->post_author != get_current_user_id()) {
-            return rest_ensure_response([
-                'success' => false,
-                'message' => __('Workout not found.', 'fitcopilot'),
-                'code'    => 'not_found',
-            ]);
+            return APIUtils::create_not_found_error(__('Workout not found.', 'fitcopilot'));
         }
+        
+        $params = $request->get_json_params() ?: [];
+        
+        // Normalize request data to support both direct and wrapped formats
+        $params = APIUtils::normalize_request_data($params, 'completion');
         
         $user_id = get_current_user_id();
         $completion_date = current_time('mysql');
@@ -303,23 +322,25 @@ class WorkoutEndpoints {
             $completions = [];
         }
         
-        // Add new completion
-        $completions[] = [
+        // Add new completion with any additional data
+        $completion_data = array_merge([
             'user_id' => $user_id,
             'date'    => $completion_date,
-        ];
+        ], $params);
+        
+        $completions[] = $completion_data;
         
         // Update post meta
         update_post_meta($post_id, '_workout_completions', $completions);
         update_post_meta($post_id, '_workout_last_completed', $completion_date);
         
-        return rest_ensure_response([
-            'success' => true,
-            'message' => __('Workout completion logged successfully.', 'fitcopilot'),
-            'data'    => [
+        return APIUtils::create_api_response(
+            [
                 'completion_date' => $completion_date,
+                'completion_data' => $completion_data,
             ],
-        ]);
+            APIUtils::get_success_message('complete', 'workout')
+        );
     }
     
     /**

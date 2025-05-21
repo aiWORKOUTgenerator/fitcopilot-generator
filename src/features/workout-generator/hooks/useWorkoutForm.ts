@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect } from 'react';
-import { WorkoutFormParams, WorkoutDifficulty } from '../types/workout';
+import { WorkoutFormParams, WorkoutDifficulty, SessionSpecificInputs } from '../types/workout';
 import { useWorkoutGenerator } from '../context/WorkoutGeneratorContext';
 import { useFormValidation } from './useFormValidation';
 import { useFormPersistence } from './useFormPersistence';
@@ -83,6 +83,11 @@ export function useWorkoutForm() {
     updateField('restrictions', restrictions);
   }, [updateField]);
   
+  // Set session inputs
+  const setSessionInputs = useCallback((sessionInputs: SessionSpecificInputs) => {
+    updateField('sessionInputs', sessionInputs);
+  }, [updateField]);
+  
   // Validate the form
   const validateForm = useCallback(() => {
     const isValid = validation.validateForm(formValues);
@@ -125,6 +130,7 @@ export function useWorkoutForm() {
     setGoals,
     setEquipment,
     setRestrictions,
+    setSessionInputs,
     
     // Storage
     clearFormStorage,

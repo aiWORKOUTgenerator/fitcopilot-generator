@@ -22,86 +22,78 @@ Generate a new AI-powered workout plan based on user preferences.
 
 **Endpoint:** `POST /wp-json/fitcopilot/v1/generate`
 
+> **Note:** There is also a legacy endpoint at `/wp-json/fitcopilot/v1/generate-workout` which is still supported for backward compatibility but should be considered deprecated.
+
 ### Request Parameters
 
+**Direct Format:**
 ```json
 {
   "duration": 30,
   "difficulty": "intermediate",
-  "equipment": ["dumbbells", "resistance-bands"],
-  "goals": "build-muscle",
-  "restrictions": "low impact only",
-  "specific_request": "Create an intermediate level workout for 30 minutes focusing on building muscle."
+  "equipment": ["dumbbells", "bench"],
+  "goals": "strength",
+  "restrictions": "lower back pain",
+  "specific_request": "A quick upper body workout focusing on shoulders"
 }
 ```
 
-#### Required Fields
+**Wrapped Format:**
+```json
+{
+  "workout": {
+    "duration": 30,
+    "difficulty": "intermediate",
+    "equipment": ["dumbbells", "bench"],
+    "goals": "strength",
+    "restrictions": "lower back pain",
+    "specific_request": "A quick upper body workout focusing on shoulders"
+  }
+}
+```
 
-- `specific_request`: String describing the workout request
-
-#### Optional Fields
-
-- `duration`: Number (minutes) - default: 30
-- `difficulty`: String ("beginner", "intermediate", "advanced") - default: "intermediate"
-- `equipment`: Array of strings - default: []
-- `goals`: String - default: "general fitness"
-- `restrictions`: String - default: ""
-
-### Success Response (200)
+### Response Format
 
 ```json
 {
   "success": true,
   "data": {
-    "workout": {
-      "title": "30-Minute Intermediate Muscle Building Workout",
-      "description": "This workout targets major muscle groups with moderate weights and controlled movements.",
-      "warmup": [
-        {
-          "name": "Arm circles",
-          "duration": "30 seconds",
-          "description": "Rotate arms in circular motion"
-        },
-        {
-          "name": "Bodyweight squats",
-          "reps": 10,
-          "description": "Perform squats with bodyweight only"
-        }
-      ],
-      "exercises": [
-        {
-          "name": "Dumbbell bench press",
-          "sets": 3,
-          "reps": 12,
-          "rest": "45 seconds",
-          "description": "Lie on bench, press dumbbells upward"
-        },
-        {
-          "name": "Resistance band rows",
-          "sets": 3,
-          "reps": 15,
-          "rest": "45 seconds",
-          "description": "Pull resistance band toward torso"
-        }
-      ],
-      "cooldown": [
-        {
-          "name": "Chest stretch",
-          "duration": "30 seconds",
-          "description": "Stretch chest muscles"
-        },
-        {
-          "name": "Back stretch",
-          "duration": "30 seconds",
-          "description": "Stretch back muscles"
-        }
-      ]
-    },
+    "title": "30-Minute Intermediate Strength Workout",
+    "sections": [
+      {
+        "name": "Warm Up",
+        "duration": 5,
+        "exercises": [
+          {
+            "name": "Arm Circles",
+            "duration": "1 minute",
+            "description": "Stand with feet shoulder-width apart, extend arms out to the sides at shoulder height, and make small circles."
+          },
+          // Additional exercises...
+        ]
+      },
+      // Additional sections...
+    ],
     "post_id": 123
   },
-  "message": "Workout generated successfully."
+  "message": "Workout created successfully"
 }
 ```
+
+### Required Parameters
+- `specific_request` - The user's specific request for the workout
+
+### Optional Parameters
+- `duration` - Workout duration in minutes (default: 30)
+- `difficulty` - Workout difficulty level (default: "intermediate")
+- `equipment` - Array of available equipment (default: [])
+- `goals` - Training goals (default: "general fitness")
+- `restrictions` - Any physical restrictions or limitations (default: "")
+
+### Notes
+- The `post_id` field in the response is required for subsequent API calls to reference this workout
+- Both direct and wrapped request formats are supported
+- The AI generation process is synchronous and may take several seconds to complete
 
 ### Error Responses
 
@@ -146,10 +138,10 @@ async function generateWorkout() {
     body: JSON.stringify({
       duration: 30,
       difficulty: 'intermediate',
-      equipment: ['dumbbells', 'resistance-bands'],
-      goals: 'build-muscle',
-      restrictions: 'low impact only',
-      specific_request: 'Create an intermediate level workout for 30 minutes focusing on building muscle.'
+      equipment: ['dumbbells', 'bench'],
+      goals: 'strength',
+      restrictions: 'lower back pain',
+      specific_request: 'A quick upper body workout focusing on shoulders'
     })
   });
   

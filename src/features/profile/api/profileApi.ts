@@ -13,8 +13,8 @@ import {
   PartialUserProfile 
 } from '../types';
 
-// API endpoints
-const PROFILE_ENDPOINT = '/wp-json/fitcopilot/v1/profile';
+// API endpoints - correctly defined without the base path (apiFetch will add it)
+const PROFILE_ENDPOINT = '/profile';
 
 /**
  * Get the current user's profile
@@ -23,13 +23,9 @@ const PROFILE_ENDPOINT = '/wp-json/fitcopilot/v1/profile';
  */
 export async function getProfile(): Promise<UserProfile> {
   try {
-    const response = await apiFetch<GetProfileResponse>(PROFILE_ENDPOINT);
-    
-    if (!response.success) {
-      throw new Error(response.message || 'Failed to fetch profile');
-    }
-    
-    return response.data;
+    // apiFetch already returns the data portion of the response
+    const profile = await apiFetch<UserProfile>(PROFILE_ENDPOINT);
+    return profile;
   } catch (error) {
     console.error('Profile fetch error:', error);
     throw error;
@@ -44,16 +40,13 @@ export async function getProfile(): Promise<UserProfile> {
  */
 export async function updateProfile(profileData: PartialUserProfile): Promise<UserProfile> {
   try {
-    const response = await apiFetch<UpdateProfileResponse>(PROFILE_ENDPOINT, {
+    // apiFetch already returns the data portion of the response
+    const profile = await apiFetch<UserProfile>(PROFILE_ENDPOINT, {
       method: 'PUT',
       body: JSON.stringify({ profile: profileData }),
     });
     
-    if (!response.success) {
-      throw new Error(response.message || 'Failed to update profile');
-    }
-    
-    return response.data;
+    return profile;
   } catch (error) {
     console.error('Profile update error:', error);
     throw error;
@@ -68,16 +61,13 @@ export async function updateProfile(profileData: PartialUserProfile): Promise<Us
  */
 export async function deleteProfileFields(fields: string[]): Promise<UserProfile> {
   try {
-    const response = await apiFetch<UpdateProfileResponse>(`${PROFILE_ENDPOINT}/fields`, {
+    // apiFetch already returns the data portion of the response
+    const profile = await apiFetch<UserProfile>(`${PROFILE_ENDPOINT}/fields`, {
       method: 'DELETE',
       body: JSON.stringify({ fields }),
     });
     
-    if (!response.success) {
-      throw new Error(response.message || 'Failed to delete profile fields');
-    }
-    
-    return response.data;
+    return profile;
   } catch (error) {
     console.error('Profile field deletion error:', error);
     throw error;

@@ -241,6 +241,9 @@ require_once FITCOPILOT_DIR . 'src/php/API/ProfileEndpoints.php';
 require_once FITCOPILOT_DIR . 'src/php/API/APITracker.php';
 require_once FITCOPILOT_DIR . 'src/php/API/APITrackerEndpoints.php';
 
+// Load API Compatibility endpoints
+require_once FITCOPILOT_DIR . 'src/php/API/CompatibilityEndpoints.php';
+
 // Load admin pages
 require_once FITCOPILOT_DIR . 'src/php/Admin/AdminMenu.php';
 require_once FITCOPILOT_DIR . 'src/php/Admin/APITrackerPage.php';
@@ -248,6 +251,92 @@ require_once FITCOPILOT_DIR . 'src/php/Admin/TokenUsagePage.php';
 
 // Load shortcodes
 require_once FITCOPILOT_DIR . 'includes/shortcodes.php';
+
+// Debug registered REST routes
+function fitcopilot_debug_rest_routes() {
+    global $wp_rest_server;
+    
+    if (!$wp_rest_server) {
+        return;
+    }
+    
+    $routes = $wp_rest_server->get_routes();
+    $fitcopilot_routes = [];
+    
+    foreach ($routes as $route => $route_data) {
+        if (strpos($route, 'fitcopilot/v1') !== false) {
+            $fitcopilot_routes[$route] = [];
+            foreach ($route_data as $endpoint) {
+                $methods = implode(', ', $endpoint['methods']);
+                $callback = is_array($endpoint['callback']) 
+                    ? (is_object($endpoint['callback'][0]) 
+                        ? get_class($endpoint['callback'][0]) . '->' . $endpoint['callback'][1]
+                        : $endpoint['callback'][0] . '::' . $endpoint['callback'][1])
+                    : 'function()';
+                $fitcopilot_routes[$route][] = ['methods' => $methods, 'callback' => $callback];
+            }
+        }
+    }
+    
+    error_log('FitCopilot registered REST routes: ' . print_r($fitcopilot_routes, true));
+}
+add_action('rest_api_init', 'FitCopilot\\fitcopilot_debug_rest_routes', 999);
+
+// Direct debug endpoint
+add_action('rest_api_init', function() {
+    register_rest_route('fitcopilot/v1', '/debug', [
+        'methods' => 'GET',
+        'callback' => function() {
+            return new \WP_REST_Response([
+                'success' => true,
+                'data' => [
+                    'message' => 'Debug endpoint accessible',
+                    'time' => current_time('mysql'),
+                    'plugin_version' => FITCOPILOT_VERSION,
+                ],
+            ]);
+        },
+        'permission_callback' => function() {
+            return true; // Public endpoint for testing
+        },
+    ]);
+    
+    // Emergency generate endpoint
+    register_rest_route('fitcopilot/v1', '/emergency-generate', [
+        'methods' => 'POST',
+        'callback' => function(\WP_REST_Request $request) {
+            $params = $request->get_json_params();
+            
+            // Return a mock response for testing
+            return new \WP_REST_Response([
+                'success' => true,
+                'data' => [
+                    'title' => 'Emergency Test Workout',
+                    'sections' => [
+                        [
+                            'name' => 'Warmup',
+                            'duration' => 5,
+                            'exercises' => [
+                                [
+                                    'name' => 'Jumping Jacks',
+                                    'duration' => '1 minute',
+                                    'description' => 'Stand with feet together, jump while spreading legs and raising arms.'
+                                ]
+                            ]
+                        ]
+                    ],
+                    'post_id' => 999 // Mock post ID
+                ],
+                'message' => 'Emergency workout generated successfully'
+            ]);
+        },
+        'permission_callback' => function() {
+            return true; // Public endpoint for testing
+        },
+    ]);
+    
+    error_log('FitCopilot registered debug endpoints');
+});
 
 /**
  * Enqueue admin dashboard assets

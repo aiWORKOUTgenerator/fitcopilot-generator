@@ -4,6 +4,7 @@ The FitCopilot Workout Generator provides a RESTful API for generating and manag
 
 ## Contents
 
+- [API Design Guidelines](./api-design-guidelines.md) - Standards and best practices for API development
 - [REST API Endpoints](./endpoints.md) - Detailed documentation of all available endpoints
 - [Authentication](./authentication.md) - Information about authentication methods
 - [Error Handling](./error-handling.md) - Standard error responses and codes
@@ -18,6 +19,8 @@ The FitCopilot Workout Generator provides a RESTful API for generating and manag
 | `/fitcopilot/v1/workouts/{id}` | GET | Get a specific workout |
 | `/fitcopilot/v1/workouts/{id}` | PUT | Update a workout |
 | `/fitcopilot/v1/workouts/{id}/complete` | POST | Mark workout as completed |
+| `/fitcopilot/v1/profile` | GET | Get current user's profile |
+| `/fitcopilot/v1/profile` | PUT | Update current user's profile |
 
 ## Integration Examples
 
