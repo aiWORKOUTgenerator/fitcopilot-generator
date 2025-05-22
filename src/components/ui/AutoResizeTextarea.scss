@@ -1,0 +1,83 @@
+/**
+ * Auto-Resize Textarea Component Styles
+ */
+
+.auto-resize-textarea {
+  // Core properties for auto-resizing
+  overflow: hidden !important; // Hide scrollbars during transition
+  resize: none !important; // Disable manual resize since we're auto-resizing
+  
+  // Smooth transition for height changes
+  transition: height 0.15s ease-in-out;
+  
+  // Ensure it doesn't shrink smaller than intended
+  min-height: 4em; // Increased from 2em to allow more content by default
+  
+  // Remove any max-height constraints that might limit expansion
+  max-height: none !important;
+  
+  // Ensure proper text wrapping
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  
+  // Force black text to match workout editor styling
+  color: #000000 !important;
+  
+  // Ensure proper padding remains during resize
+  box-sizing: border-box;
+  
+  // Proper spacing for content
+  padding: 8px 12px;
+  
+  // Override any conflicting styles that might prevent auto-resize
+  &:not([rows]) {
+    height: auto !important;
+  }
+  
+  // Focus styles to indicate interactivity
+  &:focus {
+    // Keep existing focus styles from the base component
+    transition: height 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  // Custom scrollbar for textareas that reach maxRows and need scrolling
+  &[style*="overflow-y: auto"] {
+    // Prettier scrollbar for Webkit/Chrome
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb:hover {
+      background: #a1a1a1;
+    }
+    
+    // Firefox scrollbar
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+  }
+}
+
+// When within workout editor context, add more specific styles
+.workout-editor {
+  .auto-resize-textarea {
+    width: 100%;
+    border-radius: var(--wg-radius-sm);
+    border: 1px solid var(--wg-color-border);
+    
+    // Disable styles when in disabled state
+    &:disabled {
+      resize: none;
+      background-color: #f3f4f6;
+    }
+  }
+} 

@@ -1,0 +1,223 @@
+/**
+ * Exercise List Component
+ * 
+ * Displays and manages the list of exercises in the workout editor
+ * with accessibility improvements and disabled state support.
+ */
+import React, { useEffect } from 'react';
+import { useWorkoutEditor } from './WorkoutEditorContext';
+import { Button } from '../../../../components/ui';
+import { ExpandableInput } from '../../../../components/ui/ExpandableInput';
+import { AutoResizeTextareaWithCounter } from '../../../../components/ui/AutoResizeTextareaWithCounter';
+import { Plus, Trash2, GripVertical } from 'lucide-react';
+import './workoutEditor.scss';
+
+interface ExerciseListProps {
+  /**
+   * Whether the list is disabled (for loading/saving states)
+   */
+  isDisabled?: boolean;
+}
+
+/**
+ * Exercise List component for the workout editor
+ */
+const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
+  const { state, updateExercise, addExercise, removeExercise } = useWorkoutEditor();
+  const { workout } = state;
+
+  // Force immediate textarea height adjustment when exercises change
+  useEffect(() => {
+    if (workout.exercises.length === 0) return;
+    
+    // Use a small delay to ensure DOM is updated
+    const timeoutId = setTimeout(() => {
+      // Find all autosize textareas in exercise items and trigger height adjustment
+      workout.exercises.forEach(exercise => {
+        const textarea = document.getElementById(`exercise-${exercise.id}-notes`) as HTMLTextAreaElement;
+        if (textarea) {
+          // Manually adjust height to show all content
+          textarea.style.height = 'auto';
+          textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+      });
+    }, 50);
+    
+    return () => clearTimeout(timeoutId);
+  }, [workout.exercises]);
+
+  // Add a new exercise
+  const handleAddExercise = () => {
+    addExercise();
+  };
+
+  // Remove an exercise
+  const handleRemoveExercise = (id: string) => {
+    removeExercise(id);
+  };
+
+  // Update exercise field
+  const handleUpdateExercise = (id: string, field: string, value: any) => {
+    updateExercise(id, field, value);
+  };
+
+  // Handle blur event for auto-save on focus change
+  const handleBlur = () => {
+    // In a real implementation, we might want to trigger an auto-save here
+    // This would be connected to a debounced save function
+    // For now, we just mark the state as dirty
+    // dispatch({ type: 'SET_DIRTY', payload: true });
+  };
+
+  return (
+    <div 
+      className="workout-editor__exercise-list"
+      aria-disabled={isDisabled}
+    >
+      {workout.exercises.length === 0 ? (
+        <div 
+          className="workout-editor__empty-state" 
+          aria-live="polite"
+        >
+          <p>No exercises added yet.</p>
+        </div>
+      ) : (
+        workout.exercises.map((exercise, index) => (
+          <div 
+            key={exercise.id} 
+            className="workout-editor__exercise-item"
+            aria-labelledby={`exercise-${exercise.id}-name`}
+          >
+            <div className="workout-editor__exercise-header">
+              <div 
+                className="workout-editor__exercise-drag-handle"
+                aria-hidden="true" // Hide from screen readers as drag functionality is not critical
+              >
+                <GripVertical size={20} />
+              </div>
+              <div className="workout-editor__exercise-number">
+                {index + 1}.
+              </div>
+              <ExpandableInput
+                id={`exercise-${exercise.id}-name`}
+                value={exercise.name}
+                onChange={(e) => handleUpdateExercise(exercise.id, 'name', e.target.value)}
+                onBlur={handleBlur}
+                placeholder="Exercise name"
+                className="workout-editor__exercise-name-input"
+                disabled={isDisabled}
+                aria-label={`Exercise ${index + 1} name`}
+                showTooltip={true}
+              />
+              <button
+                className="workout-editor__exercise-remove"
+                onClick={() => handleRemoveExercise(exercise.id)}
+                aria-label={`Remove ${exercise.name}`}
+                disabled={isDisabled}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+            
+            <div className="workout-editor__exercise-details">
+              <div className="workout-editor__exercise-field">
+                <label htmlFor={`exercise-${exercise.id}-sets`}>Sets</label>
+                <ExpandableInput
+                  id={`exercise-${exercise.id}-sets`}
+                  type="number"
+                  value={exercise.sets.toString()}
+                  onChange={(e) => handleUpdateExercise(
+                    exercise.id, 
+                    'sets', 
+                    parseInt(e.target.value, 10) || 1
+                  )}
+                  onBlur={handleBlur}
+                  min={1}
+                  max={20}
+                  size="sm"
+                  disabled={isDisabled}
+                  aria-label={`Sets for ${exercise.name}`}
+                />
+              </div>
+              
+              <div className="workout-editor__exercise-field">
+                <label htmlFor={`exercise-${exercise.id}-reps`}>Reps</label>
+                <ExpandableInput
+                  id={`exercise-${exercise.id}-reps`}
+                  value={exercise.reps.toString()}
+                  onChange={(e) => handleUpdateExercise(
+                    exercise.id, 
+                    'reps', 
+                    e.target.value
+                  )}
+                  onBlur={handleBlur}
+                  placeholder="e.g. 10 or 8-12"
+                  size="sm"
+                  disabled={isDisabled}
+                  aria-label={`Reps for ${exercise.name}`}
+                />
+              </div>
+              
+              <div className="workout-editor__exercise-field">
+                <label htmlFor={`exercise-${exercise.id}-rest`}>Rest (sec)</label>
+                <ExpandableInput
+                  id={`exercise-${exercise.id}-rest`}
+                  type="number"
+                  value={exercise.restPeriod?.toString() || '60'}
+                  onChange={(e) => handleUpdateExercise(
+                    exercise.id, 
+                    'restPeriod', 
+                    parseInt(e.target.value, 10) || 60
+                  )}
+                  onBlur={handleBlur}
+                  min={0}
+                  max={300}
+                  size="sm"
+                  disabled={isDisabled}
+                  aria-label={`Rest period for ${exercise.name} in seconds`}
+                />
+              </div>
+            </div>
+            
+            <div className="workout-editor__exercise-notes">
+              <label htmlFor={`exercise-${exercise.id}-notes`}>Notes</label>
+              <AutoResizeTextareaWithCounter
+                id={`exercise-${exercise.id}-notes`}
+                value={exercise.notes || ''}
+                onChange={(e) => handleUpdateExercise(
+                  exercise.id, 
+                  'notes', 
+                  e.target.value
+                )}
+                onBlur={handleBlur}
+                placeholder="Notes for this exercise"
+                disabled={isDisabled}
+                aria-label={`Notes for ${exercise.name}`}
+                minRows={4}
+                maxRows={15}
+                maxCharacters={500}
+                showWarning={true}
+                expandOnMount={true}
+              />
+            </div>
+          </div>
+        ))
+      )}
+      
+      <div className="workout-editor__add-exercise">
+        <Button
+          variant="secondary"
+          size="md"
+          onClick={handleAddExercise}
+          startIcon={<Plus size={18} />}
+          disabled={isDisabled}
+          aria-label="Add a new exercise to the workout"
+        >
+          Add Exercise
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default ExerciseList; 

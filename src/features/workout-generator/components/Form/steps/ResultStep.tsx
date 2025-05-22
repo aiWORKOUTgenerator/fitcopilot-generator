@@ -4,13 +4,16 @@
  * Displays the final generated workout and provides options for saving, sharing,
  * or generating a new workout.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
 import { GeneratedWorkout } from '../../../types/workout';
 import WorkoutCard from '../../WorkoutDisplay/WorkoutCard';
 import ErrorBoundary from '../../common/ErrorBoundary';
+import { saveWorkout } from '../../../services/workoutEditorService';
+import { convertToEditorFormat } from '../../../types/editor';
 import { RefreshCw, Eye, PlusCircle } from 'lucide-react';
+import { useNavigation } from '../../../navigation/NavigationContext';
 import '../form.scss';
 
 interface ResultStepProps {
@@ -33,23 +36,26 @@ export const ResultStep: React.FC<ResultStepProps> = ({
   error,
   onGenerateNew,
 }) => {
+  // Use navigation context to control the editor
+  const { openEditor } = useNavigation();
+  
+  // State to track saving process
+  const [isSaving, setIsSaving] = useState(false);
+  // State to store any error that occurs during saving
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   /**
    * Handle viewing the full workout details
    */
   const handleViewFullWorkout = () => {
-    // This could open a modal, expand the card, or navigate to a detailed view
-    console.log('View full workout', workout);
-  };
-
-  /**
-   * Handle saving the workout
-   */
-  const handleSaveWorkout = () => {
     if (!workout) return;
     
-    // Implement save functionality here
-    // This would typically call an API to save the workout to the user's account
-    alert('Workout saved successfully!');
+    // Reset any previous errors
+    setSaveError(null);
+    
+    // Open the workout editor using navigation context
+    const workoutId = postId ? String(postId) : 'new';
+    openEditor(workoutId, { referrer: 'generator' });
   };
 
   /**
@@ -128,6 +134,12 @@ export const ResultStep: React.FC<ResultStepProps> = ({
           <WorkoutCard workout={workout} />
         </div>
         
+        {saveError && (
+          <div className="result-step__save-error">
+            <p>{saveError}</p>
+          </div>
+        )}
+        
         <div className="result-step__actions">
           <Button 
             variant="gradient"
@@ -135,6 +147,7 @@ export const ResultStep: React.FC<ResultStepProps> = ({
             onClick={handleViewFullWorkout}
             aria-label="View full workout details"
             startIcon={<Eye size={18} />}
+            disabled={isSaving}
           >
             View Full Workout
           </Button>
@@ -145,6 +158,7 @@ export const ResultStep: React.FC<ResultStepProps> = ({
             onClick={onGenerateNew}
             aria-label="Generate another workout"
             startIcon={<PlusCircle size={18} />}
+            disabled={isSaving}
           >
             Generate Another Workout
           </Button>

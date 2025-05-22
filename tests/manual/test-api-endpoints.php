@@ -141,122 +141,307 @@ header('Content-Type: text/html; charset=utf-8');
         th {
             background-color: #f2f2f2;
         }
+        /* Tab styles */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+            cursor: pointer;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        .tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>API Standardization Testing Tool</h1>
-        <p>This tool tests the standardized API endpoints implemented in Phase 2 of the API Standardization Initiative.</p>
+        <h1>FitCopilot API Testing Tool</h1>
         
-        <div class="card">
-            <h2>Authentication Status</h2>
-            <?php if (is_user_logged_in()): ?>
-                <p class="success">You are logged in as: <?php echo wp_get_current_user()->user_login; ?></p>
-            <?php else: ?>
-                <p class="error">You are not logged in. Tests may fail due to authentication issues.</p>
-            <?php endif; ?>
+        <div class="tabs">
+            <div class="tab active" onclick="openTab(event, 'api-standardization')">API Standardization Testing</div>
+            <div class="tab" onclick="openTab(event, 'version-history')">Version History Testing</div>
         </div>
         
-        <div class="card">
-            <h2>Test Results Summary</h2>
-            <table id="results-table">
-                <thead>
-                    <tr>
-                        <th>Endpoint</th>
-                        <th>Format</th>
-                        <th>Result</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>POST /generate</td>
-                        <td>Direct</td>
-                        <td id="generate-direct-status">Not tested</td>
-                        <td><button onclick="runTest('generate-direct')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>POST /generate</td>
-                        <td>Wrapped</td>
-                        <td id="generate-wrapped-status">Not tested</td>
-                        <td><button onclick="runTest('generate-wrapped')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>GET /workouts</td>
-                        <td>-</td>
-                        <td id="get-workouts-status">Not tested</td>
-                        <td><button onclick="runTest('get-workouts')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>GET /workouts (pagination)</td>
-                        <td>per_page=3, page=2</td>
-                        <td id="get-workouts-pagination-status">Not tested</td>
-                        <td><button onclick="runTest('get-workouts-pagination')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>GET /workouts/{id}</td>
-                        <td>-</td>
-                        <td id="get-workout-status">Not tested</td>
-                        <td><button onclick="runTest('get-workout')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>PUT /workouts/{id}</td>
-                        <td>Direct</td>
-                        <td id="update-workout-direct-status">Not tested</td>
-                        <td><button onclick="runTest('update-workout-direct')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>PUT /workouts/{id}</td>
-                        <td>Wrapped</td>
-                        <td id="update-workout-wrapped-status">Not tested</td>
-                        <td><button onclick="runTest('update-workout-wrapped')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>POST /workouts/{id}/complete</td>
-                        <td>Direct</td>
-                        <td id="complete-workout-direct-status">Not tested</td>
-                        <td><button onclick="runTest('complete-workout-direct')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>POST /workouts/{id}/complete</td>
-                        <td>Wrapped</td>
-                        <td id="complete-workout-wrapped-status">Not tested</td>
-                        <td><button onclick="runTest('complete-workout-wrapped')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>GET /profile</td>
-                        <td>-</td>
-                        <td id="get-profile-status">Not tested</td>
-                        <td><button onclick="runTest('get-profile')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>PUT /profile</td>
-                        <td>Direct</td>
-                        <td id="update-profile-direct-status">Not tested</td>
-                        <td><button onclick="runTest('update-profile-direct')">Test</button></td>
-                    </tr>
-                    <tr>
-                        <td>PUT /profile</td>
-                        <td>Wrapped</td>
-                        <td id="update-profile-wrapped-status">Not tested</td>
-                        <td><button onclick="runTest('update-profile-wrapped')">Test</button></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div id="api-standardization" class="tab-content active">
+            <p>This tool tests the standardized API endpoints implemented in Phase 2 of the API Standardization Initiative.</p>
             
-            <div class="controls">
-                <button onclick="runAllTests()">Run All Tests</button>
-                <button onclick="window.location.reload()">Reset</button>
+            <div class="card">
+                <h2>Authentication Status</h2>
+                <?php if (is_user_logged_in()): ?>
+                    <p class="success">You are logged in as: <?php echo wp_get_current_user()->user_login; ?></p>
+                <?php else: ?>
+                    <p class="error">You are not logged in. Tests may fail due to authentication issues.</p>
+                <?php endif; ?>
+            </div>
+            
+            <div class="card">
+                <h2>Test Results Summary</h2>
+                <table id="results-table">
+                    <thead>
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Format</th>
+                            <th>Result</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>POST /generate</td>
+                            <td>Direct</td>
+                            <td id="generate-direct-status">Not tested</td>
+                            <td><button onclick="runTest('generate-direct')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>POST /generate</td>
+                            <td>Wrapped</td>
+                            <td id="generate-wrapped-status">Not tested</td>
+                            <td><button onclick="runTest('generate-wrapped')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /workouts</td>
+                            <td>-</td>
+                            <td id="get-workouts-status">Not tested</td>
+                            <td><button onclick="runTest('get-workouts')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /workouts (pagination)</td>
+                            <td>per_page=3, page=2</td>
+                            <td id="get-workouts-pagination-status">Not tested</td>
+                            <td><button onclick="runTest('get-workouts-pagination')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /workouts/{id}</td>
+                            <td>-</td>
+                            <td id="get-workout-status">Not tested</td>
+                            <td><button onclick="runTest('get-workout')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>PUT /workouts/{id}</td>
+                            <td>Direct</td>
+                            <td id="update-workout-direct-status">Not tested</td>
+                            <td><button onclick="runTest('update-workout-direct')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>PUT /workouts/{id}</td>
+                            <td>Wrapped</td>
+                            <td id="update-workout-wrapped-status">Not tested</td>
+                            <td><button onclick="runTest('update-workout-wrapped')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>POST /workouts/{id}/complete</td>
+                            <td>Direct</td>
+                            <td id="complete-workout-direct-status">Not tested</td>
+                            <td><button onclick="runTest('complete-workout-direct')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>POST /workouts/{id}/complete</td>
+                            <td>Wrapped</td>
+                            <td id="complete-workout-wrapped-status">Not tested</td>
+                            <td><button onclick="runTest('complete-workout-wrapped')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /profile</td>
+                            <td>-</td>
+                            <td id="get-profile-status">Not tested</td>
+                            <td><button onclick="runTest('get-profile')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>PUT /profile</td>
+                            <td>Direct</td>
+                            <td id="update-profile-direct-status">Not tested</td>
+                            <td><button onclick="runTest('update-profile-direct')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>PUT /profile</td>
+                            <td>Wrapped</td>
+                            <td id="update-profile-wrapped-status">Not tested</td>
+                            <td><button onclick="runTest('update-profile-wrapped')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /workouts/{id}/versions</td>
+                            <td>-</td>
+                            <td id="get-workout-versions-status">Not tested</td>
+                            <td><button onclick="runTest('get-workout-versions')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /workouts/{id}/versions (filtered)</td>
+                            <td>from_version=1&to_version=3</td>
+                            <td id="get-workout-versions-filtered-status">Not tested</td>
+                            <td><button onclick="runTest('get-workout-versions-filtered')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /workouts/{id}/versions (date filtered)</td>
+                            <td>Last 30 days</td>
+                            <td id="get-workout-versions-date-filtered-status">Not tested</td>
+                            <td><button onclick="runTest('get-workout-versions-date-filtered')">Test</button></td>
+                        </tr>
+                        <tr>
+                            <td>GET /workouts/{id}/versions (pagination)</td>
+                            <td>per_page=2&page=1</td>
+                            <td id="get-workout-versions-pagination-status">Not tested</td>
+                            <td><button onclick="runTest('get-workout-versions-pagination')">Test</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="controls">
+                    <button onclick="runAllTests()">Run All Tests</button>
+                    <button onclick="window.location.reload()">Reset</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Test Results Detail</h2>
+                <div id="test-results"></div>
             </div>
         </div>
         
-        <div class="card">
-            <h2>Test Results Detail</h2>
-            <div id="test-results"></div>
+        <!-- Version History Testing Tab -->
+        <div id="version-history" class="tab-content">
+            <p>This tool tests the Version History Endpoint implementation from the Versioning Initiative.</p>
+            
+            <div class="card">
+                <h2>Version History Endpoint Test</h2>
+                <div id="version-history-tests">
+                    <?php 
+                    if (function_exists('is_user_logged_in') && is_user_logged_in()) {
+                        
+                        // Test 1: Check if endpoint class exists
+                        echo "<h3>Test 1: Check if VersionHistoryEndpoint class exists</h3>";
+                        $class_exists = class_exists('FitCopilot\\API\\WorkoutEndpoints\\VersionHistoryEndpoint');
+                        echo "<p>VersionHistoryEndpoint class exists: <span class='" . ($class_exists ? "success" : "error") . "'>" . 
+                            ($class_exists ? 'Yes' : 'No') . "</span></p>";
+                        
+                        // Test 2: Check if endpoint is registered in controller
+                        echo "<h3>Test 2: Check if endpoint is registered in WorkoutEndpointsController</h3>";
+                        $has_endpoint = false;
+                        if (class_exists('FitCopilot\\API\\WorkoutEndpoints\\WorkoutEndpointsController')) {
+                            $controller = new FitCopilot\API\WorkoutEndpoints\WorkoutEndpointsController();
+                            if (method_exists($controller, 'get_endpoints')) {
+                                $endpoints = $controller->get_endpoints();
+                                $has_endpoint = isset($endpoints['VersionHistoryEndpoint']);
+                            }
+                        }
+                        echo "<p>VersionHistoryEndpoint registered in controller: <span class='" . ($has_endpoint ? "success" : "error") . "'>" . 
+                            ($has_endpoint ? 'Yes' : 'No') . "</span></p>";
+                        
+                        // Test 3: Check REST API registration
+                        echo "<h3>Test 3: Check REST API registration</h3>";
+                        $has_route = false;
+                        if (function_exists('rest_get_server')) {
+                            $routes = rest_get_server()->get_routes();
+                            foreach ($routes as $route => $handlers) {
+                                if (strpos($route, 'fitcopilot/v1/workouts/(?P<id>\d+)/versions') !== false) {
+                                    $has_route = true;
+                                    break;
+                                }
+                            }
+                        }
+                        echo "<p>REST API route for version history exists: <span class='" . ($has_route ? "success" : "error") . "'>" . 
+                            ($has_route ? 'Yes' : 'No') . "</span></p>";
+                        
+                        // Test 4: Test VersioningService method existence
+                        echo "<h3>Test 4: Check VersioningService method</h3>";
+                        $method_exists = false;
+                        if (class_exists('FitCopilot\\Service\\Versioning\\VersioningService')) {
+                            $versioning_service = new FitCopilot\Service\Versioning\VersioningService();
+                            $method_exists = method_exists($versioning_service, 'get_workout_version_history');
+                        }
+                        echo "<p>get_workout_version_history method exists: <span class='" . ($method_exists ? "success" : "error") . "'>" . 
+                            ($method_exists ? 'Yes' : 'No') . "</span></p>";
+                        
+                        // Overall result
+                        echo "<h3>Overall Result</h3>";
+                        $overall = $class_exists && $has_endpoint && $has_route && $method_exists;
+                        echo "<p>All tests passed: <span class='" . ($overall ? "success" : "error") . "'>" . 
+                            ($overall ? 'Yes' : 'No') . "</span></p>";
+                    } else {
+                        echo "<p class='error'>You need to be logged in to run these tests.</p>";
+                    }
+                    ?>
+                </div>
+                
+                <div class="card">
+                    <h3>Manual API Testing</h3>
+                    <p>Test the Version History Endpoint with a specific workout:</p>
+                    <div>
+                        <label for="workout-id">Workout ID:</label>
+                        <input type="text" id="workout-id" placeholder="Enter workout ID">
+                        <button onclick="testVersionHistory()">Test Version History</button>
+                    </div>
+                    <div id="version-history-result" class="response" style="margin-top: 15px; display: none;"></div>
+                </div>
+            </div>
         </div>
     </div>
     
     <script>
+        // Tab switching functionality
+        function openTab(evt, tabName) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            // Show the selected tab content and mark tab as active
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Manual test for Version History endpoint
+        function testVersionHistory() {
+            const workoutId = document.getElementById('workout-id').value;
+            if (!workoutId) {
+                alert('Please enter a workout ID');
+                return;
+            }
+            
+            const resultElement = document.getElementById('version-history-result');
+            resultElement.style.display = 'block';
+            resultElement.innerHTML = 'Loading...';
+            
+            fetch(`${baseUrl}/workouts/${workoutId}/versions`, {
+                method: 'GET',
+                headers: {
+                    'X-WP-Nonce': wpRestNonce
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultElement.innerHTML = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                resultElement.innerHTML = `Error: ${error.message}`;
+            });
+        }
+        
         // Store workout IDs for testing
         let directWorkoutId = null;
         let wrappedWorkoutId = null;
@@ -314,6 +499,18 @@ header('Content-Type: text/html; charset=utf-8');
                     case 'update-profile-wrapped':
                         result = await testUpdateProfileWrapped();
                         break;
+                    case 'get-workout-versions':
+                        result = await testGetWorkoutVersions();
+                        break;
+                    case 'get-workout-versions-filtered':
+                        result = await testGetWorkoutVersionsFiltered();
+                        break;
+                    case 'get-workout-versions-date-filtered':
+                        result = await testGetWorkoutVersionsDateFiltered();
+                        break;
+                    case 'get-workout-versions-pagination':
+                        result = await testGetWorkoutVersionsPagination();
+                        break;
                 }
                 
                 if (result.success) {
@@ -347,7 +544,11 @@ header('Content-Type: text/html; charset=utf-8');
                 'complete-workout-wrapped',
                 'get-profile',
                 'update-profile-direct',
-                'update-profile-wrapped'
+                'update-profile-wrapped',
+                'get-workout-versions',
+                'get-workout-versions-filtered',
+                'get-workout-versions-date-filtered',
+                'get-workout-versions-pagination'
             ];
             
             for (const test of testOrder) {
@@ -839,6 +1040,142 @@ header('Content-Type: text/html; charset=utf-8');
                     Array.isArray(data.data.workouts) && 
                     data.data.currentPage === 2 && 
                     data.data.workouts.length <= 3) { // Should be 3 or fewer items
+                    return { success: true, response: data };
+                } else {
+                    return { success: false, response: data };
+                }
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetWorkoutVersions() {
+            try {
+                if (!directWorkoutId) {
+                    return { 
+                        success: false, 
+                        error: 'No workout ID available. Please run generate workout test first.', 
+                        response: null 
+                    };
+                }
+                
+                const response = await fetch(`${baseUrl}/workouts/${directWorkoutId}/versions`, {
+                    method: 'GET',
+                    headers: {
+                        'X-WP-Nonce': wpRestNonce
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data && Array.isArray(data.data.versions)) {
+                    return { success: true, response: data };
+                } else {
+                    return { success: false, response: data };
+                }
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetWorkoutVersionsFiltered() {
+            try {
+                if (!directWorkoutId) {
+                    return { 
+                        success: false, 
+                        error: 'No workout ID available. Please run generate workout test first.', 
+                        response: null 
+                    };
+                }
+                
+                const response = await fetch(`${baseUrl}/workouts/${directWorkoutId}/versions?from_version=1&to_version=3`, {
+                    method: 'GET',
+                    headers: {
+                        'X-WP-Nonce': wpRestNonce
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data && Array.isArray(data.data.versions)) {
+                    return { success: true, response: data };
+                } else {
+                    return { success: false, response: data };
+                }
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetWorkoutVersionsDateFiltered() {
+            try {
+                if (!directWorkoutId) {
+                    return { 
+                        success: false, 
+                        error: 'No workout ID available. Please run generate workout test first.', 
+                        response: null 
+                    };
+                }
+                
+                // Get dates for last 30 days
+                const today = new Date();
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+                
+                // Format dates as YYYY-MM-DD
+                const fromDate = thirtyDaysAgo.toISOString().split('T')[0];
+                const toDate = today.toISOString().split('T')[0];
+                
+                const response = await fetch(`${baseUrl}/workouts/${directWorkoutId}/versions?from_date=${fromDate}&to_date=${toDate}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-WP-Nonce': wpRestNonce
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data && Array.isArray(data.data.versions)) {
+                    return { success: true, response: data };
+                } else {
+                    return { success: false, response: data };
+                }
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Test the workouts endpoint with pagination parameters
+        async function testGetWorkoutVersionsPagination() {
+            try {
+                if (!directWorkoutId) {
+                    return { 
+                        success: false, 
+                        error: 'No workout ID available. Please run generate workout test first.', 
+                        response: null 
+                    };
+                }
+                
+                // Test with per_page=2 and page=1
+                const response = await fetch(`${baseUrl}/workouts/${directWorkoutId}/versions?per_page=2&page=1`, {
+                    method: 'GET',
+                    headers: {
+                        'X-WP-Nonce': wpRestNonce
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                // Verify pagination parameters were applied correctly
+                if (data.success && 
+                    data.data && 
+                    Array.isArray(data.data.versions) && 
+                    data.data.currentPage === 1 && 
+                    data.data.versions.length <= 2) { // Should be 2 or fewer items
                     return { success: true, response: data };
                 } else {
                     return { success: false, response: data };

@@ -121,7 +121,7 @@ class OpenAIProvider {
                 'Content-Type' => 'application/json',
             ],
             'body' => json_encode([
-                'model' => 'gpt-4-turbo',
+                'model' => 'gpt-4.1',
                 'messages' => [
                     [
                         'role' => 'system',

@@ -1,0 +1,54 @@
+/**
+ * Auto-Resize Textarea with Character Counter Styles
+ */
+.textarea-with-counter {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  
+  &__textarea {
+    width: 100%;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    // Ensure bottom margin doesn't interfere with counter
+    margin-bottom: 0;
+    
+    // Make sure focus doesn't override the bottom margin
+    &:focus {
+      margin-bottom: 0;
+    }
+  }
+  
+  &__counter {
+    margin-top: 4px;
+    align-self: flex-end;
+    
+    // Ensure counter doesn't affect textarea position
+    margin-bottom: 0;
+  }
+}
+
+// When used within workout editor
+.workout-editor {
+  .textarea-with-counter {
+    &__counter {
+      font-size: var(--wg-font-size-xs);
+      color: var(--wg-color-text-light);
+    }
+  }
+  
+  // Specialized handling for exercise notes
+  &__exercise-notes {
+    .textarea-with-counter {
+      margin-bottom: 0;
+      
+      &__textarea {
+        background-color: var(--wg-color-background);
+      }
+      
+      &__counter {
+        margin-top: 2px;
+      }
+    }
+  }
+} 

@@ -20,6 +20,12 @@
  * This file exports specific components, hooks, and types to avoid naming collisions
  */
 
+// Import the UI component styles
+import '../../components/ui/AutoResizeTextarea.scss';
+import '../../components/ui/ExpandableInput.scss';
+import '../../components/ui/CharacterCounter.scss';
+import '../../components/ui/AutoResizeTextareaWithCounter.scss';
+
 // Export the main feature component
 export { default } from './WorkoutGeneratorFeature';
 

@@ -9,6 +9,8 @@ import { WorkoutGeneratorProvider, FormFlowProvider } from './context';
 import { WorkoutRequestForm } from './components/Form';
 import { ErrorBoundary, DebugControls, TipsCard } from './components/common';
 import { SubscriptionModalWrapper, ProfileSetupPrompt } from './components/Modals';
+import { NavigationProvider } from './navigation/NavigationContext';
+import WorkoutEditorContainer from './containers/WorkoutEditorContainer';
 
 // Import theme initialization
 import './utils/themeInit';
@@ -24,6 +26,7 @@ import './styles/workout-generator.scss';
  * 
  * Provider hierarchy:
  * - ErrorBoundary: Catches any uncaught errors in the feature
+ * - NavigationProvider: Manages navigation state and URL handling
  * - WorkoutGeneratorProvider: Manages core workout state and API integration
  * - WorkoutRequestForm: Contains its own FormFlowProvider for form flow management
  * 
@@ -46,29 +49,34 @@ export const WorkoutGeneratorFeature: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <WorkoutGeneratorProvider>
-        <div className="workout-generator-feature">
-          <h3 className="workout-generator-feature__subtitle">
-            Generate personalized workout plans based on your goals, experience level, and available equipment.
-          </h3>
-          
-          <DebugControls />
-          <WorkoutRequestForm />
-          <TipsCard />
+      <NavigationProvider>
+        <WorkoutGeneratorProvider>
+          <div className="workout-generator-feature">
+            <h3 className="workout-generator-feature__subtitle">
+              Generate personalized workout plans based on your goals, experience level, and available equipment.
+            </h3>
+            
+            <DebugControls />
+            <WorkoutRequestForm />
+            <TipsCard />
 
-          <SubscriptionModalWrapper
-            isOpen={isSubscriptionOpen}
-            onClose={() => setSubscriptionOpen(false)}
-            onSuccess={() => {/* retry generation logic */}}
-          />
+            <SubscriptionModalWrapper
+              isOpen={isSubscriptionOpen}
+              onClose={() => setSubscriptionOpen(false)}
+              onSuccess={() => {/* retry generation logic */}}
+            />
 
-          <ProfileSetupPrompt
-            isOpen={isProfilePromptOpen}
-            onClose={() => setProfilePromptOpen(false)}
-            onComplete={() => {/* re-check profile & proceed */}}
-          />
-        </div>
-      </WorkoutGeneratorProvider>
+            <ProfileSetupPrompt
+              isOpen={isProfilePromptOpen}
+              onClose={() => setProfilePromptOpen(false)}
+              onComplete={() => {/* re-check profile & proceed */}}
+            />
+            
+            {/* Workout Editor Container - handles modal or full page display */}
+            <WorkoutEditorContainer />
+          </div>
+        </WorkoutGeneratorProvider>
+      </NavigationProvider>
     </ErrorBoundary>
   );
 };

@@ -16,12 +16,17 @@ if (!defined('ABSPATH')) {
 // Register Custom Post Type for workouts
 require_once FITCOPILOT_DIR . 'src/php/Domain/WorkoutPostType.php';
 
+// Register Database components
+require_once FITCOPILOT_DIR . 'src/php/Database/VersioningSchema.php';
+require_once FITCOPILOT_DIR . 'src/php/Database/VersioningMigration.php';
+
 // Register REST API endpoints
 require_once FITCOPILOT_DIR . 'src/php/REST/RestController.php';
 require_once FITCOPILOT_DIR . 'src/php/REST/AnalyticsController.php';
 
 // Register Service components
 require_once FITCOPILOT_DIR . 'src/php/Service/AI/OpenAIProvider.php';
+require_once FITCOPILOT_DIR . 'src/php/Service/Versioning/VersioningService.php';
 
 // Register Analytics components
 require_once FITCOPILOT_DIR . 'src/php/Analytics/EventTracking.php';
@@ -232,7 +237,18 @@ function render_generator_shortcode() {
 
 // Load API endpoints
 require_once FITCOPILOT_DIR . 'src/php/API/APIUtils.php';
-require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints.php';
+// Modular architecture for workout endpoints
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/AbstractEndpoint.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/Utilities.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutEndpointsController.php';
+// Load implemented endpoints
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/GenerateEndpoint.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutRetrievalEndpoint.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutUpdateEndpoint.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutCompletionEndpoint.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/DebugEndpoints.php';
+// Initialize the controller
+$workoutEndpointsController = new \FitCopilot\API\WorkoutEndpoints\WorkoutEndpointsController();
 
 // Load Profile endpoints
 require_once FITCOPILOT_DIR . 'src/php/API/ProfileEndpoints.php';

@@ -502,6 +502,20 @@
     padding: 3rem 1rem;
   }
   
+  &__save-error {
+    background-color: var(--color-error-light);
+    border: 1px solid var(--color-error);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+    
+    p {
+      color: var(--color-error);
+      margin: 0;
+      font-weight: var(--font-weight-medium);
+    }
+  }
+  
   .dark-theme & {
     color: var(--color-dark-text);
   }

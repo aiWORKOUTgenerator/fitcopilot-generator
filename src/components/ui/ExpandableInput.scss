@@ -1,0 +1,70 @@
+/**
+ * Expandable Input Component Styles
+ */
+
+.expandable-input-wrapper {
+  position: relative;
+  width: 100%;
+  
+  // Prevent the expandable input from disrupting layout
+  &:focus-within {
+    z-index: 10; // Ensure expanded input appears above other elements
+  }
+}
+
+.expandable-input {
+  // Base styling
+  width: 100%;
+  transition: max-width 0.2s ease-out;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  // Ensure text color is black to match workout editor
+  color: #000000 !important;
+  
+  // Add visual indicator for overflowing text
+  &--overflowing {
+    &:not(:focus) {
+      // Show ellipsis when text overflows and input is not focused
+      white-space: nowrap;
+      
+      // Subtle indicator that there's more text
+      background-image: linear-gradient(to right, transparent 85%, rgba(0, 0, 0, 0.05) 100%);
+    }
+  }
+  
+  // Expanded state
+  &--expanded {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    min-width: 100%; // At least as wide as container
+  }
+  
+  // Focus state should always show full content
+  &:focus {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+// When used within workout editor
+.workout-editor {
+  .expandable-input {
+    border-radius: var(--wg-radius-sm);
+    border: 1px solid var(--wg-color-border);
+    
+    &:focus {
+      border-color: var(--wg-color-primary);
+      outline: 2px solid var(--wg-color-primary-light);
+      outline-offset: 1px;
+    }
+    
+    &:disabled {
+      background-color: #f3f4f6;
+      cursor: not-allowed;
+    }
+  }
+} 

@@ -1,0 +1,92 @@
+/**
+ * Character Counter Component Styles
+ */
+.character-counter {
+  font-size: 0.75rem;
+  text-align: right;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+  
+  &__text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  
+  &__current, &__max, &__separator, &__label {
+    transition: color 0.2s ease;
+  }
+  
+  &__label {
+    color: #64748b; // Light text color for the label
+  }
+  
+  &--normal {
+    color: #64748b; // Default state - light text
+    
+    .character-counter__current, 
+    .character-counter__max, 
+    .character-counter__separator {
+      color: #64748b;
+    }
+  }
+  
+  &--warning {
+    color: #f59e0b; // Warning state - amber/orange color
+    
+    .character-counter__current, 
+    .character-counter__separator {
+      color: #f59e0b;
+      font-weight: 500;
+    }
+    
+    .character-counter__max {
+      color: #64748b;
+    }
+  }
+  
+  &--exceeded {
+    color: #ef4444; // Exceeded state - red color
+    
+    .character-counter__current, 
+    .character-counter__separator {
+      color: #ef4444;
+      font-weight: 600;
+    }
+    
+    .character-counter__max {
+      color: #64748b;
+    }
+  }
+}
+
+// When used within workout editor
+.workout-editor {
+  .character-counter {
+    &--normal {
+      .character-counter__current, 
+      .character-counter__max, 
+      .character-counter__separator {
+        color: var(--wg-color-text-light, #64748b);
+      }
+      
+      .character-counter__label {
+        color: var(--wg-color-text-light, #64748b);
+      }
+    }
+    
+    &--warning {
+      .character-counter__current,
+      .character-counter__separator {
+        color: var(--wg-color-warning, #f59e0b);
+      }
+    }
+    
+    &--exceeded {
+      .character-counter__current,
+      .character-counter__separator {
+        color: var(--wg-color-danger, #ef4444);
+      }
+    }
+  }
+} 

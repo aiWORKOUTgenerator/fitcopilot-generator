@@ -45,7 +45,19 @@ export interface WorkoutSection {
  * Generated workout structure
  */
 export interface GeneratedWorkout {
+  /**
+   * Optional ID when the workout is saved
+   */
+  id?: string | number;
+  
+  /**
+   * Workout title
+   */
   title: string;
+  
+  /**
+   * Workout sections (warm-up, main workout, cool-down)
+   */
   sections: WorkoutSection[];
 }
 

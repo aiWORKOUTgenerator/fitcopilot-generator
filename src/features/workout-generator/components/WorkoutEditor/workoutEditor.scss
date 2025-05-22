@@ -1,0 +1,641 @@
+/**
+ * Workout Editor Styles
+ * 
+ * Implements the design system for the workout editor components
+ */
+
+// Design System Variables
+:root {
+  // Spacing
+  --wg-spacing-xs: 4px;
+  --wg-spacing-sm: 8px;
+  --wg-spacing-md: 16px;
+  --wg-spacing-lg: 24px;
+  --wg-spacing-xl: 32px;
+  
+  // Colors - using existing app color scheme
+  --wg-color-primary: var(--fc-color-primary, #3b82f6);
+  --wg-color-primary-light: var(--fc-color-primary-light, #93c5fd);
+  --wg-color-secondary: var(--fc-color-secondary, #64748b);
+  --wg-color-success: var(--fc-color-success, #10b981);
+  --wg-color-danger: var(--fc-color-danger, #ef4444);
+  --wg-color-warning: var(--fc-color-warning, #f59e0b);
+  --wg-color-text: var(--fc-color-text, #1e293b);
+  --wg-color-text-light: var(--fc-color-text-light, #64748b);
+  --wg-color-background: var(--fc-color-background, #ffffff);
+  --wg-color-border: var(--fc-color-border, #e2e8f0);
+  
+  // Shadows
+  --wg-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --wg-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --wg-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  // Border radius
+  --wg-radius-sm: 4px;
+  --wg-radius-md: 8px;
+  --wg-radius-lg: 12px;
+  
+  // Font sizes
+  --wg-font-size-xs: 0.75rem;
+  --wg-font-size-sm: 0.875rem;
+  --wg-font-size-md: 1rem;
+  --wg-font-size-lg: 1.125rem;
+  --wg-font-size-xl: 1.25rem;
+  --wg-font-size-2xl: 1.5rem;
+  
+  // Transitions
+  --wg-transition-fast: 100ms ease-in-out;
+  --wg-transition-normal: 150ms ease-in-out;
+  --wg-transition-slow: 300ms ease-in-out;
+}
+
+// Modal Overlay
+.workout-editor-modal {
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--wg-spacing-md);
+    animation: fadeIn var(--wg-transition-normal);
+    
+    @media (max-width: 480px) {
+      padding: 0;
+    }
+  }
+  
+  &__content {
+    background-color: var(--wg-color-background);
+    border-radius: var(--wg-radius-lg);
+    box-shadow: var(--wg-shadow-lg);
+    width: 80%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: scaleUp var(--wg-transition-normal);
+    outline: none; // Remove focus outline since we'll control focus
+    overflow: hidden; // Hide overflow to prevent content from spilling out
+    color: #000000; // Explicitly set text color to black
+    
+    @media (max-width: 768px) {
+      width: 90%;
+      max-width: 600px;
+    }
+    
+    @media (max-width: 480px) {
+      width: 100%;
+      height: 100%;
+      max-height: 100vh;
+      max-width: 100%;
+      border-radius: 0;
+    }
+  }
+}
+
+// Main Editor Container
+.workout-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 90vh; // Match container's max height
+  color: #000000; // Explicitly set text color to black
+  
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: var(--wg-spacing-md);
+    border-bottom: 1px solid var(--wg-color-border);
+    position: relative;
+    flex-shrink: 0; // Prevent header from shrinking
+  }
+  
+  &__close-button {
+    background: none;
+    border: none;
+    color: var(--wg-color-secondary);
+    cursor: pointer;
+    padding: var(--wg-spacing-xs);
+    border-radius: var(--wg-radius-sm);
+    margin-right: var(--wg-spacing-md);
+    
+    &:hover {
+      background-color: var(--wg-color-border);
+      color: var(--wg-color-text);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  &__title {
+    margin: 0;
+    font-size: var(--wg-font-size-xl);
+    font-weight: 600;
+    flex-grow: 1;
+    color: #000000; // Explicitly set title color to black
+  }
+  
+  &__loading {
+    display: flex;
+    align-items: center;
+    font-size: var(--wg-font-size-sm);
+    color: var(--wg-color-secondary);
+    
+    &-icon {
+      margin-right: var(--wg-spacing-xs);
+      animation: spin 1s linear infinite;
+    }
+  }
+  
+  &__content {
+    flex: 1 1 auto; // Allow content to grow and shrink
+    overflow-y: auto; // Add scrolling to content area
+    padding: var(--wg-spacing-lg);
+    
+    @media (max-width: 480px) {
+      padding: var(--wg-spacing-md);
+    }
+  }
+  
+  &__section {
+    margin-bottom: var(--wg-spacing-xl);
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  &__section-title {
+    font-size: var(--wg-font-size-lg);
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: var(--wg-spacing-md);
+    color: #000000; // Explicitly set section title color to black
+  }
+  
+  &__label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--wg-spacing-xs);
+    color: #000000; // Explicitly set label color to black
+  }
+  
+  &__error {
+    color: var(--wg-color-danger);
+    font-size: var(--wg-font-size-sm);
+    margin-top: var(--wg-spacing-xs);
+  }
+  
+  &__metadata {
+    margin-bottom: var(--wg-spacing-lg);
+  }
+  
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 calc(var(--wg-spacing-md) * -0.5);
+    
+    @media (max-width: 480px) {
+      flex-direction: column;
+    }
+  }
+  
+  &__column {
+    flex: 1;
+    padding: 0 calc(var(--wg-spacing-md) * 0.5);
+    min-width: 0; // Prevent flex children from overflowing
+    
+    @media (max-width: 480px) {
+      width: 100%;
+      margin-bottom: var(--wg-spacing-md);
+    }
+  }
+  
+  &__version {
+    text-align: right;
+    font-size: var(--wg-font-size-sm);
+    color: var(--wg-color-text-light);
+    padding: var(--wg-spacing-md) 0;
+  }
+  
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--wg-spacing-md);
+    padding: var(--wg-spacing-md);
+    border-top: 1px solid var(--wg-color-border);
+    flex-shrink: 0; // Prevent footer from shrinking
+    
+    @media (max-width: 480px) {
+      flex-direction: column-reverse;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Exercise List Styles
+.workout-editor {
+  &__exercise-list {
+    border: 1px solid var(--wg-color-border);
+    border-radius: var(--wg-radius-md);
+    padding: var(--wg-spacing-md);
+    max-height: 60vh; // Increased from 50vh to provide more viewing space
+    overflow-y: auto; // Add scrolling to exercise list
+    
+    // Scroll indicator shadows
+    background:
+      /* Shadow at the top */ 
+      linear-gradient(var(--wg-color-background) 30%, rgba(255, 255, 255, 0)) 0 0,
+      /* Shadow at the bottom */
+      linear-gradient(rgba(255, 255, 255, 0), var(--wg-color-background) 70%) 0 100%,
+      /* Radial gradient for sides */
+      radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)) 0 0,
+      radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)) 0 100%;
+    background-repeat: no-repeat;
+    background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+    background-attachment: local, local, scroll, scroll;
+    
+    // Optimize scrolling performance
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scroll-padding: var(--wg-spacing-md);
+    will-change: scroll-position;
+    
+    &[aria-disabled="true"] {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    
+    // Ensure padding stays consistent by using box-sizing: border-box
+    * {
+      box-sizing: border-box;
+    }
+    
+    // Add some space between the last exercise and the add button
+    // when content overflows the container
+    &::after {
+      content: '';
+      display: block;
+      height: var(--wg-spacing-md);
+    }
+  }
+  
+  &__empty-state {
+    padding: var(--wg-spacing-lg);
+    text-align: center;
+    color: var(--wg-color-text-light);
+    border: 2px dashed var(--wg-color-border);
+    border-radius: var(--wg-radius-md);
+  }
+  
+  &__exercise-item {
+    border: 1px solid var(--wg-color-border);
+    border-radius: var(--wg-radius-md);
+    padding: var(--wg-spacing-md);
+    margin-bottom: var(--wg-spacing-md);
+    background-color: var(--wg-color-background);
+    transition: 
+      box-shadow var(--wg-transition-fast), 
+      height var(--wg-transition-normal),
+      transform var(--wg-transition-fast);
+    color: #000000; // Explicitly set exercise item text to black
+    
+    // Use min-height instead of fixed height
+    min-height: 50px; 
+    display: flex;
+    flex-direction: column;
+    
+    // Ensure adequate spacing between sections within the item
+    > * {
+      margin-bottom: var(--wg-spacing-sm);
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    // Increased notes spacing for better readability
+    .workout-editor__exercise-notes {
+      margin-top: var(--wg-spacing-md);
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    &:hover {
+      box-shadow: var(--wg-shadow-sm);
+    }
+    
+    &.is-dragging {
+      box-shadow: var(--wg-shadow-md);
+      transform: scale(1.01);
+      z-index: 10;
+    }
+  }
+  
+  &__exercise-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--wg-spacing-md);
+    flex-wrap: nowrap; // Prevent wrapping in the header
+  }
+  
+  &__exercise-drag-handle {
+    cursor: grab;
+    color: var(--wg-color-secondary);
+    padding: var(--wg-spacing-xs);
+    margin-right: var(--wg-spacing-xs);
+    flex-shrink: 0; // Prevent handle from shrinking
+    
+    &:active {
+      cursor: grabbing;
+    }
+  }
+  
+  &__exercise-number {
+    font-weight: 600;
+    margin-right: var(--wg-spacing-sm);
+    color: #000000; // Explicitly set exercise number color to black
+    width: 20px; // Fixed width to align numbers
+    flex-shrink: 0; // Prevent number from shrinking
+  }
+  
+  &__exercise-name-input {
+    flex-grow: 1;
+    color: #000000; // Ensure input text is black
+    min-width: 0; // Allow input to shrink below content size
+    
+    input {
+      color: #000000; // Force black text in inputs
+      width: 100%; // Ensure input takes full width
+      overflow: hidden; // Hide overflow text
+      text-overflow: ellipsis; // Add ellipsis for overflow
+    }
+  }
+  
+  &__exercise-remove {
+    background: none;
+    border: none;
+    color: var(--wg-color-secondary);
+    cursor: pointer;
+    padding: var(--wg-spacing-xs);
+    border-radius: var(--wg-radius-sm);
+    margin-left: var(--wg-spacing-xs);
+    flex-shrink: 0; // Prevent button from shrinking
+    
+    &:hover {
+      color: var(--wg-color-danger);
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  &__exercise-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wg-spacing-md);
+    margin-bottom: var(--wg-spacing-md);
+    
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: var(--wg-spacing-sm);
+    }
+  }
+  
+  &__exercise-field {
+    min-width: 100px;
+    flex: 1;
+    
+    label {
+      display: block;
+      font-size: var(--wg-font-size-sm);
+      margin-bottom: var(--wg-spacing-xs);
+      color: #000000; // Explicitly set label color to black
+    }
+    
+    input, select {
+      color: #000000; // Force black text in inputs
+      width: 100%; // Ensure input takes full width
+    }
+  }
+  
+  &__exercise-notes {
+    margin-top: var(--wg-spacing-sm);
+    flex-grow: 1; // Allow notes to expand with content
+    
+    label {
+      display: block;
+      font-size: var(--wg-font-size-sm);
+      margin-bottom: var(--wg-spacing-xs);
+      color: #000000; // Explicitly set label color to black
+    }
+    
+    textarea, input {
+      color: #000000; // Force black text in inputs
+      width: 100%; // Ensure input takes full width
+      min-height: 40px; // Minimum height for textarea
+    }
+    
+    // Support for auto-resize textarea
+    .auto-resize-textarea {
+      min-height: 40px;
+      resize: none; // Disable manual resize since we're auto-resizing
+      overflow: hidden; // Hide scrollbars during transition
+      transition: height var(--wg-transition-normal);
+      width: 100%;
+    }
+  }
+  
+  &__add-exercise {
+    margin-top: var(--wg-spacing-lg);
+    text-align: center;
+    
+    @media (max-width: 480px) {
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Additional styles for expandable content
+.expandable-content {
+  max-height: 1000px; // Large enough to fit most content
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+  
+  &--collapsed {
+    max-height: 0;
+  }
+}
+
+// Force all form inputs in the workout editor to have black text
+.workout-editor input,
+.workout-editor textarea,
+.workout-editor select {
+  color: #000000 !important;
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// Responsive improvements for mobile devices
+@media (max-width: 480px) {
+  .workout-editor {
+    &__exercise-item {
+      padding: var(--wg-spacing-sm);
+    }
+    
+    &__exercise-header {
+      margin-bottom: var(--wg-spacing-sm);
+    }
+    
+    &__exercise-details {
+      flex-direction: column;
+      gap: var(--wg-spacing-sm);
+      
+      // Stack all fields vertically on mobile
+      .workout-editor__exercise-field {
+        width: 100%;
+        margin-bottom: var(--wg-spacing-sm);
+      }
+    }
+    
+    &__exercise-notes {
+      margin-top: var(--wg-spacing-sm);
+      
+      // Remove height restrictions on mobile for notes
+      .auto-resize-textarea {
+        max-height: none !important; // Override previous 120px limit
+        overflow-y: visible;
+      }
+    }
+    
+    // Adjust character counter on small screens
+    .character-counter {
+      &__label {
+        display: none; // Hide "characters" label on mobile to save space
+      }
+    }
+  }
+}
+
+// Accessibility and focus improvements
+.workout-editor {
+  // Improve focus visibility across all elements
+  *:focus {
+    outline: 2px solid var(--wg-color-primary-light);
+    outline-offset: 1px;
+  }
+  
+  // Make sure focus is visible on all interactive elements, even with custom styling
+  button:focus, 
+  input:focus, 
+  textarea:focus, 
+  select:focus {
+    outline: 2px solid var(--wg-color-primary-light);
+    outline-offset: 1px;
+    box-shadow: none; // Remove default focus shadow if present
+  }
+  
+  // Ensure expandable inputs maintain focus outline in all states
+  .expandable-input:focus {
+    outline: 2px solid var(--wg-color-primary-light);
+    outline-offset: 1px;
+  }
+  
+  // Improve focus visibility for the remove button
+  &__exercise-remove:focus {
+    outline: 2px solid var(--wg-color-danger);
+    outline-offset: 1px;
+    box-shadow: none; // Remove default focus shadow if present
+  }
+}
+
+// Dark mode support (if WordPress admin uses dark mode)
+@media (prefers-color-scheme: dark) {
+  .wp-admin.wp-core-ui .workout-editor-modal__overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .wp-admin.wp-core-ui .workout-editor {
+    // Override the explicitly set colors for dark mode
+    color: var(--wg-color-text, #e2e8f0) !important;
+    
+    // Update background colors
+    background-color: var(--wg-color-background, #1a202c);
+    
+    // Update text colors for dark mode
+    &__title,
+    &__section-title,
+    &__label,
+    input, textarea, select,
+    .auto-resize-textarea {
+      color: var(--wg-color-text, #e2e8f0) !important;
+    }
+    
+    // Adjust border colors
+    &__exercise-item,
+    &__exercise-list,
+    input, textarea, select,
+    .auto-resize-textarea {
+      border-color: var(--wg-color-border, #2d3748);
+    }
+    
+    // Adjust background for exercise items
+    &__exercise-item {
+      background-color: var(--wg-color-background, #1a202c);
+    }
+    
+    // Update scroll shadows for dark mode
+    &__exercise-list {
+      background:
+        /* Shadow at the top */ 
+        linear-gradient(var(--wg-color-background, #1a202c) 30%, rgba(26, 32, 44, 0)) 0 0,
+        /* Shadow at the bottom */
+        linear-gradient(rgba(26, 32, 44, 0), var(--wg-color-background, #1a202c) 70%) 0 100%,
+        /* Radial gradient for sides */
+        radial-gradient(farthest-side at 50% 0, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0)) 0 0,
+        radial-gradient(farthest-side at 50% 100%, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0)) 0 100%;
+      background-repeat: no-repeat;
+      background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+      background-attachment: local, local, scroll, scroll;
+    }
+  }
+} 
