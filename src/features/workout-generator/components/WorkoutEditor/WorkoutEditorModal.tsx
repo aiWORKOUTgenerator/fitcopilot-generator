@@ -2,7 +2,7 @@
  * Workout Editor Modal
  * 
  * Accessible modal container for the workout editor with
- * proper focus management and keyboard navigation
+ * proper focus management, keyboard navigation, and intelligent sizing
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -12,6 +12,7 @@ import WorkoutEditor from './WorkoutEditor';
 import { convertToEditorFormat } from '../../types/editor';
 import { convertToGeneratedWorkout } from '../../services/workoutEditorService';
 import { useNavigation } from '../../navigation/NavigationContext';
+import { useDimensionObserver } from '../../../../components/ui/hooks/useContentResize';
 import './workoutEditor.scss';
 
 interface WorkoutEditorModalProps {
@@ -32,7 +33,7 @@ interface WorkoutEditorModalProps {
 }
 
 /**
- * Modal component for the workout editor
+ * Modal component for the workout editor with intelligent sizing
  */
 const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
   workout,
@@ -48,9 +49,31 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
   // Track loading state
   const [isLoading, setIsLoading] = useState(false);
   
-  // Ref for the modal content for focus management
+  // Track modal content dimensions for intelligent sizing
+  const [contentHeight, setContentHeight] = useState(0);
+  const [modalDimensions, setModalDimensions] = useState({ width: 0, height: 0 });
+  
+  // Refs for modal elements
   const modalRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  
+  // Set up dimension observer for content
+  const { observe: observeContent, disconnect: disconnectContentObserver } = useDimensionObserver(
+    (dimensions) => {
+      setModalDimensions(dimensions);
+      
+      // Calculate optimal modal height based on content and viewport
+      const viewportHeight = window.innerHeight;
+      const maxModalHeight = viewportHeight * 0.95; // Use 95% of viewport height max
+      const minModalHeight = Math.min(400, viewportHeight * 0.5); // Minimum 400px or 50% of viewport
+      
+      // Determine if we need scrolling
+      const optimalHeight = Math.max(minModalHeight, Math.min(dimensions.height + 100, maxModalHeight));
+      setContentHeight(optimalHeight);
+    },
+    200 // Debounce for performance
+  );
   
   // Store the previously focused element when the modal opens
   useEffect(() => {
@@ -68,6 +91,17 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
       }
     };
   }, []);
+  
+  // Set up content observation for intelligent sizing
+  useEffect(() => {
+    if (modalContentRef.current) {
+      observeContent(modalContentRef.current);
+    }
+    
+    return () => {
+      disconnectContentObserver();
+    };
+  }, [observeContent, disconnectContentObserver]);
   
   // Handle escape key press
   useEffect(() => {
@@ -120,6 +154,20 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     };
   }, []);
 
+  // Handle window resize for responsive modal sizing
+  useEffect(() => {
+    const handleWindowResize = () => {
+      if (modalContentRef.current) {
+        observeContent(modalContentRef.current);
+      }
+    };
+    
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [observeContent]);
+
   // Function to handle saving
   const handleSave = async (updatedWorkout: any) => {
     try {
@@ -143,6 +191,15 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     closeEditor();
   };
 
+  // Calculate modal content styles based on dimensions
+  const modalContentStyle: React.CSSProperties = {
+    height: contentHeight > 0 ? `${contentHeight}px` : 'auto',
+    maxHeight: '95vh',
+    minHeight: '400px',
+    display: 'flex',
+    flexDirection: 'column',
+  };
+
   return createPortal(
     <div 
       className="workout-editor-modal__overlay" 
@@ -153,19 +210,25 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     >
       <div 
         ref={modalRef}
-        className="workout-editor-modal__content"
+        className="workout-editor-modal__content workout-editor-modal__content--adaptive"
+        style={modalContentStyle}
         onClick={(e) => e.stopPropagation()}
         tabIndex={-1} // Make the modal container focusable but not in tab order
         aria-busy={isLoading}
       >
-        <WorkoutEditorProvider initialWorkout={editorWorkout}>
-          <WorkoutEditor
-            onSave={handleSave}
-            onCancel={handleCancel}
-            isNewWorkout={!postId}
-            isLoading={isLoading}
-          />
-        </WorkoutEditorProvider>
+        <div 
+          ref={modalContentRef}
+          className="workout-editor-modal__inner-content"
+        >
+          <WorkoutEditorProvider initialWorkout={editorWorkout}>
+            <WorkoutEditor
+              onSave={handleSave}
+              onCancel={handleCancel}
+              isNewWorkout={!postId}
+              isLoading={isLoading}
+            />
+          </WorkoutEditorProvider>
+        </div>
       </div>
     </div>,
     document.body

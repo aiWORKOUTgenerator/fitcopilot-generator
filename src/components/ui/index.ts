@@ -13,4 +13,8 @@ export { default as ColorTest } from './ColorTest';
 export { default as Button } from './Button';
 export { default as ProgressBar } from './ProgressBar';
 export { default as ThemeToggle } from './ThemeToggle';
-export { AdvancedOptionsPanel } from './AdvancedOptionsPanel'; 
+export { AdvancedOptionsPanel } from './AdvancedOptionsPanel';
+
+// Enhanced components and hooks
+export { DynamicTextContainer } from './DynamicTextContainer';
+export { useContentResize, useDimensionObserver, useTextDimensions } from './hooks/useContentResize'; 

@@ -7,11 +7,8 @@
   overflow: hidden !important; // Hide scrollbars during transition
   resize: none !important; // Disable manual resize since we're auto-resizing
   
-  // Smooth transition for height changes
-  transition: height 0.15s ease-in-out;
-  
-  // Ensure it doesn't shrink smaller than intended
-  min-height: 4em; // Increased from 2em to allow more content by default
+  // Remove artificial minimum height - let content determine size
+  min-height: auto; // Changed from 4em to auto
   
   // Remove any max-height constraints that might limit expansion
   max-height: none !important;
@@ -26,7 +23,7 @@
   // Ensure proper padding remains during resize
   box-sizing: border-box;
   
-  // Proper spacing for content
+  // Proper spacing for content with flexible padding
   padding: 8px 12px;
   
   // Override any conflicting styles that might prevent auto-resize
@@ -34,37 +31,47 @@
     height: auto !important;
   }
   
-  // Focus styles to indicate interactivity
-  &:focus {
-    // Keep existing focus styles from the base component
-    transition: height 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  // Conditional animation based on class
+  &--animated {
+    transition: height 0.15s ease-in-out;
+    
+    &:focus {
+      transition: height 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
   }
   
-  // Custom scrollbar for textareas that reach maxRows and need scrolling
-  &[style*="overflow-y: auto"] {
-    // Prettier scrollbar for Webkit/Chrome
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb:hover {
-      background: #a1a1a1;
-    }
-    
-    // Firefox scrollbar
-    scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 #f1f1f1;
+  // Non-animated version for performance mode
+  &:not(.auto-resize-textarea--animated) {
+    transition: none;
   }
+  
+  // Remove maxRows scrolling constraint - let content expand naturally
+  &[style*="overflow-y: auto"] {
+    overflow-y: hidden !important; // Force hidden to prevent scrollbars
+  }
+  
+  // Improved scrollbar styling for cases where scrolling is actually needed
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+  }
+  
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
 // When within workout editor context, add more specific styles
@@ -74,10 +81,28 @@
     border-radius: var(--wg-radius-sm);
     border: 1px solid var(--wg-color-border);
     
+    // Enhanced focus state
+    &:focus {
+      border-color: var(--wg-color-primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+      outline: none;
+    }
+    
     // Disable styles when in disabled state
     &:disabled {
       resize: none;
       background-color: #f3f4f6;
+      opacity: 0.7;
+    }
+    
+    // Improved styling for different contexts
+    &.exercise-notes {
+      font-size: 0.875rem;
+      line-height: 1.5;
+      
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+      }
     }
   }
 } 

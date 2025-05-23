@@ -279,10 +279,12 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
             onChange={handleNotesChange}
             placeholder="Add any additional notes about this workout..."
             minRows={5}
-            maxRows={20}
+            maxRows={undefined}
             maxCharacters={1000}
             showWarning={true}
             expandOnMount={true}
+            performanceMode="standard"
+            animateResize={true}
             disabled={isLoading || isSaving}
             aria-labelledby="notes-heading"
           />

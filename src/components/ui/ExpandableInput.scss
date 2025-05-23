@@ -15,7 +15,7 @@
 .expandable-input {
   // Base styling
   width: 100%;
-  transition: max-width 0.2s ease-out;
+  transition: max-width 0.2s ease-out, height 0.2s ease-out;
   overflow: hidden;
   text-overflow: ellipsis;
   
@@ -33,20 +33,41 @@
     }
   }
   
-  // Expanded state
+  // Enhanced expanded state - allow natural content expansion
   &--expanded {
-    position: absolute;
+    position: relative; // Changed from absolute to relative for better flow
     background-color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 10;
     min-width: 100%; // At least as wide as container
+    max-width: none; // Remove width constraints
+    height: auto; // Allow height to expand naturally
+    min-height: 2.5em; // Reasonable minimum for multi-line content
   }
   
-  // Focus state should always show full content
+  // Focus state should always show full content without constraints
   &:focus {
     text-overflow: clip;
-    white-space: normal;
+    white-space: normal; // Allow text wrapping
     word-break: break-word;
+    height: auto; // Allow height expansion on focus
+    min-height: 2.5em; // Ensure adequate height for editing
+    max-height: none; // Remove height limits
+    overflow: visible; // Show all content
+    
+    // Enhanced focus styling
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    border-color: #3b82f6;
+  }
+  
+  // Support for multi-line content when needed
+  &.multi-line {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    resize: none; // Disable manual resize
+    overflow-wrap: break-word;
+    min-height: 2.5em;
+    height: auto;
   }
 }
 
@@ -65,6 +86,17 @@
     &:disabled {
       background-color: #f3f4f6;
       cursor: not-allowed;
+    }
+    
+    // Exercise-specific styling for better content display
+    &.workout-editor__exercise-name-input {
+      font-weight: 500;
+      
+      // Allow more generous sizing for exercise names
+      &:focus {
+        min-height: 3em; // Larger minimum for exercise names
+        padding: 0.75rem; // More padding when focused
+      }
     }
   }
 } 

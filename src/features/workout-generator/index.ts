@@ -25,6 +25,10 @@ import '../../components/ui/AutoResizeTextarea.scss';
 import '../../components/ui/ExpandableInput.scss';
 import '../../components/ui/CharacterCounter.scss';
 import '../../components/ui/AutoResizeTextareaWithCounter.scss';
+import '../../components/ui/DynamicTextContainer.scss';
+
+// Import the smart parsing styles
+import './components/WorkoutEditor/SmartFieldSuggestions.scss';
 
 // Export the main feature component
 export { default } from './WorkoutGeneratorFeature';

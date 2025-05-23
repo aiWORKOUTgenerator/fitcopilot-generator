@@ -53,6 +53,12 @@ export interface EditorExercise {
   notes?: string;
   /** Alternative exercises that can be substituted */
   substitutions?: string[];
+  /** Original AI-generated description before parsing */
+  originalDescription?: string;
+  /** Status of the parsing operation */
+  parsingStatus?: 'parsed' | 'manual' | 'needs_review';
+  /** Confidence score of the parsing (0-1) */
+  parsingConfidence?: number;
 }
 
 /**

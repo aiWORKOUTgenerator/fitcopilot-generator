@@ -14,18 +14,20 @@
  *   maxRows={10}
  * />
  */
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { Textarea, TextareaProps } from './Textarea';
+import { useContentResize } from './hooks/useContentResize';
 
 export interface AutoResizeTextareaProps extends TextareaProps {
   /**
    * Minimum number of rows to display
-   * @default 4
+   * @default 2
    */
   minRows?: number;
   
   /**
-   * Maximum number of rows before scrolling
+   * Maximum number of rows before scrolling (optional)
+   * When not specified, textarea expands without limit
    * @default undefined (no maximum)
    */
   maxRows?: number;
@@ -35,6 +37,24 @@ export interface AutoResizeTextareaProps extends TextareaProps {
    * @default true
    */
   expandOnMount?: boolean;
+  
+  /**
+   * Callback when component resizes
+   */
+  onResize?: (height: number) => void;
+  
+  /**
+   * Whether to animate height changes
+   * @default true
+   */
+  animateResize?: boolean;
+  
+  /**
+   * Performance mode for frequent content changes
+   * 'optimized' reduces calculation frequency for better performance
+   * @default 'standard'
+   */
+  performanceMode?: 'standard' | 'optimized';
 }
 
 /**
@@ -42,97 +62,158 @@ export interface AutoResizeTextareaProps extends TextareaProps {
  * 
  * Features:
  * - Auto-resizes height based on content
- * - Supports minimum and maximum height constraints
- * - Preserves all functionality of the base Textarea component
+ * - Supports minimum and optional maximum height constraints
+ * - Enhanced performance with debounced calculations
  * - Smooth height transitions
+ * - Preserves all functionality of the base Textarea component
  * 
  * @param {AutoResizeTextareaProps} props - Component properties
  * @returns {JSX.Element} Rendered auto-resize textarea
  */
 export const AutoResizeTextarea: React.FC<AutoResizeTextareaProps> = ({
-  minRows = 4,
+  minRows = 2,
   maxRows,
   onChange,
   className = '',
   expandOnMount = true,
+  onResize,
+  animateResize = true,
+  performanceMode = 'standard',
   ...props
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Determine debounce delay based on performance mode
+  const debounceDelay = performanceMode === 'optimized' ? 200 : 100;
+  
+  // Debounced resize function for performance optimization
+  const debouncedAdjustHeight = useContentResize(() => {
+    adjustHeightImmediate();
+  }, debounceDelay);
   
   // Calculate and set appropriate height based on content
-  const adjustHeight = useCallback(() => {
+  const adjustHeightImmediate = useCallback(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
     
-    // Store the current scroll position
+    // Store the current scroll position to prevent page jump
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
     // Reset height to auto to get the correct scrollHeight
+    const originalHeight = textarea.style.height;
     textarea.style.height = 'auto';
     
-    // Get line height for row calculations
+    // Get computed styles for calculations
     const computedStyle = window.getComputedStyle(textarea);
-    const lineHeight = parseInt(computedStyle.lineHeight) || 20;
+    const lineHeight = parseFloat(computedStyle.lineHeight) || 20;
+    const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+    const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
+    const borderTop = parseFloat(computedStyle.borderTopWidth) || 0;
+    const borderBottom = parseFloat(computedStyle.borderBottomWidth) || 0;
     
-    // Calculate minimum and maximum heights if specified
-    const minHeight = minRows * lineHeight;
-    const maxHeight = maxRows ? maxRows * lineHeight : Number.MAX_SAFE_INTEGER;
+    // Calculate minimum height based on minRows
+    const minHeight = (minRows * lineHeight) + paddingTop + paddingBottom + borderTop + borderBottom;
     
-    // Calculate content height based on scrollHeight
+    // Get content height
     const contentHeight = textarea.scrollHeight;
     
-    // Set new height based on scrollHeight, constrained by min/max
-    const newHeight = Math.min(Math.max(contentHeight, minHeight), maxHeight);
+    // Calculate final height
+    let newHeight = Math.max(contentHeight, minHeight);
+    
+    // Apply maximum height constraint only if specified
+    if (maxRows) {
+      const maxHeight = (maxRows * lineHeight) + paddingTop + paddingBottom + borderTop + borderBottom;
+      newHeight = Math.min(newHeight, maxHeight);
+      
+      // Enable scrolling if content exceeds maximum height
+      textarea.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden';
+    } else {
+      // No max height constraint - always hide scroll
+      textarea.style.overflowY = 'hidden';
+    }
+    
+    // Set the new height
     textarea.style.height = `${newHeight}px`;
     
-    // If content exceeds maximum height, enable scrolling
-    if (contentHeight > maxHeight && maxRows) {
-      textarea.style.overflowY = 'auto';
-    } else {
-      textarea.style.overflowY = 'hidden';
+    // Call resize callback if provided
+    if (onResize && originalHeight !== textarea.style.height) {
+      onResize(newHeight);
     }
     
     // Restore scroll position to prevent page jump
     window.scrollTo(0, scrollTop);
-  }, [minRows, maxRows]);
+  }, [minRows, maxRows, onResize]);
   
-  // Adjust height on content change
+  // Main adjust height function that may be debounced
+  const adjustHeight = useCallback(() => {
+    if (performanceMode === 'optimized') {
+      debouncedAdjustHeight();
+    } else {
+      adjustHeightImmediate();
+    }
+  }, [performanceMode, debouncedAdjustHeight, adjustHeightImmediate]);
+  
+  // Handle content change
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
       onChange(e);
     }
+    // Adjust height after content change
     adjustHeight();
   };
   
-  // Force initial height adjustment after content loads
+  // Initialize component and set up initial height
   useEffect(() => {
-    // Use a small delay to ensure content is properly rendered
-    const timeoutId = setTimeout(() => {
+    if (!isInitialized && textareaRef.current) {
+      setIsInitialized(true);
+      
+      // Use immediate adjustment for initial render
       if (expandOnMount) {
+        // Small delay to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+          adjustHeightImmediate();
+        }, 0);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [isInitialized, expandOnMount, adjustHeightImmediate]);
+  
+  // Adjust height when value prop changes
+  useEffect(() => {
+    if (isInitialized) {
+      adjustHeight();
+    }
+  }, [props.value, isInitialized, adjustHeight]);
+  
+  // Handle window resize events
+  useEffect(() => {
+    const handleWindowResize = () => {
+      if (isInitialized) {
         adjustHeight();
       }
-    }, 10);
-    
-    return () => clearTimeout(timeoutId);
-  }, []);
-  
-  // Adjust height on initial render, when value prop changes, and on window resize
-  useEffect(() => {
-    adjustHeight();
-    
-    // Also adjust when window resizes (affects line wrapping)
-    window.addEventListener('resize', adjustHeight);
-    return () => {
-      window.removeEventListener('resize', adjustHeight);
     };
-  }, [props.value, adjustHeight]);
+    
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [isInitialized, adjustHeight]);
+  
+  // Apply animation class based on animateResize prop
+  const textareaClassName = `
+    auto-resize-textarea 
+    ${animateResize ? 'auto-resize-textarea--animated' : ''}
+    ${className}
+  `.trim();
   
   return (
     <Textarea
       {...props}
       ref={textareaRef}
       onChange={handleChange}
-      className={`auto-resize-textarea ${className}`}
+      className={textareaClassName}
       rows={minRows} // Set initial rows
     />
   );
