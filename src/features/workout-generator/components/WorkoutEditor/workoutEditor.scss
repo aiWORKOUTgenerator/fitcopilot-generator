@@ -435,6 +435,24 @@
     flex-shrink: 0; // Prevent number from shrinking
   }
   
+  // Enhanced exercise name wrapper for better expansion handling
+  &__exercise-name-wrapper {
+    flex-grow: 1;
+    min-width: 0; // Allow shrinking below content size
+    margin-right: var(--wg-spacing-sm);
+    
+    // Enhanced expansion behavior
+    &:focus-within {
+      z-index: 15;
+      
+      @media (max-width: 768px) {
+        // On mobile, expanded name takes more vertical space
+        position: relative;
+        z-index: 20;
+      }
+    }
+  }
+  
   &__exercise-name-input {
     flex-grow: 1;
     color: #000000; // Ensure input text is black
@@ -443,8 +461,6 @@
     input {
       color: #000000; // Force black text in inputs
       width: 100%; // Ensure input takes full width
-      overflow: hidden; // Hide overflow text
-      text-overflow: ellipsis; // Add ellipsis for overflow
     }
   }
   
@@ -527,32 +543,68 @@
     }
   }
   
+  // Enhanced exercise details layout for expandable fields
   &__exercise-details {
     display: flex;
     flex-wrap: wrap;
+    align-items: flex-start; // Align to top when heights differ
     gap: var(--wg-spacing-md);
     margin-bottom: var(--wg-spacing-md);
     
-    @media (max-width: 480px) {
+    @media (max-width: 768px) {
       flex-direction: column;
       gap: var(--wg-spacing-sm);
     }
   }
   
+  // Enhanced exercise field styling for expandable inputs
   &__exercise-field {
-    min-width: 100px;
-    flex: 1;
+    min-width: 120px;
+    flex: 1 1 auto; // Allow natural growth and shrinking
+    
+    // Dynamic field sizing based on expansion state
+    &:focus-within {
+      flex: 2 1 200px; // Take more space when focused
+      z-index: 10;
+      
+      @media (max-width: 768px) {
+        flex-basis: 100%; // Take full width on mobile
+        order: -1; // Move to top
+      }
+    }
+    
+    // Field-specific sizing
+    &:has(.exercise-field-input--name) {
+      flex: 2 1 200px; // Name field gets more space by default
+      
+      &:focus-within {
+        flex: 3 1 400px;
+      }
+    }
+    
+    &:has(.exercise-field-input--sets),
+    &:has(.exercise-field-input--restPeriod) {
+      flex: 0 1 100px; // Smaller for numeric fields
+      
+      &:focus-within {
+        flex: 1 1 150px;
+      }
+    }
+    
+    &:has(.exercise-field-input--reps) {
+      flex: 1 1 150px; // Medium size for reps
+      
+      &:focus-within {
+        flex: 2 1 250px;
+      }
+    }
     
     label {
       display: block;
       font-size: var(--wg-font-size-sm);
       margin-bottom: var(--wg-spacing-xs);
       color: #000000; // Explicitly set label color to black
-    }
-    
-    input, select {
-      color: #000000; // Force black text in inputs
-      width: 100%; // Ensure input takes full width
+      font-weight: 500;
     }
   }
   
@@ -565,6 +617,7 @@
       font-size: var(--wg-font-size-sm);
       margin-bottom: var(--wg-spacing-xs);
       color: #000000; // Explicitly set label color to black
+      font-weight: 500;
     }
     
     textarea, input {
@@ -592,6 +645,55 @@
         width: 100%;
       }
     }
+  }
+}
+
+// Smart Exercise Field Styles
+.smart-exercise-field {
+  position: relative;
+  width: 100%;
+  
+  // Suggestion indicator styling
+  &.has-suggestions {
+    .expandable-input-wrapper {
+      border-left: 3px solid var(--wg-color-warning, #f59e0b);
+      padding-left: 4px;
+      border-radius: 0 var(--wg-radius-sm) var(--wg-radius-sm) 0;
+    }
+  }
+  
+  // Enhanced focus behavior
+  &:focus-within {
+    z-index: 15;
+    
+    // Remove suggestion border when focused
+    &.has-suggestions .expandable-input-wrapper {
+      border-left-color: var(--wg-color-primary, #3b82f6);
+    }
+  }
+}
+
+// Field suggestion indicator
+.field-suggestion-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--wg-color-warning, #f59e0b);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  z-index: 20;
+  animation: pulse 2s infinite;
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
   }
 }
 
@@ -635,8 +737,8 @@
   to { transform: rotate(360deg); }
 }
 
-// Responsive improvements for mobile devices
-@media (max-width: 480px) {
+// Enhanced responsive improvements for mobile devices
+@media (max-width: 768px) {
   .workout-editor {
     &__exercise-item {
       padding: var(--wg-spacing-sm);
@@ -644,6 +746,22 @@
     
     &__exercise-header {
       margin-bottom: var(--wg-spacing-sm);
+      flex-wrap: wrap; // Allow wrapping on smaller screens
+      gap: var(--wg-spacing-xs);
+    }
+    
+    &__exercise-name-wrapper {
+      flex-basis: 100%;
+      order: 1;
+      margin-bottom: var(--wg-spacing-xs);
+    }
+    
+    &__exercise-status {
+      order: 2;
+    }
+    
+    &__exercise-remove {
+      order: 3;
     }
     
     &__exercise-details {
@@ -654,6 +772,14 @@
       .workout-editor__exercise-field {
         width: 100%;
         margin-bottom: var(--wg-spacing-sm);
+        
+        &:focus-within {
+          // Enhanced focus state on mobile
+          background-color: rgba(59, 130, 246, 0.05);
+          border-radius: var(--wg-radius-sm);
+          padding: var(--wg-spacing-xs);
+          margin: -4px;
+        }
       }
     }
     
@@ -667,10 +793,84 @@
       }
     }
     
+    // Enhanced smart field behavior on mobile
+    .smart-exercise-field {
+      // Larger touch targets
+      .expandable-input {
+        min-height: 44px; // iOS recommended minimum touch target
+        padding: 12px 16px;
+        font-size: 16px; // Prevent zoom on iOS
+      }
+      
+      // Enhanced expansion on mobile
+      &:focus-within {
+        .expandable-input {
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+          border-radius: var(--wg-radius-md);
+        }
+      }
+    }
+    
     // Adjust character counter on small screens
     .character-counter {
       &__label {
         display: none; // Hide "characters" label on mobile to save space
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .workout-editor {
+    &__exercise-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--wg-spacing-sm);
+    }
+    
+    &__exercise-number {
+      align-self: flex-start;
+    }
+    
+    &__exercise-name-wrapper {
+      order: 1;
+      margin-bottom: var(--wg-spacing-sm);
+    }
+    
+    &__exercise-status,
+    &__exercise-remove {
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    
+    // Very small screen optimizations
+    .smart-exercise-field {
+      .expandable-input {
+        &:focus,
+        &.expandable-input--expanded {
+          // Full width on very small screens when focused
+          width: 100%;
+          max-width: 100%;
+          margin: 0 -16px; // Extend beyond container padding
+          padding: 16px;
+          border-radius: 0;
+        }
+      }
+    }
+    
+    // Expansion indicator adjustments
+    .expansion-indicator {
+      // Larger touch target on mobile
+      padding: 6px 10px;
+      min-width: 44px;
+      min-height: 32px;
+      
+      &__icon {
+        font-size: 16px;
+      }
+      
+      &__hint {
+        display: none; // Hide text on very small screens
       }
     }
   }

@@ -196,6 +196,12 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
               aria-invalid={!!validationErrors.title}
               aria-describedby={validationErrors.title ? "title-error" : undefined}
               showTooltip={true}
+              allowMultiLine={true}
+              autoExpand={true}
+              expansionThreshold={40}
+              maxExpandedLines={3}
+              adaptiveWidth={true}
+              adaptiveHeight={true}
             />
             {validationErrors.title && (
               <div id="title-error" className="workout-editor__error">
@@ -240,6 +246,13 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
                   size="md"
                   disabled={isLoading || isSaving}
                   aria-describedby={validationErrors.duration ? "duration-error" : undefined}
+                  showTooltip={true}
+                  allowMultiLine={false}
+                  autoExpand={false}
+                  expansionThreshold={10}
+                  maxExpandedLines={1}
+                  adaptiveWidth={true}
+                  adaptiveHeight={false}
                 />
                 {validationErrors.duration && (
                   <div id="duration-error" className="workout-editor__error">

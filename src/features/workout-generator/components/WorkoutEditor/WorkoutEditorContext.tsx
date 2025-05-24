@@ -329,7 +329,14 @@ export const WorkoutEditorProvider: React.FC<WorkoutEditorProviderProps> = ({
   
   // Helper functions to simplify common operations
   const updateExercise = useCallback((id: string, field: string, value: any) => {
+    console.log('🔄 WorkoutEditorContext updateExercise called:', {
+      id,
+      field, 
+      value,
+      currentExercises: state.workout.exercises.length
+    });
     dispatch({ type: 'UPDATE_EXERCISE', payload: { id, field, value } });
+    console.log('✅ UPDATE_EXERCISE action dispatched');
   }, []);
   
   const addExercise = useCallback((exercise?: Partial<{ name: string; sets: number; reps: string }>) => {

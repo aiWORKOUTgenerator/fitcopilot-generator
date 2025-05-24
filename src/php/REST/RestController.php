@@ -39,6 +39,17 @@ function register_rest_routes() {
         ]
     );
 
+    // Add missing POST endpoint for workout creation
+    register_rest_route(
+        'fitcopilot/v1',
+        '/workouts',
+        [
+            'methods' => 'POST',
+            'callback' => 'FitCopilot\\REST\\create_workout',
+            'permission_callback' => 'FitCopilot\\REST\\check_permission',
+        ]
+    );
+
     register_rest_route(
         'fitcopilot/v1',
         '/workouts/(?P<id>\d+)',
@@ -288,4 +299,109 @@ function complete_workout(\WP_REST_Request $request) {
             'completion_date' => $completion_date,
         ],
     ]);
+}
+
+/**
+ * Create a new workout
+ *
+ * @param \WP_REST_Request $request The request object
+ * @return \WP_REST_Response
+ */
+function create_workout(\WP_REST_Request $request) {
+    $user_id = get_current_user_id();
+    
+    // Get workout data from request
+    $data = $request->get_json_params();
+    
+    // Handle both direct format and wrapped format
+    if (isset($data['workout'])) {
+        $workout_data = $data['workout'];
+    } else {
+        $workout_data = $data;
+    }
+    
+    // Validate required fields
+    if (empty($workout_data['title'])) {
+        return new \WP_REST_Response([
+            'success' => false,
+            'message' => 'Workout title is required',
+            'code' => 'missing_title',
+        ], 400);
+    }
+    
+    try {
+        // Create the workout post
+        $post_id = wp_insert_post([
+            'post_title' => sanitize_text_field($workout_data['title']),
+            'post_content' => isset($workout_data['notes']) ? sanitize_textarea_field($workout_data['notes']) : '',
+            'post_type' => 'fc_workout',
+            'post_status' => 'publish',
+            'post_author' => $user_id,
+        ]);
+        
+        if (is_wp_error($post_id)) {
+            throw new \Exception($post_id->get_error_message());
+        }
+        
+        // Save workout metadata
+        if (isset($workout_data['difficulty'])) {
+            update_post_meta($post_id, '_workout_difficulty', sanitize_text_field($workout_data['difficulty']));
+            update_post_meta($post_id, 'workout_difficulty', sanitize_text_field($workout_data['difficulty'])); // Legacy support
+        }
+        
+        if (isset($workout_data['duration'])) {
+            update_post_meta($post_id, '_workout_duration', intval($workout_data['duration']));
+            update_post_meta($post_id, 'workout_duration', intval($workout_data['duration'])); // Legacy support
+        }
+        
+        if (isset($workout_data['equipment']) && is_array($workout_data['equipment'])) {
+            update_post_meta($post_id, '_workout_equipment', array_map('sanitize_text_field', $workout_data['equipment']));
+        }
+        
+        if (isset($workout_data['goals']) && is_array($workout_data['goals'])) {
+            update_post_meta($post_id, '_workout_goals', array_map('sanitize_text_field', $workout_data['goals']));
+        }
+        
+        if (isset($workout_data['exercises']) && is_array($workout_data['exercises'])) {
+            update_post_meta($post_id, '_workout_data', wp_json_encode(['exercises' => $workout_data['exercises']]));
+        }
+        
+        // Initialize versioning metadata
+        update_post_meta($post_id, '_workout_version', 1);
+        update_post_meta($post_id, '_workout_last_modified', current_time('mysql'));
+        update_post_meta($post_id, '_workout_modified_by', $user_id);
+        
+        // Trigger action for post-creation processing
+        do_action('fitcopilot_workout_created', $post_id, $workout_data);
+        
+        // Format successful response
+        $response_data = [
+            'id' => $post_id,
+            'title' => $workout_data['title'],
+            'difficulty' => $workout_data['difficulty'] ?? 'intermediate',
+            'duration' => $workout_data['duration'] ?? 30,
+            'equipment' => $workout_data['equipment'] ?? [],
+            'goals' => $workout_data['goals'] ?? [],
+            'exercises' => $workout_data['exercises'] ?? [],
+            'notes' => $workout_data['notes'] ?? '',
+            'date' => get_post_field('post_date', $post_id),
+            'modified' => get_post_field('post_modified', $post_id),
+            'version' => 1,
+            'last_modified' => current_time('mysql'),
+            'modified_by' => $user_id
+        ];
+        
+        return new \WP_REST_Response([
+            'success' => true,
+            'message' => 'Workout created successfully',
+            'data' => $response_data,
+        ]);
+        
+    } catch (\Exception $e) {
+        return new \WP_REST_Response([
+            'success' => false,
+            'message' => 'Failed to create workout: ' . $e->getMessage(),
+            'code' => 'creation_error',
+        ], 500);
+    }
 } 

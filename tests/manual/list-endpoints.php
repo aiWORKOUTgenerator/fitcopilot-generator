@@ -13,7 +13,6 @@ $api_patterns = [
     'API_NAMESPACE',
     'fitcopilot/v1',
     'wg/v1',
-    'my-wg/v1',
 ];
 
 // Results storage

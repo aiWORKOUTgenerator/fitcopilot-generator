@@ -4,12 +4,35 @@
  * Provides functions for interacting with the workout API.
  */
 import { GeneratedWorkout } from '../types/workout';
-import { apiFetch } from '../api/client';
+import { apiFetch, ApiRequestOptions, ApiResponse } from '../api/client';
 
 /**
  * Base API path for workout endpoints
  */
-const API_PATH = '/wp-json/my-wg/v1';
+const API_PATH = '/wp-json/fitcopilot/v1';
+
+/**
+ * Build a complete API URL from a path
+ * @param path - The API path (e.g., '/workouts' or '/workouts/123')
+ * @returns Complete API URL
+ */
+const buildApiUrl = (path: string): string => `${API_PATH}${path}`;
+
+/**
+ * Prepare request options with proper data serialization
+ * @param method - HTTP method
+ * @param data - Optional data to send (will be JSON stringified for POST/PUT)
+ * @returns Prepared request options
+ */
+const prepareRequestOptions = (method: string, data?: any): ApiRequestOptions => {
+  const options: ApiRequestOptions = { method };
+  
+  if (data && (method === 'POST' || method === 'PUT')) {
+    options.body = JSON.stringify(data);
+  }
+  
+  return options;
+};
 
 /**
  * Get a single workout by ID
@@ -18,10 +41,10 @@ const API_PATH = '/wp-json/my-wg/v1';
  */
 export async function getWorkout(id: string): Promise<GeneratedWorkout> {
   try {
-    const response = await apiFetch({
-      path: `${API_PATH}/workouts/${id}`,
-      method: 'GET',
-    });
+    const response = await apiFetch<ApiResponse<GeneratedWorkout>>(
+      buildApiUrl(`/workouts/${id}`),
+      prepareRequestOptions('GET')
+    );
     
     if (!response.success) {
       throw new Error(response.message || 'Failed to fetch workout');
@@ -42,11 +65,16 @@ export async function getWorkout(id: string): Promise<GeneratedWorkout> {
  */
 export async function getWorkouts(page = 1, perPage = 10): Promise<GeneratedWorkout[]> {
   try {
-    const response = await apiFetch({
-      path: `${API_PATH}/workouts`,
-      method: 'GET',
-      data: { page, per_page: perPage },
+    // For GET requests with query parameters, we'll add them to the URL
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      per_page: perPage.toString()
     });
+    
+    const response = await apiFetch<ApiResponse<GeneratedWorkout[]>>(
+      `${buildApiUrl('/workouts')}?${queryParams.toString()}`,
+      prepareRequestOptions('GET')
+    );
     
     if (!response.success) {
       throw new Error(response.message || 'Failed to fetch workouts');
@@ -67,15 +95,14 @@ export async function getWorkouts(page = 1, perPage = 10): Promise<GeneratedWork
 export async function saveWorkout(workout: GeneratedWorkout): Promise<GeneratedWorkout> {
   try {
     const method = workout.id ? 'PUT' : 'POST';
-    const path = workout.id 
-      ? `${API_PATH}/workouts/${workout.id}` 
-      : `${API_PATH}/workouts`;
+    const url = workout.id 
+      ? buildApiUrl(`/workouts/${workout.id}`)
+      : buildApiUrl('/workouts');
     
-    const response = await apiFetch({
-      path,
-      method,
-      data: workout,
-    });
+    const response = await apiFetch<ApiResponse<GeneratedWorkout>>(
+      url,
+      prepareRequestOptions(method, workout)
+    );
     
     if (!response.success) {
       throw new Error(response.message || 'Failed to save workout');
@@ -95,10 +122,10 @@ export async function saveWorkout(workout: GeneratedWorkout): Promise<GeneratedW
  */
 export async function deleteWorkout(id: string): Promise<boolean> {
   try {
-    const response = await apiFetch({
-      path: `${API_PATH}/workouts/${id}`,
-      method: 'DELETE',
-    });
+    const response = await apiFetch<ApiResponse<boolean>>(
+      buildApiUrl(`/workouts/${id}`),
+      prepareRequestOptions('DELETE')
+    );
     
     if (!response.success) {
       throw new Error(response.message || 'Failed to delete workout');
@@ -118,10 +145,10 @@ export async function deleteWorkout(id: string): Promise<boolean> {
  */
 export async function completeWorkout(id: string): Promise<GeneratedWorkout> {
   try {
-    const response = await apiFetch({
-      path: `${API_PATH}/workouts/${id}/complete`,
-      method: 'POST',
-    });
+    const response = await apiFetch<ApiResponse<GeneratedWorkout>>(
+      buildApiUrl(`/workouts/${id}/complete`),
+      prepareRequestOptions('POST')
+    );
     
     if (!response.success) {
       throw new Error(response.message || 'Failed to mark workout as completed');

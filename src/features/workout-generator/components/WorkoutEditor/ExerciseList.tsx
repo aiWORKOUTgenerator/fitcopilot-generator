@@ -3,6 +3,7 @@
  * 
  * Displays and manages the list of exercises in the workout editor
  * with accessibility improvements, smart parsing, and intelligent suggestions.
+ * Enhanced with smart field components for better text handling.
  */
 import React, { useEffect, useState, useMemo } from 'react';
 import { useWorkoutEditor } from './WorkoutEditorContext';
@@ -24,6 +25,113 @@ interface ExerciseListProps {
 }
 
 /**
+ * Smart Exercise Field Component
+ * Provides field-specific configuration for enhanced expansion
+ */
+const SmartExerciseField: React.FC<{
+  field: 'name' | 'sets' | 'reps' | 'restPeriod';
+  exercise: any;
+  onChange: (value: any) => void;
+  onBlur?: () => void;
+  disabled?: boolean;
+  suggestions?: FieldSuggestion[];
+}> = ({ field, exercise, onChange, onBlur, disabled, suggestions }) => {
+  
+  // Field-specific configuration
+  const getFieldConfig = () => {
+    switch (field) {
+      case 'name':
+        return {
+          allowMultiLine: true,
+          autoExpand: true,
+          expansionThreshold: 25,
+          maxExpandedLines: 3,
+          placeholder: "Exercise name",
+          type: "text" as const,
+          className: "exercise-field-input exercise-field-input--name"
+        };
+      case 'reps':
+        return {
+          allowMultiLine: false,
+          autoExpand: true,
+          expansionThreshold: 15,
+          maxExpandedLines: 2,
+          placeholder: "e.g. 10 or 8-12",
+          type: "text" as const,
+          className: "exercise-field-input exercise-field-input--reps"
+        };
+      case 'sets':
+        return {
+          allowMultiLine: false,
+          autoExpand: false,
+          expansionThreshold: 10,
+          maxExpandedLines: 1,
+          placeholder: "Sets",
+          type: "number" as const,
+          min: 1,
+          max: 20,
+          className: "exercise-field-input exercise-field-input--sets"
+        };
+      case 'restPeriod':
+        return {
+          allowMultiLine: false,
+          autoExpand: false,
+          expansionThreshold: 10,
+          maxExpandedLines: 1,
+          placeholder: "Rest (sec)",
+          type: "number" as const,
+          min: 0,
+          max: 300,
+          className: "exercise-field-input exercise-field-input--restPeriod"
+        };
+      default:
+        return {
+          allowMultiLine: false,
+          autoExpand: false,
+          expansionThreshold: 30,
+          maxExpandedLines: 1,
+          type: "text" as const,
+          className: "exercise-field-input"
+        };
+    }
+  };
+
+  const config = getFieldConfig();
+  const value = exercise[field];
+  const hasHighConfidenceSuggestions = suggestions?.some(s => s.confidence > 0.8);
+
+  return (
+    <div className={`smart-exercise-field ${hasHighConfidenceSuggestions ? 'has-suggestions' : ''}`}>
+      <ExpandableInput
+        id={`exercise-${exercise.id}-${field}`}
+        value={value?.toString() || ''}
+        onChange={(e) => {
+          const newValue = field === 'sets' || field === 'restPeriod' 
+            ? parseInt(e.target.value, 10) || (field === 'sets' ? 1 : 0)
+            : e.target.value;
+          onChange(newValue);
+        }}
+        onBlur={onBlur}
+        disabled={disabled}
+        aria-label={`${field} for ${exercise.name || 'exercise'}`}
+        showTooltip={true}
+        showExpansionIndicator={true}
+        adaptiveWidth={true}
+        adaptiveHeight={true}
+        {...config}
+      />
+      
+      {/* Visual indicator for parsing confidence */}
+      {hasHighConfidenceSuggestions && (
+        <div className="field-suggestion-indicator" title="Smart suggestions available">
+          💡
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
  * Exercise List component for the workout editor
  */
 const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
@@ -34,7 +142,7 @@ const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
   const [validationResults, setValidationResults] = useState<{[exerciseId: string]: FieldValidationResult}>({});
   const [showSuggestions, setShowSuggestions] = useState<{[exerciseId: string]: boolean}>({});
 
-  // Validate all exercises whenever they change
+  // Validate all exercises whenever they change (debounced)
   const exerciseValidations = useMemo(() => {
     const results: {[exerciseId: string]: FieldValidationResult} = {};
     
@@ -57,15 +165,20 @@ const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
   
   // Update validation results when they change
   useEffect(() => {
-    setValidationResults(exerciseValidations);
-    
-    // Auto-show suggestions for exercises with high-confidence issues
-    const autoShowSuggestions: {[exerciseId: string]: boolean} = {};
-    Object.entries(exerciseValidations).forEach(([exerciseId, validation]) => {
-      const hasHighConfidenceSuggestions = validation.suggestions.some(s => s.confidence > 0.8);
-      autoShowSuggestions[exerciseId] = hasHighConfidenceSuggestions;
-    });
-    setShowSuggestions(autoShowSuggestions);
+    // Debounce validation updates
+    const timer = setTimeout(() => {
+      setValidationResults(exerciseValidations);
+      
+      // Auto-show suggestions for exercises with high-confidence issues
+      const autoShowSuggestions: {[exerciseId: string]: boolean} = {};
+      Object.entries(exerciseValidations).forEach(([exerciseId, validation]) => {
+        const hasHighConfidenceSuggestions = validation.suggestions.some(s => s.confidence > 0.8);
+        autoShowSuggestions[exerciseId] = hasHighConfidenceSuggestions;
+      });
+      setShowSuggestions(prev => ({ ...prev, ...autoShowSuggestions }));
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [exerciseValidations]);
 
   // Force immediate textarea height adjustment when exercises change
@@ -113,23 +226,38 @@ const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
 
   // Handle applying a single suggestion
   const handleApplySuggestion = async (exerciseId: string, field: string, value: any, suggestion: FieldSuggestion) => {
+    console.log('🔄 ExerciseList handleApplySuggestion called:', {
+      exerciseId,
+      field,
+      value,
+      suggestion
+    });
+    
     try {
+      console.log('📝 Calling updateExercise with:', { exerciseId, field, value });
       await updateExercise(exerciseId, field, value);
+      console.log('✅ updateExercise completed successfully');
       
       // Also update parsing status if it's from auto-parsing
       if (suggestion.source === 'auto_parsing' || suggestion.source === 'field_analysis') {
+        console.log('📝 Updating parsing status to "parsed"');
         // Mark as successfully parsed
         await updateExercise(exerciseId, 'parsingStatus', 'parsed');
         await updateExercise(exerciseId, 'parsingConfidence', suggestion.confidence);
+        console.log('✅ Parsing status updated');
       }
     } catch (error) {
-      console.error('Error applying suggestion:', error);
+      console.error('❌ Error in handleApplySuggestion:', error);
       throw error; // Re-throw to let the UI component handle it
     }
   };
 
   // Handle dismissing a suggestion
   const handleDismissSuggestion = (exerciseId: string, suggestion: FieldSuggestion) => {
+    console.log('❌ ExerciseList handleDismissSuggestion called:', {
+      exerciseId,
+      suggestion
+    });
     // For now, we just log it - in a real app we might store dismissed suggestions
     console.log(`Dismissed suggestion for ${exerciseId}:`, suggestion);
   };
@@ -178,6 +306,12 @@ const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
     return null;
   };
 
+  // Get field suggestions for a specific field
+  const getFieldSuggestions = (exerciseId: string, field: string): FieldSuggestion[] => {
+    const validation = validationResults[exerciseId];
+    return validation?.suggestions?.filter(s => s.field === field) || [];
+  };
+
   return (
     <div 
       className="workout-editor__exercise-list"
@@ -207,17 +341,18 @@ const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
               <div className="workout-editor__exercise-number">
                 {index + 1}.
               </div>
-              <ExpandableInput
-                id={`exercise-${exercise.id}-name`}
-                value={exercise.name}
-                onChange={(e) => handleUpdateExercise(exercise.id, 'name', e.target.value)}
-                onBlur={handleBlur}
-                placeholder="Exercise name"
-                className="workout-editor__exercise-name-input"
-                disabled={isDisabled}
-                aria-label={`Exercise ${index + 1} name`}
-                showTooltip={true}
-              />
+              
+              {/* Enhanced Exercise Name Field */}
+              <div className="workout-editor__exercise-name-wrapper">
+                <SmartExerciseField
+                  field="name"
+                  exercise={exercise}
+                  onChange={(value) => handleUpdateExercise(exercise.id, 'name', value)}
+                  onBlur={handleBlur}
+                  disabled={isDisabled}
+                  suggestions={getFieldSuggestions(exercise.id, 'name')}
+                />
+              </div>
               
               {/* Validation status and smart suggestions toggle */}
               <div className="workout-editor__exercise-status">
@@ -248,59 +383,37 @@ const ExerciseList: React.FC<ExerciseListProps> = ({ isDisabled = false }) => {
             <div className="workout-editor__exercise-details">
               <div className="workout-editor__exercise-field">
                 <label htmlFor={`exercise-${exercise.id}-sets`}>Sets</label>
-                <ExpandableInput
-                  id={`exercise-${exercise.id}-sets`}
-                  type="number"
-                  value={exercise.sets.toString()}
-                  onChange={(e) => handleUpdateExercise(
-                    exercise.id, 
-                    'sets', 
-                    parseInt(e.target.value, 10) || 1
-                  )}
+                <SmartExerciseField
+                  field="sets"
+                  exercise={exercise}
+                  onChange={(value) => handleUpdateExercise(exercise.id, 'sets', value)}
                   onBlur={handleBlur}
-                  min={1}
-                  max={20}
-                  size="sm"
                   disabled={isDisabled}
-                  aria-label={`Sets for ${exercise.name}`}
+                  suggestions={getFieldSuggestions(exercise.id, 'sets')}
                 />
               </div>
               
               <div className="workout-editor__exercise-field">
                 <label htmlFor={`exercise-${exercise.id}-reps`}>Reps</label>
-                <ExpandableInput
-                  id={`exercise-${exercise.id}-reps`}
-                  value={exercise.reps.toString()}
-                  onChange={(e) => handleUpdateExercise(
-                    exercise.id, 
-                    'reps', 
-                    e.target.value
-                  )}
+                <SmartExerciseField
+                  field="reps"
+                  exercise={exercise}
+                  onChange={(value) => handleUpdateExercise(exercise.id, 'reps', value)}
                   onBlur={handleBlur}
-                  placeholder="e.g. 10 or 8-12"
-                  size="sm"
                   disabled={isDisabled}
-                  aria-label={`Reps for ${exercise.name}`}
+                  suggestions={getFieldSuggestions(exercise.id, 'reps')}
                 />
               </div>
               
               <div className="workout-editor__exercise-field">
                 <label htmlFor={`exercise-${exercise.id}-rest`}>Rest (sec)</label>
-                <ExpandableInput
-                  id={`exercise-${exercise.id}-rest`}
-                  type="number"
-                  value={exercise.restPeriod?.toString() || '60'}
-                  onChange={(e) => handleUpdateExercise(
-                    exercise.id, 
-                    'restPeriod', 
-                    parseInt(e.target.value, 10) || 60
-                  )}
+                <SmartExerciseField
+                  field="restPeriod"
+                  exercise={exercise}
+                  onChange={(value) => handleUpdateExercise(exercise.id, 'restPeriod', value)}
                   onBlur={handleBlur}
-                  min={0}
-                  max={300}
-                  size="sm"
                   disabled={isDisabled}
-                  aria-label={`Rest period for ${exercise.name} in seconds`}
+                  suggestions={getFieldSuggestions(exercise.id, 'restPeriod')}
                 />
               </div>
             </div>

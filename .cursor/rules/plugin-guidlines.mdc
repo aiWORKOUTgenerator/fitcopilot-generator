@@ -33,7 +33,7 @@ alwaysApply: true
 ## Core Plugin Architecture
 
 ### 1. API Design
-- **Namespace**: `/wp-json/my-wg/v1/`
+- **Namespace**: `/wp-json/fitcopilot/v1/`
 - Endpoints:
   - **POST** `/generate` → synchronous workout generation
   - **GET** `/workouts` → retrieve workouts list

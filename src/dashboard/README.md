@@ -58,9 +58,9 @@ const App = () => {
 
 The Dashboard components interact with the WordPress REST API endpoints:
 
-- `GET/PUT /wp-json/my-wg/v1/profile` - User profile management
-- `GET /wp-json/my-wg/v1/workouts` - Retrieve recent workouts
-- `GET /wp-json/my-wg/v1/token-usage` - API usage statistics
+- `GET/PUT /wp-json/fitcopilot/v1/profile` - User profile management
+- `GET /wp-json/fitcopilot/v1/workouts` - Retrieve recent workouts
+- `GET /wp-json/fitcopilot/v1/token-usage` - API usage statistics
 
 ## Styling
 

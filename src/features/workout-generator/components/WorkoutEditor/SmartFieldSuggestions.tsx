@@ -82,18 +82,28 @@ const SmartFieldSuggestions: React.FC<SmartFieldSuggestionsProps> = ({
   }, [validationResult.suggestions, exercise.id, maxSuggestions]);
 
   const handleApplySuggestion = async (suggestion: SuggestionDisplayData) => {
+    console.log('✅ Apply suggestion clicked:', suggestion);
+    
     // Set applying state
     setSuggestions(prev => prev.map(s => 
       s.id === suggestion.id ? { ...s, isApplying: true } : s
     ));
 
     try {
+      console.log('📝 Calling onApplySuggestion with:', {
+        field: suggestion.field,
+        value: suggestion.suggestedValue,
+        suggestion
+      });
+      
       await onApplySuggestion(suggestion.field, suggestion.suggestedValue, suggestion);
+      
+      console.log('✅ onApplySuggestion completed successfully');
       
       // Remove the applied suggestion
       setSuggestions(prev => prev.filter(s => s.id !== suggestion.id));
     } catch (error) {
-      console.error('Error applying suggestion:', error);
+      console.error('❌ Error applying suggestion:', error);
       
       // Reset applying state on error
       setSuggestions(prev => prev.map(s => 
@@ -103,6 +113,8 @@ const SmartFieldSuggestions: React.FC<SmartFieldSuggestionsProps> = ({
   };
 
   const handleDismissSuggestion = (suggestion: SuggestionDisplayData) => {
+    console.log('❌ Dismiss suggestion clicked:', suggestion);
+    
     setSuggestions(prev => prev.map(s => 
       s.id === suggestion.id ? { ...s, isDismissed: true } : s
     ));

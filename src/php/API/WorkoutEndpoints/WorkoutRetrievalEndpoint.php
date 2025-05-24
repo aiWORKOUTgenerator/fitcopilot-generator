@@ -32,9 +32,13 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
         // Register the single workout endpoint
         add_action('rest_api_init', [$this, 'register_single_workout_endpoint']);
         
+        // Register the POST endpoint for workout creation
+        add_action('rest_api_init', [$this, 'register_create_endpoint']);
+        
         // Execute immediately if already fired
         if (did_action('rest_api_init')) {
             $this->register_single_workout_endpoint();
+            $this->register_create_endpoint();
         }
         
         error_log('FitCopilot WorkoutRetrievalEndpoint initialized');
@@ -51,6 +55,19 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
         ]);
         
         error_log('FitCopilot registered endpoint: ' . self::API_NAMESPACE . '/workouts/(?P<id>\d+)');
+    }
+    
+    /**
+     * Register workout creation endpoint
+     */
+    public function register_create_endpoint() {
+        register_rest_route(self::API_NAMESPACE, '/workouts', [
+            'methods'             => 'POST',
+            'callback'            => [$this, 'create_workout'],
+            'permission_callback' => [$this, 'check_permissions'],
+        ]);
+        
+        error_log('FitCopilot registered endpoint: ' . self::API_NAMESPACE . '/workouts (POST)');
     }
     
     /**
@@ -182,5 +199,125 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
             $workout, 
             APIUtils::get_success_message('get', 'workout')
         );
+    }
+    
+    /**
+     * Create a new workout
+     *
+     * @param \WP_REST_Request $request The request
+     * @return \WP_REST_Response REST response
+     */
+    public function create_workout(\WP_REST_Request $request) {
+        $user_id = get_current_user_id();
+        $params = $this->extract_params($request, 'workout');
+        
+        // Validate required fields
+        $validation_errors = [];
+        if (empty($params['title'])) {
+            $validation_errors['title'] = __('Workout title is required', 'fitcopilot');
+        }
+        
+        if (!empty($validation_errors)) {
+            return APIUtils::create_api_response(
+                null,
+                __('Validation failed', 'fitcopilot'),
+                false,
+                'validation_error',
+                400,
+                $validation_errors
+            );
+        }
+        
+        // Start transaction for versioning
+        $versioning_service = VersioningUtils::start_transaction();
+        
+        try {
+            // Create the workout post
+            $post_id = wp_insert_post([
+                'post_title'   => sanitize_text_field($params['title']),
+                'post_content' => isset($params['notes']) ? sanitize_textarea_field($params['notes']) : '',
+                'post_type'    => 'fc_workout',
+                'post_status'  => 'publish',
+                'post_author'  => $user_id,
+            ]);
+            
+            if (is_wp_error($post_id)) {
+                throw new \Exception($post_id->get_error_message());
+            }
+            
+            // Save workout metadata
+            if (isset($params['difficulty'])) {
+                update_post_meta($post_id, '_workout_difficulty', sanitize_text_field($params['difficulty']));
+            }
+            if (isset($params['duration'])) {
+                update_post_meta($post_id, '_workout_duration', intval($params['duration']));
+            }
+            if (isset($params['equipment']) && is_array($params['equipment'])) {
+                update_post_meta($post_id, '_workout_equipment', array_map('sanitize_text_field', $params['equipment']));
+            }
+            if (isset($params['goals']) && is_array($params['goals'])) {
+                update_post_meta($post_id, '_workout_goals', array_map('sanitize_text_field', $params['goals']));
+            }
+            if (isset($params['exercises']) && is_array($params['exercises'])) {
+                update_post_meta($post_id, '_workout_data', wp_json_encode(['exercises' => $params['exercises']]));
+            }
+            
+            // Initialize versioning
+            update_post_meta($post_id, '_workout_version', 1);
+            update_post_meta($post_id, '_workout_last_modified', current_time('mysql'));
+            update_post_meta($post_id, '_workout_modified_by', $user_id);
+            
+            // Create initial version record
+            $workout_state = VersioningUtils::get_workout_state($post_id, $user_id, $versioning_service);
+            VersioningUtils::create_version_record(
+                $post_id,
+                $workout_state,
+                $user_id,
+                'create',
+                'Initial workout creation',
+                $versioning_service
+            );
+            
+            // Commit transaction
+            VersioningUtils::commit_transaction($versioning_service);
+            
+            // Get version metadata for response
+            $metadata = VersioningUtils::get_version_metadata($post_id);
+            
+            // Format response
+            $response_data = [
+                'id' => $post_id,
+                'title' => $params['title'],
+                'difficulty' => $params['difficulty'] ?? 'intermediate',
+                'duration' => $params['duration'] ?? 30,
+                'equipment' => $params['equipment'] ?? [],
+                'goals' => $params['goals'] ?? [],
+                'exercises' => $params['exercises'] ?? [],
+                'notes' => $params['notes'] ?? '',
+                'date' => get_post_field('post_date', $post_id),
+                'modified' => get_post_field('post_modified', $post_id),
+            ];
+            
+            // Add version metadata
+            $response_data = APIUtils::add_version_metadata_to_response($response_data, $metadata);
+            
+            // Set ETag header for the response
+            APIUtils::set_etag_header($metadata['version']);
+            
+            return APIUtils::create_api_response(
+                $response_data,
+                APIUtils::get_success_message('create', 'workout')
+            );
+            
+        } catch (\Exception $e) {
+            VersioningUtils::rollback_transaction($versioning_service);
+            return APIUtils::create_api_response(
+                null,
+                $e->getMessage(),
+                false,
+                'creation_error',
+                500
+            );
+        }
     }
 } 
