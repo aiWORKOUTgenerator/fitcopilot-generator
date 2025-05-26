@@ -52,10 +52,65 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   
   return (
     <div className="form-step basic-info-step">
-      <h2>Basic Fitness Information</h2>
+      <h2>Basic Information</h2>
       <p className="step-description">
-        Let's start with some basic information about your fitness level and goals.
+        Let's start with your personal information and fitness details.
       </p>
+      
+      {/* Personal Information Section */}
+      <div className="form-section">
+        <h3>Personal Information</h3>
+        
+        <div className="form-row">
+          <div className="form-field">
+            <label htmlFor="firstName">First Name *</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formData.firstName || ''}
+              onChange={(e) => onChange('firstName', e.target.value)}
+              placeholder="Enter your first name"
+              required
+            />
+            {errors.firstName && (
+              <div className="error-message">{errors.firstName}</div>
+            )}
+          </div>
+          
+          <div className="form-field">
+            <label htmlFor="lastName">Last Name *</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName || ''}
+              onChange={(e) => onChange('lastName', e.target.value)}
+              placeholder="Enter your last name"
+              required
+            />
+            {errors.lastName && (
+              <div className="error-message">{errors.lastName}</div>
+            )}
+          </div>
+        </div>
+        
+        <div className="form-field">
+          <label htmlFor="email">Email Address *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email || ''}
+            onChange={(e) => onChange('email', e.target.value)}
+            placeholder="Enter your email address"
+            required
+          />
+          {errors.email && (
+            <div className="error-message">{errors.email}</div>
+          )}
+        </div>
+      </div>
       
       <div className="form-section">
         <h3>What is your fitness level?</h3>

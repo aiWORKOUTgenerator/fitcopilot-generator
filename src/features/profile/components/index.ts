@@ -6,6 +6,7 @@
 
 // Main components
 export { default as ProfileForm } from './ProfileForm';
+export { default as ProfileCard } from './ProfileCard';
 export { default as FormNavigation } from './FormNavigation';
 export { default as FormProgress } from './FormProgress';
 

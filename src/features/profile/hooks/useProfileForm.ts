@@ -15,7 +15,7 @@ import { useProfile } from '../context';
  * @returns Profile form state and handlers
  */
 export const useProfileForm = (initialStep = 1) => {
-  const { profile, updateUserProfile, isUpdating, error } = useProfile();
+  const { profile, updateUserProfile, saveDraftUserProfile, isUpdating, isSavingDraft, error, completedSteps } = useProfile();
   const { validateProfile, isProfileComplete } = useProfileValidation();
   
   // Define total steps in the profile form
@@ -37,6 +37,9 @@ export const useProfileForm = (initialStep = 1) => {
       setFormState(state => ({
         ...state,
         formData: {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
           fitnessLevel: profile.fitnessLevel,
           goals: profile.goals,
           customGoal: profile.customGoal,
@@ -68,9 +71,9 @@ export const useProfileForm = (initialStep = 1) => {
   useEffect(() => {
     setFormState(state => ({
       ...state,
-      isSubmitting: isUpdating
+      isSubmitting: isUpdating || isSavingDraft
     }));
-  }, [isUpdating]);
+  }, [isUpdating, isSavingDraft]);
   
   // Field change handler
   const handleChange = useCallback((field: string, value: any) => {
@@ -97,7 +100,7 @@ export const useProfileForm = (initialStep = 1) => {
     switch (currentStep) {
       case 1: // Basic info
         stepErrors = Object.keys(errors)
-          .filter(key => ['fitnessLevel', 'goals', 'customGoal'].includes(key))
+          .filter(key => ['firstName', 'lastName', 'email', 'fitnessLevel', 'goals', 'customGoal'].includes(key))
           .reduce((obj, key) => ({ ...obj, [key]: errors[key] }), {});
         break;
         
@@ -143,15 +146,28 @@ export const useProfileForm = (initialStep = 1) => {
     return Object.keys(stepErrors).length === 0;
   }, [formState.currentStep, formState.formData, validateProfile]);
   
-  // Step navigation
-  const goToNextStep = useCallback(() => {
+  // Step navigation with auto-save
+  const goToNextStep = useCallback(async () => {
     if (validateForm()) {
-      setFormState(state => ({
-        ...state,
-        currentStep: Math.min(state.currentStep + 1, state.totalSteps)
-      }));
+      // Auto-save current step data before moving to next step
+      try {
+        await saveDraftUserProfile(formState.formData, formState.currentStep);
+        
+        setFormState(state => ({
+          ...state,
+          currentStep: Math.min(state.currentStep + 1, state.totalSteps),
+          isDirty: false
+        }));
+      } catch (error) {
+        console.error('Failed to auto-save step data:', error);
+        // Still allow progression even if save fails
+        setFormState(state => ({
+          ...state,
+          currentStep: Math.min(state.currentStep + 1, state.totalSteps)
+        }));
+      }
     }
-  }, [validateForm]);
+  }, [validateForm, formState.formData, formState.currentStep, formState.totalSteps, saveDraftUserProfile]);
   
   const goToPreviousStep = useCallback(() => {
     setFormState(state => ({
@@ -218,6 +234,8 @@ export const useProfileForm = (initialStep = 1) => {
   
   return {
     ...formState,
+    completedSteps,
+    isSavingDraft,
     handleChange,
     validateForm,
     goToNextStep,

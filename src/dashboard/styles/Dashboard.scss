@@ -1,5 +1,8 @@
-/* Dashboard styles with dark theme */
+/* Enhanced Dashboard styles with tabbed interface */
 @import './components.scss';
+@import '../components/TabSystem/TabSystem.scss';
+@import '../components/ProfileTab/ProfileTab.scss';
+@import '../components/SavedWorkoutsTab/SavedWorkoutsTab.scss';
 
 .fitcopilot-dashboard {
   --primary-bg: #121212;
@@ -21,67 +24,506 @@
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   
-  /* Header Styles */
-  .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-md) var(--spacing-lg);
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: var(--spacing-lg);
-    
-    .dashboard-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 0;
-    }
-    
-    .dashboard-actions {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-  }
-  
-  /* Main Content Layout */
-  .dashboard-content {
-    display: flex;
-    flex-direction: column;
-    padding: 0 var(--spacing-lg);
-    gap: var(--spacing-lg);
-    
-    @media (min-width: 768px) {
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
-    
-    /* Sidebar (Left Column - 40%) */
-    .dashboard-sidebar {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-lg);
+  // Enhanced Dashboard Layout
+  &.enhanced {
+    /* Enhanced Header Styles */
+    .dashboard-header {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-bottom: 1px solid var(--border-color);
+      background: var(--card-bg);
       
-      @media (min-width: 768px) {
-        width: 40%;
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        
+        @media (max-width: 768px) {
+          flex-direction: column;
+          gap: var(--spacing-md);
+          align-items: stretch;
+        }
+      }
+      
+      .header-main {
+        .dashboard-title {
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin: 0 0 0.5rem 0;
+          
+          @media (max-width: 768px) {
+            font-size: 1.75rem;
+          }
+        }
+        
+        .dashboard-subtitle {
+          color: var(--text-secondary);
+          font-size: 1rem;
+          margin: 0;
+          
+          @media (max-width: 768px) {
+            font-size: 0.875rem;
+          }
+        }
+      }
+      
+      .header-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+        
+        @media (max-width: 768px) {
+          width: 100%;
+          justify-content: flex-end;
+        }
       }
     }
     
-    /* Main Area (Right Column - 60%) */
-    .dashboard-main {
-      width: 100%;
+    /* Enhanced Content Layout */
+    .dashboard-content {
       display: flex;
       flex-direction: column;
-      gap: var(--spacing-lg);
+      padding: var(--spacing-xl);
+      gap: var(--spacing-xl);
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
       
-      @media (min-width: 768px) {
-        width: 60%;
-        padding-left: var(--spacing-lg);
+      @media (max-width: 768px) {
+        padding: var(--spacing-md);
+        gap: var(--spacing-lg);
+      }
+    }
+    
+    /* Tabbed Section */
+    .dashboard-tabs-section {
+      flex: 1;
+      min-height: 600px;
+      
+      .profile-tab-content,
+      .saved-workouts-tab-content,
+      .register-tab-content {
+        height: 100%;
+      }
+      
+      .profile-tab-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+      }
+      
+      /* Register Tab Layout */
+      .register-tab-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: var(--spacing-xl);
+        height: 100%;
+        
+        @media (max-width: 1024px) {
+          grid-template-columns: 1fr;
+          gap: var(--spacing-lg);
+        }
+        
+        .register-header {
+          grid-column: 1 / -1;
+          margin-bottom: var(--spacing-lg);
+          
+          h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 var(--spacing-sm) 0;
+          }
+          
+          .register-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+          }
+        }
+        
+        .register-form-section {
+          .register-form-card {
+            height: fit-content;
+            
+            .dashboard-profile-feature {
+              margin: 0;
+              
+              .profile-feature__subtitle {
+                display: none; // Hide duplicate subtitle
+              }
+            }
+          }
+        }
+        
+        .register-info-section {
+          .register-info-card {
+            height: fit-content;
+            position: sticky;
+            top: var(--spacing-lg);
+            
+            h3 {
+              font-size: 1.25rem;
+              font-weight: 600;
+              color: var(--text-primary);
+              margin: 0 0 var(--spacing-lg) 0;
+            }
+            
+            .steps-overview {
+              display: flex;
+              flex-direction: column;
+              gap: var(--spacing-md);
+              
+              .step-item {
+                display: flex;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+                padding: var(--spacing-md);
+                border-radius: 8px;
+                background: rgba(99, 102, 241, 0.1);
+                border: 1px solid rgba(99, 102, 241, 0.2);
+                
+                .step-number {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 32px;
+                  height: 32px;
+                  background: var(--accent-color);
+                  color: white;
+                  border-radius: 50%;
+                  font-weight: 600;
+                  font-size: 0.875rem;
+                  flex-shrink: 0;
+                }
+                
+                .step-content {
+                  flex: 1;
+                  
+                  h4 {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin: 0 0 0.25rem 0;
+                  }
+                  
+                  p {
+                    font-size: 0.875rem;
+                    color: var(--text-secondary);
+                    margin: 0;
+                    line-height: 1.4;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    /* Workout Generator Section */
+    .workout-generator-section {
+      .workout-generator-card {
+        .generator-header {
+          margin-bottom: var(--spacing-lg);
+          
+          .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: none;
+            padding-bottom: 0;
+          }
+          
+          .generator-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin: 0;
+          }
+        }
+        
+        .generator-content {
+          // Ensure the workout generator has proper spacing
+          .workout-generator-feature {
+            margin: 0;
+          }
+        }
+      }
+    }
+    
+    /* Error Display */
+    .dashboard-error {
+      position: fixed;
+      bottom: var(--spacing-lg);
+      right: var(--spacing-lg);
+      background: #ef4444;
+      color: white;
+      padding: var(--spacing-md);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      max-width: 400px;
+      
+      .error-content {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        
+        .error-icon {
+          font-size: 1.25rem;
+        }
+        
+        .error-message {
+          flex: 1;
+          font-size: 0.875rem;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        bottom: var(--spacing-md);
+        right: var(--spacing-md);
+        left: var(--spacing-md);
+        max-width: none;
+      }
+    }
+
+    /* Registration Steps Component Styles */
+    .registration-steps {
+      &__title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 var(--spacing-lg) 0;
+      }
+
+      &__overview {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+      }
+
+      &__completion {
+        margin-top: var(--spacing-lg);
+        padding: var(--spacing-md);
+        background: rgba(163, 230, 53, 0.1);
+        border: 1px solid rgba(163, 230, 53, 0.3);
+        border-radius: 8px;
+        text-align: center;
+
+        .completion-message {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          color: #a3e635;
+          font-weight: 600;
+
+          .completion-icon {
+            color: #a3e635;
+          }
+        }
+      }
+
+      &__saving {
+        margin-top: var(--spacing-md);
+        text-align: center;
+        padding: 0.5rem;
+        background-color: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 8px;
+
+        .saving-text {
+          color: #f59e0b;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .registration-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-radius: 16px;
+      background: rgba(31, 41, 55, 0.7);
+      border: 1px solid #374151;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      position: relative;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Green glowing border for completed steps */
+      &.completed.saved {
+        border-color: rgba(163, 230, 53, 0.5) !important;
+        box-shadow: 0 0 20px rgba(163, 230, 53, 0.15);
+
+        &:hover {
+          border-color: rgba(163, 230, 53, 0.7) !important;
+          box-shadow: 0 0 25px rgba(163, 230, 53, 0.25);
+        }
+      }
+
+      &__number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: var(--accent-color);
+        color: white;
+        border-radius: 50%;
+        font-weight: 600;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+      }
+
+      &.completed &__number {
+        background-color: #a3e635;
+        color: white;
+      }
+
+      &.saving &__number {
+        background-color: #f59e0b;
+        color: white;
+      }
+
+      &__content {
+        flex: 1;
+      }
+
+      &__title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 0.25rem 0;
+      }
+
+      &.completed &__title {
+        color: #a3e635;
+        font-weight: 600;
+      }
+
+      &__description {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      &__saved-indicator {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background-color: #a3e635;
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .saved-text {
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      .saving-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .animate-spin {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .checkmark {
+        color: white;
       }
     }
   }
   
-  /* Card Styling */
+  /* Legacy Layout Support */
+  &:not(.enhanced) {
+    /* Original Header Styles */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: var(--spacing-lg);
+      
+      .dashboard-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+      }
+      
+      .dashboard-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+      }
+    }
+    
+    /* Original Content Layout */
+    .dashboard-content {
+      display: flex;
+      flex-direction: column;
+      padding: 0 var(--spacing-lg);
+      gap: var(--spacing-lg);
+      
+      @media (min-width: 768px) {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      
+      /* Sidebar (Left Column - 40%) */
+      .dashboard-sidebar {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        
+        @media (min-width: 768px) {
+          width: 40%;
+        }
+      }
+      
+      /* Main Area (Right Column - 60%) */
+      .dashboard-main {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        
+        @media (min-width: 768px) {
+          width: 60%;
+          padding-left: var(--spacing-lg);
+        }
+      }
+    }
+  }
+  
+  /* Common Card Styling */
   .card-title {
     font-size: 1.25rem;
     font-weight: 600;

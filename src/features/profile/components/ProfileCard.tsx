@@ -4,27 +4,27 @@
  */
 
 import React from 'react';
-import { ProfileData } from '../types';
+import { UserProfile } from '../types';
 
 interface ProfileCardProps {
-  profile: ProfileData;
+  profile: UserProfile;
   onEdit: () => void;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onEdit }) => {
   // Format workout goals as readable text
-  const formattedGoals = profile.workoutGoals.map(goal => 
+  const formattedGoals = profile.goals?.map(goal => 
     goal.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-  ).join(', ');
+  ).join(', ') || 'Not set';
 
   // Calculate profile completion percentage
   const totalFields = 5; // Count major profile fields
   const filledFields = [
     !!profile.fitnessLevel,
-    profile.workoutGoals.length > 0,
-    !!profile.equipmentAvailable,
-    profile.workoutFrequency > 0,
-    profile.workoutDuration > 0
+    profile.goals && profile.goals.length > 0,
+    !!profile.availableEquipment && profile.availableEquipment.length > 0,
+    !!profile.workoutFrequency,
+    !!profile.preferredWorkoutDuration
   ].filter(Boolean).length;
   
   const completionPercentage = Math.round((filledFields / totalFields) * 100);
@@ -62,38 +62,40 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onEdit }) => {
           <div className="profile-stat-item">
             <span className="profile-stat-label">Workout Goals</span>
             <span className="profile-stat-value">
-              {formattedGoals || 'Not set'}
+              {formattedGoals}
             </span>
           </div>
           
           <div className="profile-stat-item">
             <span className="profile-stat-label">Equipment</span>
             <span className="profile-stat-value">
-              {profile.equipmentAvailable?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Not set'}
+              {profile.availableEquipment && profile.availableEquipment.length > 0 
+                ? profile.availableEquipment.map(eq => eq.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())).join(', ')
+                : 'Not set'}
             </span>
           </div>
           
           <div className="profile-stat-item">
             <span className="profile-stat-label">Workout Frequency</span>
             <span className="profile-stat-value">
-              {profile.workoutFrequency > 0 ? `${profile.workoutFrequency} times per week` : 'Not set'}
+              {profile.workoutFrequency ? `${profile.workoutFrequency} times per week` : 'Not set'}
             </span>
           </div>
           
           <div className="profile-stat-item">
             <span className="profile-stat-label">Workout Duration</span>
             <span className="profile-stat-value">
-              {profile.workoutDuration > 0 ? `${profile.workoutDuration} minutes` : 'Not set'}
+              {profile.preferredWorkoutDuration ? `${profile.preferredWorkoutDuration} minutes` : 'Not set'}
             </span>
           </div>
           
-          {profile.medicalConditions && profile.medicalConditions.length > 0 && (
+          {profile.limitations && profile.limitations.length > 0 && (
             <div className="profile-stat-item">
-              <span className="profile-stat-label">Medical Conditions</span>
+              <span className="profile-stat-label">Physical Limitations</span>
               <div className="flex flex-wrap gap-1 mt-1">
-                {profile.medicalConditions.map(condition => (
-                  <span key={condition.id} className="profile-badge profile-badge-red">
-                    {condition.name}
+                {profile.limitations.map((limitation, index) => (
+                  <span key={index} className="profile-badge profile-badge-red">
+                    {limitation.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </span>
                 ))}
               </div>
@@ -104,7 +106,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onEdit }) => {
       
       <div className="profile-card-footer">
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          Last updated: {profile.updatedAt ? new Date(profile.updatedAt).toLocaleDateString() : 'Never'}
+          Last updated: {profile.lastUpdated ? new Date(profile.lastUpdated).toLocaleDateString() : 'Never'}
         </span>
         
         <button 

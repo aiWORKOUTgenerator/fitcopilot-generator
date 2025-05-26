@@ -74,6 +74,7 @@
 .step-indicators {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .step-indicator {
@@ -81,11 +82,34 @@
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+  position: relative;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid #374151;
+  background-color: rgba(31, 41, 55, 0.7);
+  backdrop-filter: blur(8px);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  min-width: 120px;
+}
+
+.step-indicator:hover {
+  transform: translateY(-2px);
+}
+
+/* Green glowing border for completed steps */
+.step-indicator.completed.saved {
+  border-color: rgba(163, 230, 53, 0.5) !important;
+  box-shadow: 0 0 20px rgba(163, 230, 53, 0.15);
+}
+
+.step-indicator.completed.saved:hover {
+  border-color: rgba(163, 230, 53, 0.7) !important;
+  box-shadow: 0 0 25px rgba(163, 230, 53, 0.25);
 }
 
 .step-number {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,23 +118,95 @@
   border-radius: 50%;
   margin-bottom: 0.5rem;
   font-weight: bold;
+  transition: all 0.3s ease;
 }
 
 .step-label {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #666;
   text-align: center;
-  max-width: 80px;
+  max-width: 100px;
+  font-weight: 500;
 }
 
 .step-indicator.active .step-number {
   background-color: #4a90e2;
   color: white;
+  transform: scale(1.1);
 }
 
 .step-indicator.completed .step-number {
-  background-color: #4caf50;
+  background-color: #a3e635;
   color: white;
+}
+
+.step-indicator.completed .step-label {
+  color: #a3e635;
+  font-weight: 600;
+}
+
+/* Saving state styles */
+.step-indicator.saving .step-number {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.saving-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.checkmark {
+  color: white;
+}
+
+/* Step saved indicator */
+.step-saved-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #a3e635;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.saved-text {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Saving indicator */
+.saving-indicator {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+}
+
+.saving-text {
+  color: #f59e0b;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 /* Form navigation */
@@ -145,6 +241,40 @@
   margin-bottom: 1.5rem;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 576px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .step-indicators {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .step-indicator {
+    min-width: 100px;
+    padding: 0.75rem;
+  }
+  
+  .step-number {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .step-label {
+    font-size: 0.8rem;
+    max-width: 90px;
+  }
+}
+
 .form-field label {
   display: block;
   margin-bottom: 0.5rem;
@@ -152,6 +282,7 @@
 }
 
 .form-field input[type="text"],
+.form-field input[type="email"],
 .form-field input[type="number"],
 .form-field textarea,
 .form-field select {
@@ -336,6 +467,7 @@ button:disabled {
 }
 
 .dark-theme .form-field input[type="text"],
+.dark-theme .form-field input[type="email"],
 .dark-theme .form-field input[type="number"],
 .dark-theme .form-field textarea,
 .dark-theme .form-field select {

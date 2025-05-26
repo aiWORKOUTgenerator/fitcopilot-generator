@@ -9,7 +9,7 @@ import {
   PartialUserProfile, 
   INITIAL_PROFILE 
 } from '../types';
-import { getProfile, updateProfile } from '../api';
+import { getProfile, updateProfile, saveDraftProfile } from '../api';
 
 /**
  * Profile Context State
@@ -18,8 +18,10 @@ interface ProfileState {
   profile: UserProfile | null;
   isLoading: boolean;
   isUpdating: boolean;
+  isSavingDraft: boolean;
   error: string | null;
   isProfileComplete: boolean;
+  completedSteps: number[];
 }
 
 /**
@@ -32,6 +34,9 @@ type ProfileAction =
   | { type: 'UPDATE_PROFILE_START' }
   | { type: 'UPDATE_PROFILE_SUCCESS'; payload: UserProfile }
   | { type: 'UPDATE_PROFILE_ERROR'; payload: string }
+  | { type: 'SAVE_DRAFT_START' }
+  | { type: 'SAVE_DRAFT_SUCCESS'; payload: { profile: UserProfile; step: number } }
+  | { type: 'SAVE_DRAFT_ERROR'; payload: string }
   | { type: 'RESET_ERROR' };
 
 /**
@@ -40,6 +45,7 @@ type ProfileAction =
 interface ProfileContextValue extends ProfileState {
   fetchProfile: () => Promise<void>;
   updateUserProfile: (data: PartialUserProfile) => Promise<void>;
+  saveDraftUserProfile: (data: PartialUserProfile, step: number) => Promise<void>;
   resetError: () => void;
 }
 
@@ -48,8 +54,10 @@ const initialState: ProfileState = {
   profile: null,
   isLoading: false,
   isUpdating: false,
+  isSavingDraft: false,
   error: null,
-  isProfileComplete: false
+  isProfileComplete: false,
+  completedSteps: []
 };
 
 // Create context
@@ -85,6 +93,20 @@ const profileReducer = (state: ProfileState, action: ProfileAction): ProfileStat
     
     case 'UPDATE_PROFILE_ERROR':
       return { ...state, isUpdating: false, error: action.payload };
+    
+    case 'SAVE_DRAFT_START':
+      return { ...state, isSavingDraft: true, error: null };
+    
+    case 'SAVE_DRAFT_SUCCESS':
+      return { 
+        ...state, 
+        profile: action.payload.profile, 
+        isSavingDraft: false,
+        completedSteps: [...new Set([...state.completedSteps, action.payload.step])].sort()
+      };
+    
+    case 'SAVE_DRAFT_ERROR':
+      return { ...state, isSavingDraft: false, error: action.payload };
     
     case 'RESET_ERROR':
       return { ...state, error: null };
@@ -137,6 +159,22 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
     }
   };
   
+  // Save draft profile function
+  const saveDraftUserProfile = async (data: PartialUserProfile, step: number): Promise<void> => {
+    dispatch({ type: 'SAVE_DRAFT_START' });
+    
+    try {
+      const draftProfile = await saveDraftProfile(data);
+      dispatch({ type: 'SAVE_DRAFT_SUCCESS', payload: { profile: draftProfile, step } });
+    } catch (error) {
+      let errorMessage = 'Failed to save draft profile';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      dispatch({ type: 'SAVE_DRAFT_ERROR', payload: errorMessage });
+    }
+  };
+  
   // Reset error function
   const resetError = () => {
     dispatch({ type: 'RESET_ERROR' });
@@ -147,6 +185,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
     ...state,
     fetchProfile,
     updateUserProfile,
+    saveDraftUserProfile,
     resetError
   };
   

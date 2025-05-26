@@ -29,6 +29,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onComplete, className = '' })
     validationErrors,
     isDirty,
     isSubmitting,
+    isSavingDraft,
+    completedSteps,
     serverError,
     handleChange,
     validateForm,
@@ -114,7 +116,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onComplete, className = '' })
         
         <FormProgress 
           currentStep={currentStep} 
-          totalSteps={totalSteps} 
+          totalSteps={totalSteps}
+          completedSteps={completedSteps}
+          isSavingDraft={isSavingDraft}
           onStepClick={goToStep} 
         />
         

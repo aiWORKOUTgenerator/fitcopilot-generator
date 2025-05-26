@@ -2,7 +2,7 @@
 /**
  * Profile API Endpoints
  *
- * Handles the REST API endpoints for user profiles with standardized format handling
+ * Handles the REST API endpoints for user profiles with clean, unified field naming
  */
 
 namespace FitCopilot\API;
@@ -59,7 +59,7 @@ class ProfileEndpoints {
     }
     
     /**
-     * Extract profile parameters from the request, handling both direct and wrapped formats
+     * Extract profile parameters from the request
      *
      * @param \WP_REST_Request $request The request object
      * @return array Extracted parameters
@@ -82,19 +82,16 @@ class ProfileEndpoints {
         // Use APIUtils to normalize request data with 'profile' as the wrapper key
         $profile_params = APIUtils::normalize_request_data($manual_json ?: $body_params, 'profile');
         
-        // Apply defaults for required fields
+        // Apply defaults for required fields using frontend field names
         $defaults = [
             'fitnessLevel' => 'beginner',
-            'workoutGoals' => ['strength'],
-            'equipmentAvailable' => 'minimal',
-            'workoutFrequency' => 3,
-            'workoutDuration' => 30,
-            'preferences' => [
-                'darkMode' => false,
-                'notifications' => true,
-                'metrics' => 'imperial'
-            ],
-            'medicalConditions' => [],
+            'goals' => ['general_fitness'],
+            'availableEquipment' => ['none'],
+            'workoutFrequency' => '3-4',
+            'preferredWorkoutDuration' => 30,
+            'preferredLocation' => 'home',
+            'limitations' => ['none'],
+            'profileComplete' => false,
         ];
         
         // Merge in defaults for missing fields
@@ -120,113 +117,74 @@ class ProfileEndpoints {
         try {
             $user_id = get_current_user_id();
             
-            // Get the profile data from user meta with consistent _profile_ prefix
-            $fitness_level = get_user_meta($user_id, '_profile_fitness_level', true);
-            $workout_goals = get_user_meta($user_id, '_profile_workout_goals', true);
-            $equipment_available = get_user_meta($user_id, '_profile_equipment', true);
-            $workout_frequency = get_user_meta($user_id, '_profile_frequency', true);
-            $workout_duration = get_user_meta($user_id, '_profile_duration', true);
-            $preferences = get_user_meta($user_id, '_profile_preferences', true);
-            $medical_conditions = get_user_meta($user_id, '_profile_medical_conditions', true);
+            // Get the profile data from user meta using frontend field names
+            $first_name = get_user_meta($user_id, '_profile_firstName', true);
+            $last_name = get_user_meta($user_id, '_profile_lastName', true);
+            $email = get_user_meta($user_id, '_profile_email', true);
+            $fitness_level = get_user_meta($user_id, '_profile_fitnessLevel', true);
+            $goals = get_user_meta($user_id, '_profile_goals', true);
+            $custom_goal = get_user_meta($user_id, '_profile_customGoal', true);
+            $weight = get_user_meta($user_id, '_profile_weight', true);
+            $weight_unit = get_user_meta($user_id, '_profile_weightUnit', true);
+            $height = get_user_meta($user_id, '_profile_height', true);
+            $height_unit = get_user_meta($user_id, '_profile_heightUnit', true);
+            $age = get_user_meta($user_id, '_profile_age', true);
+            $gender = get_user_meta($user_id, '_profile_gender', true);
+            $available_equipment = get_user_meta($user_id, '_profile_availableEquipment', true);
+            $custom_equipment = get_user_meta($user_id, '_profile_customEquipment', true);
+            $preferred_location = get_user_meta($user_id, '_profile_preferredLocation', true);
+            $limitations = get_user_meta($user_id, '_profile_limitations', true);
+            $limitation_notes = get_user_meta($user_id, '_profile_limitationNotes', true);
+            $workout_frequency = get_user_meta($user_id, '_profile_workoutFrequency', true);
+            $custom_frequency = get_user_meta($user_id, '_profile_customFrequency', true);
+            $preferred_workout_duration = get_user_meta($user_id, '_profile_preferredWorkoutDuration', true);
+            $favorite_exercises = get_user_meta($user_id, '_profile_favoriteExercises', true);
+            $disliked_exercises = get_user_meta($user_id, '_profile_dislikedExercises', true);
+            $medical_conditions = get_user_meta($user_id, '_profile_medicalConditions', true);
+            $profile_complete = get_user_meta($user_id, '_profile_profileComplete', true);
+            $created_at = get_user_meta($user_id, '_profile_createdAt', true);
+            $updated_at = get_user_meta($user_id, '_profile_updatedAt', true);
             
-            // Check for legacy data format and migrate if necessary
-            if (empty($fitness_level)) {
-                $fitness_level = get_user_meta($user_id, 'fitness_level', true);
-                if (!empty($fitness_level)) {
-                    update_user_meta($user_id, '_profile_fitness_level', $fitness_level);
-                } else {
-                    $fitness_level = 'beginner';
-                }
-            }
-            
-            if (empty($workout_goals) || !is_array($workout_goals)) {
-                $workout_goals = get_user_meta($user_id, 'workout_goals', true);
-                if (!empty($workout_goals) && is_array($workout_goals)) {
-                    update_user_meta($user_id, '_profile_workout_goals', $workout_goals);
-                } else {
-                    $workout_goals = ['strength'];
-                }
-            }
-            
-            if (empty($equipment_available)) {
-                $equipment_available = get_user_meta($user_id, 'equipment_available', true);
-                if (!empty($equipment_available)) {
-                    update_user_meta($user_id, '_profile_equipment', $equipment_available);
-                } else {
-                    $equipment_available = 'minimal';
-                }
-            }
-            
-            if (empty($workout_frequency)) {
-                $workout_frequency = get_user_meta($user_id, 'workout_frequency', true);
-                if (!empty($workout_frequency)) {
-                    update_user_meta($user_id, '_profile_frequency', $workout_frequency);
-                } else {
-                    $workout_frequency = 3;
-                }
-            }
-            
-            if (empty($workout_duration)) {
-                $workout_duration = get_user_meta($user_id, 'workout_duration', true);
-                if (!empty($workout_duration)) {
-                    update_user_meta($user_id, '_profile_duration', $workout_duration);
-                } else {
-                    $workout_duration = 30;
-                }
-            }
-            
-            if (empty($preferences) || !is_array($preferences)) {
-                $preferences = get_user_meta($user_id, 'fitness_preferences', true);
-                if (!empty($preferences) && is_array($preferences)) {
-                    update_user_meta($user_id, '_profile_preferences', $preferences);
-                } else {
-                    $preferences = [
-                        'darkMode' => false,
-                        'notifications' => true,
-                        'metrics' => 'imperial'
-                    ];
-                }
-            }
-            
-            if (empty($medical_conditions) || !is_array($medical_conditions)) {
-                $medical_conditions = get_user_meta($user_id, 'medical_conditions', true);
-                if (!empty($medical_conditions) && is_array($medical_conditions)) {
-                    update_user_meta($user_id, '_profile_medical_conditions', $medical_conditions);
-                } else {
-                    $medical_conditions = [];
-                }
-            }
-            
-            // Get timestamps with consistent naming
-            $created_at = get_user_meta($user_id, '_profile_created_at', true);
+            // Set timestamps if not present
             if (empty($created_at)) {
-                $created_at = get_user_meta($user_id, 'profile_created_at', true);
-                if (!empty($created_at)) {
-                    update_user_meta($user_id, '_profile_created_at', $created_at);
-                }
+                $created_at = current_time('mysql');
+                update_user_meta($user_id, '_profile_createdAt', $created_at);
             }
             
-            $updated_at = get_user_meta($user_id, '_profile_updated_at', true);
             if (empty($updated_at)) {
-                $updated_at = get_user_meta($user_id, 'profile_updated_at', true);
-                if (!empty($updated_at)) {
-                    update_user_meta($user_id, '_profile_updated_at', $updated_at);
-                }
+                $updated_at = current_time('mysql');
+                update_user_meta($user_id, '_profile_updatedAt', $updated_at);
             }
             
-            // Build the profile data
+            // Build the profile data using frontend field names
             $profile = [
                 'id' => $user_id,
-                'userId' => $user_id,
-                'fitnessLevel' => $fitness_level,
-                'workoutGoals' => $workout_goals,
-                'equipmentAvailable' => $equipment_available,
-                'workoutFrequency' => intval($workout_frequency),
-                'workoutDuration' => intval($workout_duration),
-                'medicalConditions' => $medical_conditions,
-                'preferences' => $preferences,
-                'createdAt' => $created_at,
-                'updatedAt' => $updated_at
+                'firstName' => $first_name ?: '',
+                'lastName' => $last_name ?: '',
+                'email' => $email ?: '',
+                'fitnessLevel' => $fitness_level ?: 'beginner',
+                'goals' => is_array($goals) ? $goals : ['general_fitness'],
+                'customGoal' => $custom_goal ?: '',
+                'weight' => intval($weight),
+                'weightUnit' => $weight_unit ?: 'lbs',
+                'height' => intval($height),
+                'heightUnit' => $height_unit ?: 'ft',
+                'age' => intval($age),
+                'gender' => $gender ?: '',
+                'availableEquipment' => is_array($available_equipment) ? $available_equipment : ['none'],
+                'customEquipment' => $custom_equipment ?: '',
+                'preferredLocation' => $preferred_location ?: 'home',
+                'limitations' => is_array($limitations) ? $limitations : ['none'],
+                'limitationNotes' => $limitation_notes ?: '',
+                'workoutFrequency' => $workout_frequency ?: '3-4',
+                'customFrequency' => $custom_frequency ?: '',
+                'preferredWorkoutDuration' => intval($preferred_workout_duration) ?: 30,
+                'favoriteExercises' => is_array($favorite_exercises) ? $favorite_exercises : [],
+                'dislikedExercises' => is_array($disliked_exercises) ? $disliked_exercises : [],
+                'medicalConditions' => is_array($medical_conditions) ? $medical_conditions : [],
+                'profileComplete' => (bool) $profile_complete,
+                'lastUpdated' => $updated_at,
+                'completedWorkouts' => 0 // This would come from workout logs in the future
             ];
             
             // Return success response with standardized format
@@ -265,7 +223,7 @@ class ProfileEndpoints {
                 );
             }
             
-            // Validate parameters
+            // Validate parameters using frontend field names
             $validation_errors = [];
             
             // Validate fitnessLevel
@@ -274,18 +232,18 @@ class ProfileEndpoints {
             }
             
             // Validate workoutFrequency
-            if (isset($params['workoutFrequency']) && (!is_numeric($params['workoutFrequency']) || $params['workoutFrequency'] < 1 || $params['workoutFrequency'] > 7)) {
-                $validation_errors['workoutFrequency'] = 'Workout frequency must be a number between 1 and 7';
+            if (isset($params['workoutFrequency']) && !in_array($params['workoutFrequency'], ['1-2', '3-4', '5+', 'custom'])) {
+                $validation_errors['workoutFrequency'] = 'Workout frequency must be one of: 1-2, 3-4, 5+, custom';
             }
             
-            // Validate workoutDuration
-            if (isset($params['workoutDuration']) && (!is_numeric($params['workoutDuration']) || $params['workoutDuration'] < 10 || $params['workoutDuration'] > 120)) {
-                $validation_errors['workoutDuration'] = 'Workout duration must be a number between 10 and 120';
+            // Validate preferredWorkoutDuration
+            if (isset($params['preferredWorkoutDuration']) && (!is_numeric($params['preferredWorkoutDuration']) || $params['preferredWorkoutDuration'] < 10 || $params['preferredWorkoutDuration'] > 120)) {
+                $validation_errors['preferredWorkoutDuration'] = 'Workout duration must be a number between 10 and 120';
             }
             
-            // Validate workoutGoals
-            if (isset($params['workoutGoals']) && !is_array($params['workoutGoals'])) {
-                $validation_errors['workoutGoals'] = 'Workout goals must be an array';
+            // Validate goals
+            if (isset($params['goals']) && !is_array($params['goals'])) {
+                $validation_errors['goals'] = 'Goals must be an array';
             }
             
             // Return validation errors if any
@@ -296,57 +254,117 @@ class ProfileEndpoints {
                 );
             }
             
-            // Update profile data in user meta with consistent _profile_ prefix
+            // Update profile data in user meta using frontend field names
+            if (isset($params['firstName'])) {
+                update_user_meta($user_id, '_profile_firstName', sanitize_text_field($params['firstName']));
+            }
+            
+            if (isset($params['lastName'])) {
+                update_user_meta($user_id, '_profile_lastName', sanitize_text_field($params['lastName']));
+            }
+            
+            if (isset($params['email'])) {
+                update_user_meta($user_id, '_profile_email', sanitize_email($params['email']));
+            }
+            
             if (isset($params['fitnessLevel'])) {
-                update_user_meta($user_id, '_profile_fitness_level', sanitize_text_field($params['fitnessLevel']));
+                update_user_meta($user_id, '_profile_fitnessLevel', sanitize_text_field($params['fitnessLevel']));
             }
             
-            if (isset($params['workoutGoals']) && is_array($params['workoutGoals'])) {
-                // Sanitize each goal
-                $sanitized_goals = array_map('sanitize_text_field', $params['workoutGoals']);
-                update_user_meta($user_id, '_profile_workout_goals', $sanitized_goals);
+            if (isset($params['goals']) && is_array($params['goals'])) {
+                $sanitized_goals = array_map('sanitize_text_field', $params['goals']);
+                update_user_meta($user_id, '_profile_goals', $sanitized_goals);
             }
             
-            if (isset($params['equipmentAvailable'])) {
-                update_user_meta($user_id, '_profile_equipment', sanitize_text_field($params['equipmentAvailable']));
+            if (isset($params['customGoal'])) {
+                update_user_meta($user_id, '_profile_customGoal', sanitize_textarea_field($params['customGoal']));
+            }
+            
+            if (isset($params['weight'])) {
+                update_user_meta($user_id, '_profile_weight', intval($params['weight']));
+            }
+            
+            if (isset($params['weightUnit'])) {
+                update_user_meta($user_id, '_profile_weightUnit', sanitize_text_field($params['weightUnit']));
+            }
+            
+            if (isset($params['height'])) {
+                update_user_meta($user_id, '_profile_height', intval($params['height']));
+            }
+            
+            if (isset($params['heightUnit'])) {
+                update_user_meta($user_id, '_profile_heightUnit', sanitize_text_field($params['heightUnit']));
+            }
+            
+            if (isset($params['age'])) {
+                update_user_meta($user_id, '_profile_age', intval($params['age']));
+            }
+            
+            if (isset($params['gender'])) {
+                update_user_meta($user_id, '_profile_gender', sanitize_text_field($params['gender']));
+            }
+            
+            if (isset($params['availableEquipment']) && is_array($params['availableEquipment'])) {
+                $sanitized_equipment = array_map('sanitize_text_field', $params['availableEquipment']);
+                update_user_meta($user_id, '_profile_availableEquipment', $sanitized_equipment);
+            }
+            
+            if (isset($params['customEquipment'])) {
+                update_user_meta($user_id, '_profile_customEquipment', sanitize_textarea_field($params['customEquipment']));
+            }
+            
+            if (isset($params['preferredLocation'])) {
+                update_user_meta($user_id, '_profile_preferredLocation', sanitize_text_field($params['preferredLocation']));
+            }
+            
+            if (isset($params['limitations']) && is_array($params['limitations'])) {
+                $sanitized_limitations = array_map('sanitize_text_field', $params['limitations']);
+                update_user_meta($user_id, '_profile_limitations', $sanitized_limitations);
+            }
+            
+            if (isset($params['limitationNotes'])) {
+                update_user_meta($user_id, '_profile_limitationNotes', sanitize_textarea_field($params['limitationNotes']));
             }
             
             if (isset($params['workoutFrequency'])) {
-                update_user_meta($user_id, '_profile_frequency', intval($params['workoutFrequency']));
+                update_user_meta($user_id, '_profile_workoutFrequency', sanitize_text_field($params['workoutFrequency']));
             }
             
-            if (isset($params['workoutDuration'])) {
-                update_user_meta($user_id, '_profile_duration', intval($params['workoutDuration']));
+            if (isset($params['customFrequency'])) {
+                update_user_meta($user_id, '_profile_customFrequency', sanitize_textarea_field($params['customFrequency']));
             }
             
-            if (isset($params['preferences']) && is_array($params['preferences'])) {
-                // Get existing preferences
-                $existing_preferences = get_user_meta($user_id, '_profile_preferences', true);
-                if (!is_array($existing_preferences)) {
-                    $existing_preferences = [
-                        'darkMode' => false,
-                        'notifications' => true,
-                        'metrics' => 'imperial'
-                    ];
-                }
-                
-                // Update only the provided preferences
-                $updated_preferences = array_merge($existing_preferences, $params['preferences']);
-                update_user_meta($user_id, '_profile_preferences', $updated_preferences);
+            if (isset($params['preferredWorkoutDuration'])) {
+                update_user_meta($user_id, '_profile_preferredWorkoutDuration', intval($params['preferredWorkoutDuration']));
+            }
+            
+            if (isset($params['favoriteExercises']) && is_array($params['favoriteExercises'])) {
+                $sanitized_exercises = array_map('sanitize_text_field', $params['favoriteExercises']);
+                update_user_meta($user_id, '_profile_favoriteExercises', $sanitized_exercises);
+            }
+            
+            if (isset($params['dislikedExercises']) && is_array($params['dislikedExercises'])) {
+                $sanitized_exercises = array_map('sanitize_text_field', $params['dislikedExercises']);
+                update_user_meta($user_id, '_profile_dislikedExercises', $sanitized_exercises);
             }
             
             if (isset($params['medicalConditions']) && is_array($params['medicalConditions'])) {
-                update_user_meta($user_id, '_profile_medical_conditions', $params['medicalConditions']);
+                $sanitized_conditions = array_map('sanitize_text_field', $params['medicalConditions']);
+                update_user_meta($user_id, '_profile_medicalConditions', $sanitized_conditions);
             }
             
-            // Update the updated_at timestamp
-            $now = current_time('mysql');
-            update_user_meta($user_id, '_profile_updated_at', $now);
+            if (isset($params['profileComplete'])) {
+                update_user_meta($user_id, '_profile_profileComplete', (bool) $params['profileComplete']);
+            }
             
-            // If this is the first update, set the created_at timestamp
-            $created_at = get_user_meta($user_id, '_profile_created_at', true);
+            // Update the updated timestamp
+            $now = current_time('mysql');
+            update_user_meta($user_id, '_profile_updatedAt', $now);
+            
+            // If this is the first update, set the created timestamp
+            $created_at = get_user_meta($user_id, '_profile_createdAt', true);
             if (empty($created_at)) {
-                update_user_meta($user_id, '_profile_created_at', $now);
+                update_user_meta($user_id, '_profile_createdAt', $now);
             }
             
             // Get the updated profile

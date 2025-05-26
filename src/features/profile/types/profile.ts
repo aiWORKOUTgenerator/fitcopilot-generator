@@ -73,6 +73,9 @@ export interface UserProfile {
   // User identifiers
   id: number;
   username?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
   
   // Basic fitness information
   fitnessLevel: FitnessLevel;

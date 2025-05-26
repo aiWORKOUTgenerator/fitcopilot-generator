@@ -18,6 +18,29 @@ export const useProfileValidation = () => {
   const validateProfile = useCallback((profile: PartialUserProfile): ValidationErrors => {
     const errors: ValidationErrors = {};
 
+    // Validate personal information
+    if (!profile.firstName || profile.firstName.trim().length === 0) {
+      errors.firstName = 'First name is required';
+    } else if (profile.firstName.trim().length < 2) {
+      errors.firstName = 'First name must be at least 2 characters';
+    }
+
+    if (!profile.lastName || profile.lastName.trim().length === 0) {
+      errors.lastName = 'Last name is required';
+    } else if (profile.lastName.trim().length < 2) {
+      errors.lastName = 'Last name must be at least 2 characters';
+    }
+
+    if (!profile.email || profile.email.trim().length === 0) {
+      errors.email = 'Email address is required';
+    } else {
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(profile.email.trim())) {
+        errors.email = 'Please enter a valid email address';
+      }
+    }
+
     // Validate fitness level
     if (!profile.fitnessLevel) {
       errors.fitnessLevel = 'Fitness level is required';
@@ -79,6 +102,12 @@ export const useProfileValidation = () => {
    */
   const isProfileComplete = useCallback((profile: PartialUserProfile): boolean => {
     return Boolean(
+      profile.firstName &&
+      profile.firstName.trim().length >= 2 &&
+      profile.lastName &&
+      profile.lastName.trim().length >= 2 &&
+      profile.email &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email.trim()) &&
       profile.fitnessLevel &&
       profile.goals &&
       profile.goals.length > 0 &&

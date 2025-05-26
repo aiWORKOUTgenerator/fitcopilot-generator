@@ -4,8 +4,8 @@
  * Main entry point for the user profile feature
  */
 import React, { useState } from 'react';
-import { ProfileProvider } from './context';
-import { ProfileForm } from './components';
+import { ProfileProvider, useProfile } from './context';
+import { ProfileForm, ProfileCard } from './components';
 
 interface ProfileFeatureProps {
   onProfileComplete?: () => void;
@@ -13,25 +13,53 @@ interface ProfileFeatureProps {
 }
 
 /**
- * Profile Feature Component
+ * Profile Feature Content Component
  * 
- * Main container for the profile management feature
+ * Internal component that uses the ProfileProvider context
  */
-const ProfileFeature: React.FC<ProfileFeatureProps> = ({
+const ProfileFeatureContent: React.FC<ProfileFeatureProps> = ({
   onProfileComplete,
   className = ''
 }) => {
+  const { profile, isLoading, error, fetchProfile, isProfileComplete } = useProfile();
+  const [isEditing, setIsEditing] = useState(false);
   const [isFormCompleted, setIsFormCompleted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   
   // Handle profile form completion
   const handleProfileComplete = () => {
     setIsFormCompleted(true);
+    setIsEditing(false);
     
     if (onProfileComplete) {
       onProfileComplete();
     }
   };
+
+  // Handle edit button click
+  const handleEditProfile = () => {
+    setIsEditing(true);
+    setIsFormCompleted(false);
+  };
+
+  // Handle refresh/retry
+  const refreshProfile = async () => {
+    try {
+      await fetchProfile();
+    } catch (err) {
+      console.error('Failed to refresh profile:', err);
+    }
+  };
+  
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="profile-container">
+        <div className="profile-loading">
+          <p>Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
   
   // Error state
   if (error) {
@@ -52,33 +80,56 @@ const ProfileFeature: React.FC<ProfileFeatureProps> = ({
       </div>
     );
   }
-  
-  return (
-    <ProfileProvider>
-      <div className={`profile-feature ${className}`}>
-        <h3 className="profile-feature__subtitle">
-          Manage your fitness profile to get personalized workout recommendations
-        </h3>
-        <div className="profile-container">
-          {isFormCompleted ? (
-            <div className="profile-success">
-              <h2>Profile Updated Successfully!</h2>
-              <p>
-                Your fitness profile has been saved. Your workouts will now be personalized
-                based on your preferences and fitness goals.
-              </p>
-              <button
-                className="button button-primary"
-                onClick={() => setIsFormCompleted(false)}
-              >
-                Edit Profile
-              </button>
-            </div>
-          ) : (
-            <ProfileForm onComplete={handleProfileComplete} />
-          )}
+
+  // Success message after form completion
+  if (isFormCompleted) {
+    return (
+      <div className="profile-container">
+        <div className="profile-success">
+          <h2>Profile Updated Successfully!</h2>
+          <p>
+            Your fitness profile has been saved. Your workouts will now be personalized
+            based on your preferences and fitness goals.
+          </p>
+          <button
+            className="button button-primary"
+            onClick={() => setIsFormCompleted(false)}
+          >
+            View Profile
+          </button>
         </div>
       </div>
+    );
+  }
+
+  // Determine whether to show form or profile card
+  const shouldShowForm = isEditing || !profile || !isProfileComplete;
+
+  return (
+    <div className={`profile-feature ${className}`}>
+      <h3 className="profile-feature__subtitle">
+        Manage your fitness profile to get personalized workout recommendations
+      </h3>
+      <div className="profile-container">
+        {shouldShowForm ? (
+          <ProfileForm onComplete={handleProfileComplete} />
+        ) : (
+          <ProfileCard profile={profile} onEdit={handleEditProfile} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Profile Feature Component
+ * 
+ * Main container for the profile management feature
+ */
+const ProfileFeature: React.FC<ProfileFeatureProps> = (props) => {
+  return (
+    <ProfileProvider>
+      <ProfileFeatureContent {...props} />
     </ProfileProvider>
   );
 };
