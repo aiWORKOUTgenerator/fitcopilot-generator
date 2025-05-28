@@ -3,37 +3,37 @@
 
 /* Base styles */
 html, body {
-  font-family: var(--font-base);
-  font-size: var(--text-md);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-md);
   color: var(--color-text);
   background-color: var(--bg-page);
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
   margin: 0;
   padding: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+  font-family: var(--font-family-sans);
   margin-top: 0;
 }
 
 h1 {
-  font-size: calc(var(--text-xl) * 1.5);
+  font-size: var(--font-size-3xl);
 }
 
 h2 {
-  font-size: var(--text-xl);
+  font-size: var(--font-size-2xl);
 }
 
 h3 {
-  font-size: var(--text-lg);
+  font-size: var(--font-size-xl);
 }
 
 /* Layout */
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: var(--space-4);
 }
 
 /* Utility classes */
@@ -41,12 +41,12 @@ h3 {
   text-align: center;
 }
 
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-.mt-4 { margin-top: 2rem; }
+.mt-1 { margin-top: var(--space-2); }
+.mt-2 { margin-top: var(--space-4); }
+.mt-3 { margin-top: var(--space-6); }
+.mt-4 { margin-top: var(--space-8); }
 
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mb-4 { margin-bottom: 2rem; }
+.mb-1 { margin-bottom: var(--space-2); }
+.mb-2 { margin-bottom: var(--space-4); }
+.mb-3 { margin-bottom: var(--space-6); }
+.mb-4 { margin-bottom: var(--space-8); }

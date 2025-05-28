@@ -1,0 +1,27 @@
+// Design System - Single source of truth
+// Only import from here to ensure all components
+// have access to the same tokens
+
+// Color utilities
+@forward './color-utils';
+
+// Core tokens
+// @forward './colors'; // Legacy color system (commented out)
+@forward './colors-next'; // New color system
+@forward './typography';
+@forward './spacing';
+@forward './radii';
+@forward './shadows';
+@forward './transitions';
+@forward './backgrounds';
+@forward './mixins';
+@forward './breakpoints';
+
+// Gradient system
+@forward './tokens/gradients';
+
+// Component-specific tokens
+@forward './component-tokens';
+
+// Component Base Styles
+@forward './components'; 

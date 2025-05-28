@@ -1,0 +1,49 @@
+// Design system tokens for buttons
+:root {
+    // Base button properties
+    --button-transition: all 300ms ease;
+    --button-font-weight: 500;
+    --button-border-radius: 9999px; // rounded-full
+
+    // Primary button - Default
+    --button-default-primary-gradient: linear-gradient(to right, var(--color-lime-300), var(--color-emerald-400));
+    --button-default-primary-gradient-hover: linear-gradient(to right, var(--color-lime-400), var(--color-emerald-500));
+    --button-default-primary-shadow: 0 10px 15px -3px rgba(var(--color-lime-300-rgb), 0.3);
+    --button-default-primary-shadow-hover: 0 15px 20px -3px rgba(var(--color-lime-300-rgb), 0.4);
+
+    // Primary button - Gym
+    --button-gym-primary-gradient: linear-gradient(to right, var(--color-lime-400), var(--color-emerald-500));
+    --button-gym-primary-gradient-hover: linear-gradient(to right, var(--color-lime-500), var(--color-emerald-600));
+    --button-gym-primary-shadow: 0 10px 15px -3px rgba(var(--color-lime-400-rgb), 0.3);
+    --button-gym-primary-shadow-hover: 0 15px 20px -3px rgba(var(--color-lime-400-rgb), 0.4);
+
+    // Primary button - Sports
+    --button-sports-primary-gradient: linear-gradient(to right, var(--color-cyan-400), var(--color-blue-500));
+    --button-sports-primary-gradient-hover: linear-gradient(to right, var(--color-cyan-500), var(--color-blue-600));
+    --button-sports-primary-shadow: 0 10px 15px -3px rgba(var(--color-cyan-400-rgb), 0.3);
+    --button-sports-primary-shadow-hover: 0 15px 20px -3px rgba(var(--color-cyan-400-rgb), 0.4);
+
+    // Primary button - Wellness
+    --button-wellness-primary-gradient: linear-gradient(to right, var(--color-violet-400), var(--color-purple-500));
+    --button-wellness-primary-gradient-hover: linear-gradient(to right, var(--color-violet-500), var(--color-purple-600));
+    --button-wellness-primary-shadow: 0 10px 15px -3px rgba(var(--color-violet-400-rgb), 0.3);
+    --button-wellness-primary-shadow-hover: 0 15px 20px -3px rgba(var(--color-violet-400-rgb), 0.4);
+
+    // Primary button - Modern
+    --button-modern-primary-gradient: linear-gradient(to right, var(--color-amber-400), var(--color-orange-500));
+    --button-modern-primary-gradient-hover: linear-gradient(to right, var(--color-amber-500), var(--color-orange-600));
+    --button-modern-primary-shadow: 0 10px 15px -3px rgba(var(--color-amber-400-rgb), 0.3);
+    --button-modern-primary-shadow-hover: 0 15px 20px -3px rgba(var(--color-amber-400-rgb), 0.4);
+
+    // Primary button - Classic
+    --button-classic-primary-gradient: linear-gradient(to right, var(--color-red-400), var(--color-orange-500));
+    --button-classic-primary-gradient-hover: linear-gradient(to right, var(--color-red-500), var(--color-orange-600));
+    --button-classic-primary-shadow: 0 10px 15px -3px rgba(var(--color-red-400-rgb), 0.3);
+    --button-classic-primary-shadow-hover: 0 15px 20px -3px rgba(var(--color-red-400-rgb), 0.4);
+
+    // Primary button - Minimalist
+    --button-minimalist-primary-gradient: linear-gradient(to right, var(--color-gray-200), var(--color-gray-300));
+    --button-minimalist-primary-gradient-hover: linear-gradient(to right, var(--color-gray-300), var(--color-gray-400));
+    --button-minimalist-primary-shadow: 0 10px 15px -3px rgba(var(--color-gray-300-rgb), 0.3);
+    --button-minimalist-primary-shadow-hover: 0 15px 20px -3px rgba(var(--color-gray-300-rgb), 0.4);
+}

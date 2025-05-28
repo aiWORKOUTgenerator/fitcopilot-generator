@@ -1,14 +1,16 @@
 /**
- * Form Components Index
+ * Forms Components Index
  * 
- * This file serves as an entry point for all form components.
- * It imports all individual form component styles to provide
- * a single import for consuming applications.
+ * This file imports all form-related component styles.
  */
 
-// Import individual form controls
+// Base form components
 @import 'input';
 @import 'select';
-@import 'radio';
 @import 'checkbox';
+@import 'radio';
+
+// Enhanced form components for registration
+@import 'form-field-enhanced';
+
 // Future components: checkbox, etc. 

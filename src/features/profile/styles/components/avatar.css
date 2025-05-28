@@ -1,0 +1,532 @@
+/**
+ * Avatar Component Styles
+ * 
+ * Comprehensive styling for the avatar system including images,
+ * initials, sizing, and interactive states
+ * Now using FitCopilot design system tokens for consistency
+ * Enhanced with premium visual effects and micro-interactions
+ */
+
+/* Design tokens are now inlined for CSS compatibility */
+
+/* Base Avatar Styles - Enhanced */
+.profile-avatar {
+  /* Ensure consistent circular shape */
+  aspect-ratio: 1;
+  
+  /* Smooth transitions for all interactions */
+  transition: $profile-transition-standard;
+  
+  /* Prevent text selection on initials */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  
+  /* Ensure proper stacking context */
+  position: relative;
+  z-index: 1;
+  
+  /* Premium shadow foundation */
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  /* Subtle glow effect */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, 
+      rgba(132, 204, 22, 0.1), 
+      rgba(34, 197, 94, 0.1));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Avatar Sizes - Enhanced */
+.profile-avatar--small {
+  width: $profile-avatar-size-small;
+  height: $profile-avatar-size-small;
+  border-radius: $profile-avatar-border-radius;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  
+  /* Smaller status indicator */
+  &::after {
+    width: 8px;
+    height: 8px;
+    border-width: 2px;
+  }
+}
+
+.profile-avatar--medium {
+  width: $profile-avatar-size-medium;
+  height: $profile-avatar-size-medium;
+  border-radius: $profile-avatar-border-radius;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  
+  /* Medium status indicator */
+  &::after {
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+  }
+}
+
+.profile-avatar--large {
+  width: $profile-avatar-size-large;
+  height: $profile-avatar-size-large;
+  border-radius: $profile-avatar-border-radius;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  
+  /* Large status indicator */
+  &::after {
+    width: 16px;
+    height: 16px;
+    border-width: 3px;
+  }
+}
+
+.profile-avatar--extra-large {
+  width: $profile-avatar-size-extra-large;
+  height: $profile-avatar-size-extra-large;
+  font-size: $profile-avatar-initials-size-extra-large;
+  line-height: $line-height-relaxed;
+}
+
+/* Avatar Image Styles - Enhanced */
+.profile-avatar--image {
+  overflow: hidden;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  
+  img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  
+    /* Image loading state */
+    &[data-loading="true"] {
+  opacity: 0;
+      transform: scale(1.1);
+}
+
+    &[data-loaded="true"] {
+  opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Hover effect for images */
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+/* Avatar Initials Styles - Enhanced */
+.profile-avatar--initials {
+  background: linear-gradient(135deg, $profile-avatar-gradient-start, $profile-avatar-gradient-end);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: $profile-avatar-initials-letter-spacing;
+  font-weight: $profile-avatar-initials-weight;
+  
+  /* Premium text shadow */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  
+  /* Subtle pattern overlay */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 30%, 
+      rgba(255, 255, 255, 0.2) 0%, 
+      transparent 50%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+}
+
+/* Size-specific initials */
+.profile-avatar--small.profile-avatar--initials {
+  font-size: $profile-avatar-initials-size-small;
+}
+
+.profile-avatar--medium.profile-avatar--initials {
+  font-size: $profile-avatar-initials-size-medium;
+}
+
+.profile-avatar--large.profile-avatar--initials {
+  font-size: $profile-avatar-initials-size-large;
+}
+
+/* Avatar Status Indicators - Enhanced */
+.profile-avatar--online::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 2px 8px rgba(34, 197, 94, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  animation: pulse-online 3s ease-in-out infinite;
+}
+
+.profile-avatar--away::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 2px 8px rgba(245, 158, 11, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  animation: pulse-away 4s ease-in-out infinite;
+}
+
+.profile-avatar--offline::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    0 2px 8px rgba(107, 114, 128, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Status animations */
+@keyframes pulse-online {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+    box-shadow: 
+      0 2px 8px rgba(34, 197, 94, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.1);
+    box-shadow: 
+      0 4px 12px rgba(34, 197, 94, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+}
+
+@keyframes pulse-away {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  25% { 
+    opacity: 0.7; 
+    transform: scale(0.95);
+  }
+  75% { 
+    opacity: 0.9; 
+    transform: scale(1.05);
+  }
+}
+
+/* Avatar Loading States - Enhanced */
+.profile-avatar--loading {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  position: relative;
+  overflow: hidden;
+  
+  /* Shimmer effect */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.4) 50%, 
+      transparent 100%);
+    animation: shimmer 2s ease-in-out infinite;
+    border-radius: inherit;
+  }
+  
+  /* Loading spinner */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid rgba(132, 204, 22, 0.2);
+    border-top-color: rgba(132, 204, 22, 0.8);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Avatar Error States - Enhanced */
+.profile-avatar--error {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Error icon */
+  &::before {
+    content: '⚠';
+    font-size: 1.2em;
+    opacity: 0.7;
+  }
+}
+
+/* Avatar Hover Effects - Enhanced */
+.profile-avatar:hover {
+  transform: scale(1.05);
+  border-color: rgba(132, 204, 22, 0.6);
+  box-shadow: 
+    0 0 0 1px rgba(132, 204, 22, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(132, 204, 22, 0.2);
+}
+
+/* Avatar Focus States - Enhanced */
+.profile-avatar:focus {
+  outline: none;
+  border-color: rgba(132, 204, 22, 0.8);
+  box-shadow: 
+    0 0 0 2px rgba(132, 204, 22, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(132, 204, 22, 0.2);
+}
+
+/* Avatar Group Styles - Enhanced */
+.profile-avatar-group {
+  display: flex;
+  align-items: center;
+  
+  .profile-avatar {
+    margin-left: -8px;
+    border: 3px solid white;
+    transition: all 0.2s ease;
+    
+    &:first-child {
+      margin-left: 0;
+    }
+    
+    &:hover {
+      z-index: 10;
+      transform: scale(1.1);
+      margin-left: 0;
+      margin-right: 8px;
+    }
+  }
+}
+
+/* Mobile Responsive - Enhanced */
+@media (max-width: $profile-mobile-breakpoint) {
+  .profile-avatar--large {
+    width: $profile-avatar-size-large-mobile;
+    height: $profile-avatar-size-large-mobile;
+    
+    &::after {
+      width: 14px;
+      height: 14px;
+      border-width: 2px;
+    }
+  }
+  
+  .profile-avatar--large.profile-avatar--initials {
+    font-size: $profile-avatar-initials-size-large-mobile;
+  }
+  
+  .profile-avatar-group .profile-avatar {
+    margin-left: -6px;
+    
+    &:hover {
+      margin-right: 6px;
+    }
+  }
+}
+
+/* Dark Theme Overrides - Enhanced */
+.dark-theme .profile-avatar {
+  border-color: rgba(71, 85, 105, 0.6);
+  box-shadow: 
+    0 0 0 1px rgba(132, 204, 22, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(132, 204, 22, 0.1);
+    
+  &::before {
+    background: linear-gradient(135deg, 
+      rgba(132, 204, 22, 0.15), 
+      rgba(34, 197, 94, 0.15));
+  }
+}
+
+.dark-theme .profile-avatar--image {
+  background: linear-gradient(135deg, #1e293b, #334155);
+}
+
+.dark-theme .profile-avatar--loading {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  
+  &::before {
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.1) 50%, 
+      transparent 100%);
+  }
+}
+
+.dark-theme .profile-avatar--error {
+  background: linear-gradient(135deg, #450a0a, #7f1d1d);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.dark-theme .profile-avatar:hover {
+  border-color: rgba(132, 204, 22, 0.7);
+  box-shadow: 
+    0 0 0 1px rgba(132, 204, 22, 0.5),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(132, 204, 22, 0.3);
+}
+
+.dark-theme .profile-avatar:focus {
+  border-color: rgba(132, 204, 22, 0.9);
+  box-shadow: 
+    0 0 0 2px rgba(132, 204, 22, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(132, 204, 22, 0.3);
+}
+
+.dark-theme .profile-avatar-group .profile-avatar {
+  border-color: rgba(15, 23, 42, 0.9);
+}
+
+/* Print Styles - Enhanced */
+@media print {
+  .profile-avatar {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    
+    &::before,
+    &::after {
+      display: none !important;
+    }
+  }
+  
+  .profile-avatar--initials {
+    background: #f3f4f6 !important;
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+  
+  .profile-avatar--loading,
+.profile-avatar--error {
+    background: #f3f4f6 !important;
+    
+    &::before,
+    &::after {
+      display: none !important;
+    }
+  }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .profile-avatar,
+  .profile-avatar *,
+  .profile-avatar::before,
+  .profile-avatar::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .profile-avatar {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+  
+  .profile-avatar--initials {
+    background: #000;
+    color: #fff;
+  }
+  
+  .dark-theme .profile-avatar--initials {
+    background: #fff;
+    color: #000;
+  }
+}
+
+/* Avatar Color Variants */
+.profile-avatar--indigo {
+  background-color: $color-info-500;
+}
+
+.profile-avatar--violet {
+  background-color: #8b5cf6;
+}
+
+.profile-avatar--cyan {
+  background-color: $color-secondary-500;
+}
+
+.profile-avatar--emerald {
+  background-color: $color-success-500;
+}
+
+.profile-avatar--amber {
+  background-color: $color-warning-500;
+}
+
+.profile-avatar--red {
+  background-color: $color-error-500;
+}
+
+.profile-avatar--pink {
+  background-color: #ec4899;
+}
+
+.profile-avatar--lime {
+  background-color: $color-primary-500;
+}
+
+.profile-avatar--orange {
+  background-color: #f97316;
+}
+
+.profile-avatar--blue {
+  background-color: $color-info-500;
+} 

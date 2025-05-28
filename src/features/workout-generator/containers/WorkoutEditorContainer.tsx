@@ -1,23 +1,33 @@
 /**
- * Workout Editor Container
+ * Enhanced Workout Editor Container
  * 
- * Container component that handles the navigation and data loading for the workout editor.
- * This component manages the state and decides whether to render the editor as a modal
- * or full page based on the navigation context.
+ * Container component that handles the navigation and data loading for both
+ * the view modal (EnhancedWorkoutModal) and edit modal (WorkoutEditorModal).
+ * This component manages the dual modal state and provides smooth transitions.
  */
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '../navigation/NavigationContext';
+import { EnhancedWorkoutModal } from '../components/WorkoutEditor/EnhancedWorkoutModal';
 import WorkoutEditorModal from '../components/WorkoutEditor/WorkoutEditorModal';
 import { GeneratedWorkout } from '../types/workout';
 import { getWorkout, saveWorkout } from '../services/workoutService';
 import { useWorkoutGenerator } from '../context';
 
 /**
- * Container for the workout editor that handles navigation and data
+ * Enhanced container for the workout editor that handles dual modal navigation and data
  */
 const WorkoutEditorContainer: React.FC = () => {
-  // Get navigation state
-  const { isEditorOpen, currentWorkoutId, closeEditor } = useNavigation();
+  // Get enhanced navigation state with dual modal support
+  const { 
+    isEditorOpen, 
+    isEditModalOpen, 
+    currentWorkoutId, 
+    modalMode,
+    isTransitioning,
+    closeEditor,
+    transitionToEdit,
+    transitionToView 
+  } = useNavigation();
   
   // Get workout generator context to access the generated workout
   const { state } = useWorkoutGenerator();
@@ -27,6 +37,7 @@ const WorkoutEditorContainer: React.FC = () => {
   const [workout, setWorkout] = useState<GeneratedWorkout | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Load workout data based on the navigation context and available data
   useEffect(() => {
@@ -63,50 +74,114 @@ const WorkoutEditorContainer: React.FC = () => {
     }
   }, [isEditorOpen, currentWorkoutId, generatedWorkout, closeEditor]);
   
-  // Handle workout save
-  const handleSave = async (updatedWorkout: GeneratedWorkout) => {
+  // Handle workout save from view modal
+  const handleSave = async () => {
+    if (!workout) return;
+    
     try {
-      setLoading(true);
-      const savedWorkout = await saveWorkout(updatedWorkout);
+      setIsSaving(true);
+      const savedWorkout = await saveWorkout(workout);
       setWorkout(savedWorkout);
-      return savedWorkout;
+      // TODO: Show success toast
+      console.log('Workout saved successfully');
     } catch (err) {
       console.error('Failed to save workout:', err);
-      throw err;
+      // TODO: Show error toast
     } finally {
-      setLoading(false);
+      setIsSaving(false);
+    }
+  };
+
+  // Handle workout edit - transition to edit modal
+  const handleEdit = () => {
+    transitionToEdit();
+  };
+  
+  // Handle workout save from edit modal
+  const handleSaveFromEdit = async (updatedWorkout: GeneratedWorkout) => {
+    try {
+      setIsSaving(true);
+      const savedWorkout = await saveWorkout(updatedWorkout);
+      setWorkout(savedWorkout);
+      
+      // Transition back to view modal after successful save
+      transitionToView();
+      
+      // TODO: Show success toast
+      console.log('Workout updated successfully');
+    } catch (err) {
+      console.error('Failed to update workout:', err);
+      // TODO: Show error toast
+      throw err; // Re-throw to let the edit modal handle the error
+    } finally {
+      setIsSaving(false);
     }
   };
   
-  // Don't render anything if the editor is not open
-  // This ensures the modal only opens when explicitly triggered by the "View Full Workout" button
-  if (!isEditorOpen) {
+  // Don't render anything if no modals are open
+  if (!isEditorOpen && !isEditModalOpen) {
     return null;
   }
   
   // Show loading state
   if (loading && !workout) {
-    return <div className="workout-editor-loading">Loading workout...</div>;
+    return (
+      <div className="workout-editor-loading">
+        <div className="loading-spinner"></div>
+        <span>Loading workout...</span>
+      </div>
+    );
   }
   
   // Show error state
   if (error) {
-    return <div className="workout-editor-error">{error}</div>;
+    return (
+      <div className="workout-editor-error">
+        <div className="error-message">{error}</div>
+        <button onClick={closeEditor} className="error-close-button">
+          Close
+        </button>
+      </div>
+    );
   }
   
-  // Ensure we have a workout to edit
+  // Ensure we have a workout to display/edit
   if (!workout) {
     return null;
   }
   
-  // For now, always render as modal
-  // In the future, this could conditionally render full page editor
+  // Render the dual modal system
   return (
-    <WorkoutEditorModal
-      workout={workout}
-      postId={workout.id ? Number(workout.id) : undefined}
-      onSave={handleSave}
-    />
+    <>
+      {/* Enhanced Workout Modal - View Mode */}
+      <EnhancedWorkoutModal
+        workout={workout}
+        isOpen={isEditorOpen && modalMode === 'view' && !isTransitioning}
+        onClose={closeEditor}
+        onSave={handleSave}
+        onEdit={handleEdit}
+        isSaving={isSaving}
+        isTransitioning={isTransitioning}
+        postId={workout.id ? Number(workout.id) : undefined}
+      />
+      
+      {/* Workout Editor Modal - Edit Mode */}
+      {isEditModalOpen && (
+        <WorkoutEditorModal
+          workout={workout}
+          isOpen={isEditModalOpen && modalMode === 'edit' && !isTransitioning}
+          onSave={handleSaveFromEdit}
+          postId={workout.id ? Number(workout.id) : undefined}
+        />
+      )}
+      
+      {/* Transition Loading State */}
+      {isTransitioning && (
+        <div className="modal-transition-overlay">
+          <div className="transition-spinner"></div>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -1,0 +1,65 @@
+// Transitions and Animations
+// Consistent timings and easing functions for transitions and animations
+
+// Transition durations (in ms)
+$transition-duration-fast: 150ms;
+$transition-duration-normal: 250ms;
+$transition-duration-slow: 350ms;
+$transition-duration-slower: 500ms;
+
+// Easing functions
+$transition-ease: ease;
+$transition-ease-in: ease-in;
+$transition-ease-out: ease-out;
+$transition-ease-in-out: ease-in-out;
+$transition-linear: linear;
+
+// Cubic bezier curves for more precise control
+$transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); // Slight "bounce" effect
+$transition-emphasis: cubic-bezier(0.2, 0.9, 0.4, 1.0); // Emphasis on exit
+$transition-smooth: cubic-bezier(0.4, 0.0, 0.2, 1.0); // Google's standard curve
+
+// Animation durations (in ms)
+$animation-duration-short: 300ms;
+$animation-duration-normal: 500ms;
+$animation-duration-long: 800ms;
+
+// Common transitions
+$transition-color: color $transition-duration-normal $transition-ease;
+$transition-opacity: opacity $transition-duration-normal $transition-ease;
+$transition-transform: transform $transition-duration-normal $transition-ease;
+$transition-shadow: box-shadow $transition-duration-normal $transition-ease;
+$transition-all: all $transition-duration-normal $transition-ease;
+
+// CSS Variables
+:root {
+    // Transition durations
+    --transition-duration-fast: #{$transition-duration-fast};
+    --transition-duration-normal: #{$transition-duration-normal};
+    --transition-duration-slow: #{$transition-duration-slow};
+    --transition-duration-slower: #{$transition-duration-slower};
+
+    // Easing functions
+    --transition-ease: #{$transition-ease};
+    --transition-ease-in: #{$transition-ease-in};
+    --transition-ease-out: #{$transition-ease-out};
+    --transition-ease-in-out: #{$transition-ease-in-out};
+    --transition-linear: #{$transition-linear};
+
+    // Cubic bezier curves
+    --transition-bounce: #{$transition-bounce};
+    --transition-emphasis: #{$transition-emphasis};
+    --transition-smooth: #{$transition-smooth};
+
+    // Animation durations
+    --animation-duration-short: #{$animation-duration-short};
+    --animation-duration-normal: #{$animation-duration-normal};
+    --animation-duration-long: #{$animation-duration-long};
+
+    // Common transitions
+    --transition-color: #{$transition-color};
+    --transition-opacity: #{$transition-opacity};
+    --transition-transform: #{$transition-transform};
+    --transition-shadow: #{$transition-shadow};
+    --transition-all: #{$transition-all};
+}

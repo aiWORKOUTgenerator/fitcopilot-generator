@@ -4,7 +4,7 @@
  * Main entry point for the plugin's frontend
  */
 
-import './styles.css';
+import './styles.scss';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { WorkoutGeneratorFeature } from './features/workout-generator/WorkoutGeneratorFeature';

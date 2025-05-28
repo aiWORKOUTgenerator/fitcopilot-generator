@@ -46,4 +46,57 @@ $letter-spacing-tight: -0.025em;
 $letter-spacing-normal: 0em;
 $letter-spacing-wide: 0.025em;
 $letter-spacing-wider: 0.05em;
-$letter-spacing-widest: 0.1em; 
+$letter-spacing-widest: 0.1em;
+
+// ----------------------------------------------------------------------------
+// CSS CUSTOM PROPERTIES EXPORT
+// ----------------------------------------------------------------------------
+
+:root {
+  // Font families
+  --font-family-sans: #{$font-family-sans};
+  --font-family-mono: #{$font-family-mono};
+  
+  // Font sizes
+  --font-size-xs: #{$font-size-xs};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-md: #{$font-size-md};
+  --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
+  --font-size-2xl: #{$font-size-2xl};
+  --font-size-3xl: #{$font-size-3xl};
+  --font-size-4xl: #{$font-size-4xl};
+  --font-size-5xl: #{$font-size-5xl};
+  --font-size-6xl: #{$font-size-6xl};
+  --font-size-7xl: #{$font-size-7xl};
+  
+  // Line heights
+  --line-height-none: #{$line-height-none};
+  --line-height-tight: #{$line-height-tight};
+  --line-height-snug: #{$line-height-snug};
+  --line-height-normal: #{$line-height-normal};
+  --line-height-relaxed: #{$line-height-relaxed};
+  --line-height-loose: #{$line-height-loose};
+  
+  // Font weights
+  --font-weight-thin: #{$font-weight-thin};
+  --font-weight-extralight: #{$font-weight-extralight};
+  --font-weight-light: #{$font-weight-light};
+  --font-weight-normal: #{$font-weight-normal};
+  --font-weight-medium: #{$font-weight-medium};
+  --font-weight-semibold: #{$font-weight-semibold};
+  --font-weight-bold: #{$font-weight-bold};
+  --font-weight-extrabold: #{$font-weight-extrabold};
+  --font-weight-black: #{$font-weight-black};
+  
+  // Letter spacing
+  --letter-spacing-tighter: #{$letter-spacing-tighter};
+  --letter-spacing-tight: #{$letter-spacing-tight};
+  --letter-spacing-normal: #{$letter-spacing-normal};
+  --letter-spacing-wide: #{$letter-spacing-wide};
+  --letter-spacing-wider: #{$letter-spacing-wider};
+  --letter-spacing-widest: #{$letter-spacing-widest};
+}
+
+// Export a flag to indicate this file was imported
+$core-typography-imported: true; 

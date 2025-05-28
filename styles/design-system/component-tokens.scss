@@ -1,0 +1,528 @@
+/**
+ * Component-specific tokens
+ * Organized by component type
+ */
+
+:root {
+    /* Tooltip */
+    --size-tooltip-arrow: 12px;
+
+    /* Button Base Tokens */
+    --button-padding-x: var(--spacing-4, 1rem);
+    --button-padding-y: var(--spacing-2, 0.5rem);
+    --button-border-radius: var(--radius-md, 0.5rem);
+    --button-transition: var(--transition-normal, 0.3s ease);
+    --button-size-sm: 36px;
+    --button-size-md: 44px;
+    --button-size-lg: 52px;
+    --button-font-weight: 600;
+    --button-shadow: var(--shadow-sm);
+    --button-shadow-hover: var(--shadow-md);
+    
+    /* Hero Button Direct Tokens - Simplified Inheritance */
+    /* Base Dimensions */
+    --hero-button-padding-x: var(--spacing-6, 1.5rem);
+    --hero-button-padding-y: var(--spacing-3, 0.75rem);
+    --hero-button-radius: var(--radius-full, 9999px);
+    --hero-button-min-width: 200px;
+    --hero-button-font-weight: 700;
+    
+    /* Size Variants */
+    --hero-button-size-sm-padding-x: 1.5rem;
+    --hero-button-size-sm-padding-y: 0.625rem;
+    --hero-button-size-sm-min-width: 180px;
+    --hero-button-size-sm-font-size: 0.875rem;
+    
+    --hero-button-size-md-padding-x: 2rem;
+    --hero-button-size-md-padding-y: 0.75rem;
+    --hero-button-size-md-min-width: 200px;
+    --hero-button-size-md-font-size: 1rem;
+    
+    --hero-button-size-lg-padding-x: 2rem;
+    --hero-button-size-lg-padding-y: 1rem;
+    --hero-button-size-lg-min-width: 240px;
+    --hero-button-size-lg-font-size: 1.125rem;
+    
+    /* Border and Structure */
+    --hero-button-border-width-primary: 2px;
+    --hero-button-border-width-secondary: 2px;
+    
+    /* Effects and Transitions */
+    --hero-button-transition: 0.3s ease;
+    --hero-button-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --hero-button-shadow-hover: 0 15px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --hero-button-transform-up: -4px;
+    --hero-button-transform-down: 1px;
+    
+    /* Icon Layout */
+    --hero-button-icon-spacing: 0.5rem;
+    
+    /* Default Theme Colors (will be overridden by theme variants) */
+    --hero-button-primary-bg: rgba(15, 23, 42, 0.8);
+    --hero-button-primary-border: transparent;
+    --hero-button-primary-border-hover: transparent;
+    --hero-button-gradient-angle: 90deg;
+    --hero-button-gradient-from: #a3e635 !important;
+    --hero-button-gradient-to: #34d399 !important;
+    --hero-button-gradient-from-hover: #84cc16 !important;
+    --hero-button-gradient-to-hover: #10b981 !important;
+    
+    --hero-button-secondary-bg: var(--color-gray-800);
+    --hero-button-secondary-bg-hover: rgba(163, 230, 53, 0.1);
+    --hero-button-secondary-border: rgba(163, 230, 53, 0.3);
+    --hero-button-secondary-border-hover: rgba(163, 230, 53, 0.4);
+    --hero-button-secondary-text: var(--color-white);
+    
+    /* Focus State */
+    --hero-button-focus-ring-color: rgba(59, 130, 246, 0.5);
+    --hero-button-focus-ring-width: 4px;
+    
+    /* Hero */
+    --size-hero-min-height: 80vh;
+    --size-hero-content-width: 50%;
+    --size-content-max-sm: 600px;
+    --size-hero-image-width: 45%;
+    --size-hero-image-max-width: 700px;
+    --size-hero-image-max-width-mobile: 500px;
+    --size-hero-grid-pattern: 20px;
+    --size-hero-tooltip-width: 260px;
+    --size-hero-floating-icon-translate: -10px;
+    --size-hero-tooltip-margin-right: 8px;
+    --size-hero-tooltip-margin-top: 2px;
+    --size-hero-gap-buttons: 1.5rem;
+    --size-hero-margin-buttons: 2rem;
+    --size-hero-margin-feature-pills: 2.5rem;
+    --size-hero-button-padding: 1rem 2rem;
+    --size-hero-tooltip-transform-y: 10px;
+    --size-hero-breakpoint-mobile: 992px;
+    --size-hero-backdrop-blur: 10px;
+    --size-hero-image-center-translate: -50%;
+    --pos-hero-bg-x: center;
+    --pos-hero-bg-y: center;
+    --size-hero-gradient-x: 200%;
+    --size-hero-gradient-y: 200%;
+    --size-hero-clamp-middle: 2vw;
+    --pos-hero-before-left-start: -100%;
+    --pos-hero-before-left-end: 100%;
+    --opacity-hero-white-shine: 0.2;
+    --pos-hero-gradient-0: 0%;
+    --pos-hero-gradient-50: 50%;
+    --pos-hero-gradient-100: 100%;
+    --color-hero-transparent: transparent;
+    --cursor-hero-pointer: pointer;
+    --white-space-hero-nowrap: nowrap;
+    --text-decoration-hero-none: none;
+    --border-hero-none: none;
+    --transform-hero-none: none;
+    --width-hero-full: 100%;
+    --height-hero-full: 100%;
+    --max-width-hero-full: 100%;
+    --transition-hero-none: none;
+    --cursor-hero-not-allowed: not-allowed;
+    --margin-hero-auto: 0 auto;
+    --pos-hero-auto: auto;
+    --height-hero-auto: auto;
+    --color-hero-current: currentColor;
+
+    /* Hero Typography Additions */
+    --hero-font-size-heading-base: 2.25rem;
+    /* text-4xl */
+    --hero-font-size-heading-md: 3rem;
+    /* md:text-5xl */
+    --hero-font-size-heading-lg: 3.75rem;
+    /* lg:text-6xl */
+    --hero-line-height-heading: 1.2;
+    --hero-margin-heading: 1rem;
+    --hero-font-size-description-base: 1rem;
+    /* text-base */
+    --hero-font-size-description-md: 1.25rem;
+    /* md:text-xl */
+    --hero-line-height-description: 1.5;
+    --hero-margin-description: 2.5rem;
+    /* mb-10 */
+    --hero-description-max-width: 36rem;
+    /* max-w-2xl */
+
+    /* Hero Subtitle Tokens */
+    --hero-font-size-subtitle-base: 0.9375rem;
+    /* Slightly smaller than description */
+    --hero-font-size-subtitle-md: 1.125rem;
+    /* md:text-lg */
+    --hero-line-height-subtitle: 1.5;
+    --hero-margin-subtitle: 2rem;
+    /* mb-8 */
+    --hero-subtitle-max-width: 34rem;
+    /* max-w-xl */
+
+    --hero-font-size-feature-pill: 0.875rem;
+    /* text-sm */
+    --hero-icon-size-sm: 0.875rem;
+    /* w-3.5 h-3.5 */
+    --hero-icon-size-md: 1.25rem;
+    /* w-5 h-5 */
+    --hero-icon-margin-right: 0.5rem;
+    /* mr-2 */
+
+    /* Hero Layout Additions */
+    --hero-padding-y: 5rem;
+    /* py-20 */
+    --hero-padding-x: 1rem;
+    /* px-4 */
+    --hero-content-max-width: 56rem;
+    /* max-w-4xl */
+    --hero-card-padding: 2rem;
+    /* p-8 */
+    --hero-card-margin-bottom: 1.5rem;
+    /* mb-6 */
+    --hero-card-border-radius: 1.5rem;
+    /* rounded-3xl */
+    --hero-logo-margin-bottom: 2rem;
+    /* mb-8 */
+    --hero-gap-feature-pills: 0.75rem;
+    /* gap-3 */
+    --hero-margin-top-feature-pills: 2rem;
+    /* mt-8 */
+    --hero-feature-pill-padding-x: 1rem;
+    /* px-4 */
+    --hero-feature-pill-padding-y: 0.5rem;
+    /* py-2 */
+    --hero-feature-pill-border-radius: 9999px;
+    /* rounded-full */
+    --hero-divider-width: 6rem;
+    /* w-24 */
+    --hero-divider-height: 0.25rem;
+    /* h-1 */
+    --hero-divider-margin: 1.5rem;
+    /* mb-6 */
+
+    /* Hero Positions and Layout */
+    --pos-hero-element-relative: relative;
+    --pos-hero-element-absolute: absolute;
+    --pos-hero-top-0: 0;
+    --pos-hero-left-0: 0;
+    --pos-hero-right-0: 0;
+    --pos-hero-bottom-0: 0;
+    --pos-hero-bottom-100: 100%;
+    --pos-hero-element-center: 50%;
+    --z-hero-behind: 0;
+    --z-hero-base: 1;
+    --z-hero-content: 2;
+    --z-hero-floating: 3;
+    --z-hero-hover: 10;
+    --z-hero-tooltip: 50;
+
+    /* Hero Display and Flex properties */
+    --display-hero-flex: flex;
+    --display-hero-inline-flex: inline-flex;
+    --display-hero-none: none;
+    --flex-hero-row: row;
+    --flex-hero-column: column;
+    --flex-hero-center: center;
+    --flex-hero-shrink-0: 0;
+    --flex-hero-grow-1: 1;
+    --align-hero-center: center;
+    --align-hero-flex-start: flex-start;
+    --justify-hero-center: center;
+
+    /* Hero Visual Properties */
+    --overflow-hero-hidden: hidden;
+    --pointer-hero-none: none;
+    --visibility-hero-visible: visible;
+    --visibility-hero-hidden: hidden;
+    --content-hero-empty: '';
+    --text-align-hero-center: center;
+    --weight-hero-heading: 800;
+
+    /* Hero Animations */
+    --duration-hero-float-base: 6s;
+    --duration-hero-float-odd: 8s;
+    --duration-hero-float-even: 10s;
+    --duration-hero-gradient: 8s;
+    --duration-hero-button-transition: 0.3s;
+    --duration-hero-pulse: 3s;
+    --duration-hero-animation-delay: 1s;
+    --ease-hero-gradient: ease;
+    --scale-hero-icon-hover: 1.1;
+    --scale-hero-button-hover-y: -4px;
+    --angle-hero-gradient: 90deg;
+    --angle-hero-float-rotate: 5deg;
+    --pos-hero-gradient-start: 0% 50%;
+    --pos-hero-gradient-mid: 100% 50%;
+    --pos-hero-gradient-end: 0% 50%;
+    --animation-hero-none: none;
+
+    /* Hero Colors */
+    --color-hero-button-primary-text: var(--color-text-primary);
+    --color-hero-signin-text: var(--color-text-primary);
+    --color-hero-feature-pill-bg: rgba(15, 23, 42, 0.5);
+    --color-hero-feature-pill-border: rgba(31, 41, 55, 0.5);
+    --color-hero-tooltip-title: #a3e635;
+    --color-hero-button-secondary-bg: rgba(15, 23, 42, 0.8);
+    --color-hero-button-secondary-border: rgba(163, 230, 53, 0.3);
+    --color-hero-button-secondary-hover-bg: rgba(163, 230, 53, 0.1);
+    --color-hero-card-bg: rgba(31, 41, 55, 0.3);
+    /* bg-gray-800/30 */
+    --color-hero-card-border: rgba(55, 65, 81, 1);
+    /* border-gray-700 */
+    --color-hero-text-primary: #ffffff;
+    /* text-white */
+    --color-hero-text-secondary: #d1d5db;
+    /* text-gray-300 */
+    --color-hero-gradient-from: #a3e635;
+    /* from-lime-300 */
+    --color-hero-gradient-to: #34d399;
+    /* to-emerald-400 */
+    --opacity-hero-floating-icon: 0.5;
+    --opacity-hero-tooltip-border: 0.3;
+    --opacity-hero-lime-border: 0.3;
+
+    /* Hero Text */
+    --type-hero-tooltip-title: 14px;
+    --type-hero-signin: 0.875rem;
+    --weight-hero-button: 700;
+    --weight-hero-tooltip-title: 500;
+    --weight-hero-citron-text: 600;
+
+    /* Hero Shadows */
+    --shadow-hero-button-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    --shadow-hero-secondary-button-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    --shadow-hero-optimized: 0 10px 15px -5px rgba(0, 0, 0, 0.3);
+    --shadow-hero-optimized-hover: 0 20px 30px -10px rgba(0, 0, 0, 0.4);
+    --shadow-hero-citron-text: 0 0 6px rgba(163, 230, 53, 0.4);
+    --shadow-hero-no-shadow: 0 0 0 rgba(var(--color-lime-rgb), 0);
+    --shadow-hero-card: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    /* shadow-xl */
+
+    /* Hero Opacity */
+    --opacity-disabled: 0.6;
+    --opacity-hero-icon: 0.6;
+    --opacity-hero-citron-pulse-min: 0.8;
+    --opacity-hero-tooltip-hidden: 0;
+    --opacity-hero-tooltip-visible: 1;
+    --opacity-hero-icon-hover: 1;
+
+    /* HeroButton */
+    --size-hero-btn-gap: 0.5rem;
+    --size-hero-btn-padding-x-sm: 1.25rem;
+    --size-hero-btn-padding-x-md: 1.75rem;
+    --size-hero-btn-padding-x-lg: 2rem;
+    --size-hero-btn-padding-y-sm: 0.5rem;
+    --size-hero-btn-padding-y-md: 0.75rem;
+    --size-hero-btn-padding-y-lg: 1rem;
+    --size-hero-btn-icon-margin: 8px;
+
+    /* Pricing (pr) */
+    --pr-spacing-section: 3rem;
+    --pr-spacing-card-gap: 1.5rem;
+    --pr-color-bg: var(--color-background-light);
+    --pr-color-heading: var(--color-text-primary);
+    --pr-color-text: var(--color-text-muted);
+    --pr-font-size-title: var(--font-size-large);
+    --pr-font-weight-title: var(--font-weight-semibold);
+    --pr-radius-card: var(--radius-md);
+    --pr-shadow-card: var(--shadow-md);
+    --pr-transition-hover: var(--transition-standard);
+    --pr-transform-hover: translateY(-5px);
+    --pr-transform-none: none;
+    --pr-font-size-plan-name: 1.75rem;
+    --pr-font-weight-plan-name: 700;
+    --pr-line-height-plan-name: 1.2;
+    --pr-font-size-price: 2.5rem;
+    --pr-font-weight-price: 700;
+    --pr-line-height-price: 1;
+    --pr-shadow-blue: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -5px rgba(59, 130, 246, 0.04);
+    --pr-shadow-lime: 0 10px 25px -5px rgba(132, 204, 22, 0.1), 0 8px 10px -5px rgba(132, 204, 22, 0.04);
+    --pr-shadow-purple: 0 10px 25px -5px rgba(139, 92, 246, 0.1), 0 8px 10px -5px rgba(139, 92, 246, 0.04);
+    --pr-animation-shake: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    --pr-animation-flash: flash 0.5s ease-out both;
+    --pr-animation-fade-out: fadeOut 0.5s ease both;
+    --pr-animation-fade-in: fadeIn 0.5s ease 0.3s both;
+    --pr-animation-zoom-in: zoomIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s both;
+    --pr-animation-float: float 15s infinite ease-in-out;
+    --pr-animation-explode: explode 1s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+    --pr-transition-feature-icon: transform 0.2s ease;
+    --pr-transform-feature-icon-hover: scale(1.1);
+    --pr-display-badge: inline-flex;
+    --pr-align-badge: center;
+    --pr-font-weight-badge: 600;
+    --pr-gap-badge: 0.25rem;
+    --pr-scale-popular: 1.05;
+    --pr-transform-popular-hover: scale(1.05) translateY(-5px);
+    --pr-position-relative: relative;
+    --pr-position-absolute: absolute;
+    --pr-overflow-hidden: hidden;
+    --pr-content-empty: '';
+    --pr-top-0: 0;
+    --pr-left-0: 0;
+    --pr-width-full: 100%;
+    --pr-height-full: 100%;
+    --pr-opacity-bg-pattern: 0.5;
+    --pr-z-index-bg: 0;
+    --pr-background-size-full: 100%;
+    --pr-bg-clip-text: text;
+    --pr-webkit-bg-clip-text: text;
+    --pr-moz-bg-clip-text: text;
+    --pr-webkit-text-fill-transparent: transparent;
+    --pr-moz-text-fill-transparent: transparent;
+    --pr-border-radius-particle: 50%;
+    --pr-opacity-particle: 0.4;
+    --pr-pointer-events-none: none;
+    --pr-right-0: 0;
+    --pr-bottom-0: 0;
+    --pr-transform-translatex-neg-2: translateX(-2px);
+    --pr-transform-translatex-2: translateX(2px);
+    --pr-opacity-full: 1;
+    --pr-opacity-half: 0.5;
+    --pr-opacity-zero: 0;
+    --pr-transform-scale-small: scale(0.8);
+    --pr-transform-scale-full: scale(1);
+    --pr-transform-translate-y0-x0: translateY(0) translateX(0);
+    --pr-transform-translate-y30-x15: translateY(30px) translateX(15px);
+    --pr-transform-translate-neg-50: translate(-50%, -50%);
+    --pr-bg-gradient-lime-teal: linear-gradient(135deg, rgba(132, 204, 22, 0.3), rgba(5, 150, 105, 0.2));
+    --pr-bg-gradient-highlight: linear-gradient(to right, #84cc16, #059669);
+
+    /* PersonalTraining */
+    --pt-button-primary-bg: linear-gradient(to right, var(--color-violet-300, #a78bfa), var(--color-indigo-400, #818cf8));
+    --pt-button-primary-color: var(--color-text-dark, #111827);
+    --pt-button-primary-hover-y: -5px;
+    --pt-button-primary-shadow: 0 10px 15px -3px rgba(167, 139, 250, 0.3);
+    --color-violet-300: #a78bfa;
+    --color-indigo-400: #818cf8;
+
+    /* VideoPlayer (vp) Component Tokens */
+    --vp-border-radius: 0.75rem;
+    --vp-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --vp-container-padding-bottom: 1.75rem;
+
+    /* Color Tokens */
+    --vp-color-bg: var(--color-gray-800);
+    --vp-color-streaming-bg: var(--color-gray-900);
+    --vp-color-overlay-bg: var(--color-ui-surface-alt, rgba(31, 41, 55, 0.8));
+    --vp-color-loading-bg: var(--color-ui-surface, var(--color-gray-800));
+    --vp-color-error-bg: var(--color-ui-surface, var(--color-gray-800));
+    --vp-color-progress-bg: var(--color-gray-700);
+    --vp-color-error-icon: var(--color-red-500);
+    --vp-color-error-text: var(--color-text-secondary, var(--color-gray-300));
+    --vp-color-time-text: var(--color-text-muted, var(--color-gray-400));
+
+    /* Control Button Tokens */
+    --vp-control-button-size: 3rem;
+    --vp-control-button-mobile-size: 2.5rem;
+    --vp-control-button-bg: var(--pt-button-primary-bg);
+    --vp-control-button-color: var(--color-text-primary, var(--color-white));
+    --vp-control-button-shadow: var(--pt-button-primary-shadow, 0 2px 8px rgba(0, 0, 0, 0.3));
+    --vp-control-button-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --vp-control-button-focus-outline: 2px solid var(--color-accent-400, var(--color-violet-300));
+    --vp-control-button-focus-offset: 2px;
+
+    /* Progress Bar Tokens */
+    --vp-progress-height: 4px;
+    --vp-progress-radius: 0.5rem;
+    --vp-progress-bar-bg: var(--pt-button-primary-bg);
+
+    /* Theme-Specific Tokens */
+    --vp-gym-accent-gradient: linear-gradient(to right, var(--color-accent-300), var(--color-accent-500));
+    --vp-sports-accent-gradient: linear-gradient(to right, var(--color-accent-300), var(--color-accent-500));
+    --vp-wellness-accent-gradient: linear-gradient(to right, var(--color-accent-300), var(--color-accent-500));
+
+    /* Animation Tokens */
+    --vp-transition-standard: 0.3s ease;
+    --vp-transition-fast: 0.1s linear;
+    --vp-animation-spin-duration: 1s;
+
+    /* Journey Component Tokens */
+    --journey-bg-color: var(--color-slate-900);
+    --journey-card-bg: var(--color-slate-800);
+    --journey-card-border: var(--color-slate-700);
+
+    /* Journey Button Tokens */
+    --journey-btn-radius: var(--radii-xl);
+    --journey-btn-padding-x: 1.5rem;
+    --journey-btn-padding-x-large: 2.5rem;
+    --journey-btn-padding-y: 0.875rem;
+    --journey-btn-transition: var(--transition-standard);
+
+    /* Journey Feature Card Tokens */
+    --journey-feature-card-radius: var(--radii-lg);
+    --journey-feature-card-border-width: 1px;
+    --journey-feature-icon-size: 1.5rem;
+
+    /* Journey Step Card Tokens */
+    --journey-step-card-radius: var(--radii-xl);
+    --journey-step-card-border-width: 1px;
+    --journey-step-icon-size: 2.5rem;
+    --journey-step-number-size: 1.75rem;
+    --journey-step-number-radius: var(--radii-full);
+
+    /* Card tokens */
+    --card-bg-color: var(--color-surface);
+    --card-shadow: var(--shadow-md);
+    --card-border-width: 1px;
+    --card-border-color: var(--color-border);
+
+    /* Form tokens */
+    --input-height: 2.5rem;
+    --input-padding-x: var(--spacing-3);
+    --input-padding-y: var(--spacing-2);
+    --input-border-radius: var(--radius-md);
+    --input-border-width: 1px;
+    --input-focus-ring-width: 2px;
+    --input-focus-ring-color: var(--color-primary-light);
+
+    /* Navigation tokens */
+    --nav-height: 4rem;
+    --nav-padding-x: var(--spacing-6);
+    --nav-item-gap: var(--spacing-8);
+    --nav-font-weight: var(--font-weight-medium);
+
+    /* Modal tokens */
+    --modal-border-radius: var(--radius-lg);
+    --modal-padding: var(--spacing-6);
+    --modal-shadow: var(--shadow-lg);
+    --modal-backdrop-opacity: 0.5;
+    --modal-max-width: 500px;
+    --modal-transition: var(--transition-all);
+
+    /* Tooltip tokens */
+    --tooltip-bg-color: var(--color-gray-800);
+    --tooltip-text-color: var(--color-white);
+    --tooltip-border-radius: var(--radius-sm);
+    --tooltip-padding-x: var(--spacing-2);
+    --tooltip-padding-y: var(--spacing-1);
+    --tooltip-arrow-size: 5px;
+    --tooltip-font-size: var(--font-size-xs);
+    --tooltip-max-width: 200px;
+
+    /* Badge tokens */
+    --badge-padding-x: var(--spacing-2);
+    --badge-padding-y: var(--spacing-1);
+    --badge-border-radius: var(--radius-full);
+    --badge-font-size: var(--font-size-xs);
+    --badge-font-weight: var(--font-weight-medium);
+}
+
+/* Variant Overrides */
+[data-theme="gym"] {
+    --journey-bg-color: var(--color-slate-900);
+    --journey-card-bg: var(--color-slate-800);
+    --journey-card-border: var(--color-violet-700);
+}
+
+[data-theme="sports"] {
+    --journey-bg-color: var(--color-slate-900);
+    --journey-card-bg: var(--color-slate-800);
+    --journey-card-border: var(--color-cyan-700);
+}
+
+[data-theme="wellness"] {
+    --journey-bg-color: var(--color-slate-900);
+    --journey-card-bg: var(--color-slate-800);
+    --journey-card-border: var(--color-teal-700);
+}
+
+[data-theme="modern"] {
+    --journey-bg-color: var(--color-slate-900);
+    --journey-card-bg: var(--color-slate-800);
+    --journey-card-border: var(--color-amber-700);
+}

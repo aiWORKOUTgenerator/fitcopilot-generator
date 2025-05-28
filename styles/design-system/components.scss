@@ -1,0 +1,141 @@
+// Base Component Styles
+// Common patterns and base styles for components
+
+// Import necessary dependencies
+@use "./color-utils" as colors;
+
+// Import component-specific styles
+@use "./components/registration-entry-form";
+@use "./components/splash-feature-card";
+
+// Button base styles
+%button-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--button-border-radius);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    font-weight: var(--button-font-weight);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: var(--button-transition);
+    line-height: 1.5;
+    text-decoration: none;
+
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+// Card base styles
+%card-base {
+    background-color: var(--card-bg-color);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
+    padding: var(--card-padding);
+    border: var(--card-border-width) solid var(--card-border-color);
+}
+
+// Form input base styles
+%input-base {
+    height: var(--input-height);
+    padding: var(--input-padding-y) var(--input-padding-x);
+    border: var(--input-border-width) solid var(--input-border-color);
+    border-radius: var(--input-border-radius);
+    background-color: var(--color-white);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 var(--input-focus-ring-width) var(--input-focus-ring-color);
+    }
+
+    &:disabled {
+        background-color: var(--color-gray-100);
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+}
+
+// Badge base styles
+%badge-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--badge-padding-y) var(--badge-padding-x);
+    border-radius: var(--badge-border-radius);
+    font-size: var(--badge-font-size);
+    font-weight: var(--badge-font-weight);
+    line-height: 1;
+}
+
+// Container layout mixin
+@mixin container($max-width: var(--container-lg)) {
+    width: 100%;
+    max-width: $max-width;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--spacing-4);
+    padding-right: var(--spacing-4);
+
+    @media (min-width: 768px) {
+        padding-left: var(--spacing-6);
+        padding-right: var(--spacing-6);
+    }
+}
+
+// Section layout mixin
+@mixin section($padding-y: var(--section-spacing-y)) {
+    padding-top: var(--section-spacing-y-mobile);
+    padding-bottom: var(--section-spacing-y-mobile);
+
+    @media (min-width: 768px) {
+        padding-top: $padding-y;
+        padding-bottom: $padding-y;
+    }
+}
+
+// Flex layouts
+%flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+%flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+%flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+// Grid layouts
+%grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-6);
+}
+
+// Focus styles
+%focus-outline {
+    outline: none;
+
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}

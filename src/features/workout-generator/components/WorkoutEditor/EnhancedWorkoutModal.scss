@@ -1,0 +1,807 @@
+/**
+ * Enhanced Workout Modal Styles
+ * 
+ * Premium full-screen modal with glass morphism, smooth animations, and enhanced UX.
+ * Fully compliant with design token system.
+ */
+
+@import '../../../../styles/design-system/tokens/index.scss';
+
+// Component-specific tokens
+$modal-backdrop-bg: rgba(0, 0, 0, 0.8);
+$modal-glass-bg: rgba(255, 255, 255, 0.05);
+$modal-glass-border: rgba(255, 255, 255, 0.1);
+$modal-glass-backdrop: blur(20px);
+$modal-max-width: 1200px;
+$modal-header-height: 80px;
+$modal-footer-height: 80px;
+
+.enhanced-workout-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $modal-backdrop-bg;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+
+    .modal-content {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  // Modal Content Container
+  .modal-content {
+    width: 100%;
+    max-width: $modal-max-width;
+    height: 90vh;
+    max-height: 900px;
+    margin: var(--spacing-lg, 1.5rem);
+    background: $modal-glass-bg;
+    backdrop-filter: $modal-glass-backdrop;
+    border: 1px solid $modal-glass-border;
+    border-radius: var(--border-radius-xl, 16px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+
+    @media (max-width: 768px) {
+      margin: var(--spacing-md, 1rem);
+      height: 95vh;
+      border-radius: var(--border-radius-lg, 12px);
+    }
+  }
+
+  // Modal Header
+  .modal-header {
+    height: $modal-header-height;
+    padding: var(--spacing-lg, 1.5rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm, 0.5rem);
+      }
+    }
+
+    .workout-info {
+      flex: 1;
+
+      .workout-title {
+        font-size: var(--font-size-2xl, 1.5rem);
+        font-weight: var(--font-weight-bold, 700);
+        color: var(--color-text-primary, #ffffff);
+        margin: 0 0 var(--spacing-xs, 0.25rem) 0;
+        line-height: 1.2;
+
+        @media (max-width: 768px) {
+          font-size: var(--font-size-xl, 1.25rem);
+        }
+      }
+
+      .workout-stats {
+        display: flex;
+        gap: var(--spacing-lg, 1.5rem);
+
+        @media (max-width: 768px) {
+          gap: var(--spacing-md, 1rem);
+          flex-wrap: wrap;
+        }
+
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          font-size: var(--font-size-sm, 0.875rem);
+          color: var(--color-text-secondary, #b3b3b3);
+          font-weight: var(--font-weight-medium, 500);
+
+          svg {
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: var(--spacing-sm, 0.5rem);
+
+      @media (max-width: 768px) {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  // Modal Body
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg, 1.5rem);
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .workout-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  }
+
+  // Workout Section
+  .workout-section {
+    margin-bottom: var(--spacing-lg, 1.5rem);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius-lg, 12px);
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    &.active {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-header {
+      padding: var(--spacing-lg, 1.5rem);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .section-info {
+        flex: 1;
+
+        .section-name {
+          font-size: var(--font-size-xl, 1.25rem);
+          font-weight: var(--font-weight-semibold, 600);
+          color: var(--color-text-primary, #ffffff);
+          margin: 0 0 var(--spacing-xs, 0.25rem) 0;
+        }
+
+        .section-meta {
+          display: flex;
+          gap: var(--spacing-md, 1rem);
+
+          .section-duration,
+          .section-exercises {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: var(--font-size-sm, 0.875rem);
+            color: var(--color-text-secondary, #b3b3b3);
+            font-weight: var(--font-weight-medium, 500);
+
+            svg {
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+
+      .section-toggle {
+        .toggle-icon {
+          font-size: var(--font-size-sm, 0.875rem);
+          color: var(--color-text-secondary, #b3b3b3);
+          transition: transform 0.3s ease;
+
+          &.expanded {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+
+    .section-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &.expanded {
+        max-height: 2000px; // Large enough to accommodate content
+      }
+
+      .exercises-list {
+        padding: 0 var(--spacing-lg, 1.5rem) var(--spacing-lg, 1.5rem);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+    }
+  }
+
+  // Exercise Item
+  .exercise-item {
+    padding: var(--spacing-lg, 1.5rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--border-radius-md, 8px);
+    }
+
+    .exercise-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-sm, 0.5rem);
+
+      .exercise-name {
+        font-size: var(--font-size-lg, 1.125rem);
+        font-weight: var(--font-weight-semibold, 600);
+        color: var(--color-text-primary, #ffffff);
+        margin: 0;
+      }
+
+      .exercise-details {
+        .exercise-duration,
+        .exercise-sets {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          font-size: var(--font-size-sm, 0.875rem);
+          color: var(--color-primary-400, #a3e635);
+          font-weight: var(--font-weight-semibold, 600);
+          padding: 0.25rem 0.75rem;
+          background: rgba(163, 230, 53, 0.1);
+          border: 1px solid rgba(163, 230, 53, 0.2);
+          border-radius: var(--border-radius-full, 9999px);
+
+          svg {
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+
+    .exercise-description {
+      font-size: var(--font-size-sm, 0.875rem);
+      color: var(--color-text-secondary, #b3b3b3);
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // Modal Footer
+  .modal-footer {
+    height: $modal-footer-height;
+    padding: var(--spacing-lg, 1.5rem);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: var(--spacing-md, 1rem);
+        align-items: stretch;
+      }
+
+      .primary-actions {
+        display: flex;
+        gap: var(--spacing-sm, 0.5rem);
+      }
+
+      .secondary-actions {
+        display: flex;
+        gap: var(--spacing-sm, 0.5rem);
+
+        @media (max-width: 768px) {
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  // Enhanced edit button styling with improved states
+  .edit-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    min-width: 100px; // Ensure consistent width during state changes
+    
+    // Enhanced loading state
+    &.loading {
+      background: var(--glass-bg-active);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      cursor: wait;
+      
+      .spin {
+        animation: spin 1s linear infinite;
+      }
+      
+      .edit-btn__text {
+        margin-left: var(--spacing-xs);
+      }
+      
+      .edit-btn__progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: var(--color-primary);
+        animation: progressBar 2s ease-in-out infinite;
+      }
+    }
+    
+    // Enhanced transitioning state
+    &.transitioning {
+      background: var(--glass-bg-active);
+      border-color: var(--color-primary-light);
+      color: var(--color-primary);
+      cursor: wait;
+      opacity: 0.8;
+      
+      .spin {
+        animation: spin 0.8s linear infinite;
+      }
+      
+      .edit-btn__text {
+        margin-left: var(--spacing-xs);
+        opacity: 0.9;
+      }
+    }
+    
+    // Enhanced hover state
+    &:hover:not(:disabled) {
+      background: var(--glass-bg-hover);
+      border-color: var(--color-primary-light);
+      transform: translateY(-1px);
+      box-shadow: 
+        var(--shadow-md),
+        0 0 0 1px rgba(59, 130, 246, 0.1);
+      
+      .edit-btn__text {
+        color: var(--color-primary);
+      }
+    }
+    
+    // Enhanced active state
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      background: var(--glass-bg-active);
+    }
+    
+    // Enhanced disabled state
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      
+      &:hover {
+        background: var(--glass-bg);
+        border-color: var(--glass-border);
+        box-shadow: none;
+        transform: none;
+      }
+    }
+    
+    // Enhanced focus state for accessibility
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+      box-shadow: 
+        var(--shadow-md),
+        0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    
+    // Text elements styling
+    .edit-btn__text {
+      transition: all var(--transition-fast);
+      font-weight: 500;
+    }
+    
+    // Loading shimmer effect
+    &.loading::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(59, 130, 246, 0.1),
+        transparent
+      );
+      animation: shimmer 1.5s infinite;
+    }
+  }
+  
+  // Enhanced close button styling
+  .close-btn {
+    transition: all var(--transition-normal);
+    
+    &:hover:not(:disabled) {
+      background: var(--glass-bg-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .close-btn__text {
+      margin-left: var(--spacing-xs);
+      font-weight: 500;
+    }
+  }
+  
+  // Screen reader only class
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+// Enhanced animations
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes progressBar {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  50% {
+    width: 70%;
+    opacity: 0.8;
+  }
+  100% {
+    width: 100%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+}
+
+// Enhanced responsive button behavior
+@media (max-width: 768px) {
+  .enhanced-workout-modal {
+    .header-actions {
+      gap: var(--spacing-sm);
+      
+      .button {
+        min-width: 80px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        
+        &.edit-btn.loading {
+          min-width: 100px; // Accommodate "Opening..." text
+        }
+      }
+    }
+    
+    .footer-actions {
+      .primary-actions,
+      .secondary-actions {
+        gap: var(--spacing-sm);
+      }
+      
+      .button {
+        flex: 1;
+        min-width: 0;
+        
+        // Ensure text doesn't overflow on small screens
+        span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-workout-modal {
+    .header-actions {
+      width: 100%;
+      justify-content: space-between;
+      
+      .edit-btn {
+        order: 1;
+        flex: 1;
+        max-width: 120px;
+      }
+      
+      .close-btn {
+        order: 2;
+        flex: 0 0 auto;
+        min-width: 60px;
+      }
+    }
+    
+    .footer-actions {
+      flex-direction: column;
+      gap: var(--spacing-md);
+      
+      .primary-actions,
+      .secondary-actions {
+        width: 100%;
+        
+        .button {
+          flex: 1;
+        }
+      }
+      
+      .secondary-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-sm);
+      }
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .enhanced-workout-modal {
+    .edit-btn {
+      &.loading {
+        border-width: 2px;
+        border-color: var(--color-primary);
+      }
+      
+      &:focus-visible {
+        outline-width: 3px;
+        outline-offset: 3px;
+      }
+    }
+    
+    .button:disabled {
+      border-width: 2px;
+      border-style: dashed;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .enhanced-workout-modal {
+    &.transitioning .modal-content {
+      transition: none;
+    }
+    
+    .edit-btn {
+      &.loading::before {
+        animation: none;
+      }
+      
+      .spin {
+        animation: none;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: none;
+      }
+    }
+    
+    .button {
+      transition: none;
+      
+      &:hover:not(:disabled),
+      &:active:not(:disabled) {
+        transform: none;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .enhanced-workout-modal {
+    .modal-content {
+      max-width: 95vw;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: var(--spacing-md, 1rem);
+    }
+
+    .workout-section .section-header {
+      padding: var(--spacing-md, 1rem);
+    }
+
+    .exercise-item {
+      padding: var(--spacing-md, 1rem);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .enhanced-workout-modal {
+    .modal-content {
+      height: 100vh;
+      max-height: none;
+      margin: 0;
+      border-radius: 0;
+    }
+
+    .workout-section .section-header .section-info .section-meta {
+      flex-direction: column;
+      gap: var(--spacing-xs, 0.25rem);
+      align-items: flex-start;
+    }
+
+    .exercise-item .exercise-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-xs, 0.25rem);
+    }
+  }
+}
+
+// Dark theme enhancements
+@media (prefers-color-scheme: dark) {
+  .enhanced-workout-modal {
+    background: rgba(0, 0, 0, 0.9);
+
+    .modal-content {
+      background: rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .workout-section {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+
+      &.active {
+        background: rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .enhanced-workout-modal {
+    position: static;
+    background: none;
+
+    .modal-content {
+      box-shadow: none;
+      border: none;
+      background: white;
+      color: black;
+      height: auto;
+      max-height: none;
+    }
+
+    .modal-header,
+    .modal-footer {
+      display: none;
+    }
+
+    .modal-body {
+      padding: 0;
+    }
+
+    .workout-section {
+      background: white;
+      border: 1px solid #ddd;
+      page-break-inside: avoid;
+      margin-bottom: 20px;
+
+      .section-content {
+        max-height: none;
+        overflow: visible;
+      }
+    }
+
+    .exercise-item {
+      background: white;
+      border-bottom: 1px solid #eee;
+    }
+  }
+} 

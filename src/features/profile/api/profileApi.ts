@@ -7,71 +7,116 @@
 import { apiFetch } from '../../../utils/api';
 import { 
   GetProfileResponse, 
+  UpdateProfileRequest,
   UpdateProfileResponse, 
+  UpdateUserIdentityRequest,
+  UpdateUserIdentityResponse,
+  ValidateProfileResponse,
+  GetWordPressUserDataResponse,
   ProfileApiError, 
+  ProfileApiResponse,
+  ProfileApiRequestOptions,
   UserProfile, 
-  PartialUserProfile 
+  PartialUserProfile,
+  UserIdentity,
+  UserIdentityUpdate,
+  WordPressUserData,
+  ProfileValidationResult
 } from '../types';
 
 /**
- * Get the current user's profile
+ * Get the current user's profile with enhanced WordPress integration
  * 
+ * @param options Optional request options for enhanced functionality
  * @returns Promise resolving to the user profile
  */
-export async function getProfile(): Promise<UserProfile> {
+export async function getProfile(options?: ProfileApiRequestOptions): Promise<UserProfile> {
   try {
-    console.log('Fetching user profile from API...');
+    console.log('🔍 [Profile API] Starting profile fetch...');
     
-    const apiResponse = await apiFetch<any>({
-      path: '/profile',
-      method: 'GET'
+    // Debug authentication state
+    console.log('🔍 [Profile API] Authentication check:', {
+      windowExists: typeof window !== 'undefined',
+      nonces: {
+        fitcopilotData: (window as any)?.fitcopilotData?.nonce ? 'Present' : 'Missing',
+        workoutGenerator: (window as any)?.workoutGenerator?.nonce ? 'Present' : 'Missing',
+        wpApiSettings: (window as any)?.wpApiSettings?.nonce ? 'Present' : 'Missing',
+        _wpnonce: (window as any)?._wpnonce ? 'Present' : 'Missing'
+      },
+      isLoggedIn: (window as any)?.fitcopilotData?.isLoggedIn,
+      currentUserId: (window as any)?.fitcopilotData?.currentUserId
     });
     
-    console.log('Raw API response:', apiResponse);
+    const profileData = await apiFetch<UserProfile>({
+      path: '/profile',
+      method: 'GET',
+      data: options
+    });
     
-    // Since we use unified field names, no mapping needed
-    const profile: UserProfile = {
-      id: apiResponse.id || 1,
-      firstName: apiResponse.firstName || '',
-      lastName: apiResponse.lastName || '',
-      email: apiResponse.email || '',
-      fitnessLevel: apiResponse.fitnessLevel || 'beginner',
-      goals: apiResponse.goals || ['general_fitness'],
-      customGoal: apiResponse.customGoal || '',
-      weight: apiResponse.weight || 0,
-      weightUnit: apiResponse.weightUnit || 'lbs',
-      height: apiResponse.height || 0,
-      heightUnit: apiResponse.heightUnit || 'ft',
-      age: apiResponse.age || 0,
-      gender: apiResponse.gender || undefined,
-      availableEquipment: apiResponse.availableEquipment || ['none'],
-      customEquipment: apiResponse.customEquipment || '',
-      preferredLocation: apiResponse.preferredLocation || 'home',
-      limitations: apiResponse.limitations || ['none'],
-      limitationNotes: apiResponse.limitationNotes || '',
-      medicalConditions: apiResponse.medicalConditions || '',
-      preferredWorkoutDuration: apiResponse.preferredWorkoutDuration || 30,
-      workoutFrequency: apiResponse.workoutFrequency || '3-4',
-      customFrequency: apiResponse.customFrequency || '',
-      favoriteExercises: apiResponse.favoriteExercises || [],
-      dislikedExercises: apiResponse.dislikedExercises || [],
-      lastUpdated: apiResponse.lastUpdated || new Date().toISOString(),
-      profileComplete: apiResponse.profileComplete || false,
-      completedWorkouts: apiResponse.completedWorkouts || 0
+    console.log('✅ [Profile API] Successfully received profile data from backend');
+    console.log('📊 [Profile API] Profile data summary:', {
+      hasUserData: !!(profileData.firstName || profileData.lastName || profileData.email),
+      hasWordPressData: !!(profileData.username || profileData.displayName),
+      hasAvatarUrl: !!profileData.avatarUrl,
+      profileComplete: profileData.profileComplete,
+      fitnessLevel: profileData.fitnessLevel,
+      lastUpdated: profileData.lastUpdated
+    });
+    
+    // Return the profile data directly
+    return profileData;
+  } catch (error) {
+    console.error('❌ [Profile API] Error occurred:', error);
+    
+    // Enhanced error logging
+    if (error instanceof Error) {
+      console.error('❌ [Profile API] Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.split('\n').slice(0, 3) // First 3 lines of stack
+      });
+    }
+    
+    // Check if this is an authentication error
+    const isAuthError = error instanceof Error && (
+      error.message.includes('401') ||
+      error.message.includes('403') ||
+      error.message.includes('unauthorized') ||
+      error.message.includes('permission')
+    );
+    
+    if (isAuthError) {
+      console.warn('🔐 [Profile API] Authentication error detected - user may need to refresh page');
+      console.warn('🔐 [Profile API] Suggestion: Check if WordPress session is valid');
+    }
+    
+    // For new users or when no profile exists, provide a default profile structure
+    // This allows the UI to work properly and show the form for profile creation
+    console.log('🔄 [Profile API] Creating default profile for user...');
+    
+    // Get current user ID from WordPress if available
+    const getCurrentUserId = (): number => {
+      if (typeof window !== 'undefined') {
+        const userId = (window as any).fitcopilotData?.currentUserId || 
+                      (window as any).workoutGenerator?.currentUserId ||
+                      1; // fallback to 1
+        return parseInt(userId, 10) || 1;
+      }
+      return 1;
     };
     
-    console.log('Profile data:', profile);
-    return profile;
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    
-    // Return a default profile if API fails
-    console.log('Falling back to default profile data');
-    return {
-      id: 1,
-      firstName: '',
-      lastName: '',
-      email: '',
+    // Create a default profile structure that matches the UserProfile interface
+    const defaultProfile: UserProfile = {
+      id: getCurrentUserId(),
+      // WordPress user fields will be populated by backend when available
+      username: undefined,
+      firstName: undefined,
+      lastName: undefined,
+      email: undefined,
+      displayName: undefined,
+      avatarUrl: undefined,
+      
+      // Default fitness profile values
       fitnessLevel: 'beginner',
       goals: ['general_fitness'],
       customGoal: '',
@@ -86,105 +131,63 @@ export async function getProfile(): Promise<UserProfile> {
       preferredLocation: 'home',
       limitations: ['none'],
       limitationNotes: '',
-      medicalConditions: '',
       preferredWorkoutDuration: 30,
       workoutFrequency: '3-4',
       customFrequency: '',
       favoriteExercises: [],
       dislikedExercises: [],
+      medicalConditions: '',
+      
+      // Meta fields
       lastUpdated: new Date().toISOString(),
       profileComplete: false,
       completedWorkouts: 0
     };
+    
+    console.log('🔄 [Profile API] Returning default profile:', {
+      userId: defaultProfile.id,
+      isDefault: true,
+      reason: isAuthError ? 'Authentication Error' : 'API Error'
+    });
+    
+    return defaultProfile;
   }
 }
 
 /**
- * Update the current user's profile
+ * Update the current user's profile with enhanced WordPress integration
  * 
  * @param profileData The profile data to update
+ * @param options Optional request options for enhanced functionality
  * @returns Promise resolving to the updated profile
  */
-export async function updateProfile(profileData: PartialUserProfile): Promise<UserProfile> {
+export async function updateProfile(
+  profileData: PartialUserProfile, 
+  options?: ProfileApiRequestOptions
+): Promise<UserProfile> {
   try {
-    console.log('Updating user profile via API...', profileData);
+    console.log('Updating user profile via API...', profileData, options);
     
-    // No field mapping needed - send data directly
-    const apiResponse = await apiFetch<any>({
-      path: '/profile',
-      method: 'PUT',
-      data: profileData
-    });
-    
-    console.log('Update API response:', apiResponse);
-    
-    // Return the updated profile directly
-    const updatedProfile: UserProfile = {
-      id: apiResponse.id || 1,
-      firstName: apiResponse.firstName || '',
-      lastName: apiResponse.lastName || '',
-      email: apiResponse.email || '',
-      fitnessLevel: apiResponse.fitnessLevel || 'beginner',
-      goals: apiResponse.goals || ['general_fitness'],
-      customGoal: apiResponse.customGoal || '',
-      weight: apiResponse.weight || 0,
-      weightUnit: apiResponse.weightUnit || 'lbs',
-      height: apiResponse.height || 0,
-      heightUnit: apiResponse.heightUnit || 'ft',
-      age: apiResponse.age || 0,
-      gender: apiResponse.gender || undefined,
-      availableEquipment: apiResponse.availableEquipment || ['none'],
-      customEquipment: apiResponse.customEquipment || '',
-      preferredLocation: apiResponse.preferredLocation || 'home',
-      limitations: apiResponse.limitations || ['none'],
-      limitationNotes: apiResponse.limitationNotes || '',
-      medicalConditions: apiResponse.medicalConditions || '',
-      preferredWorkoutDuration: apiResponse.preferredWorkoutDuration || 30,
-      workoutFrequency: apiResponse.workoutFrequency || '3-4',
-      customFrequency: apiResponse.customFrequency || '',
-      favoriteExercises: apiResponse.favoriteExercises || [],
-      dislikedExercises: apiResponse.dislikedExercises || [],
-      lastUpdated: apiResponse.lastUpdated || new Date().toISOString(),
-      profileComplete: apiResponse.profileComplete || false,
-      completedWorkouts: apiResponse.completedWorkouts || 0
+    const request: UpdateProfileRequest = {
+      profile: profileData
     };
     
+    const updatedProfile = await apiFetch<UserProfile>({
+      path: '/profile',
+      method: 'PUT',
+      data: { ...request, ...options }
+    });
+    
+    console.log('Update API response:', updatedProfile);
+    
+    // Return the updated profile data directly
     console.log('Updated profile:', updatedProfile);
     return updatedProfile;
   } catch (error) {
     console.error('Error updating profile:', error);
     
-    // Return a merged profile if API fails
-    console.log('Falling back to merged profile data');
-    return {
-      id: 1,
-      firstName: profileData.firstName || '',
-      lastName: profileData.lastName || '',
-      email: profileData.email || '',
-      fitnessLevel: profileData.fitnessLevel || 'beginner',
-      goals: profileData.goals || ['general_fitness'],
-      customGoal: profileData.customGoal || '',
-      weight: profileData.weight || 0,
-      weightUnit: profileData.weightUnit || 'lbs',
-      height: profileData.height || 0,
-      heightUnit: profileData.heightUnit || 'ft',
-      age: profileData.age || 0,
-      gender: profileData.gender || undefined,
-      availableEquipment: profileData.availableEquipment || ['none'],
-      customEquipment: profileData.customEquipment || '',
-      preferredLocation: profileData.preferredLocation || 'home',
-      limitations: profileData.limitations || ['none'],
-      limitationNotes: profileData.limitationNotes || '',
-      medicalConditions: profileData.medicalConditions || '',
-      preferredWorkoutDuration: profileData.preferredWorkoutDuration || 30,
-      workoutFrequency: profileData.workoutFrequency || '3-4',
-      customFrequency: profileData.customFrequency || '',
-      favoriteExercises: profileData.favoriteExercises || [],
-      dislikedExercises: profileData.dislikedExercises || [],
-      lastUpdated: new Date().toISOString(),
-      profileComplete: profileData.profileComplete || false,
-      completedWorkouts: 0
-    };
+    // Don't fall back to merged data - throw the error so UI can handle it properly
+    throw error;
   }
 }
 
@@ -258,6 +261,28 @@ export async function deleteProfileFields(fields: string[]): Promise<UserProfile
     return await updateProfile(updateData);
   } catch (error) {
     console.error('Error deleting profile fields:', error);
+    throw error;
+  }
+}
+
+/**
+ * Debug profile authentication and data loading
+ * 
+ * @returns Promise resolving to debug information
+ */
+export async function debugProfileAuth(): Promise<any> {
+  try {
+    console.log('🔧 [Profile Debug] Calling debug endpoint...');
+    
+    const debugData = await apiFetch<any>({
+      path: '/profile/debug',
+      method: 'GET'
+    });
+    
+    console.log('🔧 [Profile Debug] Debug response:', debugData);
+    return debugData;
+  } catch (error) {
+    console.error('🔧 [Profile Debug] Debug endpoint failed:', error);
     throw error;
   }
 } 

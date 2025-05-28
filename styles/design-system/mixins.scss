@@ -1,0 +1,142 @@
+// Common mixins for the design system
+@mixin center-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin responsive-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@mixin card-shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/**
+ * Responsive typography with design tokens
+ */
+@mixin responsive-typography($base-size, $md-size, $lg-size, $weight: null, $line-height: null) {
+  font-size: $base-size;
+
+  @if $weight {
+    font-weight: $weight;
+  }
+
+  @if $line-height {
+    line-height: $line-height;
+  }
+
+  @media (min-width: var(--breakpoint-md)) {
+    font-size: $md-size;
+  }
+
+  @media (min-width: var(--breakpoint-lg)) {
+    font-size: $lg-size;
+  }
+}
+
+/**
+ * Hero component specific mixins
+ */
+@mixin hero-heading {
+  @include responsive-typography(var(--hero-font-size-heading-base),
+    var(--hero-font-size-heading-md),
+    var(--hero-font-size-heading-lg),
+    var(--weight-hero-heading),
+    var(--hero-line-height-heading));
+  margin-bottom: var(--hero-margin-heading);
+  color: var(--hero-text-primary);
+}
+
+@mixin hero-description {
+  @include responsive-typography(var(--hero-font-size-description-base),
+    var(--hero-font-size-description-md),
+    var(--hero-font-size-description-base));
+  color: var(--hero-text-secondary);
+  margin-bottom: var(--hero-margin-description);
+  max-width: var(--hero-description-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  line-height: var(--hero-line-height-description);
+  text-align: center;
+}
+
+@mixin hero-subtitle {
+  @include responsive-typography(var(--hero-font-size-subtitle-base),
+    var(--hero-font-size-subtitle-md),
+    var(--hero-font-size-subtitle-base));
+  color: var(--hero-text-secondary);
+  margin-bottom: var(--hero-margin-subtitle);
+  max-width: var(--hero-subtitle-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  line-height: var(--hero-line-height-subtitle);
+  text-align: var(--text-align-hero-center);
+}
+
+@mixin hero-section {
+  width: var(--width-hero-full);
+  min-height: var(--size-hero-min-height);
+  display: var(--display-hero-flex);
+  align-items: var(--align-hero-center);
+  justify-content: var(--justify-hero-center);
+  padding: var(--hero-padding-y) var(--hero-padding-x);
+  position: var(--pos-hero-element-relative);
+  overflow: var(--overflow-hero-hidden);
+  background-color: var(--hero-bg-primary);
+}
+
+/**
+ * Gradient Button Mixins
+ * 
+ * Create a gradient button style using component gradient tokens
+ */
+@mixin gradient-button($component, $variant, $hover: true) {
+  // Get the gradient tokens for this component and variant
+  $primary-gradient: get-gradient-token($component, $variant, 'primary');
+  $hover-gradient: get-gradient-token($component, $variant, 'hover');
+  $glow-color: get-gradient-token($component, $variant, 'glow-color');
+
+  // Apply primary gradient
+  background: linear-gradient(90deg,
+      get-gradient-color($primary-gradient, 'start') 0%,
+      get-gradient-color($primary-gradient, 'end') 100%);
+
+  // Using the glow-color instead of trying to access RGB values
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.3);
+
+  // Apply hover gradient if requested
+  @if $hover {
+
+    &:hover,
+    &:focus {
+      background: linear-gradient(90deg,
+          get-gradient-color($hover-gradient, 'start') 0%,
+          get-gradient-color($hover-gradient, 'end') 100%);
+
+      // Using a simple shadow instead of trying to use RGB values
+      box-shadow: 0 0 25px 0 rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+/**
+ * Accent Color with Opacity
+ * 
+ * Creates a CSS variable for an accent color with opacity
+ */
+@mixin create-accent-color-variants($color-var, $prefix) {
+  --#{$prefix}: rgba(var(--#{$color-var}-rgb), 0.15);
+  --#{$prefix}-strong: rgba(var(--#{$color-var}-rgb), 0.5);
+  --#{$prefix}-light: rgba(var(--#{$color-var}-rgb), 0.05);
+  --#{$prefix}-medium: rgba(var(--#{$color-var}-rgb), 0.1);
+}

@@ -9,8 +9,8 @@
 
 // Card base tokens
 $card-base: (
-  'padding': 1.5rem,
-  'border-radius': 0.5rem,
+  'padding': var(--space-6),
+  'border-radius': var(--space-2),
   'transition': 'all 0.2s ease-in-out'
 );
 

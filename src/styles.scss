@@ -1,0 +1,73 @@
+/**
+ * Main Styles Entry Point
+ * 
+ * This file imports all necessary styles including the design system,
+ * dashboard styles, and feature-specific styles.
+ */
+
+// Import Design System (must be first to establish tokens)
+@import './styles/design-system/index.scss';
+
+// Import Dashboard Styles
+@import './styles/dashboard.css';
+
+// Import Profile Feature Styles
+@import './features/profile/styles/profile.css';
+
+// Tailwind base styles
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Global styles */
+.fitcopilot-container {
+  @apply w-full max-w-full mx-0 p-0;
+}
+
+/* Main workout generator container styling */
+.workout-generator-feature {
+  @apply w-full max-w-full;
+}
+
+/* Form elements */
+.fitcopilot-button {
+  @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
+}
+
+.fitcopilot-button-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-md transition-colors duration-200;
+}
+
+.fitcopilot-input {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+}
+
+.fitcopilot-select {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+}
+
+.fitcopilot-textarea {
+  @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+}
+
+.fitcopilot-error {
+  @apply text-red-500 text-sm mt-1;
+}
+
+/* Card components */
+.fitcopilot-card {
+  @apply bg-white rounded-lg shadow-md p-6 mb-6;
+}
+
+.fitcopilot-card-title {
+  @apply text-xl font-semibold text-gray-800 mb-4;
+}
+
+/* Loading indicators */
+.fitcopilot-loading {
+  @apply animate-pulse bg-gray-200 rounded-md;
+}
+
+.fitcopilot-spinner {
+  @apply animate-spin rounded-full h-5 w-5 border-b-2 border-white;
+} 

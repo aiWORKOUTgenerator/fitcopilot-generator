@@ -1,0 +1,110 @@
+@use "sass:map";
+
+
+/**
+ * Gradient System Tokens
+ * 
+ * This file defines the base gradient tokens and their variants
+ * used throughout the application. Gradients are defined as maps
+ * with start and end colors, referencing design system color tokens.
+ */
+
+// Import the Sass module system
+
+// Base gradient primitive tokens - using color system variables
+$gradient-map: (
+    // Lime-based gradients
+    'lime-primary': (start: var(--color-lime-500),
+        end: var(--color-emerald-500),
+        start-rgb: var(--color-lime-500-rgb),
+        end-rgb: var(--color-emerald-500-rgb)),
+    'lime-hover': (start: var(--color-lime-400),
+        end: var(--color-teal-500),
+        start-rgb: var(--color-lime-400-rgb),
+        end-rgb: var(--color-teal-500-rgb)),
+
+    // Green-based gradients
+    'green-primary': (start: var(--color-green-500),
+        end: var(--color-emerald-600),
+        start-rgb: var(--color-green-500-rgb),
+        end-rgb: var(--color-emerald-600-rgb)),
+    'green-hover': (start: var(--color-green-400),
+        end: var(--color-emerald-500),
+        start-rgb: var(--color-green-400-rgb),
+        end-rgb: var(--color-emerald-500-rgb)),
+
+    // Violet-based gradients
+    'violet-primary': (start: var(--color-violet-500),
+        end: var(--color-purple-500),
+        start-rgb: var(--color-violet-500-rgb),
+        end-rgb: var(--color-purple-500-rgb)),
+    'violet-hover': (start: var(--color-violet-400),
+        end: var(--color-fuchsia-500),
+        start-rgb: var(--color-violet-400-rgb),
+        end-rgb: var(--color-fuchsia-500-rgb)),
+
+    // Cyan-based gradients
+    'cyan-primary': (start: var(--color-cyan-500),
+        end: var(--color-blue-500),
+        start-rgb: var(--color-cyan-500-rgb),
+        end-rgb: var(--color-blue-500-rgb)),
+    'cyan-hover': (start: var(--color-cyan-400),
+        end: var(--color-indigo-500),
+        start-rgb: var(--color-cyan-400-rgb),
+        end-rgb: var(--color-indigo-500-rgb)),
+
+    // Teal-based gradients (for wellness)
+    'teal-primary': (start: var(--color-teal-500),
+        end: var(--color-emerald-500),
+        start-rgb: var(--color-teal-500-rgb),
+        end-rgb: var(--color-emerald-500-rgb)),
+    'teal-hover': (start: var(--color-teal-400),
+        end: var(--color-green-500),
+        start-rgb: var(--color-teal-400-rgb),
+        end-rgb: var(--color-green-500-rgb)),
+
+    // Amber-based gradients
+    'amber-primary': (start: var(--color-amber-500),
+        end: var(--color-orange-500),
+        start-rgb: var(--color-amber-500-rgb),
+        end-rgb: var(--color-orange-500-rgb)),
+    'amber-hover': (start: var(--color-amber-400),
+        end: var(--color-orange-600),
+        start-rgb: var(--color-amber-400-rgb),
+        end-rgb: var(--color-orange-600-rgb))
+);
+
+// Component-specific semantic gradient tokens
+$component-gradients: (
+    // Journey component gradients
+    'journey': ('default': ('primary': map.get($gradient-map, 'lime-primary'),
+            'hover': map.get($gradient-map, 'lime-hover'),
+            'glow-color': var(--color-lime-500)),
+        'gym': ('primary': map.get($gradient-map, 'violet-primary'),
+            'hover': map.get($gradient-map, 'violet-hover'),
+            'glow-color': var(--color-violet-500)),
+        'sports': ('primary': map.get($gradient-map, 'cyan-primary'),
+            'hover': map.get($gradient-map, 'cyan-hover'),
+            'glow-color': var(--color-cyan-500)),
+        'wellness': ('primary': map.get($gradient-map, 'teal-primary'),
+            'hover': map.get($gradient-map, 'teal-hover'),
+            'glow-color': var(--color-teal-500)),
+        'modern': ('primary': map.get($gradient-map, 'amber-primary'),
+            'hover': map.get($gradient-map, 'amber-hover'),
+            'glow-color': var(--color-amber-500)),
+        'green': ('primary': map.get($gradient-map, 'green-primary'),
+            'hover': map.get($gradient-map, 'green-hover'),
+            'glow-color': var(--color-green-500)))
+);
+
+// Helper functions to retrieve gradient values
+@function get-gradient-token($component, $variant, $type) {
+    $component-map: map.get($component-gradients, $component);
+    $variant-map: map.get($component-map, $variant);
+    @return map.get($variant-map, $type);
+}
+
+@function get-gradient-color($gradient-token, $position) {
+    @return map.get($gradient-token, $position);
+}
+

@@ -6,6 +6,13 @@
 import React, { useState } from 'react';
 import { ProfileProvider, useProfile } from './context';
 import { ProfileForm, ProfileCard } from './components';
+import { debugProfileAuth } from './api/profileApi';
+
+// Add debug function to window for troubleshooting
+if (typeof window !== 'undefined') {
+  (window as any).debugProfileAuth = debugProfileAuth;
+  console.log('🔧 [Profile Debug] Debug function available: window.debugProfileAuth()');
+}
 
 interface ProfileFeatureProps {
   onProfileComplete?: () => void;

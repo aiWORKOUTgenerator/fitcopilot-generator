@@ -1,10 +1,15 @@
 /**
  * ProfileCard Component
- * Displays user profile information in a card format
+ * Displays user profile information in a modern step-based card layout
  */
 
 import React from 'react';
 import { UserProfile } from '../types';
+import { 
+  ProfileHeader, 
+  ProfileStepsGrid, 
+  ProfileActions 
+} from './step-cards';
 
 interface ProfileCardProps {
   profile: UserProfile;
@@ -12,110 +17,34 @@ interface ProfileCardProps {
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profile, onEdit }) => {
-  // Format workout goals as readable text
-  const formattedGoals = profile.goals?.map(goal => 
-    goal.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
-  ).join(', ') || 'Not set';
-
-  // Calculate profile completion percentage
-  const totalFields = 5; // Count major profile fields
-  const filledFields = [
-    !!profile.fitnessLevel,
-    profile.goals && profile.goals.length > 0,
-    !!profile.availableEquipment && profile.availableEquipment.length > 0,
-    !!profile.workoutFrequency,
-    !!profile.preferredWorkoutDuration
-  ].filter(Boolean).length;
-  
-  const completionPercentage = Math.round((filledFields / totalFields) * 100);
+  // Handle step click for future enhancement (optional)
+  const handleStepClick = (stepNumber: number) => {
+    // For now, just trigger the main edit function
+    // In the future, this could navigate to a specific step
+    onEdit();
+  };
 
   return (
     <div className="profile-card">
-      <div className="profile-card-header">
-        <div>
-          <h2 className="profile-card-title">Profile Details</h2>
-          <p className="profile-card-subtitle">
-            {completionPercentage}% Complete
-          </p>
-        </div>
-        <button 
-          className="profile-action-button"
-          onClick={onEdit}
-          aria-label="Edit profile"
-        >
-          <svg className="profile-action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-        </button>
-      </div>
+      {/* Header with title and completion percentage */}
+      <ProfileHeader 
+        profile={profile}
+        className="profile-card__header"
+      />
       
-      <div className="profile-card-body">
-        <div className="profile-stats">
-          <div className="profile-stat-item">
-            <span className="profile-stat-label">Fitness Level</span>
-            <span className="profile-stat-value">
-              {profile.fitnessLevel?.replace(/\b\w/g, l => l.toUpperCase()) || 'Not set'}
-            </span>
-          </div>
-          
-          <div className="profile-stat-item">
-            <span className="profile-stat-label">Workout Goals</span>
-            <span className="profile-stat-value">
-              {formattedGoals}
-            </span>
-          </div>
-          
-          <div className="profile-stat-item">
-            <span className="profile-stat-label">Equipment</span>
-            <span className="profile-stat-value">
-              {profile.availableEquipment && profile.availableEquipment.length > 0 
-                ? profile.availableEquipment.map(eq => eq.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())).join(', ')
-                : 'Not set'}
-            </span>
-          </div>
-          
-          <div className="profile-stat-item">
-            <span className="profile-stat-label">Workout Frequency</span>
-            <span className="profile-stat-value">
-              {profile.workoutFrequency ? `${profile.workoutFrequency} times per week` : 'Not set'}
-            </span>
-          </div>
-          
-          <div className="profile-stat-item">
-            <span className="profile-stat-label">Workout Duration</span>
-            <span className="profile-stat-value">
-              {profile.preferredWorkoutDuration ? `${profile.preferredWorkoutDuration} minutes` : 'Not set'}
-            </span>
-          </div>
-          
-          {profile.limitations && profile.limitations.length > 0 && (
-            <div className="profile-stat-item">
-              <span className="profile-stat-label">Physical Limitations</span>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {profile.limitations.map((limitation, index) => (
-                  <span key={index} className="profile-badge profile-badge-red">
-                    {limitation.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Step-based grid layout */}
+      <ProfileStepsGrid 
+        profile={profile}
+        onStepClick={handleStepClick}
+        className="profile-card__steps"
+      />
       
-      <div className="profile-card-footer">
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          Last updated: {profile.lastUpdated ? new Date(profile.lastUpdated).toLocaleDateString() : 'Never'}
-        </span>
-        
-        <button 
-          className="profile-button-primary"
-          onClick={onEdit}
-        >
-          Edit Profile
-        </button>
-      </div>
+      {/* Actions with prominent CTA button */}
+      <ProfileActions 
+        profile={profile}
+        onEdit={onEdit}
+        className="profile-card__actions"
+      />
     </div>
   );
 };

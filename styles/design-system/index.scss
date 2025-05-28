@@ -1,0 +1,115 @@
+// Design System Entry Point
+// This file coordinates all design system imports and ensures proper initialization
+
+// IMPORTANT: @forward rules must come first in Sass
+@forward './color-utils';
+@forward './colors-next'; // New color system
+@forward './typography';
+@forward './spacing';
+@forward './radii';
+@forward './shadows';
+@forward './transitions';
+@forward './backgrounds';
+@forward './mixins';
+@forward './breakpoints';
+@forward './tokens/gradients';
+@forward './component-tokens';
+@forward './button-tokens'; // Registration button and other button tokens
+@forward './components';
+
+// 1. Core foundations (must be first)
+@use '../reset';
+@use './typography';
+@use './colors-next' as colors;
+@use './spacing';
+@use './breakpoints';
+
+// 2. Animation system (before components)
+@use '../animations';
+@use './transitions';
+
+// 3. Component tokens
+@use './tokens/theme-tokens';
+@use './component-tokens';
+
+// 5. External animation libraries
+@import 'aos/dist/aos.css';
+
+// 6. Animation system initialization
+:root {
+  // Animation system flags
+  --animation-system-initialized: true;
+  --aos-integration-enabled: true;
+  
+  // Global animation settings
+  --animation-duration-fast: 200ms;
+  --animation-duration-normal: 300ms;
+  --animation-duration-slow: 500ms;
+  --animation-easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  // AOS integration settings
+  --aos-duration: 800;
+  --aos-easing: ease-in-out;
+  --aos-offset: 100;
+  --aos-delay: 0;
+}
+
+// Global animation utilities
+.animate-fade-in {
+  animation: fadeIn var(--animation-duration-normal) var(--animation-easing-default);
+}
+
+.animate-fade-up {
+  animation: fadeUp var(--animation-duration-normal) var(--animation-easing-default);
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--animation-duration-normal) var(--animation-easing-bounce);
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  // But allow AOS to handle its own reduced motion
+  [data-aos] {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// Animation keyframes
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

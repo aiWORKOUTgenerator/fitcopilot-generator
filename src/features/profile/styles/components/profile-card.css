@@ -1,7 +1,22 @@
-/* Profile Card Component Styles - Dark Theme */
+/* Profile Card Component Styles - Updated for Step-Based Layout */
 
 .profile-card {
   @apply bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all duration-200;
+  /* Updated to accommodate new step-based layout */
+  padding: 1.5rem;
+}
+
+/* New layout structure classes */
+.profile-card__header {
+  margin-bottom: 0; /* Override default margin from step-cards.css */
+}
+
+.profile-card__steps {
+  margin-bottom: 0; /* Override default margin from step-cards.css */
+}
+
+.profile-card__actions {
+  margin-top: 0; /* Ensure proper spacing */
 }
 
 .profile-card-header {

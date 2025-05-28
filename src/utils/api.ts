@@ -71,14 +71,33 @@ export async function apiFetch<T>({
     url += `?${searchParams.toString()}`;
   }
 
+  // Get nonce from multiple possible sources
+  const getNonce = (): string => {
+    if (typeof window === 'undefined') return '';
+    
+    // Try multiple possible global locations for the nonce
+    const possibleNonces = [
+      (window as any).fitcopilotData?.nonce,
+      (window as any).workoutGenerator?.nonce,
+      (window as any).wpApiSettings?.nonce,
+      (window as any)._wpnonce,
+    ];
+
+    for (const nonce of possibleNonces) {
+      if (nonce && typeof nonce === 'string') {
+        return nonce;
+      }
+    }
+
+    return '';
+  };
+
   // Prepare the request options
   const requestOptions: RequestInit = {
     method,
     headers: {
       'Content-Type': 'application/json',
-      'X-WP-Nonce': typeof window !== 'undefined' 
-        ? window.workoutGenerator?.nonce || '' 
-        : '',
+      'X-WP-Nonce': getNonce(),
     },
     credentials: 'same-origin',
   };

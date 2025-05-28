@@ -39,4 +39,50 @@ $spacing-60: 15rem;     // 240px
 $spacing-64: 16rem;     // 256px
 $spacing-72: 18rem;     // 288px
 $spacing-80: 20rem;     // 320px
-$spacing-96: 24rem;     // 384px 
+$spacing-96: 24rem;     // 384px
+
+// ----------------------------------------------------------------------------
+// CSS CUSTOM PROPERTIES EXPORT
+// ----------------------------------------------------------------------------
+
+:root {
+  // Spacing scale
+  --space-0: #{$spacing-0};
+  --space-px: #{$spacing-px};
+  --space-0-5: #{$spacing-0-5};
+  --space-1: #{$spacing-1};
+  --space-1-5: #{$spacing-1-5};
+  --space-2: #{$spacing-2};
+  --space-2-5: #{$spacing-2-5};
+  --space-3: #{$spacing-3};
+  --space-3-5: #{$spacing-3-5};
+  --space-4: #{$spacing-4};
+  --space-5: #{$spacing-5};
+  --space-6: #{$spacing-6};
+  --space-7: #{$spacing-7};
+  --space-8: #{$spacing-8};
+  --space-9: #{$spacing-9};
+  --space-10: #{$spacing-10};
+  --space-11: #{$spacing-11};
+  --space-12: #{$spacing-12};
+  --space-14: #{$spacing-14};
+  --space-16: #{$spacing-16};
+  --space-20: #{$spacing-20};
+  --space-24: #{$spacing-24};
+  --space-28: #{$spacing-28};
+  --space-32: #{$spacing-32};
+  --space-36: #{$spacing-36};
+  --space-40: #{$spacing-40};
+  --space-44: #{$spacing-44};
+  --space-48: #{$spacing-48};
+  --space-52: #{$spacing-52};
+  --space-56: #{$spacing-56};
+  --space-60: #{$spacing-60};
+  --space-64: #{$spacing-64};
+  --space-72: #{$spacing-72};
+  --space-80: #{$spacing-80};
+  --space-96: #{$spacing-96};
+}
+
+// Export a flag to indicate this file was imported
+$core-spacing-imported: true; 

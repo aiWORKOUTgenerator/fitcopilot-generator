@@ -1,0 +1,382 @@
+/**
+ * Button Component Tokens
+ *
+ * This file defines button-specific tokens structured according to the
+ * Theme Token Organization Schema.
+ */
+
+:root {
+  /**
+   * Base Button Tokens
+   * Shared across all button variants
+   */
+  
+  /* Sizing */
+  --button-padding-x: var(--spacing-4, 1rem);
+  --button-padding-y: var(--spacing-2, 0.5rem);
+  --button-border-radius: var(--radius-md, 0.375rem);
+  --button-min-width: 6rem;
+  
+  /* Size Variants */
+  --button-font-size-sm: var(--font-size-xs, 0.75rem);
+  --button-font-size-md: var(--font-size-sm, 0.875rem);
+  --button-font-size-lg: var(--font-size-base, 1rem);
+  
+  --button-padding-x-sm: var(--spacing-3, 0.75rem);
+  --button-padding-y-sm: var(--spacing-1, 0.25rem);
+  --button-padding-x-md: var(--button-padding-x, 1rem);
+  --button-padding-y-md: var(--button-padding-y, 0.5rem);
+  --button-padding-x-lg: var(--spacing-5, 1.25rem);
+  --button-padding-y-lg: var(--spacing-3, 0.75rem);
+  
+  /* Typography */
+  --button-font-weight: var(--font-weight-semibold, 600);
+  --button-line-height: 1.5;
+  --button-letter-spacing: 0.025em;
+  
+  /* Effects */
+  --button-transition: 0.3s ease;
+  --button-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+  --button-shadow-hover: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+  --button-transform-hover: translateY(-1px);
+  --button-transform-active: translateY(1px);
+  
+  /* States */
+  --button-opacity-disabled: 0.65;
+  
+  /* Icon Layout */
+  --button-icon-spacing: var(--spacing-2, 0.5rem);
+  --button-icon-size-sm: 0.875rem;
+  --button-icon-size-md: 1rem;
+  --button-icon-size-lg: 1.25rem;
+  
+  /**
+   * Primary Button Tokens
+   */
+  --button-primary-color: var(--color-button-primary-text, #ffffff);
+  --button-primary-bg: var(--color-button-primary, var(--color-primary));
+  --button-primary-border-color: transparent;
+  --button-primary-border-width: 0;
+  
+  /* Gradient variant */
+  --button-primary-gradient-angle: 90deg;
+  --button-primary-gradient-from: var(--color-gradient-from, var(--color-primary));
+  --button-primary-gradient-to: var(--color-gradient-to, var(--color-secondary));
+  
+  /* Hover state */
+  --button-primary-color-hover: var(--button-primary-color);
+  --button-primary-bg-hover: var(--color-primary-dark, var(--color-primary));
+  
+  /* Focus state */
+  --button-primary-ring-color: var(--color-focus-ring, var(--color-primary));
+  --button-primary-ring-width: 2px;
+  --button-primary-ring-offset: 2px;
+  
+  /**
+   * Secondary Button Tokens
+   */
+  --button-secondary-color: var(--color-button-secondary-text, var(--color-primary));
+  --button-secondary-bg: var(--color-button-secondary, var(--color-white, #ffffff));
+  --button-secondary-border-color: var(--color-primary);
+  --button-secondary-border-width: 1px;
+  
+  /* Hover state */
+  --button-secondary-color-hover: var(--button-secondary-color);
+  --button-secondary-bg-hover: var(--color-gray-50, #f9fafb);
+  --button-secondary-border-color-hover: var(--color-primary-dark, var(--color-primary));
+  
+  /* Focus state */
+  --button-secondary-ring-color: var(--color-focus-ring, var(--color-primary));
+  --button-secondary-ring-width: 2px;
+  --button-secondary-ring-offset: 2px;
+  
+  /**
+   * Tertiary Button Tokens
+   */
+  --button-tertiary-color: var(--color-text, #111827);
+  --button-tertiary-bg: transparent;
+  --button-tertiary-border-color: transparent;
+  --button-tertiary-border-width: 0;
+  
+  /* Hover state */
+  --button-tertiary-color-hover: var(--color-primary);
+  --button-tertiary-bg-hover: var(--color-gray-50, #f9fafb);
+  
+  /* Focus state */
+  --button-tertiary-ring-color: var(--color-focus-ring, var(--color-primary));
+  --button-tertiary-ring-width: 2px;
+  --button-tertiary-ring-offset: 2px;
+  
+  /**
+   * Hero Button Tokens
+   * Specific to HeroButton component
+   */
+  
+  /* Base dimensions */
+  --hero-button-padding-x: var(--button-padding-x-lg, 1.25rem);
+  --hero-button-padding-y: var(--button-padding-y-lg, 0.75rem);
+  --hero-button-radius: var(--radius-full, 9999px);
+  --hero-button-min-width: 210px;
+  --hero-button-font-weight: var(--button-font-weight, 600);
+  
+  /* Size variants */
+  --hero-button-size-sm-padding-x: 2rem;
+  --hero-button-size-sm-padding-y: 0.875rem;
+  --hero-button-size-sm-min-width: 240px;
+  --hero-button-size-sm-font-size: 1rem;
+  
+  --hero-button-size-md-padding-x: 2.5rem;
+  --hero-button-size-md-padding-y: 1rem;
+  --hero-button-size-md-min-width: 280px;
+  --hero-button-size-md-font-size: 1.125rem;
+  
+  --hero-button-size-lg-padding-x: 3rem;
+  --hero-button-size-lg-padding-y: 1.125rem;
+  --hero-button-size-lg-min-width: 320px;
+  --hero-button-size-lg-font-size: 1.25rem;
+  
+  /* Effects and transitions */
+  --hero-button-transition: var(--button-transition);
+  --hero-button-shadow: var(--button-shadow);
+  --hero-button-shadow-hover: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+  --hero-button-transform-up: -3px;
+  --hero-button-transform-down: 1px;
+  
+  /* Primary variant */
+  --hero-button-primary-border-width: 2px;
+  --hero-button-primary-border-color: rgba(var(--color-primary-rgb, 163, 230, 53), 0.3);
+  --hero-button-primary-gradient-angle: var(--button-primary-gradient-angle, 90deg);
+  --hero-button-primary-gradient-from: var(--button-primary-gradient-from);
+  --hero-button-primary-gradient-to: var(--button-primary-gradient-to);
+  
+  /* Secondary variant */
+  --hero-button-secondary-bg: rgba(15, 23, 42, 0.8);
+  --hero-button-secondary-color: var(--color-text-inverse, #ffffff);
+  --hero-button-secondary-border-width: 2px;
+  --hero-button-secondary-border-color: rgba(var(--color-primary-rgb, 163, 230, 53), 0.3);
+  --hero-button-secondary-bg-hover: rgba(var(--color-primary-rgb, 163, 230, 53), 0.1);
+}
+
+/**
+ * Theme-Specific Button Tokens
+ */
+
+/* Gym Theme Button Tokens */
+[data-theme="gym"] {
+  --button-primary-gradient-from: var(--color-violet-500, #8b5cf6);
+  --button-primary-gradient-to: var(--color-purple-500, #a855f7);
+  --hero-button-primary-border-color: rgba(var(--color-violet-rgb, 139, 92, 246), 0.3);
+  --hero-button-secondary-border-color: rgba(var(--color-violet-rgb, 139, 92, 246), 0.3);
+  --hero-button-secondary-bg-hover: rgba(var(--color-violet-rgb, 139, 92, 246), 0.1);
+}
+
+/* Sports Theme Button Tokens */
+[data-theme="sports"] {
+  --button-primary-gradient-from: var(--color-cyan-500, #06b6d4);
+  --button-primary-gradient-to: var(--color-blue-500, #3b82f6);
+  --hero-button-primary-border-color: rgba(var(--color-cyan-rgb, 6, 182, 212), 0.3);
+  --hero-button-secondary-border-color: rgba(var(--color-cyan-rgb, 6, 182, 212), 0.3);
+  --hero-button-secondary-bg-hover: rgba(var(--color-cyan-rgb, 6, 182, 212), 0.1);
+}
+
+/* Wellness Theme Button Tokens */
+[data-theme="wellness"] {
+  --button-primary-gradient-from: var(--color-teal-500, #14b8a6);
+  --button-primary-gradient-to: var(--color-emerald-500, #10b981);
+  --hero-button-primary-border-color: rgba(var(--color-teal-rgb, 20, 184, 166), 0.3);
+  --hero-button-secondary-border-color: rgba(var(--color-teal-rgb, 20, 184, 166), 0.3);
+  --hero-button-secondary-bg-hover: rgba(var(--color-teal-rgb, 20, 184, 166), 0.1);
+}
+
+/* Nutrition Theme Button Tokens */
+[data-theme="nutrition"] {
+  --button-primary-gradient-from: var(--color-amber-500, #f59e0b);
+  --button-primary-gradient-to: var(--color-amber-600, #d97706);
+  --hero-button-primary-border-color: rgba(var(--color-amber-rgb, 245, 158, 11), 0.3);
+  --hero-button-secondary-border-color: rgba(var(--color-amber-rgb, 245, 158, 11), 0.3);
+  --hero-button-secondary-bg-hover: rgba(var(--color-amber-rgb, 245, 158, 11), 0.1);
+}
+
+/**
+ * Registration Button Tokens
+ * Specific to RegistrationButton component
+ * These tokens preserve the exact current visual appearance
+ */
+
+:root {
+  /* === REGISTRATION BUTTON BASE TOKENS === */
+  
+  /* Core Design Values - PROTECTED (from Task 2.2) */
+  --registration-button-border-radius: 9999px; /* Perfect circle - NEVER CHANGE */
+  --registration-button-font-weight: 600; /* Semibold - NEVER CHANGE */
+  --registration-button-transition: all 0.2s ease; /* Exact timing - NEVER CHANGE */
+  --registration-button-hover-scale: 1.02; /* 2% increase - NEVER CHANGE */
+  
+  /* === PRIMARY VARIANT TOKENS === */
+  
+  /* Gradient Colors - PROTECTED: These exact colors MUST be preserved */
+  --registration-button-primary-gradient-from: #4ade80; /* green-400 - CRITICAL */
+  --registration-button-primary-gradient-to: #059669; /* emerald-600 - CRITICAL */
+  --registration-button-primary-gradient-direction: to right;
+  --registration-button-primary-text-color: #ffffff; /* white */
+  
+  /* Hover Effects - PROTECTED: Complex shadow configuration */
+  --registration-button-primary-shadow-base: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --registration-button-primary-glow-border: 0 0 0 1px rgba(74, 222, 128, 0.3); /* 30% opacity - CRITICAL */
+  --registration-button-primary-glow-outer: 0 0 8px 2px rgba(74, 222, 128, 0.2); /* 20% opacity - CRITICAL */
+  
+  /* Complete Shadow Stack */
+  --registration-button-primary-shadow-hover: var(--registration-button-primary-shadow-base), 
+                                               var(--registration-button-primary-glow-border), 
+                                               var(--registration-button-primary-glow-outer);
+  
+  /* === SECONDARY VARIANT TOKENS === */
+  
+  /* Colors - PROTECTED: Green theme */
+  --registration-button-secondary-bg: transparent;
+  --registration-button-secondary-border-color: #4ade80; /* green-400 - CRITICAL */
+  --registration-button-secondary-border-width: 1px;
+  --registration-button-secondary-text-color: #4ade80; /* green-400 - CRITICAL */
+  
+  /* Hover Effects - PROTECTED */
+  --registration-button-secondary-bg-hover: rgba(74, 222, 128, 0.1); /* 10% opacity - CRITICAL */
+  --registration-button-secondary-border-hover: 0 0 0 1px rgba(74, 222, 128, 0.5); /* 50% opacity - CRITICAL */
+  --registration-button-secondary-glow-hover: 0 0 6px 1px rgba(74, 222, 128, 0.15); /* 15% opacity - CRITICAL */
+  
+  /* Complete Secondary Hover Shadow */
+  --registration-button-secondary-shadow-hover: var(--registration-button-secondary-border-hover), 
+                                                 var(--registration-button-secondary-glow-hover);
+  
+  /* === TERTIARY VARIANT TOKENS === */
+  
+  /* Colors - PROTECTED: Minimal green styling */
+  --registration-button-tertiary-bg: transparent;
+  --registration-button-tertiary-text-color: #4ade80; /* green-400 - CRITICAL */
+  --registration-button-tertiary-border: none;
+  
+  /* Hover Effects - PROTECTED */
+  --registration-button-tertiary-bg-hover: rgba(74, 222, 128, 0.05); /* 5% opacity - CRITICAL */
+  --registration-button-tertiary-glow-hover: 0 0 6px 1px rgba(74, 222, 128, 0.1); /* 10% opacity - CRITICAL */
+  
+  /* === SIZING TOKENS === */
+  
+  /* Small Size */
+  --registration-button-small-padding-x: 1rem; /* 0.5rem 1rem from specs */
+  --registration-button-small-padding-y: 0.5rem;
+  --registration-button-small-font-size: 0.875rem; /* 14px */
+  
+  /* Medium Size (Default) */
+  --registration-button-medium-padding-x: 1.5rem; /* 0.75rem 1.5rem from specs */
+  --registration-button-medium-padding-y: 0.75rem;
+  --registration-button-medium-font-size: 1rem; /* 16px */
+  
+  /* Large Size */
+  --registration-button-large-padding-x: 2rem; /* 1rem 2rem from specs */
+  --registration-button-large-padding-y: 1rem;
+  --registration-button-large-font-size: 1.125rem; /* 18px */
+  
+  /* === LOADING STATE TOKENS === */
+  
+  /* Loading Animations - PROTECTED: Exact timing from specs */
+  --registration-button-loading-pulse-duration: 2s; /* NEVER CHANGE */
+  --registration-button-loading-pulse-timing: cubic-bezier(0.4, 0, 0.6, 1); /* NEVER CHANGE */
+  --registration-button-loading-pulse-opacity-min: 0.7; /* 70% minimum opacity */
+  --registration-button-loading-pulse-opacity-max: 1; /* 100% maximum opacity */
+  
+  --registration-button-loading-dots-duration: 1.5s; /* NEVER CHANGE */
+  --registration-button-loading-dots-timing: steps(5, end); /* NEVER CHANGE */
+  --registration-button-loading-text-spacing: 0.5rem; /* Margin between text and dots */
+  
+  /* === ICON TOKENS === */
+  
+  /* Icon Spacing - PROTECTED */
+  --registration-button-icon-spacing-left: 0.5rem; /* 8px gap to text */
+  --registration-button-icon-spacing-right: 0.5rem; /* 8px gap from text */
+  
+  /* === STATE TOKENS === */
+  
+  /* Disabled State - PROTECTED */
+  --registration-button-disabled-opacity: 0.7; /* 30% transparency */
+  --registration-button-disabled-cursor: not-allowed;
+  --registration-button-disabled-transform: none; /* Override hover effects */
+  
+  /* Loading State Cursor */
+  --registration-button-loading-cursor: wait;
+  
+  /* Focus State */
+  --registration-button-focus-outline-width: 2px;
+  --registration-button-focus-outline-color: var(--color-primary, #4ade80);
+  --registration-button-focus-outline-offset: 2px;
+  
+  /* === FULL WIDTH VARIANT === */
+  
+  --registration-button-full-width: 100%;
+  
+  /* === SPLASH CONTEXT TOKENS === */
+  /* Tokens for buttons within .registration-entry-form context */
+  
+  /* Form Container */
+  --registration-entry-form-filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+  
+  /* Button Base Styling in Splash Context */
+  --registration-entry-form-button-transition: all 0.3s ease;
+  --registration-entry-form-button-position: relative;
+  --registration-entry-form-button-overflow: hidden;
+  
+  /* Hover Effects */
+  --registration-entry-form-button-hover-scale: 1.02;
+  --registration-entry-form-button-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  --registration-entry-form-button-active-scale: 0.98;
+  
+  /* Shimmer Effect Tokens */
+  --registration-entry-form-shimmer-gradient: linear-gradient(to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%);
+  --registration-entry-form-shimmer-transform-default: rotate(30deg);
+  --registration-entry-form-shimmer-transform-hover: rotate(30deg) translate(10%, 10%);
+  --registration-entry-form-shimmer-transition: transform 0.7s ease-in-out;
+  --registration-entry-form-shimmer-opacity-default: 0;
+  --registration-entry-form-shimmer-opacity-hover: 1;
+  
+  /* Tertiary Variant in Splash Context */
+  --registration-entry-form-tertiary-bg: transparent;
+  --registration-entry-form-tertiary-border: none;
+  --registration-entry-form-tertiary-color: #ffffff;
+  --registration-entry-form-tertiary-shadow: none;
+  --registration-entry-form-tertiary-padding-y: 0.25rem;
+  
+  /* Tertiary Hover Effects in Splash Context */
+  --registration-entry-form-tertiary-hover-color: #ffffff;
+  --registration-entry-form-tertiary-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 
+    0 0 0 1px rgba(74, 222, 128, 0.5),
+    0 0 6px 1px rgba(74, 222, 128, 0.3);
+
+  /* === SPLASH FEATURE CARD TOKENS === */
+  /* Tokens for feature cards on the Splash page */
+  
+  /* Base Feature Card Styling */
+  --splash-feature-card-bg: rgba(30, 41, 59, 0.5);
+  --splash-feature-card-border: 1px solid rgba(255, 255, 255, 0.1);
+  --splash-feature-card-border-radius: 16px;
+  --splash-feature-card-padding: 24px;
+  --splash-feature-card-backdrop-filter: blur(8px);
+  --splash-feature-card-transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  /* Feature Card Hover Effects */
+  --splash-feature-card-hover-transform: translateY(-5px);
+  --splash-feature-card-hover-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --splash-feature-card-hover-border: 0 0 0 1px rgba(74, 222, 128, 0.5);
+  --splash-feature-card-hover-glow: 0 0 6px 1px rgba(74, 222, 128, 0.3);
+  
+  /* Feature Icon Styling */
+  --splash-feature-icon-size: 48px;
+  --splash-feature-icon-border-radius: 12px;
+  --splash-feature-icon-bg: rgba(132, 225, 188, 0.1);
+  --splash-feature-icon-margin-bottom: 16px;
+  
+  /* Responsive Feature Card Tokens */
+  --splash-feature-card-padding-mobile: 20px;
+  --splash-feature-card-padding-small: 16px;
+} 

@@ -1,0 +1,102 @@
+/**
+ * Registration Entry Form Component Styles
+ * Uses design system tokens for consistent styling
+ * Replaces hardcoded overrides from Splash.scss
+ */
+
+.registration-entry-form {
+  position: relative;
+  filter: var(--registration-entry-form-filter);
+
+  /* Input styling */
+  input {
+    transition: var(--registration-entry-form-button-transition);
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(132, 225, 188, 0.3);
+    }
+  }
+
+  /* Button styling using design tokens */
+  button {
+    transition: var(--registration-entry-form-button-transition);
+    position: var(--registration-entry-form-button-position);
+    overflow: var(--registration-entry-form-button-overflow);
+
+    &:hover {
+      transform: scale(var(--registration-entry-form-button-hover-scale));
+      box-shadow: var(--registration-entry-form-button-hover-shadow);
+    }
+
+    &:active {
+      transform: scale(var(--registration-entry-form-button-active-scale));
+    }
+
+    /* Shimmer effect using design tokens */
+    &::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: var(--registration-entry-form-shimmer-gradient);
+      transform: var(--registration-entry-form-shimmer-transform-default);
+      transition: var(--registration-entry-form-shimmer-transition);
+      opacity: var(--registration-entry-form-shimmer-opacity-default);
+    }
+
+    &:hover::after {
+      opacity: var(--registration-entry-form-shimmer-opacity-hover);
+      transform: var(--registration-entry-form-shimmer-transform-hover);
+    }
+  }
+
+  /* Tertiary variant specific styling in Splash context */
+  .registration-button[data-variant="tertiary"].btn-secondary {
+    background-color: var(--registration-entry-form-tertiary-bg) !important;
+    border: var(--registration-entry-form-tertiary-border) !important;
+    color: var(--registration-entry-form-tertiary-color) !important;
+    box-shadow: var(--registration-entry-form-tertiary-shadow) !important;
+    padding-top: var(--registration-entry-form-tertiary-padding-y) !important;
+    padding-bottom: var(--registration-entry-form-tertiary-padding-y) !important;
+    
+    /* Ensure button content stays inline and centered */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: row !important;
+    white-space: nowrap !important;
+
+    &:hover:not(:disabled) {
+      color: var(--registration-entry-form-tertiary-hover-color) !important;
+      box-shadow: var(--registration-entry-form-tertiary-hover-shadow) !important;
+    }
+
+    /* Icon alignment - ensure inline with text and vertically centered */
+    .registration-button__icon {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-left: 0.5rem !important;
+
+      svg {
+        display: block !important;
+        vertical-align: middle !important;
+        width: 1rem !important;
+        height: 1rem !important;
+      }
+    }
+
+    /* Ensure right icon specifically stays inline */
+    .registration-button__icon--right {
+      margin-left: 0.5rem !important;
+      margin-right: 0 !important;
+    }
+
+    .registration-button__text {
+      display: inline-flex !important;
+      align-items: center !important;
+    }
+  }
+} 

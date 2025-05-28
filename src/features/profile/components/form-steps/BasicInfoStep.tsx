@@ -1,10 +1,15 @@
 /**
  * Basic Info Step Component
  * 
- * Form step for basic fitness information
+ * Form step for basic fitness information - Enhanced with Design System
  */
 import React from 'react';
 import { FitnessGoal, FitnessLevel, PartialUserProfile } from '../../types';
+import { 
+  FormFieldEnhanced, 
+  RadioGroupEnhanced, 
+  FormSectionEnhanced 
+} from '../enhanced';
 
 interface BasicInfoStepProps {
   formData: PartialUserProfile;
@@ -13,36 +18,67 @@ interface BasicInfoStepProps {
 }
 
 /**
- * Form step for basic fitness information
+ * Form step for basic fitness information with enhanced design system integration
  */
 const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   formData,
   errors,
   onChange
 }) => {
+  // Fitness level options with enhanced descriptions
+  const fitnessLevelOptions = [
+    {
+      value: 'beginner',
+      title: 'Beginner',
+      description: 'New to exercise or returning after a long break'
+    },
+    {
+      value: 'intermediate',
+      title: 'Intermediate',
+      description: 'Exercise regularly and have good fitness base'
+    },
+    {
+      value: 'advanced',
+      title: 'Advanced',
+      description: 'Very experienced with intense training routines'
+    }
+  ];
+
+  // Complete fitness goals list matching the original implementation
+  const fitnessGoals = [
+    { id: 'weight_loss', label: 'Weight Loss', description: 'Burn calories and reduce body fat' },
+    { id: 'muscle_building', label: 'Muscle Building', description: 'Increase muscle mass and strength' },
+    { id: 'endurance', label: 'Endurance', description: 'Improve cardiovascular fitness and stamina' },
+    { id: 'flexibility', label: 'Flexibility', description: 'Enhance mobility and range of motion' },
+    { id: 'general_fitness', label: 'General Fitness', description: 'Overall health and wellness improvement' },
+    { id: 'strength', label: 'Strength', description: 'Build functional strength and power' },
+    { id: 'rehabilitation', label: 'Rehabilitation', description: 'Recovery from injury or medical condition' },
+    { id: 'sport_specific', label: 'Sport-Specific Training', description: 'Training for specific sports or activities' },
+    { id: 'custom', label: 'Other/Custom', description: 'Specify your own unique fitness goal' }
+  ];
+
   // Handle fitness level change
-  const handleFitnessLevelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange('fitnessLevel', e.target.value as FitnessLevel);
+  const handleFitnessLevelChange = (value: string) => {
+    onChange('fitnessLevel', value as FitnessLevel);
   };
   
   // Handle goal selection
-  const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const goal = e.target.value as FitnessGoal;
-    const isChecked = e.target.checked;
+  const handleGoalChange = (goalId: string, checked: boolean) => {
+    const currentGoals = [...(formData.goals || [])];
     
-    let updatedGoals = [...(formData.goals || [])];
-    
-    if (isChecked) {
+    if (checked) {
       // Add goal if not already in the array
-      if (!updatedGoals.includes(goal)) {
-        updatedGoals.push(goal);
+      if (!currentGoals.includes(goalId as FitnessGoal)) {
+        currentGoals.push(goalId as FitnessGoal);
       }
     } else {
       // Remove goal if it exists
-      updatedGoals = updatedGoals.filter(g => g !== goal);
+      const updatedGoals = currentGoals.filter(g => g !== goalId);
+      onChange('goals', updatedGoals);
+      return;
     }
     
-    onChange('goals', updatedGoals);
+    onChange('goals', currentGoals);
   };
   
   // Handle custom goal change
@@ -58,251 +94,134 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       </p>
       
       {/* Personal Information Section */}
-      <div className="form-section">
-        <h3>Personal Information</h3>
-        
+      <FormSectionEnhanced
+        title="Personal Information"
+        description="Basic details to personalize your experience"
+      >
         <div className="form-row">
-          <div className="form-field">
-            <label htmlFor="firstName">First Name *</label>
+          <FormFieldEnhanced
+            label="First Name"
+            required
+            error={errors.firstName}
+            hint="Enter your preferred first name"
+          >
             <input
               type="text"
-              id="firstName"
               name="firstName"
               value={formData.firstName || ''}
               onChange={(e) => onChange('firstName', e.target.value)}
               placeholder="Enter your first name"
-              required
             />
-            {errors.firstName && (
-              <div className="error-message">{errors.firstName}</div>
-            )}
-          </div>
+          </FormFieldEnhanced>
           
-          <div className="form-field">
-            <label htmlFor="lastName">Last Name *</label>
+          <FormFieldEnhanced
+            label="Last Name"
+            required
+            error={errors.lastName}
+            hint="Enter your family name"
+          >
             <input
               type="text"
-              id="lastName"
               name="lastName"
               value={formData.lastName || ''}
               onChange={(e) => onChange('lastName', e.target.value)}
               placeholder="Enter your last name"
-              required
             />
-            {errors.lastName && (
-              <div className="error-message">{errors.lastName}</div>
-            )}
-          </div>
+          </FormFieldEnhanced>
         </div>
         
-        <div className="form-field">
-          <label htmlFor="email">Email Address *</label>
+        <FormFieldEnhanced
+          label="Email Address"
+          required
+          error={errors.email}
+          hint="We'll use this to send you workout updates and progress reports"
+        >
           <input
             type="email"
-            id="email"
             name="email"
             value={formData.email || ''}
             onChange={(e) => onChange('email', e.target.value)}
             placeholder="Enter your email address"
-            required
           />
-          {errors.email && (
-            <div className="error-message">{errors.email}</div>
+        </FormFieldEnhanced>
+      </FormSectionEnhanced>
+
+      {/* Fitness Level Section */}
+      <FormSectionEnhanced
+        title="Fitness Level"
+        description="Help us understand your current fitness experience"
+      >
+        <RadioGroupEnhanced
+          title="What is your fitness level?"
+          description="This helps us recommend appropriate workout intensity and progression"
+          value={formData.fitnessLevel || ''}
+          onChange={handleFitnessLevelChange}
+          options={fitnessLevelOptions}
+          name="fitnessLevel"
+          error={errors.fitnessLevel}
+        />
+      </FormSectionEnhanced>
+
+      {/* Fitness Goals Section */}
+      <FormSectionEnhanced
+        title="Fitness Goals"
+        description="Select all goals that apply to you"
+      >
+        <div className="checkbox-group-enhanced">
+          <div className="checkbox-group-enhanced__title">
+            What are your fitness goals?
+          </div>
+          <div className="checkbox-group-enhanced__description">
+            Choose multiple goals to create a well-rounded fitness plan
+          </div>
+          
+          <div className="checkbox-group-enhanced__options">
+            {fitnessGoals.map((goal) => (
+              <div key={goal.id} className="checkbox-option-enhanced">
+                <input
+                  type="checkbox"
+                  id={goal.id}
+                  name="goals"
+                  value={goal.id}
+                  checked={formData.goals?.includes(goal.id as FitnessGoal) || false}
+                  onChange={(e) => handleGoalChange(goal.id, e.target.checked)}
+                  className="checkbox-option-enhanced__input"
+                />
+                <label htmlFor={goal.id} className="checkbox-option-enhanced__label">
+                  <div className="checkbox-option-enhanced__indicator" />
+                  <div className="checkbox-option-enhanced__content">
+                    <span className="checkbox-option-enhanced__title">{goal.label}</span>
+                    <span className="checkbox-option-enhanced__description">{goal.description}</span>
+                  </div>
+                </label>
+              </div>
+            ))}
+          </div>
+          
+          {errors.goals && (
+            <div className="form-field-enhanced__error">
+              {errors.goals}
+            </div>
           )}
         </div>
-      </div>
-      
-      <div className="form-section">
-        <h3>What is your fitness level?</h3>
-        
-        <div className="radio-group">
-          <div className="radio-option">
-            <input
-              type="radio"
-              id="beginner"
-              name="fitnessLevel"
-              value="beginner"
-              checked={formData.fitnessLevel === 'beginner'}
-              onChange={handleFitnessLevelChange}
-            />
-            <label htmlFor="beginner">
-              <strong>Beginner</strong>
-              <span className="option-description">New to exercise or returning after a long break</span>
-            </label>
-          </div>
-          
-          <div className="radio-option">
-            <input
-              type="radio"
-              id="intermediate"
-              name="fitnessLevel"
-              value="intermediate"
-              checked={formData.fitnessLevel === 'intermediate'}
-              onChange={handleFitnessLevelChange}
-            />
-            <label htmlFor="intermediate">
-              <strong>Intermediate</strong>
-              <span className="option-description">Exercise regularly and have good fitness base</span>
-            </label>
-          </div>
-          
-          <div className="radio-option">
-            <input
-              type="radio"
-              id="advanced"
-              name="fitnessLevel"
-              value="advanced"
-              checked={formData.fitnessLevel === 'advanced'}
-              onChange={handleFitnessLevelChange}
-            />
-            <label htmlFor="advanced">
-              <strong>Advanced</strong>
-              <span className="option-description">Very experienced with intense training routines</span>
-            </label>
-          </div>
-        </div>
-        
-        {errors.fitnessLevel && (
-          <div className="error-message">{errors.fitnessLevel}</div>
-        )}
-      </div>
-      
-      <div className="form-section">
-        <h3>What are your fitness goals?</h3>
-        <p>Select all that apply</p>
-        
-        <div className="checkbox-group">
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="weight_loss"
-              name="goals"
-              value="weight_loss"
-              checked={formData.goals?.includes('weight_loss')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="weight_loss">Weight Loss</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="muscle_building"
-              name="goals"
-              value="muscle_building"
-              checked={formData.goals?.includes('muscle_building')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="muscle_building">Muscle Building</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="endurance"
-              name="goals"
-              value="endurance"
-              checked={formData.goals?.includes('endurance')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="endurance">Endurance</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="flexibility"
-              name="goals"
-              value="flexibility"
-              checked={formData.goals?.includes('flexibility')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="flexibility">Flexibility</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="general_fitness"
-              name="goals"
-              value="general_fitness"
-              checked={formData.goals?.includes('general_fitness')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="general_fitness">General Fitness</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="strength"
-              name="goals"
-              value="strength"
-              checked={formData.goals?.includes('strength')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="strength">Strength</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="rehabilitation"
-              name="goals"
-              value="rehabilitation"
-              checked={formData.goals?.includes('rehabilitation')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="rehabilitation">Rehabilitation</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="sport_specific"
-              name="goals"
-              value="sport_specific"
-              checked={formData.goals?.includes('sport_specific')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="sport_specific">Sport-Specific Training</label>
-          </div>
-          
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="custom"
-              name="goals"
-              value="custom"
-              checked={formData.goals?.includes('custom')}
-              onChange={handleGoalChange}
-            />
-            <label htmlFor="custom">Other/Custom</label>
-          </div>
-        </div>
-        
-        {errors.goals && (
-          <div className="error-message">{errors.goals}</div>
-        )}
-        
+
+        {/* Custom Goal Input - Show when 'custom' goal is selected */}
         {formData.goals?.includes('custom') && (
-          <div className="form-field">
-            <label htmlFor="customGoal">Please specify your goal:</label>
+          <FormFieldEnhanced
+            label="Please specify your goal"
+            error={errors.customGoal}
+            hint="Tell us more about your specific fitness goal"
+          >
             <textarea
-              id="customGoal"
               name="customGoal"
               value={formData.customGoal || ''}
               onChange={handleCustomGoalChange}
               placeholder="Tell us more about your specific fitness goal..."
               rows={3}
             />
-            
-            {errors.customGoal && (
-              <div className="error-message">{errors.customGoal}</div>
-            )}
-          </div>
+          </FormFieldEnhanced>
         )}
-      </div>
+      </FormSectionEnhanced>
     </div>
   );
 };

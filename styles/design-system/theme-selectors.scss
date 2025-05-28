@@ -1,0 +1,143 @@
+/**
+ * Theme Selectors
+ *
+ * This file provides standardized selectors for applying themes to components.
+ * It follows the patterns defined in the Theme Architecture Documentation.
+ */
+
+/**
+ * Theme Root Selectors
+ * 
+ * Pattern: [data-theme="theme-name"]
+ * Used to target global theme styles
+ */
+
+/* Base Theme (default) */
+:root:not([data-theme]), 
+:root[data-theme="default"] {
+  /* Default theme is already defined in root scope */
+}
+
+/* Gym Theme */
+[data-theme="gym"] {
+  /* Gym theme overrides */
+}
+
+/* Sports Theme */
+[data-theme="sports"] {
+  /* Sports theme overrides */
+}
+
+/* Wellness Theme */
+[data-theme="wellness"] {
+  /* Wellness theme overrides */
+}
+
+/* Nutrition Theme */
+[data-theme="nutrition"] {
+  /* Nutrition theme overrides */
+}
+
+/**
+ * Component-Level Theme Selectors
+ * 
+ * Pattern: .component { styles }
+ *          [data-theme="theme-name"] .component { theme overrides }
+ */
+
+/* Standard Component Theming Pattern */
+.component-example {
+  /* Default theme styling using variables */
+  color: var(--component-color);
+  background: var(--component-background);
+  
+  /* Theme-specific overrides */
+  [data-theme="gym"] & {
+    --component-color: var(--color-gym-text);
+    --component-background: var(--color-gym-background);
+  }
+  
+  [data-theme="sports"] & {
+    --component-color: var(--color-sports-text);
+    --component-background: var(--color-sports-background);
+  }
+  
+  [data-theme="wellness"] & {
+    --component-color: var(--color-wellness-text);
+    --component-background: var(--color-wellness-background);
+  }
+  
+  [data-theme="nutrition"] & {
+    --component-color: var(--color-nutrition-text);
+    --component-background: var(--color-nutrition-background);
+  }
+}
+
+/**
+ * Mixin-Style Class Selectors for Common Theme Patterns
+ */
+
+/* Primary Button Theme Pattern */
+.theme-primary-button {
+  /* Default primary button styling */
+  background: linear-gradient(
+    var(--angle-gradient, 90deg),
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  
+  /* Theme overrides will be applied via the parent data-theme attribute */
+  [data-theme="gym"] & {
+    /* Theme-specific gradient will be achieved through CSS variables */
+  }
+}
+
+/* Secondary Button Theme Pattern */
+.theme-secondary-button {
+  /* Default secondary button styling */
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  
+  /* Theme overrides will be applied via the parent data-theme attribute */
+  [data-theme="gym"] & {
+    /* Theme-specific styles will be achieved through CSS variables */
+  }
+}
+
+/* Card Theme Pattern */
+.theme-card {
+  /* Default card styling */
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  
+  /* Theme overrides will be applied via the parent data-theme attribute */
+  [data-theme="gym"] & {
+    /* Theme-specific styles will be achieved through CSS variables */
+  }
+}
+
+/**
+ * Helper Classes for Explicit Theme Application
+ * These allow adding theme classes directly to elements
+ */
+
+/* Apply specific theme */
+.theme-default {
+  --current-theme: "default";
+}
+
+.theme-gym {
+  --current-theme: "gym";
+}
+
+.theme-sports {
+  --current-theme: "sports";
+}
+
+.theme-wellness {
+  --current-theme: "wellness";
+}
+
+.theme-nutrition {
+  --current-theme: "nutrition";
+} 

@@ -1,0 +1,55 @@
+// Enhanced color system with semantic mappings
+// This extends the existing color tokens with more consistent naming
+
+:root {
+    // Base color palette (using existing variables)
+    // These should match the existing palette but with more consistent naming
+
+    // Background colors
+    --color-background-primary: var(--color-background-dark, #0f172a);
+    --color-background-secondary: var(--color-background, #111827);
+    --color-background-tertiary: var(--color-background-light, #1f2937);
+
+    // Surface colors (for cards, containers, etc.)
+    --color-surface-primary: var(--color-background-light, #1f2937);
+    --color-surface-secondary: rgba(31, 41, 55, 0.5);
+
+    // Text colors
+    --color-text-primary: var(--color-text, #f9fafb);
+    --color-text-secondary: var(--color-text-muted, #9ca3af);
+    --color-text-accent: var(--color-lime, #a3e635);
+
+    // Border colors
+    --color-border-light: rgba(255, 255, 255, 0.1);
+    --color-border-medium: rgba(255, 255, 255, 0.2);
+
+    // Overlay colors
+    --color-overlay-light: rgba(0, 0, 0, 0.1);
+    --color-overlay-medium: rgba(0, 0, 0, 0.3);
+    --color-overlay-dark: rgba(0, 0, 0, 0.5);
+
+    // Grid pattern color
+    --color-grid-pattern: rgba(255, 255, 255, 0.05);
+}
+
+// Theme variants
+body[data-theme="gym"] {
+    --color-background-primary: #10132B;
+    --color-background-secondary: #171A3F;
+    --color-background-tertiary: #222654;
+    --color-text-accent: var(--color-violet-400, #a78bfa);
+}
+
+body[data-theme="sports"] {
+    --color-background-primary: #0B1423;
+    --color-background-secondary: #0F1C2D;
+    --color-background-tertiary: #172A43;
+    --color-text-accent: var(--color-blue-400, #60a5fa);
+}
+
+body[data-theme="wellness"] {
+    --color-background-primary: #0B1A17;
+    --color-background-secondary: #102924;
+    --color-background-tertiary: #153B33;
+    --color-text-accent: var(--color-teal-400, #2dd4bf);
+}

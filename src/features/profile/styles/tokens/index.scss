@@ -1,0 +1,16 @@
+/**
+ * ProfileHeader Design Tokens Index
+ * 
+ * This file provides a clean interface for importing all ProfileHeader-related design tokens.
+ * Import this file to access the complete ProfileHeader token system.
+ */
+
+/* Import ProfileHeader component tokens */
+@import '_profile-tokens';
+
+/* Export a flag to show ProfileHeader tokens were imported */
+$profile-tokens-imported: true;
+
+/* Re-export key token maps for external use */
+$exported-profile-avatar-sizes: $profile-avatar-sizes;
+$exported-profile-avatar-colors: $profile-avatar-colors; 

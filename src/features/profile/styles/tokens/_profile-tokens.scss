@@ -1,0 +1,205 @@
+/**
+ * ProfileHeader Component Tokens
+ * 
+ * Component-specific design tokens for the ProfileHeader and Avatar system.
+ * These tokens extend the core FitCopilot design system for ProfileHeader-specific needs.
+ */
+
+// Import core design system tokens
+@import '../../../styles/design-system/tokens/core/colors';
+@import '../../../styles/design-system/tokens/core/spacing';
+@import '../../../styles/design-system/tokens/core/typography';
+@import '../../../styles/design-system/tokens/semantic/surfaces';
+
+// ----------------------------------------------------------------------------
+// PROFILEHEADER LAYOUT TOKENS
+// ----------------------------------------------------------------------------
+
+// ProfileHeader spacing and layout
+$profile-header-spacing: $spacing-6; // 1.5rem - main margin-bottom
+$profile-header-content-gap: $spacing-6; // 1.5rem - gap between sections
+$profile-header-user-gap: $spacing-4; // 1rem - gap within user section
+$profile-header-user-gap-mobile: $spacing-3; // 0.75rem - mobile gap
+
+// Completion section sizing
+$profile-completion-min-width: 12.5rem; // 200px - minimum width for completion section
+
+// ----------------------------------------------------------------------------
+// AVATAR SIZING TOKENS
+// ----------------------------------------------------------------------------
+
+// Avatar size scale (following design system pattern)
+$profile-avatar-size-small: 2rem; // 32px
+$profile-avatar-size-medium: 3rem; // 48px  
+$profile-avatar-size-large: 3.75rem; // 60px
+$profile-avatar-size-large-mobile: 3.125rem; // 50px - mobile variant
+$profile-avatar-size-extra-large: 5rem; // 80px
+
+// Avatar border and styling
+$profile-avatar-border-width: 2px;
+$profile-avatar-border-radius: 50%;
+
+// ----------------------------------------------------------------------------
+// PROGRESS BAR TOKENS
+// ----------------------------------------------------------------------------
+
+// Progress bar dimensions
+$profile-progress-height: 0.375rem; // 6px
+$profile-progress-radius: 0.1875rem; // 3px
+$profile-progress-gap: $spacing-1; // 0.25rem - gap in progress section
+
+// ----------------------------------------------------------------------------
+// TYPOGRAPHY TOKENS (ProfileHeader-specific)
+// ----------------------------------------------------------------------------
+
+// User name typography
+$profile-user-name-size: $font-size-2xl; // 1.5rem
+$profile-user-name-size-mobile: $font-size-xl; // 1.25rem
+$profile-user-name-weight: $font-weight-semibold; // 600
+$profile-user-name-line-height: $line-height-tight; // 1.2
+
+// User email typography
+$profile-user-email-size: $font-size-sm; // 0.875rem
+$profile-user-email-weight: $font-weight-normal; // 400
+
+// Subtitle typography
+$profile-subtitle-size: $font-size-sm; // 0.875rem
+$profile-subtitle-weight: $font-weight-medium; // 500
+$profile-subtitle-letter-spacing: $letter-spacing-wide; // 0.025em
+
+// Completion percentage typography
+$profile-completion-percentage-size: $font-size-lg; // 1.125rem (was 1.1rem)
+$profile-completion-percentage-weight: $font-weight-semibold; // 600
+
+// Completion steps typography
+$profile-completion-steps-size: $font-size-sm; // 0.875rem
+
+// Avatar initials typography
+$profile-avatar-initials-size-small: $font-size-sm; // 0.875rem
+$profile-avatar-initials-size-medium: $font-size-md; // 1rem
+$profile-avatar-initials-size-large: $font-size-xl; // 1.25rem
+$profile-avatar-initials-size-large-mobile: $font-size-lg; // 1.125rem (was 1.1rem)
+$profile-avatar-initials-size-extra-large: $font-size-xl; // 1.25rem
+$profile-avatar-initials-weight: $font-weight-semibold; // 600
+$profile-avatar-initials-letter-spacing: $letter-spacing-wide; // 0.025em
+
+// ----------------------------------------------------------------------------
+// COLOR TOKENS (ProfileHeader-specific)
+// ----------------------------------------------------------------------------
+
+// Avatar gradient colors (using design system colors)
+$profile-avatar-gradient-start: $color-primary-500; // #84cc16
+$profile-avatar-gradient-end: $color-primary-600; // #65a30d (was #78c241)
+
+// Progress bar gradient colors
+$profile-progress-gradient-start: $color-primary-400; // #a3e635 (was #8cd867)
+$profile-progress-gradient-end: $color-primary-600; // #65a30d (was #78c241)
+
+// Avatar color variants (mapped to design system)
+$profile-avatar-colors: (
+  'indigo': $color-info-500, // #3b82f6 (was #6366f1)
+  'violet': #8b5cf6, // Keep custom for now
+  'cyan': $color-secondary-500, // #06b6d4
+  'emerald': $color-success-500, // #22c55e (was #10b981)
+  'amber': $color-warning-500, // #f59e0b
+  'red': $color-error-500, // #ef4444
+  'pink': #ec4899, // Keep custom for now
+  'lime': $color-primary-500, // #84cc16
+  'orange': #f97316, // Keep custom for now
+  'blue': $color-info-500 // #3b82f6
+);
+
+// Avatar loading state colors
+$profile-avatar-loading-light: $color-gray-100; // #f3f4f6
+$profile-avatar-loading-medium: $color-gray-200; // #e5e7eb
+
+// Avatar error state colors
+$profile-avatar-error-bg: $color-gray-100; // #f3f4f6
+$profile-avatar-error-text: $color-gray-500; // #6b7280
+$profile-avatar-error-border: $color-gray-300; // #d1d5db
+
+// ----------------------------------------------------------------------------
+// MOTION TOKENS (ProfileHeader-specific)
+// ----------------------------------------------------------------------------
+
+// Standard transitions
+$profile-transition-standard: all 0.2s ease;
+$profile-transition-border: border-color 0.2s ease;
+$profile-transition-progress: width 0.3s ease;
+$profile-transition-avatar: opacity 0.3s ease-in-out;
+
+// Hover effects
+$profile-hover-transform: translateY(-2px);
+$profile-avatar-hover-scale: 1.05;
+$profile-avatar-active-scale: 0.98;
+
+// Loading animation
+$profile-avatar-loading-duration: 1.5s;
+
+// ----------------------------------------------------------------------------
+// SHADOW TOKENS (ProfileHeader-specific)
+// ----------------------------------------------------------------------------
+
+// Avatar shadows
+$profile-avatar-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+$profile-avatar-focus-shadow: 0 0 0 3px rgba($color-info-rgb, 0.3);
+
+// ----------------------------------------------------------------------------
+// RESPONSIVE BREAKPOINTS (ProfileHeader-specific)
+// ----------------------------------------------------------------------------
+
+$profile-mobile-breakpoint: 768px;
+
+// ----------------------------------------------------------------------------
+// COMPONENT TOKEN MAPS
+// ----------------------------------------------------------------------------
+
+// Avatar size map for easy access
+$profile-avatar-sizes: (
+  'small': (
+    'size': $profile-avatar-size-small,
+    'font-size': $profile-avatar-initials-size-small
+  ),
+  'medium': (
+    'size': $profile-avatar-size-medium,
+    'font-size': $profile-avatar-initials-size-medium
+  ),
+  'large': (
+    'size': $profile-avatar-size-large,
+    'font-size': $profile-avatar-initials-size-large,
+    'mobile-size': $profile-avatar-size-large-mobile,
+    'mobile-font-size': $profile-avatar-initials-size-large-mobile
+  ),
+  'extra-large': (
+    'size': $profile-avatar-size-extra-large,
+    'font-size': $profile-avatar-initials-size-extra-large
+  )
+);
+
+// Helper function to get avatar size
+@function get-avatar-size($size, $property: 'size', $mobile: false) {
+  @if not map-has-key($profile-avatar-sizes, $size) {
+    @warn 'Avatar size `#{$size}` not found.';
+    @return null;
+  }
+  
+  $size-map: map-get($profile-avatar-sizes, $size);
+  $key: if($mobile and map-has-key($size-map, 'mobile-#{$property}'), 'mobile-#{$property}', $property);
+  
+  @if map-has-key($size-map, $key) {
+    @return map-get($size-map, $key);
+  }
+  
+  @warn 'Avatar size property `#{$property}` for size `#{$size}` not found.';
+  @return null;
+}
+
+// Helper function to get avatar color
+@function get-avatar-color($color-name) {
+  @if map-has-key($profile-avatar-colors, $color-name) {
+    @return map-get($profile-avatar-colors, $color-name);
+  }
+  
+  @warn 'Avatar color `#{$color-name}` not found.';
+  @return $color-primary-500; // Fallback to primary
+} 

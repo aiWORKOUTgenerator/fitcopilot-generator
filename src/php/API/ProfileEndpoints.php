@@ -34,18 +34,25 @@ class ProfileEndpoints {
      * Register REST API endpoints
      */
     public function register_endpoints() {
-        // Get profile endpoint
-        register_rest_route(self::API_NAMESPACE, '/profile', [
-            'methods'             => 'GET',
-            'callback'            => [$this, 'get_profile'],
-            'permission_callback' => [$this, 'user_permissions_check'],
+        // Profile endpoints
+        register_rest_route('fitcopilot/v1', '/profile', [
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'get_profile'],
+                'permission_callback' => [$this, 'user_permissions_check'],
+            ],
+            [
+                'methods' => 'PUT',
+                'callback' => [$this, 'update_profile'],
+                'permission_callback' => [$this, 'user_permissions_check'],
+            ],
         ]);
         
-        // Update profile endpoint
-        register_rest_route(self::API_NAMESPACE, '/profile', [
-            'methods'             => 'PUT',
-            'callback'            => [$this, 'update_profile'],
-            'permission_callback' => [$this, 'user_permissions_check'],
+        // Add diagnostic endpoint for troubleshooting
+        register_rest_route('fitcopilot/v1', '/profile/debug', [
+            'methods' => 'GET',
+            'callback' => [$this, 'debug_profile_auth'],
+            'permission_callback' => '__return_true', // Allow access for debugging
         ]);
     }
     
@@ -56,6 +63,48 @@ class ProfileEndpoints {
      */
     public function user_permissions_check() {
         return is_user_logged_in();
+    }
+    
+    /**
+     * Get WordPress user data with error handling
+     *
+     * @param int $user_id The user ID
+     * @return \WP_User WordPress user object
+     * @throws \Exception If user not found
+     */
+    private function get_wordpress_user($user_id) {
+        $wp_user = get_userdata($user_id);
+        if (!$wp_user) {
+            throw new \Exception("WordPress user with ID {$user_id} not found");
+        }
+        return $wp_user;
+    }
+    
+    /**
+     * Build user identity data with WordPress fallbacks
+     *
+     * @param int $user_id The user ID
+     * @param \WP_User $wp_user WordPress user object
+     * @return array User identity data with fallbacks
+     */
+    private function build_user_identity($user_id, $wp_user) {
+        // Get profile meta for user identity fields
+        $first_name = get_user_meta($user_id, '_profile_firstName', true);
+        $last_name = get_user_meta($user_id, '_profile_lastName', true);
+        $email = get_user_meta($user_id, '_profile_email', true);
+        
+        return [
+            'username' => $wp_user->user_login,
+            'firstName' => $first_name ?: $wp_user->first_name,
+            'lastName' => $last_name ?: $wp_user->last_name,
+            'email' => $email ?: $wp_user->user_email,
+            'displayName' => $wp_user->display_name,
+            'avatarUrl' => get_avatar_url($user_id, [
+                'size' => 80, 
+                'default' => 'identicon',
+                'force_default' => false
+            ])
+        ];
     }
     
     /**
@@ -117,10 +166,13 @@ class ProfileEndpoints {
         try {
             $user_id = get_current_user_id();
             
+            // Get WordPress user data for fallback integration
+            $wp_user = $this->get_wordpress_user($user_id);
+            
+            // Get user identity data with WordPress fallbacks
+            $user_identity = $this->build_user_identity($user_id, $wp_user);
+            
             // Get the profile data from user meta using frontend field names
-            $first_name = get_user_meta($user_id, '_profile_firstName', true);
-            $last_name = get_user_meta($user_id, '_profile_lastName', true);
-            $email = get_user_meta($user_id, '_profile_email', true);
             $fitness_level = get_user_meta($user_id, '_profile_fitnessLevel', true);
             $goals = get_user_meta($user_id, '_profile_goals', true);
             $custom_goal = get_user_meta($user_id, '_profile_customGoal', true);
@@ -156,12 +208,11 @@ class ProfileEndpoints {
                 update_user_meta($user_id, '_profile_updatedAt', $updated_at);
             }
             
-            // Build the profile data using frontend field names
-            $profile = [
+            // Build the profile data with WordPress user fallbacks
+            $profile = array_merge([
                 'id' => $user_id,
-                'firstName' => $first_name ?: '',
-                'lastName' => $last_name ?: '',
-                'email' => $email ?: '',
+            ], $user_identity, [
+                // Fitness profile data (no fallbacks needed)
                 'fitnessLevel' => $fitness_level ?: 'beginner',
                 'goals' => is_array($goals) ? $goals : ['general_fitness'],
                 'customGoal' => $custom_goal ?: '',
@@ -181,11 +232,11 @@ class ProfileEndpoints {
                 'preferredWorkoutDuration' => intval($preferred_workout_duration) ?: 30,
                 'favoriteExercises' => is_array($favorite_exercises) ? $favorite_exercises : [],
                 'dislikedExercises' => is_array($disliked_exercises) ? $disliked_exercises : [],
-                'medicalConditions' => is_array($medical_conditions) ? $medical_conditions : [],
+                'medicalConditions' => is_array($medical_conditions) ? implode(', ', $medical_conditions) : ($medical_conditions ?: ''),
                 'profileComplete' => (bool) $profile_complete,
                 'lastUpdated' => $updated_at,
                 'completedWorkouts' => 0 // This would come from workout logs in the future
-            ];
+            ]);
             
             // Return success response with standardized format
             return APIUtils::create_api_response(
@@ -348,9 +399,14 @@ class ProfileEndpoints {
                 update_user_meta($user_id, '_profile_dislikedExercises', $sanitized_exercises);
             }
             
-            if (isset($params['medicalConditions']) && is_array($params['medicalConditions'])) {
-                $sanitized_conditions = array_map('sanitize_text_field', $params['medicalConditions']);
-                update_user_meta($user_id, '_profile_medicalConditions', $sanitized_conditions);
+            if (isset($params['medicalConditions'])) {
+                if (is_array($params['medicalConditions'])) {
+                    $sanitized_conditions = array_map('sanitize_text_field', $params['medicalConditions']);
+                    update_user_meta($user_id, '_profile_medicalConditions', $sanitized_conditions);
+                } else {
+                    // Handle string format (frontend sends as string)
+                    update_user_meta($user_id, '_profile_medicalConditions', sanitize_textarea_field($params['medicalConditions']));
+                }
             }
             
             if (isset($params['profileComplete'])) {
@@ -383,6 +439,89 @@ class ProfileEndpoints {
                 500
             );
         }
+    }
+
+    /**
+     * Debug profile authentication and user data
+     * 
+     * @param \WP_REST_Request $request The request object
+     * @return \WP_REST_Response Response object
+     */
+    public function debug_profile_auth(\WP_REST_Request $request) {
+        $debug_info = [
+            'timestamp' => current_time('mysql'),
+            'authentication' => [
+                'is_user_logged_in' => is_user_logged_in(),
+                'current_user_id' => get_current_user_id(),
+                'wp_get_current_user_id' => wp_get_current_user_id(),
+            ],
+            'wordpress_user' => null,
+            'profile_meta_exists' => false,
+            'profile_meta_sample' => [],
+            'nonce_verification' => [
+                'wp_rest_nonce' => wp_verify_nonce($request->get_header('X-WP-Nonce'), 'wp_rest'),
+                'nonce_header_present' => !empty($request->get_header('X-WP-Nonce')),
+                'nonce_value' => $request->get_header('X-WP-Nonce') ? 'Present' : 'Missing'
+            ]
+        ];
+        
+        $user_id = get_current_user_id();
+        
+        if ($user_id > 0) {
+            // Get WordPress user data
+            $wp_user = get_userdata($user_id);
+            if ($wp_user) {
+                $debug_info['wordpress_user'] = [
+                    'ID' => $wp_user->ID,
+                    'user_login' => $wp_user->user_login,
+                    'user_email' => $wp_user->user_email,
+                    'display_name' => $wp_user->display_name,
+                    'first_name' => $wp_user->first_name,
+                    'last_name' => $wp_user->last_name,
+                    'user_registered' => $wp_user->user_registered,
+                ];
+            }
+            
+            // Check for profile meta data
+            $profile_meta_keys = [
+                '_profile_firstName',
+                '_profile_lastName', 
+                '_profile_email',
+                '_profile_fitnessLevel',
+                '_profile_goals',
+                '_profile_profileComplete',
+                '_profile_createdAt',
+                '_profile_updatedAt'
+            ];
+            
+            $profile_meta_found = [];
+            foreach ($profile_meta_keys as $key) {
+                $value = get_user_meta($user_id, $key, true);
+                if (!empty($value)) {
+                    $profile_meta_found[$key] = $value;
+                }
+            }
+            
+            $debug_info['profile_meta_exists'] = !empty($profile_meta_found);
+            $debug_info['profile_meta_sample'] = $profile_meta_found;
+        }
+        
+        // Add session information
+        $debug_info['session'] = [
+            'session_id' => session_id(),
+            'session_status' => session_status(),
+            'cookie_domain' => COOKIE_DOMAIN,
+            'wp_cookies' => [
+                'logged_in_cookie' => isset($_COOKIE[LOGGED_IN_COOKIE]) ? 'Present' : 'Missing',
+                'auth_cookie' => isset($_COOKIE[AUTH_COOKIE]) ? 'Present' : 'Missing',
+                'secure_auth_cookie' => isset($_COOKIE[SECURE_AUTH_COOKIE]) ? 'Present' : 'Missing',
+            ]
+        ];
+        
+        return APIUtils::create_api_response(
+            $debug_info,
+            'Debug information retrieved successfully'
+        );
     }
 }
 

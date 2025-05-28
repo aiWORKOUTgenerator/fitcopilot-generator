@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import Card from '../../../components/ui/Card/Card';
 import Button from '../../../components/ui/Button/Button';
+import { FitnessStats } from './FitnessStats';
 import './ProfileTab.scss';
 
 interface UserProfile {
@@ -132,35 +133,14 @@ export const ProfileSummary: React.FC<ProfileSummaryProps> = ({
         </div>
       </Card>
 
-      {/* Fitness Stats */}
-      <Card className="fitness-stats-card">
-        <h3 className="card-title">Fitness Statistics</h3>
-        <div className="stats-grid">
-          <div className="stat-item">
-            <div className="stat-icon">🏋️</div>
-            <div className="stat-content">
-              <div className="stat-value">{profile.completedWorkouts}</div>
-              <div className="stat-label">Workouts Completed</div>
-            </div>
-          </div>
-          
-          <div className="stat-item">
-            <div className="stat-icon">🔥</div>
-            <div className="stat-content">
-              <div className="stat-value">{profile.currentStreak}</div>
-              <div className="stat-label">Day Streak</div>
-            </div>
-          </div>
-          
-          <div className="stat-item">
-            <div className="stat-icon">⏱️</div>
-            <div className="stat-content">
-              <div className="stat-value">{formatMinutesToHours(profile.totalMinutesExercised)}</div>
-              <div className="stat-label">Total Exercise Time</div>
-            </div>
-          </div>
-        </div>
-      </Card>
+      {/* Fitness Stats - Premium Version */}
+      <FitnessStats
+        completedWorkouts={profile.completedWorkouts}
+        currentStreak={profile.currentStreak}
+        totalMinutesExercised={profile.totalMinutesExercised}
+        weeklyGoal={5}
+        className="profile-fitness-stats"
+      />
 
       {/* Fitness Goals */}
       <Card className="fitness-goals-card">

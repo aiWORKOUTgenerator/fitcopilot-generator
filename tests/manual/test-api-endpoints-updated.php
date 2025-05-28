@@ -743,14 +743,15 @@ header('Content-Type: text/html; charset=utf-8');
                     },
                     body: JSON.stringify({
                         fitnessLevel: 'advanced',
-                        workoutGoals: ['strength', 'cardio'],
-                        equipmentAvailable: 'full-gym',
-                        workoutFrequency: 4,
-                        workoutDuration: 45,
-                        preferences: {
-                            darkMode: true,
-                            metrics: 'imperial'
-                        }
+                        goals: ['strength', 'muscle_building'],
+                        availableEquipment: ['dumbbells', 'barbell', 'bench'],
+                        workoutFrequency: '5+',
+                        preferredWorkoutDuration: 45,
+                        firstName: 'Test',
+                        lastName: 'User',
+                        age: 30,
+                        weight: 180,
+                        weightUnit: 'lbs'
                     }),
                     credentials: 'same-origin'
                 });
@@ -778,14 +779,17 @@ header('Content-Type: text/html; charset=utf-8');
                     body: JSON.stringify({
                         profile: {
                             fitnessLevel: 'beginner',
-                            workoutGoals: ['weight-loss', 'flexibility'],
-                            equipmentAvailable: 'minimal',
-                            workoutFrequency: 3,
-                            workoutDuration: 30,
-                            preferences: {
-                                darkMode: false,
-                                metrics: 'metric'
-                            }
+                            goals: ['weight_loss', 'flexibility'],
+                            availableEquipment: ['resistance_bands', 'none'],
+                            workoutFrequency: '3-4',
+                            preferredWorkoutDuration: 30,
+                            firstName: 'Jane',
+                            lastName: 'Doe',
+                            age: 25,
+                            weight: 140,
+                            weightUnit: 'lbs',
+                            limitations: ['none'],
+                            preferredLocation: 'home'
                         }
                     }),
                     credentials: 'same-origin'

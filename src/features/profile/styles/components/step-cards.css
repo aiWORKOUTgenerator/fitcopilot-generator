@@ -1,0 +1,734 @@
+/**
+ * Step Cards Component Styles
+ * 
+ * Styles for the new step-based profile card layout
+ * Now using FitCopilot design system tokens for consistency
+ * Enhanced with premium visual design for modern fitness app aesthetics
+ */
+
+/* Import avatar styles */
+@import url('./avatar.css');
+
+/* Profile Header - Premium Design */
+.profile-header {
+  margin-bottom: 1.5rem;
+  
+  /* Glass morphism background */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* Elevated card design */
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  /* Premium spacing */
+  padding: 2rem;
+  
+  /* Smooth transitions for interactions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Subtle hover enhancement */
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+}
+
+.profile-header__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+/* User Identity Section - Enhanced */
+.profile-header__user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+}
+
+.profile-header__avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-header__avatar {
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Premium shadow and glow */
+  box-shadow: 
+    0 0 0 1px rgba(132, 204, 22, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(132, 204, 22, 0.1);
+  
+  /* Status indicator */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    animation: pulse-status 3s ease-in-out infinite;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+    border-color: rgba(132, 204, 22, 0.6);
+    box-shadow: 
+      0 0 0 1px rgba(132, 204, 22, 0.4),
+      0 8px 24px rgba(0, 0, 0, 0.15),
+      0 4px 12px rgba(132, 204, 22, 0.2);
+  }
+}
+
+@keyframes pulse-status {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.1);
+  }
+}
+
+.profile-header__avatar--image {
+  object-fit: cover;
+  display: block;
+}
+
+.profile-header__avatar--initials {
+  background: linear-gradient(135deg, $profile-avatar-gradient-start, $profile-avatar-gradient-end);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $profile-avatar-initials-size-large;
+  font-weight: $profile-avatar-initials-weight;
+  text-transform: uppercase;
+  letter-spacing: $profile-avatar-initials-letter-spacing;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.profile-header__user-info {
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+}
+
+.profile-header__user-name {
+  font-size: $profile-user-name-size;
+  font-weight: 700; /* Enhanced weight for premium feel */
+  color: var(--color-text);
+  margin: 0 0 $spacing-1 0;
+  line-height: $profile-user-name-line-height;
+  letter-spacing: -0.025em; /* Tighter letter spacing for modern look */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  /* Subtle text shadow for depth */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.profile-header__user-email {
+  font-size: $profile-user-email-size;
+  color: var(--color-text-muted);
+  margin: 0 0 $spacing-2 0;
+  font-weight: 500; /* Enhanced weight */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+.profile-header__subtitle {
+  font-size: $profile-subtitle-size;
+  color: var(--color-text-accent);
+  margin: 0;
+  font-weight: 600; /* Enhanced weight */
+  text-transform: uppercase;
+  letter-spacing: 0.1em; /* Wider letter spacing for labels */
+  opacity: 0.9;
+}
+
+/* Completion Section - Enhanced */
+.profile-header__completion-section {
+  flex-shrink: 0;
+}
+
+.profile-header__completion {
+  text-align: right;
+  min-width: $profile-completion-min-width;
+}
+
+.completion-percentage {
+  font-size: $profile-completion-percentage-size;
+  font-weight: 700; /* Enhanced weight */
+  color: var(--color-primary);
+  display: block;
+  margin-bottom: $spacing-2;
+  
+  /* Premium glow effect */
+  text-shadow: 0 0 8px rgba(132, 204, 22, 0.3);
+  
+  /* Animated counter effect */
+  animation: glow-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+  0% { 
+    text-shadow: 0 0 8px rgba(132, 204, 22, 0.3);
+  }
+  100% { 
+    text-shadow: 0 0 12px rgba(132, 204, 22, 0.5);
+  }
+}
+
+.completion-progress {
+  display: flex;
+  flex-direction: column;
+  gap: $profile-progress-gap;
+}
+
+.completion-progress__track {
+  width: 100%;
+  height: 8px; /* Slightly thicker for premium feel */
+  background: linear-gradient(90deg, 
+    rgba(132, 204, 22, 0.1), 
+    rgba(132, 204, 22, 0.05));
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  
+  /* Subtle inner shadow */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.completion-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    $profile-progress-gradient-start, 
+    $profile-progress-gradient-end);
+  border-radius: 6px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  
+  /* Animated shine effect */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+    animation: progress-shine 2s ease-in-out infinite;
+  }
+  
+  /* Subtle glow */
+  box-shadow: 
+    0 0 8px rgba(132, 204, 22, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+@keyframes progress-shine {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: translateX(0);
+  }
+  50% { 
+    opacity: 1;
+    transform: translateX(-2px);
+  }
+}
+
+.completion-steps {
+  font-size: $profile-completion-steps-size;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Profile Steps Grid */
+.profile-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-4;
+  margin-bottom: $profile-header-spacing;
+}
+
+/* Mobile Responsive Design - Enhanced */
+@media (max-width: $profile-mobile-breakpoint) {
+  .profile-header {
+    padding: $spacing-6;
+    border-radius: 12px;
+  }
+  
+  .profile-steps-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-header__content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-4;
+  }
+  
+  .profile-header__user-section {
+    gap: $profile-header-user-gap-mobile;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .profile-header__avatar {
+    width: $profile-avatar-size-large-mobile;
+    height: $profile-avatar-size-large-mobile;
+    
+    &::after {
+      width: 14px;
+      height: 14px;
+      border-width: 2px;
+    }
+  }
+  
+  .profile-header__avatar--initials {
+    font-size: $profile-avatar-initials-size-large-mobile;
+  }
+  
+  .profile-header__user-name {
+    font-size: $profile-user-name-size-mobile;
+  }
+  
+  .profile-header__completion {
+    text-align: center;
+    min-width: auto;
+  }
+  
+  .completion-percentage {
+    text-align: center;
+  }
+}
+
+.profile-steps-grid__item {
+  min-height: 140px;
+}
+
+/* Profile Step Card - Enhanced */
+.profile-step-card {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Glass morphism for cards */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: $spacing-4;
+  
+  /* Subtle shadow */
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.profile-step-card--complete {
+  border-color: rgba(132, 204, 22, 0.3) !important;
+  background: rgba(132, 204, 22, 0.05);
+  
+  /* Success glow */
+  box-shadow: 
+    0 4px 16px rgba(132, 204, 22, 0.15),
+    0 1px 4px rgba(132, 204, 22, 0.1);
+}
+
+.profile-step-card--incomplete {
+  border-color: rgba(156, 163, 175, 0.2);
+}
+
+.profile-step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.profile-step-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-3;
+}
+
+.profile-step-card__icon-container {
+  flex-shrink: 0;
+  margin-right: $spacing-3;
+}
+
+.step-icon {
+  width: $spacing-6;
+  height: $spacing-6;
+  transition: all 0.2s ease;
+}
+
+.step-icon--complete {
+  color: var(--color-primary);
+  filter: drop-shadow(0 2px 4px rgba(132, 204, 22, 0.3));
+}
+
+.step-icon--incomplete {
+  color: var(--color-text-muted);
+}
+
+.profile-step-card__completion-indicator {
+  flex-shrink: 0;
+  width: $spacing-6;
+  height: $spacing-6;
+  border-radius: $profile-avatar-border-radius;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.completion-check {
+  color: var(--color-primary);
+  filter: drop-shadow(0 1px 2px rgba(132, 204, 22, 0.3));
+}
+
+.completion-pending {
+  color: var(--color-text-muted);
+}
+
+.profile-step-card__title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-step-card__title {
+  font-size: $font-size-lg;
+  font-weight: 600; /* Enhanced weight */
+  color: var(--color-text);
+  margin: 0 0 $spacing-1 0;
+  line-height: $line-height-tight;
+  letter-spacing: -0.01em;
+}
+
+.profile-step-card__description {
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: $line-height-normal;
+  opacity: 0.8;
+}
+
+.profile-step-card__content {
+  margin-bottom: $spacing-4;
+}
+
+.profile-step-card__summary {
+  font-size: $font-size-sm;
+  color: var(--color-text);
+  margin-bottom: $spacing-3;
+  line-height: $line-height-normal;
+  font-weight: 500;
+}
+
+.profile-step-card__status {
+  margin-bottom: $spacing-3;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-1 $spacing-2;
+  border-radius: 8px; /* More rounded for modern look */
+  font-size: $font-size-xs;
+  font-weight: 600; /* Enhanced weight */
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+  
+  /* Subtle shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge--complete {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.15), 
+    rgba(34, 197, 94, 0.1));
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-badge--incomplete {
+  background: linear-gradient(135deg, 
+    rgba(156, 163, 175, 0.15), 
+    rgba(156, 163, 175, 0.1));
+  color: #6b7280;
+  border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+.profile-step-card__details {
+  display: none;
+  margin-top: $spacing-3;
+  padding-top: $spacing-3;
+  border-top: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+.profile-step-card__field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-2;
+}
+
+.field-label {
+  font-size: $font-size-sm;
+  color: var(--color-text-muted);
+  font-weight: $font-weight-medium;
+}
+
+.field-value {
+  font-size: $font-size-sm;
+  color: var(--color-text);
+  font-weight: 600; /* Enhanced weight */
+  text-align: right;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-step-card__more {
+  margin-top: $spacing-4;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-weight: 600; /* Enhanced weight */
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: var(--color-primary);
+    text-shadow: 0 0 4px rgba(132, 204, 22, 0.3);
+  }
+}
+
+/* Profile Actions - Enhanced */
+.profile-actions {
+  margin-top: $spacing-8;
+}
+
+.profile-actions__main {
+  margin-bottom: $spacing-6;
+}
+
+.profile-actions__primary-button {
+  width: 100%;
+}
+
+.profile-actions__status {
+  margin-bottom: $spacing-4;
+}
+
+.completion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-4;
+  background: linear-gradient(135deg, 
+    rgba(132, 204, 22, 0.15), 
+    rgba(132, 204, 22, 0.1));
+  border: 1px solid rgba(132, 204, 22, 0.3);
+  border-radius: 12px;
+  font-size: $font-size-sm;
+  font-weight: 600; /* Enhanced weight */
+  color: var(--color-primary);
+  
+  /* Premium shadow */
+  box-shadow: 0 4px 12px rgba(132, 204, 22, 0.2);
+}
+
+.completion-badge__icon {
+  width: $spacing-4;
+  height: $spacing-4;
+  filter: drop-shadow(0 1px 2px rgba(132, 204, 22, 0.3));
+}
+
+.profile-actions__meta {
+  text-align: center;
+}
+
+.last-updated {
+  font-size: $font-size-xs;
+  color: var(--color-text-muted);
+  margin: 0;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Dark Theme Overrides - Enhanced */
+.dark-theme .profile-header {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(71, 85, 105, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+  &:hover {
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+}
+
+.dark-theme .profile-header__avatar {
+  border-color: rgba(71, 85, 105, 0.6);
+  box-shadow: 
+    0 0 0 1px rgba(132, 204, 22, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(132, 204, 22, 0.2);
+}
+
+.dark-theme .profile-step-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(71, 85, 105, 0.3);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 1px 4px rgba(0, 0, 0, 0.1);
+    
+  &:hover {
+    background: rgba(15, 23, 42, 0.8);
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.3),
+      0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.dark-theme .completion-progress__track {
+  background: linear-gradient(90deg, 
+    rgba(132, 204, 22, 0.15), 
+    rgba(132, 204, 22, 0.08));
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .profile-header__user-name {
+  color: var(--color-text-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .profile-header__user-email {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .profile-header__subtitle {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .completion-percentage {
+  color: var(--color-primary);
+  text-shadow: 0 0 12px rgba(132, 204, 22, 0.5);
+}
+
+.dark-theme .completion-steps {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .profile-step-card__title {
+  color: var(--color-text-primary);
+}
+
+.dark-theme .profile-step-card__description {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .profile-step-card__summary {
+  color: var(--color-text-primary);
+}
+
+.dark-theme .step-icon--complete {
+  color: var(--color-primary);
+}
+
+.dark-theme .step-icon--incomplete {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .completion-check {
+  color: var(--color-primary);
+}
+
+.dark-theme .completion-pending {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .status-badge--complete {
+  background: linear-gradient(135deg, 
+    rgba(34, 197, 94, 0.25), 
+    rgba(34, 197, 94, 0.15));
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.dark-theme .status-badge--incomplete {
+  background: linear-gradient(135deg, 
+    rgba(156, 163, 175, 0.25), 
+    rgba(156, 163, 175, 0.15));
+  color: #9ca3af;
+  border-color: rgba(156, 163, 175, 0.3);
+}
+
+.dark-theme .field-label {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .field-value {
+  color: var(--color-text-primary);
+}
+
+.dark-theme .profile-step-card__more {
+  color: var(--color-primary);
+}
+
+.dark-theme .completion-badge {
+  background: linear-gradient(135deg, 
+    rgba(132, 204, 22, 0.25), 
+    rgba(132, 204, 22, 0.15));
+  border-color: rgba(132, 204, 22, 0.4);
+  box-shadow: 0 4px 12px rgba(132, 204, 22, 0.3);
+}
+
+.dark-theme .completion-badge__icon {
+  color: var(--color-primary);
+}
+
+.dark-theme .last-updated {
+  color: var(--color-text-secondary);
+}
+
+.dark-theme .profile-step-card__details {
+  border-top-color: rgba(71, 85, 105, 0.3);
+} 

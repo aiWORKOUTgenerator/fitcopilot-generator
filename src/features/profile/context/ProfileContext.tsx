@@ -70,11 +70,15 @@ const profileReducer = (state: ProfileState, action: ProfileAction): ProfileStat
       return { ...state, isLoading: true, error: null };
     
     case 'FETCH_PROFILE_SUCCESS':
+      // If profile is complete, mark all steps as completed
+      const completedStepsOnFetch = action.payload?.profileComplete ? [1, 2, 3, 4, 5] : [];
+      
       return { 
         ...state, 
         profile: action.payload, 
         isLoading: false,
-        isProfileComplete: Boolean(action.payload?.profileComplete)
+        isProfileComplete: Boolean(action.payload?.profileComplete),
+        completedSteps: completedStepsOnFetch
       };
     
     case 'FETCH_PROFILE_ERROR':
@@ -84,11 +88,15 @@ const profileReducer = (state: ProfileState, action: ProfileAction): ProfileStat
       return { ...state, isUpdating: true, error: null };
     
     case 'UPDATE_PROFILE_SUCCESS':
+      // If profile is now complete, mark all steps as completed
+      const allStepsCompleted = action.payload?.profileComplete ? [1, 2, 3, 4, 5] : state.completedSteps;
+      
       return { 
         ...state, 
         profile: action.payload, 
         isUpdating: false,
-        isProfileComplete: Boolean(action.payload?.profileComplete)
+        isProfileComplete: Boolean(action.payload?.profileComplete),
+        completedSteps: allStepsCompleted
       };
     
     case 'UPDATE_PROFILE_ERROR':

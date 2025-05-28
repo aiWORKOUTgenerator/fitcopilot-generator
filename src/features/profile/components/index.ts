@@ -10,6 +10,9 @@ export { default as ProfileCard } from './ProfileCard';
 export { default as FormNavigation } from './FormNavigation';
 export { default as FormProgress } from './FormProgress';
 
+// Step card components
+export * from './step-cards';
+
 // Form steps
 export { default as BasicInfoStep } from './form-steps/BasicInfoStep';
 export { default as BodyMetricsStep } from './form-steps/BodyMetricsStep';

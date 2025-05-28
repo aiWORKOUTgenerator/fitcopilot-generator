@@ -130,6 +130,25 @@ const markStepCompleted = (stepNumber: number) => {
 };
 ```
 
+### Step 5 Completion Fix
+The ProfileContext reducer was updated to ensure step 5 (Preferences) gets marked as completed when the final "Save Profile" button is clicked:
+
+```typescript
+case 'UPDATE_PROFILE_SUCCESS':
+  // If profile is now complete, mark all steps as completed
+  const allStepsCompleted = action.payload?.profileComplete ? [1, 2, 3, 4, 5] : state.completedSteps;
+  
+  return { 
+    ...state, 
+    profile: action.payload, 
+    isUpdating: false,
+    isProfileComplete: Boolean(action.payload?.profileComplete),
+    completedSteps: allStepsCompleted
+  };
+```
+
+This ensures that when `profileComplete: true` is set, all steps including step 5 are marked as completed, triggering the green glowing border effect for the Preferences step.
+
 ## Visual Enhancements
 
 ### Registration Steps Sidebar
@@ -198,10 +217,12 @@ Supports both draft saves (`profileComplete: false`) and final saves (`profileCo
 The system has been thoroughly tested with:
 - ✅ Auto-save functionality on each step
 - ✅ Step completion tracking and visual indicators
+- ✅ Step 5 (Preferences) completion on final "Save Profile" action
 - ✅ Data validation and error handling
 - ✅ Database storage verification
 - ✅ Complete profile retrieval
 - ✅ Field validation with proper error messages
+- ✅ Green glowing border effects for all completed steps
 
 ## Migration Strategy
 

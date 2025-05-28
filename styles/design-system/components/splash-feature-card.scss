@@ -1,0 +1,46 @@
+/**
+ * Splash Feature Card Component Styles
+ * Uses design system tokens for consistent styling
+ * Replaces hardcoded overrides from Splash.scss
+ */
+
+/* Splash-specific feature cards - higher specificity to override global styles */
+.splash-step .feature-card {
+  background-color: var(--splash-feature-card-bg) !important;
+  border: var(--splash-feature-card-border) !important;
+  border-radius: var(--splash-feature-card-border-radius) !important;
+  padding: var(--splash-feature-card-padding) !important;
+  backdrop-filter: var(--splash-feature-card-backdrop-filter) !important;
+  transition: var(--splash-feature-card-transition) !important;
+
+  &:hover {
+    transform: var(--splash-feature-card-hover-transform) !important;
+    box-shadow: var(--splash-feature-card-hover-shadow), 
+      var(--splash-feature-card-hover-border),
+      var(--splash-feature-card-hover-glow) !important;
+  }
+}
+
+.splash-step .feature-icon {
+  width: var(--splash-feature-icon-size) !important;
+  height: var(--splash-feature-icon-size) !important;
+  border-radius: var(--splash-feature-icon-border-radius) !important;
+  background-color: var(--splash-feature-icon-bg) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: var(--splash-feature-icon-margin-bottom) !important;
+}
+
+/* Responsive adjustments using design tokens */
+@media (max-width: 768px) {
+  .splash-step .feature-card {
+    padding: var(--splash-feature-card-padding-mobile) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .splash-step .feature-card {
+    padding: var(--splash-feature-card-padding-small) !important;
+  }
+} 

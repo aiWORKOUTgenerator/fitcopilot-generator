@@ -308,9 +308,9 @@
   
   @if $control {
     color: control-label-token('color');
-    margin-left: 0.5rem;
-    font-size: var(--text-md);
-    line-height: 1.5;
+    margin-left: var(--space-2);
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-normal);
     cursor: pointer;
     
     .dark-theme & {
@@ -326,8 +326,8 @@
       }
     }
   } @else {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    margin-bottom: var(--space-2);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text);
     
     .dark-theme & {
@@ -389,16 +389,16 @@
 ///     @include radio-group('horizontal');
 ///   }
 @mixin radio-group($layout: 'vertical') {
-  margin: 0.5rem 0;
+  margin: var(--space-2) 0;
   
   @if $layout == 'horizontal' {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-4);
   } @else {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-2);
   }
 }
 
@@ -420,12 +420,12 @@
     flex-direction: row-reverse;
     
     .radio-label {
-      margin-right: 0.5rem;
+      margin-right: var(--space-2);
       margin-left: 0;
     }
   } @else {
     .radio-label {
-      margin-left: 0.5rem;
+      margin-left: var(--space-2);
     }
   }
 }

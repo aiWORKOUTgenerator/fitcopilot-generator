@@ -1,7 +1,10 @@
 /**
  * Profile Feature Styles Index
  * Main entry point for all profile-related styles
+ * Now includes FitCopilot design system integration and premium visual enhancements
  */
+
+/* Design tokens are now inlined in component files for CSS compatibility */
 
 /* Import base profile styles */
 @import './profile.css';
@@ -9,5 +12,8 @@
 /* Import component-specific styles */
 @import './components/profile-form.css';
 @import './components/profile-card.css';
+@import './components/step-cards.css';
+@import './components/avatar.css';
+@import './components/loading-states.css';
 
 /* Additional imports can be added as the feature grows */ 

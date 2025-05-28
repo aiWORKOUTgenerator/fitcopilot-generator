@@ -1,8 +1,9 @@
 /**
- * Workout Editor Modal
+ * Enhanced Workout Editor Modal
  * 
  * Accessible modal container for the workout editor with
- * proper focus management, keyboard navigation, and intelligent sizing
+ * proper focus management, keyboard navigation, intelligent sizing,
+ * and premium glass morphism styling to match EnhancedWorkoutModal.
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -30,15 +31,21 @@ interface WorkoutEditorModalProps {
    * Callback when the workout is saved
    */
   onSave: (workout: GeneratedWorkout) => void;
+  
+  /**
+   * Whether the modal is open
+   */
+  isOpen: boolean;
 }
 
 /**
- * Modal component for the workout editor with intelligent sizing
+ * Enhanced modal component for the workout editor with intelligent sizing
  */
 const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
   workout,
   postId,
-  onSave
+  onSave,
+  isOpen
 }) => {
   // Use navigation context for modal state management
   const { closeEditor } = useNavigation();
@@ -46,8 +53,9 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
   // Convert the workout to editor format
   const editorWorkout = convertToEditorFormat(workout, postId);
   
-  // Track loading state
+  // Track loading and visibility state
   const [isLoading, setIsLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   
   // Track modal content dimensions for intelligent sizing
   const [contentHeight, setContentHeight] = useState(0);
@@ -57,6 +65,21 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  
+  // Handle modal visibility with animation
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+      document.body.style.overflow = 'hidden';
+    } else {
+      setIsVisible(false);
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
   
   // Set up dimension observer for content
   const { observe: observeContent, disconnect: disconnectContentObserver } = useDimensionObserver(
@@ -77,56 +100,55 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
   
   // Store the previously focused element when the modal opens
   useEffect(() => {
-    previousFocusRef.current = document.activeElement as HTMLElement;
-    
-    // Focus the modal when it opens
-    if (modalRef.current) {
-      modalRef.current.focus();
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      
+      // Focus the modal when it opens
+      if (modalRef.current) {
+        modalRef.current.focus();
+      }
     }
     
     return () => {
       // Restore focus when the modal closes
-      if (previousFocusRef.current) {
+      if (previousFocusRef.current && !isOpen) {
         previousFocusRef.current.focus();
       }
     };
-  }, []);
+  }, [isOpen]);
   
   // Set up content observation for intelligent sizing
   useEffect(() => {
-    if (modalContentRef.current) {
+    if (modalContentRef.current && isOpen) {
       observeContent(modalContentRef.current);
     }
     
     return () => {
       disconnectContentObserver();
     };
-  }, [observeContent, disconnectContentObserver]);
+  }, [observeContent, disconnectContentObserver, isOpen]);
   
   // Handle escape key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && isOpen) {
         closeEditor();
       }
     };
     
-    document.addEventListener('keydown', handleKeyDown);
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [closeEditor]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, []);
+  }, [closeEditor, isOpen]);
 
   // Trap focus within the modal
   useEffect(() => {
+    if (!isOpen) return;
+    
     const focusableSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     
     const handleTabKey = (e: KeyboardEvent) => {
@@ -152,10 +174,12 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     return () => {
       document.removeEventListener('keydown', handleTabKey);
     };
-  }, []);
+  }, [isOpen]);
 
   // Handle window resize for responsive modal sizing
   useEffect(() => {
+    if (!isOpen) return;
+    
     const handleWindowResize = () => {
       if (modalContentRef.current) {
         observeContent(modalContentRef.current);
@@ -166,7 +190,14 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     return () => {
       window.removeEventListener('resize', handleWindowResize);
     };
-  }, [observeContent]);
+  }, [observeContent, isOpen]);
+
+  // Handle backdrop click
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === modalRef.current) {
+      closeEditor();
+    }
+  };
 
   // Function to handle saving
   const handleSave = async (updatedWorkout: any) => {
@@ -195,21 +226,26 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
   const modalContentStyle: React.CSSProperties = {
     height: contentHeight > 0 ? `${contentHeight}px` : 'auto',
     maxHeight: '95vh',
-    minHeight: '400px',
+    minHeight: '600px',
     display: 'flex',
     flexDirection: 'column',
   };
 
+  // Don't render if not open
+  if (!isOpen) {
+    return null;
+  }
+
   return createPortal(
     <div 
-      className="workout-editor-modal__overlay" 
-      onClick={closeEditor}
+      ref={modalRef}
+      className={`workout-editor-modal__overlay ${isVisible ? 'visible' : ''}`}
+      onClick={handleBackdropClick}
       aria-modal="true"
       role="dialog"
       aria-labelledby="workout-editor-title"
     >
       <div 
-        ref={modalRef}
         className="workout-editor-modal__content workout-editor-modal__content--adaptive"
         style={modalContentStyle}
         onClick={(e) => e.stopPropagation()}

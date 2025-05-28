@@ -1,0 +1,137 @@
+:root {
+    // Primary color (blue) scale
+    --color-primary-50: #ebf8ff;
+    --color-primary-100: #bee3f8;
+    --color-primary-200: #90cdf4;
+    --color-primary-300: #63b3ed;
+    --color-primary-400: #4299e1;
+    --color-primary-500: #3498db;
+    --color-primary-600: #2980b9;
+    --color-primary-700: #2c5282;
+    --color-primary-800: #2a4365;
+    --color-primary-900: #1a365d;
+
+    // Accent color (lime) scale - based on #ddff0e
+    --color-accent-50: #faffed;
+    --color-accent-100: #f3ffcc;
+    --color-accent-200: #ebff99;
+    --color-accent-300: #e2ff66;
+    --color-accent-400: #ddff0e;
+    --color-accent-500: #b3cc0b;
+    --color-accent-600: #849909;
+    --color-accent-700: #566606;
+    --color-accent-800: #293303;
+    --color-accent-900: #141a01;
+
+    // Gray scale
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    // Semantic color mapping
+    --color-brand-primary: var(--color-primary-500);
+    --color-brand-accent: var(--color-accent-400);
+
+    // UI state colors
+    --color-ui-background: var(--color-gray-900);
+    --color-ui-surface: var(--color-gray-800);
+    --color-ui-surface-alt: rgba(31, 41, 55, 0.8);
+    --color-ui-border: var(--color-gray-700);
+
+    // Text colors
+    --color-text-primary: var(--color-gray-50);
+    --color-text-secondary: var(--color-gray-300);
+    --color-text-accent: var(--color-accent-400);
+    --color-text-muted: var(--color-gray-400);
+    --color-text-inverse: var(--color-gray-900);
+
+    // Component colors
+    --color-hero-heading: var(--color-text-primary);
+    --color-hero-paragraph: var(--color-text-secondary);
+    --color-hero-highlight: var(--color-text-accent);
+    --color-hero-button-primary: var(--color-brand-accent);
+    --color-hero-button-primary-hover: var(--color-accent-500);
+    --color-hero-button-secondary-bg: var(--color-ui-surface-alt);
+    --color-hero-tooltip-bg: var(--color-ui-surface);
+
+    // RGB variants for opacity operations
+    --color-accent-400-rgb: 221, 255, 14;
+    --color-primary-500-rgb: 52, 152, 219;
+    --color-gray-900-rgb: 17, 24, 39;
+
+    // Alpha variants
+    --color-accent-400-alpha-10: rgba(var(--color-accent-400-rgb), 0.1);
+    --color-accent-400-alpha-30: rgba(var(--color-accent-400-rgb), 0.3);
+    --color-accent-400-alpha-50: rgba(var(--color-accent-400-rgb), 0.5);
+    --color-accent-400-alpha-70: rgba(var(--color-accent-400-rgb), 0.7);
+}
+
+/**
+ * Theme Variants
+ * 
+ * Each theme overrides specific color tokens while inheriting the rest
+ * from the default theme (root scope).
+ */
+
+/* Gym Theme - Uses violet/purple palette */
+[data-theme="gym"] {
+    // Accent color (violet) scale
+    --color-accent-50: #f5f3ff;
+    --color-accent-100: #ede9fe;
+    --color-accent-200: #ddd6fe;
+    --color-accent-300: #c4b5fd;
+    --color-accent-400: #8b5cf6;
+    --color-accent-500: #7c3aed;
+    --color-accent-600: #6d28d9;
+    --color-accent-700: #5b21b6;
+    --color-accent-800: #4c1d95;
+    --color-accent-900: #2e1065;
+
+    // RGB variants for opacity operations (overrides)
+    --color-accent-400-rgb: 139, 92, 246;
+
+    // Alpha variants are automatically inherited since they use the RGB variable
+}
+
+/* Sports Theme - Uses blue/cyan palette */
+[data-theme="sports"] {
+    // Accent color (blue) scale
+    --color-accent-50: #eff6ff;
+    --color-accent-100: #dbeafe;
+    --color-accent-200: #bfdbfe;
+    --color-accent-300: #93c5fd;
+    --color-accent-400: #38bdf8;
+    --color-accent-500: #0ea5e9;
+    --color-accent-600: #0284c7;
+    --color-accent-700: #0369a1;
+    --color-accent-800: #075985;
+    --color-accent-900: #0c4a6e;
+
+    // RGB variants for opacity operations (overrides)
+    --color-accent-400-rgb: 56, 189, 248;
+}
+
+/* Wellness Theme - Uses teal/green palette */
+[data-theme="wellness"] {
+    // Accent color (teal) scale
+    --color-accent-50: #f0fdfa;
+    --color-accent-100: #ccfbf1;
+    --color-accent-200: #99f6e4;
+    --color-accent-300: #5eead4;
+    --color-accent-400: #2dd4bf;
+    --color-accent-500: #14b8a6;
+    --color-accent-600: #0d9488;
+    --color-accent-700: #0f766e;
+    --color-accent-800: #115e59;
+    --color-accent-900: #134e4a;
+
+    // RGB variants for opacity operations (overrides)
+    --color-accent-400-rgb: 45, 212, 191;
+}

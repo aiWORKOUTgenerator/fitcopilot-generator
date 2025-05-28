@@ -53,8 +53,33 @@
   }
 }
 
-// Profile Header Card
+// Profile Header Card - Premium Design
 .profile-header-card {
+  /* Glass morphism background */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* Elevated card design */
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  /* Smooth transitions for interactions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Subtle hover enhancement */
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
   .profile-header {
     display: flex;
     align-items: flex-start;
@@ -74,33 +99,59 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+    background: linear-gradient(135deg, #84cc16, #65a30d);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Premium shadow and glow */
+    box-shadow: 
+      0 0 0 1px rgba(132, 204, 22, 0.2),
+      0 4px 16px rgba(0, 0, 0, 0.1),
+      0 2px 8px rgba(132, 204, 22, 0.1);
+    
+    &:hover {
+      transform: scale(1.05);
+      border-color: rgba(132, 204, 22, 0.6);
+      box-shadow: 
+        0 0 0 1px rgba(132, 204, 22, 0.4),
+        0 8px 24px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(132, 204, 22, 0.2);
+    }
     
     .avatar-initial {
       font-size: 2rem;
       font-weight: 600;
       color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
     
     .fitness-level-badge {
       position: absolute;
-      bottom: -2px;
-      right: -2px;
+      bottom: 2px;
+      right: 2px;
       width: 28px;
       height: 28px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid var(--card-bg);
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+      animation: pulse-status 3s ease-in-out infinite;
       
-      &.green { background: #10b981; }
-      &.blue { background: #3b82f6; }
-      &.purple { background: #8b5cf6; }
+      &.green { 
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+      }
+      &.blue { 
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+      }
+      &.purple { 
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      }
       
       .level-icon {
         font-size: 0.875rem;
@@ -113,14 +164,20 @@
     
     .profile-name {
       font-size: 1.5rem;
-      font-weight: 600;
+      font-weight: 700; /* Enhanced weight for premium feel */
       color: var(--text-primary);
       margin: 0 0 0.25rem 0;
+      letter-spacing: -0.025em; /* Tighter letter spacing for modern look */
+      
+      /* Subtle text shadow for depth */
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
     
     .profile-email {
       color: var(--text-secondary);
       margin: 0 0 0.5rem 0;
+      font-weight: 500; /* Enhanced weight */
+      opacity: 0.8;
     }
     
     .fitness-level {
@@ -184,29 +241,99 @@
       }
       
       .completeness-percentage {
-        font-weight: 600;
+        font-weight: 700; /* Enhanced weight */
         
-        &.success { color: #10b981; }
-        &.warning { color: #f59e0b; }
-        &.error { color: #ef4444; }
+        &.success { 
+          color: #10b981;
+          /* Premium glow effect */
+          text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+          /* Animated counter effect */
+          animation: glow-pulse 2s ease-in-out infinite alternate;
+        }
+        &.warning { 
+          color: #f59e0b;
+          text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+          animation: glow-pulse 2s ease-in-out infinite alternate;
+        }
+        &.error { 
+          color: #ef4444;
+          text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+          animation: glow-pulse 2s ease-in-out infinite alternate;
+        }
       }
     }
     
     .completeness-bar {
-      height: 8px;
-      background: var(--border-color);
-      border-radius: 4px;
+      height: 8px; /* Slightly thicker for premium feel */
+      background: linear-gradient(90deg, 
+        rgba(132, 204, 22, 0.1), 
+        rgba(132, 204, 22, 0.05));
+      border-radius: 6px;
       overflow: hidden;
       margin-bottom: 0.5rem;
       
+      /* Subtle inner shadow */
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      
       .completeness-fill {
         height: 100%;
-        border-radius: 4px;
-        transition: width 0.3s ease;
+        border-radius: 6px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
         
-        &.success { background: #10b981; }
-        &.warning { background: #f59e0b; }
-        &.error { background: #ef4444; }
+        &.success { 
+          background: linear-gradient(90deg, #a3e635, #65a30d);
+          /* Animated shine effect */
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            animation: progress-shine 2s ease-in-out infinite;
+          }
+          /* Subtle glow */
+          box-shadow: 
+            0 0 8px rgba(132, 204, 22, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        &.warning { 
+          background: linear-gradient(90deg, #fbbf24, #d97706);
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            animation: progress-shine 2s ease-in-out infinite;
+          }
+          box-shadow: 
+            0 0 8px rgba(245, 158, 11, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        &.error { 
+          background: linear-gradient(90deg, #f87171, #dc2626);
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            animation: progress-shine 2s ease-in-out infinite;
+          }
+          box-shadow: 
+            0 0 8px rgba(239, 68, 68, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
       }
     }
     
@@ -361,5 +488,78 @@
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+// Premium animations for enhanced ProfileHeader
+@keyframes pulse-status {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.1);
+  }
+}
+
+@keyframes glow-pulse {
+  0% { 
+    text-shadow: 0 0 8px rgba(132, 204, 22, 0.3);
+  }
+  100% { 
+    text-shadow: 0 0 12px rgba(132, 204, 22, 0.5);
+  }
+}
+
+@keyframes progress-shine {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: translateX(0);
+  }
+  50% { 
+    opacity: 1;
+    transform: translateX(-2px);
+  }
+}
+
+// Dark theme overrides for premium effects
+.dark-theme .profile-header-card {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(71, 85, 105, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+  &:hover {
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+  
+  .profile-avatar {
+    border-color: rgba(71, 85, 105, 0.6);
+    box-shadow: 
+      0 0 0 1px rgba(132, 204, 22, 0.3),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      0 2px 8px rgba(132, 204, 22, 0.2);
+  }
+  
+  .profile-name {
+    color: var(--text-primary);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .profile-email {
+    color: var(--text-secondary);
+  }
+  
+  .completeness-bar {
+    background: linear-gradient(90deg, 
+      rgba(132, 204, 22, 0.15), 
+      rgba(132, 204, 22, 0.08));
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 } 
