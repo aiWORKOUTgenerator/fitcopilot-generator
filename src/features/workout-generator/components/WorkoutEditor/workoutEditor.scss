@@ -236,27 +236,33 @@
   
   &__title {
     margin: 0;
-    font-size: var(--wg-font-size-xl);
-    font-weight: 600;
-    flex-grow: 1;
-    color: #000000; // Explicitly set title color to black
+    font-size: var(--wg-font-size-2xl);
+    font-weight: 700;
+    color: var(--wg-color-text-primary);
+    margin: 0 0 var(--wg-spacing-xs) 0;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: var(--wg-font-size-xl);
+    }
   }
   
   &__loading {
     display: flex;
     align-items: center;
+    gap: var(--wg-spacing-sm);
+    color: var(--wg-color-text-secondary);
     font-size: var(--wg-font-size-sm);
-    color: var(--wg-color-secondary);
     
     &-icon {
-      margin-right: var(--wg-spacing-xs);
-      animation: spin 1s linear infinite;
-    }
+    animation: spin 1s linear infinite;
+  }
   }
   
   &__content {
-    flex: 1 1 auto; // Allow content to grow and shrink
-    overflow-y: auto; // Add scrolling to content area
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: var(--wg-spacing-lg);
     
     @media (max-width: 480px) {
@@ -1002,31 +1008,31 @@
 // Enhanced Modal Overlay with Glass Morphism
 .workout-editor-modal {
   &__overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
     z-index: 9999;
     padding: var(--wg-spacing-lg);
-    opacity: 0;
-    visibility: hidden;
+  opacity: 0;
+  visibility: hidden;
     transition: all var(--wg-transition-normal);
-    
-    &.visible {
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+
+    .workout-editor-modal__content {
+      transform: scale(1) translateY(0);
       opacity: 1;
-      visibility: visible;
-      
-      .workout-editor-modal__content {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-      }
     }
+  }
     
     @media (max-width: 768px) {
       padding: var(--wg-spacing-md);
@@ -1044,39 +1050,39 @@
     backdrop-filter: var(--wg-glass-backdrop);
     border: 1px solid var(--wg-glass-border);
     border-radius: var(--wg-radius-xl);
-    width: 100%;
-    max-width: 1000px;
-    height: 90vh;
+  width: 100%;
+  max-width: 1000px;
+  height: 90vh;
     max-height: 900px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform: scale(0.95) translateY(20px);
-    opacity: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.95) translateY(20px);
+  opacity: 0;
     transition: all var(--wg-transition-bounce);
-    box-shadow: 
+  box-shadow: 
       var(--wg-shadow-xl),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
-    
-    @media (max-width: 768px) {
-      height: 95vh;
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  @media (max-width: 768px) {
+    height: 95vh;
       border-radius: var(--wg-radius-lg);
-    }
-    
-    @media (max-width: 480px) {
+  }
+
+  @media (max-width: 480px) {
       width: 100%;
-      height: 100vh;
+    height: 100vh;
       max-height: 100vh;
-      border-radius: 0;
+    border-radius: 0;
       margin: 0;
-    }
+}
     
     // Adaptive sizing variant
     &--adaptive {
       transition: height var(--wg-transition-normal);
       overflow: hidden;
-      
-      .workout-editor-modal__inner-content {
+
+.workout-editor-modal__inner-content {
         height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
@@ -1111,16 +1117,16 @@
   
   // Inner content wrapper for proper content flow
   &__inner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  
+  .workout-editor {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    
-    .workout-editor {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
       
       &__header {
         flex-shrink: 0;
@@ -1166,7 +1172,7 @@
   background: transparent;
   color: var(--wg-color-text-primary);
   font-family: var(--font-family-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  
+
   &--enhanced {
     // Enhanced glass morphism styling
     .workout-editor__section {
@@ -1180,34 +1186,34 @@
   &__header {
     padding: var(--wg-spacing-xl) var(--wg-spacing-xl) var(--wg-spacing-lg);
     border-bottom: 1px solid var(--wg-glass-border);
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(10px);
     flex-shrink: 0;
-    
+
     @media (max-width: 768px) {
       padding: var(--wg-spacing-lg) var(--wg-spacing-lg) var(--wg-spacing-md);
     }
   }
-  
+
   &__header-content {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--wg-spacing-lg);
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       gap: var(--wg-spacing-md);
     }
   }
-  
+
   &__header-info {
     display: flex;
     align-items: flex-start;
     gap: var(--wg-spacing-md);
     flex: 1;
   }
-  
+
   &__header-icon {
     display: flex;
     align-items: center;
@@ -1219,29 +1225,29 @@
     border-radius: var(--wg-radius-lg);
     color: var(--wg-color-primary);
     backdrop-filter: var(--wg-glass-backdrop);
-    
+
     @media (max-width: 768px) {
       width: 40px;
       height: 40px;
     }
   }
-  
+
   &__header-text {
     flex: 1;
   }
-  
+
   &__title {
     font-size: var(--wg-font-size-2xl);
     font-weight: 700;
     color: var(--wg-color-text-primary);
     margin: 0 0 var(--wg-spacing-xs) 0;
     line-height: 1.2;
-    
+
     @media (max-width: 768px) {
       font-size: var(--wg-font-size-xl);
     }
   }
-  
+
   &__subtitle {
     font-size: var(--wg-font-size-sm);
     color: var(--wg-color-text-secondary);
@@ -1259,8 +1265,8 @@
     }
     
     .stat {
-      display: flex;
-      align-items: center;
+    display: flex;
+    align-items: center;
       gap: 0.375rem;
       font-size: var(--wg-font-size-xs);
       color: var(--wg-color-text-muted);
@@ -1276,13 +1282,13 @@
     display: flex;
     gap: var(--wg-spacing-sm);
     align-items: flex-start;
-    
+
     @media (max-width: 768px) {
       width: 100%;
       justify-content: flex-end;
     }
   }
-  
+
   &__loading {
     display: flex;
     align-items: center;
@@ -1291,13 +1297,8 @@
     font-size: var(--wg-font-size-sm);
     
     &-icon {
-      animation: spin 1s linear infinite;
-    }
+    animation: spin 1s linear infinite;
   }
-  
-  &__close-button {
-    // Enhanced button styling handled by Button component
-    // Additional custom styling if needed
   }
   
   // Enhanced Content Area
@@ -1334,19 +1335,6 @@
     
     &:last-child {
       margin-bottom: 0;
-    }
-    
-    // Section variants
-    &--basic {
-      // Specific styling for basic info section
-    }
-    
-    &--exercises {
-      // Specific styling for exercises section
-    }
-    
-    &--notes {
-      // Specific styling for notes section
     }
   }
   
@@ -1401,23 +1389,15 @@
     flex-direction: column;
     gap: var(--wg-spacing-lg);
   }
-  
+
   &__form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--wg-spacing-lg);
-    
+
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: var(--wg-spacing-md);
-    }
-  }
-  
-  &__form-field {
-    // Form field styling handled by FormFieldEnhanced component
-    
-    &--title {
-      // Special styling for title field if needed
     }
   }
   
@@ -1431,12 +1411,12 @@
     border-radius: var(--wg-radius-md);
     font-size: var(--wg-font-size-sm);
   }
-  
+
   &__version-label {
     color: var(--wg-color-text-secondary);
     font-weight: 500;
   }
-  
+
   &__version-number {
     color: var(--wg-color-text-primary);
     font-weight: 600;
@@ -1458,18 +1438,18 @@
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid var(--wg-glass-border) !important;
     color: var(--wg-color-text-primary) !important;
-    
+
     &:focus {
       background: rgba(255, 255, 255, 0.05) !important;
       border-color: var(--wg-color-primary) !important;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
     }
-    
+
     &::placeholder {
       color: var(--wg-color-text-muted) !important;
     }
   }
-  
+
   // Enhanced Footer with Glass Morphism
   &__footer {
     padding: var(--wg-spacing-lg) var(--wg-spacing-xl);
@@ -1477,33 +1457,33 @@
     background: rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(10px);
     flex-shrink: 0;
-    
+
     @media (max-width: 768px) {
       padding: var(--wg-spacing-md) var(--wg-spacing-lg);
     }
   }
-  
+
   &__footer-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--wg-spacing-lg);
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       gap: var(--wg-spacing-md);
     }
   }
-  
+
   &__footer-info {
     flex: 1;
-    
+
     @media (max-width: 768px) {
       width: 100%;
       text-align: center;
     }
   }
-  
+
   &__unsaved-indicator {
     display: flex;
     align-items: center;
@@ -1520,21 +1500,15 @@
       animation: pulse 2s infinite;
     }
   }
-  
+
   &__footer-actions {
     display: flex;
     gap: var(--wg-spacing-md);
-    
+
     @media (max-width: 768px) {
       width: 100%;
       justify-content: center;
     }
-  }
-  
-  &__cancel-button,
-  &__save-button {
-    // Enhanced button styling handled by Button component
-    // Additional custom styling if needed
   }
 }
 
@@ -1868,7 +1842,7 @@
           background: var(--wg-glass-bg);
           border: 1px solid var(--wg-glass-border);
           position: relative;
-          min-width: 140px;
+    min-width: 140px;
           
           &.stat--complete {
             color: var(--wg-color-success);
@@ -1923,14 +1897,14 @@
     background: rgba(255, 255, 255, 0.02);
     
     .exercise-list-stats {
-      display: flex;
+    display: flex;
       flex-direction: column;
       gap: var(--wg-spacing-md);
       
       .stats-primary {
         display: flex;
         gap: var(--wg-spacing-lg);
-        align-items: center;
+    align-items: center;
         
         @media (max-width: 768px) {
           flex-direction: column;
@@ -2051,8 +2025,8 @@
       transition: all var(--wg-transition-normal);
       backdrop-filter: var(--wg-glass-backdrop);
       position: relative;
-      
-      &:hover {
+
+  &:hover {
         background: var(--wg-glass-hover-bg);
         border-color: rgba(255, 255, 255, 0.15);
         box-shadow: var(--wg-shadow-md);
@@ -2390,8 +2364,8 @@
       color: var(--wg-color-text-primary) !important;
       border-radius: var(--wg-radius-md) !important;
       transition: all var(--wg-transition-normal) !important;
-      
-      &:focus {
+
+    &:focus {
         background: var(--wg-glass-hover-bg) !important;
         border-color: var(--wg-color-primary) !important;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
@@ -2400,9 +2374,9 @@
       &:hover:not(:focus) {
         background: var(--wg-glass-hover-bg) !important;
         border-color: rgba(255, 255, 255, 0.15) !important;
-      }
-      
-      &::placeholder {
+    }
+
+    &::placeholder {
         color: var(--wg-color-text-muted) !important;
       }
       
@@ -2610,11 +2584,11 @@
 @media (prefers-contrast: high) {
   .workout-editor {
     &__exercise-item--enhanced {
-      border-width: 2px;
-      
+    border-width: 2px;
+
       .workout-editor__suggestions-toggle,
       .workout-editor__exercise-remove {
-        border-width: 2px;
+      border-width: 2px;
       }
     }
     
@@ -2637,22 +2611,22 @@
       }
       
       &.dragging {
-        transform: none;
+    transform: none;
       }
-    }
-    
+  }
+
     &__exercise-field {
       .field-suggestion-indicator {
-        animation: none;
-      }
-      
+    animation: none;
+  }
+
       .enhanced-field {
         transition: none !important;
         
         &.suggestion-applied {
-          animation: none;
-        }
-      }
+    animation: none;
+  }
+}
     }
     
     &__add-exercise {

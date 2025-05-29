@@ -99,10 +99,10 @@ function editorReducer(state: WorkoutEditorState, action: WorkoutEditorAction): 
         },
         isDirty: true,
         // Clear any validation error for this field
-        validationErrors: {
-          ...state.validationErrors,
-          title: undefined
-        }
+        validationErrors: (() => {
+          const { title, ...rest } = state.validationErrors;
+          return rest;
+        })()
       };
 
     case 'UPDATE_DIFFICULTY':
@@ -124,10 +124,10 @@ function editorReducer(state: WorkoutEditorState, action: WorkoutEditorAction): 
         },
         isDirty: true,
         // Clear any validation error for this field
-        validationErrors: {
-          ...state.validationErrors,
-          duration: undefined
-        }
+        validationErrors: (() => {
+          const { duration, ...rest } = state.validationErrors;
+          return rest;
+        })()
       };
 
     case 'UPDATE_EQUIPMENT':
@@ -167,10 +167,10 @@ function editorReducer(state: WorkoutEditorState, action: WorkoutEditorAction): 
         },
         isDirty: true,
         // Clear any validation error for exercises
-        validationErrors: {
-          ...state.validationErrors,
-          exercises: undefined
-        }
+        validationErrors: (() => {
+          const { exercises, ...rest } = state.validationErrors;
+          return rest;
+        })()
       };
     }
 

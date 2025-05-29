@@ -20,8 +20,18 @@ require_once FITCOPILOT_DIR . 'src/php/Domain/WorkoutPostType.php';
 require_once FITCOPILOT_DIR . 'src/php/Database/VersioningSchema.php';
 require_once FITCOPILOT_DIR . 'src/php/Database/VersioningMigration.php';
 
-// Register REST API endpoints
-require_once FITCOPILOT_DIR . 'src/php/REST/RestController.php';
+// Register NEW API endpoint system with versioning support
+require_once FITCOPILOT_DIR . 'src/php/API/APIUtils.php';
+require_once FITCOPILOT_DIR . 'src/php/Service/Versioning/VersioningUtils.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/AbstractEndpoint.php';
+require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutEndpointsController.php';
+
+// Initialize the workout endpoints controller
+add_action('init', function() {
+    new \FitCopilot\API\WorkoutEndpoints\WorkoutEndpointsController();
+}, 5); // Early priority to register endpoints before other systems
+
+// Register Analytics API endpoint  
 require_once FITCOPILOT_DIR . 'src/php/REST/AnalyticsController.php';
 
 // Register Service components
@@ -236,19 +246,13 @@ function render_generator_shortcode() {
 }
 
 // Load API endpoints
-require_once FITCOPILOT_DIR . 'src/php/API/APIUtils.php';
-// Modular architecture for workout endpoints
-require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/AbstractEndpoint.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/Utilities.php';
-require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutEndpointsController.php';
 // Load implemented endpoints
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/GenerateEndpoint.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutRetrievalEndpoint.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutUpdateEndpoint.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutCompletionEndpoint.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/DebugEndpoints.php';
-// Initialize the controller
-$workoutEndpointsController = new \FitCopilot\API\WorkoutEndpoints\WorkoutEndpointsController();
 
 // Load Profile endpoints
 require_once FITCOPILOT_DIR . 'src/php/API/ProfileEndpoints.php';

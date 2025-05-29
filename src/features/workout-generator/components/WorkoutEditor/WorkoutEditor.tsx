@@ -2,7 +2,8 @@
  * Enhanced Workout Editor Component
  * 
  * Main component for editing workouts with premium glass morphism design,
- * accessibility enhancements, and design system integration to match EnhancedWorkoutModal.
+ * accessibility enhancements, design system integration, auto-save functionality,
+ * real-time validation, and unsaved changes management.
  */
 import React, { useEffect } from 'react';
 import { useWorkoutEditor } from './WorkoutEditorContext';
@@ -11,10 +12,23 @@ import { AutoResizeTextarea } from '../../../../components/ui/AutoResizeTextarea
 import { ExpandableInput } from '../../../../components/ui/ExpandableInput';
 import { AutoResizeTextareaWithCounter } from '../../../../components/ui/AutoResizeTextareaWithCounter';
 import { FormFieldEnhanced } from '../../../profile/components/enhanced/FormFieldEnhanced';
-import { FormSectionEnhanced } from '../../../profile/components/enhanced/FormSectionEnhanced';
 import { X, Save, Loader, Edit3, FileText, Clock, Target, Dumbbell } from 'lucide-react';
 import { WorkoutDifficulty } from '../../types/workout';
 import ExerciseList from './ExerciseList';
+
+// Import our modular enhancements
+import { 
+  useAutoSave, 
+  useWorkoutValidation, 
+  useUnsavedChanges,
+  type UseAutoSaveOptions 
+} from './hooks';
+import { 
+  SaveStatusIndicator, 
+  ValidationFeedback, 
+  UnsavedChangesWarning 
+} from './components';
+
 import './workoutEditor.scss';
 
 interface WorkoutEditorProps {
@@ -50,6 +64,108 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
 }) => {
   const { state, dispatch, clearError, clearAllErrors } = useWorkoutEditor();
   const { workout, isDirty, isSaving, validationErrors } = state;
+
+  // Handle save button click (moved up to be available for hooks)
+  const handleSave = async (): Promise<{ success: boolean; data?: any; error?: string; timestamp: number; duration: number }> => {
+    const startTime = Date.now();
+    
+    // Validate the form before saving
+    const errors: Record<string, string> = {};
+    
+    if (!workout.title.trim()) {
+      errors.title = 'Title is required';
+    }
+    
+    if (workout.exercises.length === 0) {
+      errors.exercises = 'At least one exercise is required';
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      dispatch({ type: 'SET_VALIDATION_ERRORS', payload: errors });
+      return {
+        success: false,
+        error: 'Validation failed',
+        timestamp: Date.now(),
+        duration: Date.now() - startTime
+      };
+    }
+    
+    // Set saving state
+    dispatch({ type: 'SET_SAVING', payload: true });
+    
+    try {
+      // Call the save callback
+      await onSave(workout);
+      return {
+        success: true,
+        data: workout,
+        timestamp: Date.now(),
+        duration: Date.now() - startTime
+      };
+    } catch (error) {
+      console.error('Save failed:', error);
+      // Handle save error
+      dispatch({ type: 'SET_FIELD_ERROR', payload: { field: 'general', message: 'Save failed. Please try again.' } });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Save failed',
+        timestamp: Date.now(),
+        duration: Date.now() - startTime
+      };
+    } finally {
+      dispatch({ type: 'SET_SAVING', payload: false });
+    }
+  };
+
+  // ===== STEP 5: MODULAR HOOK INTEGRATION =====
+  
+  // Auto-save functionality with debounced saves
+  const autoSave = useAutoSave(handleSave, {
+    debounceMs: 2000,
+    enabled: !isNewWorkout && isDirty, // Only auto-save existing workouts
+    enabledWhenValid: true,
+    maxRetries: 3
+  });
+
+  // Enhanced validation with real-time feedback
+  const validation = useWorkoutValidation(workout, {
+    validateOnChange: true,
+    debounceMs: 300,
+    enableSuggestions: true,
+    contextualValidation: true
+  });
+
+  // Unsaved changes detection and warnings
+  const unsavedChanges = useUnsavedChanges(
+    workout, 
+    state.originalWorkout || workout,
+    {
+      confirmOnNavigate: true,
+      confirmOnClose: true,
+      deepCompare: true,
+      excludeFields: ['lastModified'],
+      autoSaveEnabled: !isNewWorkout // Enable auto-save for existing workouts
+    }
+  );
+
+  // Enhanced save function that uses validation and auto-save
+  const enhancedHandleSave = async () => {
+    // If validation errors exist, show them and don't save
+    if (validation.hasErrors) {
+      // Convert validation result to the format expected by the editor
+      const errors: Record<string, string> = {};
+      validation.workoutValidation.errors.forEach((error: any) => {
+        if (error.field) {
+          errors[error.field] = error.message;
+        }
+      });
+      dispatch({ type: 'SET_VALIDATION_ERRORS', payload: errors });
+      return;
+    }
+    
+    // Use the regular save function
+    await handleSave();
+  };
 
   // Clear all validation errors when component unmounts
   useEffect(() => {
@@ -103,31 +219,6 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type: 'UPDATE_NOTES', payload: e.target.value });
   };
-
-  // Handle save button click
-  const handleSave = () => {
-    // Validate the form before saving
-    const errors: Record<string, string> = {};
-    
-    if (!workout.title.trim()) {
-      errors.title = 'Title is required';
-    }
-    
-    if (workout.exercises.length === 0) {
-      errors.exercises = 'At least one exercise is required';
-    }
-    
-    if (Object.keys(errors).length > 0) {
-      dispatch({ type: 'SET_VALIDATION_ERRORS', payload: errors });
-      return;
-    }
-    
-    // Set saving state
-    dispatch({ type: 'SET_SAVING', payload: true });
-    
-    // Call the save callback
-    onSave(workout);
-  };
   
   // Handle keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -153,9 +244,9 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
 
   // Calculate workout stats for display
   const totalExercises = workout.exercises.length;
-  const estimatedDuration = workout.duration || workout.exercises.reduce((total, exercise) => {
+  const estimatedDuration = workout.duration || workout.exercises.reduce((total, exercise: any) => {
     // Estimate duration based on exercise type
-    return total + ('duration' in exercise ? parseInt(exercise.duration) || 3 : 3);
+    return total + (exercise.duration ? parseInt(String(exercise.duration)) || 3 : 3);
   }, 0);
 
   return (
@@ -202,6 +293,19 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
           </div>
           
           <div className="workout-editor__header-actions">
+            {/* Step 5: Save Status Indicator */}
+            <SaveStatusIndicator
+              status={autoSave.saveStatus.status}
+              lastSaved={unsavedChanges.lastSavedAt}
+              hasUnsavedChanges={unsavedChanges.hasUnsavedChanges}
+              queueLength={autoSave.saveStatus.queueLength}
+              lastError={autoSave.saveStatus.status === 'error' ? 'Auto-save failed' : undefined}
+              onRetry={() => {
+                autoSave.forceSave(workout);
+              }}
+              compact={true}
+            />
+            
             {(isLoading || isSaving) && (
               <div className="workout-editor__loading" aria-live="polite">
                 <Loader size={20} className="workout-editor__loading-icon" />
@@ -398,7 +502,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
             <Button
               variant="gradient"
               size="lg"
-              onClick={handleSave}
+              onClick={enhancedHandleSave}
               disabled={isSaveDisabled}
               startIcon={isSaving ? <Loader size={18} /> : <Save size={18} />}
               aria-label={isSaving ? "Saving workout" : "Save workout"}
@@ -409,6 +513,18 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
           </div>
         </div>
       </footer>
+
+      {/* Step 5: Unsaved Changes Warning Modal */}
+      <UnsavedChangesWarning
+        isOpen={unsavedChanges.showConfirmation}
+        changedFields={unsavedChanges.changedFields}
+        confirmationType={unsavedChanges.confirmationType}
+        confirmationMessage="You have unsaved changes that will be lost."
+        onSave={unsavedChanges.handleConfirmSave}
+        onDiscard={unsavedChanges.handleConfirmDiscard}
+        onCancel={unsavedChanges.handleConfirmCancel}
+        isSaving={isSaving}
+      />
     </div>
   );
 };

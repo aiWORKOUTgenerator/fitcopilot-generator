@@ -2,48 +2,33 @@
  * Workout Service
  * 
  * Provides functions for interacting with the workout API.
- * TEMPORARY: Using mock data to prevent dashboard loading issues.
- * TODO: Re-enable API client once browser compatibility issues are resolved.
+ * Uses the real WordPress REST API with proper error handling.
  */
 import { GeneratedWorkout } from '../types/workout';
-// TEMPORARY: Disable API client imports to prevent browser compatibility issues
-// import { apiClient, ApiError, ApiErrorCode } from '../../../common/api';
+import { apiFetch } from '../../../common/api/client';
+
+// API configuration
+const API_BASE = '';
 
 /**
  * Get a single workout by ID
- * @param id - The workout ID
+ * @param id - The workout ID to fetch
  * @returns Promise with the workout data
- * TEMPORARY: Returns mock data to prevent dashboard loading issues
  */
 export async function getWorkout(id: string): Promise<GeneratedWorkout> {
-  console.log('TEMPORARY: getWorkout called with mock data for ID:', id);
-  
-  // Return mock workout data
-  return {
-    id: parseInt(id) || 1,
-    title: 'Sample Workout',
-    description: 'A sample workout for testing',
-    duration: 30,
-    difficulty: 'intermediate',
-    exercises: [
-      {
-        name: 'Push-ups',
-        sets: 3,
-        reps: 10,
-        duration: 0,
-        rest: 60
-      },
-      {
-        name: 'Squats',
-        sets: 3,
-        reps: 15,
-        duration: 0,
-        rest: 60
-      }
-    ],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
+  try {
+    // apiFetch returns the data directly, not a wrapped response
+    const data = await apiFetch<any>(`/workouts/${id}`);
+    
+    if (!data) {
+      throw new Error('Workout not found');
+    }
+    
+    return transformWorkoutResponse(data);
+  } catch (error) {
+    console.error('Failed to get workout:', error);
+    throw error;
+  }
 }
 
 /**
@@ -51,128 +36,163 @@ export async function getWorkout(id: string): Promise<GeneratedWorkout> {
  * @param page - Optional page number for pagination
  * @param perPage - Optional number of workouts per page
  * @returns Promise with the workouts data
- * TEMPORARY: Returns mock data to prevent dashboard loading issues
  */
 export async function getWorkouts(page = 1, perPage = 10): Promise<GeneratedWorkout[]> {
-  console.log('TEMPORARY: getWorkouts called with mock data');
-  
-  // Return mock workouts array
-  return [
-    {
-      id: 1,
-      title: 'Morning HIIT',
-      description: 'High-intensity interval training for the morning',
-      duration: 20,
-      difficulty: 'beginner',
-      exercises: [],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 2,
-      title: 'Strength Training',
-      description: 'Full body strength workout',
-      duration: 45,
-      difficulty: 'intermediate',
-      exercises: [],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      per_page: perPage.toString()
+    });
+    
+    // apiFetch returns the data directly, not a wrapped response
+    const data = await apiFetch<{
+      workouts: any[];
+      total?: number;
+      totalPages?: number;
+    }>(`/workouts?${params}`);
+    
+    if (!data?.workouts) {
+      throw new Error('Failed to fetch workouts');
     }
-  ];
+    
+    return data.workouts.map(transformWorkoutResponse);
+  } catch (error) {
+    console.error('Failed to get workouts:', error);
+    throw error;
+  }
 }
 
 /**
  * Generate a new workout
  * @param workoutRequest - The workout generation request data
  * @returns Promise with the generated workout data
- * TEMPORARY: Returns mock data to prevent dashboard loading issues
  */
 export async function generateWorkout(workoutRequest: any): Promise<GeneratedWorkout> {
-  console.log('TEMPORARY: generateWorkout called with mock data for request:', workoutRequest);
-  
-  // Return mock generated workout
-  return {
-    id: Date.now(), // Use timestamp as unique ID
-    title: 'AI Generated Workout',
-    description: 'A personalized workout generated based on your preferences',
-    duration: workoutRequest?.duration || 30,
-    difficulty: workoutRequest?.difficulty || 'intermediate',
-    exercises: [
-      {
-        name: 'Jumping Jacks',
-        sets: 3,
-        reps: 20,
-        duration: 0,
-        rest: 30
-      },
-      {
-        name: 'Push-ups',
-        sets: 3,
-        reps: 10,
-        duration: 0,
-        rest: 60
-      },
-      {
-        name: 'Squats',
-        sets: 3,
-        reps: 15,
-        duration: 0,
-        rest: 60
-      }
-    ],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
+  try {
+    // apiFetch returns the data directly, not a wrapped response
+    const data = await apiFetch<any>(`/generate`, {
+      method: 'POST',
+      body: JSON.stringify(workoutRequest)
+    });
+    
+    if (!data) {
+      throw new Error('Failed to generate workout');
+    }
+    
+    return transformWorkoutResponse(data);
+  } catch (error) {
+    console.error('Failed to generate workout:', error);
+    throw error;
+  }
 }
 
 /**
  * Save a workout (create or update)
  * @param workout - The workout data to save
  * @returns Promise with the saved workout data
- * TEMPORARY: Returns mock data to prevent dashboard loading issues
  */
 export async function saveWorkout(workout: GeneratedWorkout): Promise<GeneratedWorkout> {
-  console.log('TEMPORARY: saveWorkout called with mock data for workout:', workout.title);
-  
-  // Return the workout with updated timestamp
-  return {
-    ...workout,
-    id: workout.id || Date.now(),
-    updated_at: new Date().toISOString()
-  };
+  try {
+    const isUpdate = workout.id && workout.id !== 'new';
+    const endpoint = isUpdate 
+      ? `/workouts/${workout.id}` 
+      : '/workouts';
+    
+    const method = isUpdate ? 'PUT' : 'POST';
+    
+    // apiFetch returns the data directly, not a wrapped response
+    const data = await apiFetch<any>(endpoint, {
+      method,
+      body: JSON.stringify({
+        workout: transformWorkoutForSave(workout)
+      })
+    });
+    
+    // data is the workout object directly from the API
+    if (!data) {
+      throw new Error('No data returned from save operation');
+    }
+    
+    return transformWorkoutResponse(data);
+  } catch (error) {
+    console.error('Failed to save workout:', error);
+    throw error;
+  }
 }
 
 /**
  * Delete a workout
  * @param id - The workout ID to delete
  * @returns Promise indicating success
- * TEMPORARY: Returns mock success to prevent dashboard loading issues
  */
 export async function deleteWorkout(id: string): Promise<boolean> {
-  console.log('TEMPORARY: deleteWorkout called with mock data for ID:', id);
-  
-  // Always return success
-  return true;
+  try {
+    // apiFetch returns the data directly, not a wrapped response
+    await apiFetch<any>(`/workouts/${id}`, {
+      method: 'DELETE'
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to delete workout:', error);
+    throw error;
+  }
 }
 
 /**
  * Mark a workout as completed
  * @param id - The workout ID to mark as completed
  * @returns Promise with the updated workout data
- * TEMPORARY: Returns mock data to prevent dashboard loading issues
  */
 export async function completeWorkout(id: string): Promise<GeneratedWorkout> {
-  console.log('TEMPORARY: completeWorkout called with mock data for ID:', id);
-  
-  // Return mock completed workout
+  try {
+    // apiFetch returns the data directly, not a wrapped response
+    const data = await apiFetch<any>(`/workouts/${id}/complete`, {
+      method: 'POST'
+    });
+    
+    if (!data) {
+      throw new Error('Failed to complete workout');
+    }
+    
+    return transformWorkoutResponse(data);
+  } catch (error) {
+    console.error('Failed to complete workout:', error);
+    throw error;
+  }
+}
+
+/**
+ * Transform workout response from API format to frontend format
+ */
+function transformWorkoutResponse(apiData: any): GeneratedWorkout {
   return {
-    id: parseInt(id) || 1,
-    title: 'Completed Workout',
-    description: 'This workout has been marked as completed',
-    duration: 30,
-    difficulty: 'intermediate',
-    exercises: [],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    id: apiData.id || apiData.post_id,
+    title: apiData.title,
+    description: apiData.description || apiData.content || '',
+    duration: apiData.duration || 30,
+    difficulty: apiData.difficulty || 'intermediate',
+    exercises: apiData.exercises || apiData.workout_data?.exercises || [],
+    created_at: apiData.date || apiData.created_at || new Date().toISOString(),
+    updated_at: apiData.modified || apiData.updated_at || new Date().toISOString(),
+    // Additional fields from API
+    version: apiData.version,
+    lastModified: apiData.last_modified,
+    modifiedBy: apiData.modified_by
+  };
+}
+
+/**
+ * Transform workout data for saving to API format
+ */
+function transformWorkoutForSave(workout: GeneratedWorkout): any {
+  return {
+    title: workout.title,
+    notes: workout.description,
+    difficulty: workout.difficulty,
+    duration: workout.duration,
+    exercises: workout.exercises,
+    // Include version if updating
+    ...(workout.version && { version: workout.version })
   };
 } 
