@@ -70,9 +70,24 @@ class Utilities {
             return false;
         }
         
-        // Get the workout data
-        $workout_data = get_post_meta($post_id, '_workout_data', true);
-        $workout_data = $workout_data ? json_decode($workout_data, true) : [];
+        // Get the workout data with defensive programming
+        $workout_data_raw = get_post_meta($post_id, '_workout_data', true);
+        $workout_data = [];
+        
+        if ($workout_data_raw) {
+            $decoded = json_decode($workout_data_raw, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                // Detect and normalize different data formats
+                $workout_data = self::normalize_workout_data($decoded, $post_id);
+            } else {
+                error_log("FitCopilot: Invalid JSON in _workout_data for post {$post_id}: " . json_last_error_msg());
+                $workout_data = self::get_default_workout_data();
+            }
+        } else {
+            // No workout data found - use default empty structure
+            $workout_data = self::get_default_workout_data();
+        }
         
         // Get workout metadata
         $difficulty = get_post_meta($post_id, '_workout_difficulty', true);
@@ -103,6 +118,94 @@ class Utilities {
             'version' => $version,
             'last_modified' => $last_modified,
             'modified_by' => $modified_by
+        ];
+    }
+    
+    /**
+     * Normalize workout data to consistent format
+     * Handles different data structures gracefully
+     *
+     * @param array $data The decoded workout data
+     * @param int $post_id The post ID for logging
+     * @return array Normalized workout data
+     */
+    private static function normalize_workout_data($data, $post_id) {
+        // Format 1: Full workout object from AI (GenerateEndpoint)
+        // Expected keys: title, exercises, sections, duration, etc.
+        if (isset($data['title']) && isset($data['exercises']) && is_array($data['exercises'])) {
+            error_log("FitCopilot: Workout {$post_id} using AI-generated format");
+            return [
+                'title' => $data['title'],
+                'exercises' => $data['exercises'],
+                'sections' => $data['sections'] ?? [],
+                'duration' => $data['duration'] ?? null,
+                'difficulty' => $data['difficulty'] ?? null,
+                'equipment' => $data['equipment'] ?? [],
+                'metadata' => [
+                    'format' => 'ai_generated',
+                    'normalized_at' => current_time('mysql')
+                ]
+            ];
+        }
+        
+        // Format 2: Wrapped exercises format (WorkoutRetrievalEndpoint create)
+        // Expected keys: exercises, possibly sections
+        if (isset($data['exercises']) && is_array($data['exercises']) && !isset($data['title'])) {
+            error_log("FitCopilot: Workout {$post_id} using exercises wrapper format");
+            return [
+                'title' => '', // Will be populated from post_title
+                'exercises' => $data['exercises'],
+                'sections' => $data['sections'] ?? [],
+                'metadata' => [
+                    'format' => 'exercises_wrapper',
+                    'normalized_at' => current_time('mysql')
+                ]
+            ];
+        }
+        
+        // Format 3: Legacy or custom format - try to extract what we can
+        if (is_array($data)) {
+            error_log("FitCopilot: Workout {$post_id} using unknown format, attempting extraction. Keys: " . implode(', ', array_keys($data)));
+            
+            // Try to find exercises in various possible locations
+            $exercises = [];
+            if (isset($data['exercises'])) {
+                $exercises = is_array($data['exercises']) ? $data['exercises'] : [];
+            } elseif (isset($data['workout']) && isset($data['workout']['exercises'])) {
+                $exercises = is_array($data['workout']['exercises']) ? $data['workout']['exercises'] : [];
+            }
+            
+            return [
+                'title' => $data['title'] ?? '',
+                'exercises' => $exercises,
+                'sections' => $data['sections'] ?? [],
+                'metadata' => [
+                    'format' => 'unknown_extracted',
+                    'original_keys' => array_keys($data),
+                    'normalized_at' => current_time('mysql')
+                ]
+            ];
+        }
+        
+        // Format 4: Completely unknown - return safe default
+        error_log("FitCopilot: Workout {$post_id} has unrecognizable data format: " . print_r($data, true));
+        return self::get_default_workout_data();
+    }
+    
+    /**
+     * Get default workout data structure
+     *
+     * @return array Default workout data
+     */
+    private static function get_default_workout_data() {
+        return [
+            'title' => '',
+            'exercises' => [],
+            'sections' => [],
+            'metadata' => [
+                'format' => 'default_fallback',
+                'created_at' => current_time('mysql')
+            ]
         ];
     }
     
@@ -230,5 +333,81 @@ class Utilities {
         $in_transaction = $wpdb->get_var("SELECT @@in_transaction");
         
         return $in_transaction == 1;
+    }
+    
+    /**
+     * Debug method to analyze workout data formats across all workouts
+     * Useful for monitoring data consistency and identifying issues
+     *
+     * @param int $limit Number of workouts to analyze (default: 10)
+     * @return array Analysis results
+     */
+    public static function analyze_workout_data_formats($limit = 10) {
+        $analysis = [
+            'total_analyzed' => 0,
+            'formats_found' => [],
+            'issues' => [],
+            'recommendations' => []
+        ];
+        
+        $workouts = get_posts([
+            'post_type' => ['fc_workout', 'wg_workout'],
+            'numberposts' => $limit,
+            'post_status' => 'any'
+        ]);
+        
+        foreach ($workouts as $workout) {
+            $analysis['total_analyzed']++;
+            
+            $workout_data_raw = get_post_meta($workout->ID, '_workout_data', true);
+            
+            if (empty($workout_data_raw)) {
+                $analysis['issues'][] = "Workout {$workout->ID}: No _workout_data found";
+                continue;
+            }
+            
+            $decoded = json_decode($workout_data_raw, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $analysis['issues'][] = "Workout {$workout->ID}: Invalid JSON - " . json_last_error_msg();
+                continue;
+            }
+            
+            if (!is_array($decoded)) {
+                $analysis['issues'][] = "Workout {$workout->ID}: Data is not an array";
+                continue;
+            }
+            
+            // Determine format
+            $format = 'unknown';
+            if (isset($decoded['title']) && isset($decoded['exercises'])) {
+                $format = 'ai_generated';
+            } elseif (isset($decoded['exercises']) && !isset($decoded['title'])) {
+                $format = 'exercises_wrapper';
+            } elseif (is_array($decoded)) {
+                $format = 'custom_format';
+            }
+            
+            if (!isset($analysis['formats_found'][$format])) {
+                $analysis['formats_found'][$format] = [];
+            }
+            
+            $analysis['formats_found'][$format][] = [
+                'workout_id' => $workout->ID,
+                'keys' => array_keys($decoded),
+                'title' => $workout->post_title
+            ];
+        }
+        
+        // Generate recommendations
+        if (count($analysis['formats_found']) > 1) {
+            $analysis['recommendations'][] = "Multiple data formats detected - consider standardizing";
+        }
+        
+        if (!empty($analysis['issues'])) {
+            $analysis['recommendations'][] = "Fix JSON/data issues before proceeding";
+        }
+        
+        return $analysis;
     }
 } 

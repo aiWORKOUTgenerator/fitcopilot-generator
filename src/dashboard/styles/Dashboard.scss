@@ -1,6 +1,9 @@
 /* Enhanced Dashboard styles with tabbed interface */
 @import './components.scss';
 @import '../components/TabSystem/TabSystem.scss';
+@import '../components/TabSystem/EnhancedTabSystem.scss';
+@import '../components/EnhancedHeader/EnhancedHeader.scss';
+@import '../components/UnifiedModal/UnifiedModal.scss';
 @import '../components/ProfileTab/ProfileTab.scss';
 @import '../components/SavedWorkoutsTab/SavedWorkoutsTab.scss';
 

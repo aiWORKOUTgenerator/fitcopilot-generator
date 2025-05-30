@@ -31,10 +31,40 @@ interface EnhancedWorkoutModalProps {
 }
 
 /**
+ * Transform API workout data to ensure it has the expected structure
+ */
+const transformWorkoutData = (workout: GeneratedWorkout): GeneratedWorkout => {
+  // If workout already has sections, use as-is
+  if ('sections' in workout && workout.sections && workout.sections.length > 0) {
+    return workout;
+  }
+  
+  // Transform exercises-only format to sections format for display
+  if ('exercises' in workout && workout.exercises && workout.exercises.length > 0) {
+    const section: WorkoutSection = {
+      name: 'Main Workout',
+      duration: workout.duration || 30,
+      exercises: workout.exercises as Exercise[]
+    };
+    
+    return {
+      ...workout,
+      sections: [section]
+    };
+  }
+  
+  // Fallback: empty workout structure
+  return {
+    ...workout,
+    sections: []
+  };
+};
+
+/**
  * Enhanced Workout Modal with premium UX and smooth edit transitions
  */
 export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
-  workout,
+  workout: rawWorkout,
   isOpen,
   onClose,
   onSave,
@@ -43,6 +73,9 @@ export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
   postId,
   isTransitioning = false
 }) => {
+  // Transform workout data to ensure compatible structure
+  const workout = transformWorkoutData(rawWorkout);
+  
   const [isVisible, setIsVisible] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [isEditLoading, setIsEditLoading] = useState(false);
@@ -168,8 +201,8 @@ export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
             <h1 class="workout-title">${workout.title}</h1>
             <div class="workout-meta">
               <span>📅 Generated: ${new Date().toLocaleDateString()}</span>
-              <span>⏱️ Duration: ${workout.sections.reduce((total, section) => total + section.duration, 0)} minutes</span>
-              <span>🎯 Sections: ${workout.sections.length}</span>
+              <span>⏱️ Duration: ${workout.duration || 0} minutes</span>
+              <span>🎯 Exercises: ${workout.exercises?.length || 0}</span>
             </div>
           </div>
           ${printContent}
@@ -199,14 +232,18 @@ export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
       }
     } else {
       // Fallback: copy to clipboard
-      const workoutText = `${workout.title}\n\n${workout.sections.map(section => 
+      const workoutText = `${workout.title}\n\n${workout.sections?.map(section => 
         `${section.name} (${section.duration} min)\n${section.exercises.map(exercise => 
-          `• ${exercise.name}: ${'sets' in exercise ? exercise.sets : exercise.duration}`
+          `• ${exercise.name}: ${'sets' in exercise ? `${exercise.sets} sets` : exercise.duration}`
         ).join('\n')}`
-      ).join('\n\n')}`;
+      ).join('\n\n') || 'No workout content available'}`;
       
-      await navigator.clipboard.writeText(workoutText);
-      // TODO: Show toast notification
+      try {
+        await navigator.clipboard.writeText(workoutText);
+        // TODO: Show toast notification
+      } catch (err) {
+        console.error('Failed to copy to clipboard:', err);
+      }
     }
   };
 
@@ -217,8 +254,9 @@ export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
   };
 
   // Calculate workout stats
-  const totalDuration = workout.sections.reduce((total, section) => total + section.duration, 0);
-  const totalExercises = workout.sections.reduce((total, section) => total + section.exercises.length, 0);
+  const totalDuration = workout.duration || workout.sections?.reduce((total, section) => total + section.duration, 0) || 0;
+  const totalExercises = workout.exercises?.length || workout.sections?.reduce((total, section) => total + section.exercises.length, 0) || 0;
+  const totalSections = workout.sections?.length || 0;
 
   // Render exercise based on type
   const renderExercise = (exercise: Exercise, index: number) => {
@@ -311,7 +349,7 @@ export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
                 </span>
                 <span className="stat">
                   <Dumbbell size={16} />
-                  {workout.sections.length} sections
+                  {totalSections} sections
                 </span>
               </div>
             </div>
@@ -383,7 +421,13 @@ export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
         {/* Modal Body */}
         <main className="modal-body">
           <div ref={contentRef} className="workout-content">
-            {workout.sections.map((section, index) => renderSection(section, index))}
+            {workout.sections && workout.sections.length > 0 ? (
+              workout.sections.map((section, index) => renderSection(section, index))
+            ) : (
+              <div className="empty-workout">
+                <p>No workout content available.</p>
+              </div>
+            )}
           </div>
         </main>
 

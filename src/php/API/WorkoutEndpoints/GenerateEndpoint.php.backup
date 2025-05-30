@@ -182,29 +182,10 @@ class GenerateEndpoint extends AbstractEndpoint {
             throw new \Exception($post_id->get_error_message());
         }
         
-        // Standardize workout data format for consistency
-        $standardized_workout = [
-            'title' => $workout['title'] ?? __('Generated Workout', 'fitcopilot'),
-            'exercises' => $workout['exercises'] ?? [],
-            'sections' => $workout['sections'] ?? [],
-            'duration' => $workout['duration'] ?? $params['duration'],
-            'difficulty' => $workout['difficulty'] ?? $params['difficulty'],
-            'equipment' => $workout['equipment'] ?? $params['equipment'],
-            'goals' => $workout['goals'] ?? $params['goals'],
-            'restrictions' => $workout['restrictions'] ?? $params['restrictions'],
-            'metadata' => [
-                'ai_generated' => true,
-                'created_at' => $now,
-                'generation_params' => $params,
-                'openai_model' => $workout['model'] ?? 'unknown',
-                'format_version' => '1.0'
-            ]
-        ];
+        // Save workout data
+        update_post_meta($post_id, '_workout_data', wp_json_encode($workout));
         
-        // Save standardized workout data
-        update_post_meta($post_id, '_workout_data', wp_json_encode($standardized_workout));
-        
-        // Save generation parameters as separate meta for backward compatibility
+        // Save generation parameters
         update_post_meta($post_id, '_workout_difficulty', $params['difficulty']);
         update_post_meta($post_id, '_workout_duration', $params['duration']);
         update_post_meta($post_id, '_workout_equipment', $params['equipment']);

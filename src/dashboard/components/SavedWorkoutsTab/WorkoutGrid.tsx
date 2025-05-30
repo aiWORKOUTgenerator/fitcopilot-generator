@@ -1,31 +1,49 @@
 /**
- * Workout Grid Component
+ * Enhanced Workout Grid Component
  * 
- * Displays saved workouts in a responsive grid layout with filtering,
- * search, and quick actions for each workout.
+ * Displays saved workouts in a responsive grid layout with enhanced filtering,
+ * search, bulk selection capabilities, and improved visual design.
  */
-import React, { useState, useMemo } from 'react';
-import { Card } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui';
-import WorkoutCard from './WorkoutCard';
-import WorkoutFilters from './WorkoutFilters';
-import WorkoutSearch from './WorkoutSearch';
+import React, { useState, useMemo, useCallback } from 'react';
+import { 
+  Grid, 
+  List, 
+  MoreHorizontal,
+  CheckSquare,
+  Square,
+  Trash2,
+  Copy,
+  Download,
+  ArrowUp,
+  ArrowDown
+} from 'lucide-react';
+import Card from '../../../components/ui/Card/Card';
+import Button from '../../../components/ui/Button/Button';
+import AdvancedWorkoutFilters from './AdvancedWorkoutFilters';
+import EnhancedWorkoutCard from './EnhancedWorkoutCard';
 import './SavedWorkoutsTab.scss';
+import './AdvancedFilters.scss';
+import './EnhancedWorkoutCard.scss';
 
-interface GeneratedWorkout {
-  id: string;
+interface DisplayWorkout {
+  id: string | number;
   title: string;
   description: string;
   duration: number;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
+  exercises: any[];
+  created_at: string;
+  updated_at: string;
+  // Computed/derived properties for display
   workoutType: string;
   equipment: string[];
-  exercises: any[];
-  createdAt: string;
-  lastModified: string;
   isCompleted: boolean;
   completedAt?: string;
   tags: string[];
+  createdAt: string; // For backward compatibility
+  lastModified: string; // For backward compatibility
+  isFavorite?: boolean;
+  rating?: number;
 }
 
 interface WorkoutFilters {
@@ -36,23 +54,145 @@ interface WorkoutFilters {
   completed: 'all' | 'completed' | 'pending';
   sortBy: 'date' | 'title' | 'duration' | 'difficulty';
   sortOrder: 'asc' | 'desc';
+  tags: string[];
+  createdDate: { start: Date | null; end: Date | null };
+  searchQuery: string;
 }
 
-interface WorkoutGridProps {
-  workouts: GeneratedWorkout[];
+interface EnhancedWorkoutGridProps {
+  workouts: any[]; // Accept any workout format from API
   isLoading?: boolean;
-  onWorkoutSelect: (workout: GeneratedWorkout) => void;
-  onWorkoutEdit: (workout: GeneratedWorkout) => void;
+  onWorkoutSelect: (workout: DisplayWorkout) => void;
+  onWorkoutEdit: (workout: DisplayWorkout) => void;
   onWorkoutDelete: (workoutId: string) => void;
-  onWorkoutDuplicate: (workout: GeneratedWorkout) => void;
-  onCreateSimilar: (workout: GeneratedWorkout) => void;
+  onWorkoutDuplicate: (workout: DisplayWorkout) => void;
+  onCreateSimilar: (workout: DisplayWorkout) => void;
   onMarkComplete: (workoutId: string) => void;
+  onBulkDelete?: (workoutIds: string[]) => void;
+  onToggleFavorite?: (workoutId: string) => void;
+  onRateWorkout?: (workoutId: string, rating: number) => void;
 }
 
 /**
- * WorkoutGrid displays saved workouts with filtering and search
+ * Transform API workout data for grid display
  */
-export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
+const transformWorkoutForDisplay = (workout: any): DisplayWorkout => {
+  // Defensive coding: ensure workout is an object
+  if (!workout || typeof workout !== 'object') {
+    console.warn('Invalid workout data received:', workout);
+    return createDefaultWorkout();
+  }
+
+  try {
+    // Extract equipment from exercises if not provided
+    const equipment = workout.equipment || extractEquipmentFromExercises(workout.exercises);
+    
+    // Determine workout type from exercises or use default
+    const workoutType = workout.workoutType || deriveWorkoutTypeFromExercises(workout.exercises);
+    
+    return {
+      id: workout.id || `temp-${Date.now()}`,
+      title: workout.title || 'Untitled Workout',
+      description: workout.description || '',
+      duration: typeof workout.duration === 'number' ? workout.duration : 30,
+      difficulty: ['beginner', 'intermediate', 'advanced'].includes(workout.difficulty) ? workout.difficulty : 'intermediate',
+      exercises: Array.isArray(workout.exercises) ? workout.exercises : [],
+      created_at: workout.created_at || new Date().toISOString(),
+      updated_at: workout.updated_at || new Date().toISOString(),
+      workoutType,
+      equipment,
+      isCompleted: Boolean(workout.isCompleted),
+      tags: Array.isArray(workout.tags) ? workout.tags : [],
+      completedAt: workout.completedAt,
+      createdAt: workout.createdAt || workout.created_at || new Date().toISOString(),
+      lastModified: workout.lastModified || workout.updated_at || new Date().toISOString(),
+      isFavorite: Boolean(workout.isFavorite),
+      rating: typeof workout.rating === 'number' ? workout.rating : undefined
+    };
+  } catch (error) {
+    console.error('Error transforming workout data:', error, workout);
+    return createDefaultWorkout();
+  }
+};
+
+/**
+ * Create a default workout object for error cases
+ */
+const createDefaultWorkout = (): DisplayWorkout => ({
+  id: `error-${Date.now()}`,
+  title: 'Error Loading Workout',
+  description: 'There was an error loading this workout data.',
+  duration: 30,
+  difficulty: 'intermediate',
+  exercises: [],
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  workoutType: 'General',
+  equipment: [],
+  isCompleted: false,
+  tags: [],
+  createdAt: new Date().toISOString(),
+  lastModified: new Date().toISOString(),
+  isFavorite: false
+});
+
+/**
+ * Extract equipment from exercises
+ */
+const extractEquipmentFromExercises = (exercises: any[]): string[] => {
+  if (!Array.isArray(exercises)) return [];
+  
+  try {
+    const equipment = new Set<string>();
+    exercises.forEach(exercise => {
+      if (exercise && exercise.equipment) {
+        if (Array.isArray(exercise.equipment)) {
+          exercise.equipment.forEach((eq: string) => equipment.add(eq));
+        } else if (typeof exercise.equipment === 'string') {
+          equipment.add(exercise.equipment);
+        }
+      }
+    });
+    return Array.from(equipment).filter(Boolean);
+  } catch (error) {
+    console.warn('Error extracting equipment:', error);
+    return [];
+  }
+};
+
+/**
+ * Derive workout type from exercises
+ */
+const deriveWorkoutTypeFromExercises = (exercises: any[]): string => {
+  if (!Array.isArray(exercises) || exercises.length === 0) return 'General';
+  
+  try {
+    // Simple heuristic based on exercise names
+    const exerciseNames = exercises
+      .map(ex => ex && ex.name && typeof ex.name === 'string' ? ex.name.toLowerCase() : '')
+      .filter(name => name.length > 0)
+      .join(' ');
+    
+    if (exerciseNames.includes('cardio') || exerciseNames.includes('running') || exerciseNames.includes('cycling')) {
+      return 'Cardio';
+    }
+    if (exerciseNames.includes('strength') || exerciseNames.includes('weights') || exerciseNames.includes('lifting')) {
+      return 'Strength';
+    }
+    if (exerciseNames.includes('yoga') || exerciseNames.includes('stretch')) {
+      return 'Flexibility';
+    }
+  } catch (error) {
+    console.warn('Error deriving workout type:', error);
+  }
+  
+  return 'General';
+};
+
+/**
+ * Enhanced WorkoutGrid displays saved workouts with advanced filtering and search
+ */
+export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
   workouts,
   isLoading = false,
   onWorkoutSelect,
@@ -60,9 +200,11 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
   onWorkoutDelete,
   onWorkoutDuplicate,
   onCreateSimilar,
-  onMarkComplete
+  onMarkComplete,
+  onBulkDelete,
+  onToggleFavorite,
+  onRateWorkout
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<WorkoutFilters>({
     difficulty: [],
     workoutType: [],
@@ -70,21 +212,29 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
     duration: { min: 0, max: 120 },
     completed: 'all',
     sortBy: 'date',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
+    tags: [],
+    createdDate: { start: null, end: null },
+    searchQuery: ''
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedWorkouts, setSelectedWorkouts] = useState<Set<string>>(new Set());
 
   // Filter and sort workouts based on current filters and search
   const filteredWorkouts = useMemo(() => {
-    let filtered = workouts.filter(workout => {
+    // Transform raw API data to display format
+    const transformedWorkouts = workouts.map(transformWorkoutForDisplay);
+    
+    let filtered = transformedWorkouts.filter(workout => {
       // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+      if (filters.searchQuery) {
+        const query = filters.searchQuery.toLowerCase();
         const matchesSearch = 
           workout.title.toLowerCase().includes(query) ||
           workout.description.toLowerCase().includes(query) ||
           workout.workoutType.toLowerCase().includes(query) ||
-          workout.tags.some(tag => tag.toLowerCase().includes(query));
+          workout.tags.some((tag: string) => tag.toLowerCase().includes(query));
         
         if (!matchesSearch) return false;
       }
@@ -116,6 +266,14 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
       if (filters.completed === 'completed' && !workout.isCompleted) return false;
       if (filters.completed === 'pending' && workout.isCompleted) return false;
 
+      // Tags filter
+      if (filters.tags.length > 0) {
+        const hasRequiredTags = filters.tags.some(tag => 
+          workout.tags.includes(tag)
+        );
+        if (!hasRequiredTags) return false;
+      }
+
       return true;
     });
 
@@ -134,8 +292,8 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
           comparison = a.duration - b.duration;
           break;
         case 'difficulty':
-          const difficultyOrder = { beginner: 1, intermediate: 2, advanced: 3 };
-          comparison = difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+          const difficultyOrder: Record<string, number> = { beginner: 1, intermediate: 2, advanced: 3 };
+          comparison = (difficultyOrder[a.difficulty] || 2) - (difficultyOrder[b.difficulty] || 2);
           break;
       }
 
@@ -143,14 +301,20 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
     });
 
     return filtered;
-  }, [workouts, searchQuery, filters]);
+  }, [workouts, filters]);
 
-  const handleFilterChange = (newFilters: Partial<WorkoutFilters>) => {
+  // Handle filter changes
+  const handleFilterChange = useCallback((newFilters: Partial<WorkoutFilters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
-  };
+  }, []);
 
-  const handleClearFilters = () => {
-    setSearchQuery('');
+  // Handle search changes
+  const handleSearchChange = useCallback((searchQuery: string) => {
+    setFilters(prev => ({ ...prev, searchQuery }));
+  }, []);
+
+  // Clear all filters
+  const handleClearFilters = useCallback(() => {
     setFilters({
       difficulty: [],
       workoutType: [],
@@ -158,13 +322,50 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
       duration: { min: 0, max: 120 },
       completed: 'all',
       sortBy: 'date',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
+      tags: [],
+      createdDate: { start: null, end: null },
+      searchQuery: ''
     });
-  };
+  }, []);
+
+  // Selection handlers
+  const handleToggleSelection = useCallback((workoutId: string) => {
+    setSelectedWorkouts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(workoutId)) {
+        newSet.delete(workoutId);
+      } else {
+        newSet.add(workoutId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedWorkouts.size === filteredWorkouts.length) {
+      setSelectedWorkouts(new Set());
+    } else {
+      setSelectedWorkouts(new Set(filteredWorkouts.map(w => w.id.toString())));
+    }
+  }, [selectedWorkouts, filteredWorkouts]);
+
+  const handleBulkDelete = useCallback(() => {
+    if (selectedWorkouts.size > 0 && onBulkDelete) {
+      const confirmDelete = window.confirm(
+        `Are you sure you want to delete ${selectedWorkouts.size} workout${selectedWorkouts.size !== 1 ? 's' : ''}?`
+      );
+      if (confirmDelete) {
+        onBulkDelete(Array.from(selectedWorkouts));
+        setSelectedWorkouts(new Set());
+        setIsSelectionMode(false);
+      }
+    }
+  }, [selectedWorkouts, onBulkDelete]);
 
   if (isLoading) {
     return (
-      <div className="workout-grid loading">
+      <div className="enhanced-workout-grid loading">
         <div className="loading-grid">
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="workout-card-skeleton">
@@ -180,7 +381,7 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
 
   if (workouts.length === 0) {
     return (
-      <div className="workout-grid empty">
+      <div className="enhanced-workout-grid empty">
         <div className="empty-state">
           <div className="empty-icon">🏋️‍♀️</div>
           <h3 className="empty-title">No Saved Workouts</h3>
@@ -203,46 +404,87 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
   }
 
   return (
-    <div className="workout-grid">
-      {/* Search and Filters */}
-      <div className="workout-controls">
-        <div className="search-section">
-          <WorkoutSearch 
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search workouts by title, type, or tags..."
-          />
-        </div>
-        
-        <div className="filter-section">
-          <WorkoutFilters 
-            filters={filters}
-            onChange={handleFilterChange}
-            onClear={handleClearFilters}
-            workouts={workouts}
-          />
-        </div>
-        
-        <div className="view-controls">
-          <div className="view-mode-toggle">
-            <button 
-              className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => setViewMode('grid')}
-              aria-label="Grid view"
-            >
-              ⊞
-            </button>
-            <button 
-              className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => setViewMode('list')}
-              aria-label="List view"
-            >
-              ☰
-            </button>
+    <div className="enhanced-workout-grid">
+      {/* Advanced Filters */}
+      <AdvancedWorkoutFilters
+        filters={filters}
+        workouts={workouts}
+        onChange={handleFilterChange}
+        onClear={handleClearFilters}
+        onSearchChange={handleSearchChange}
+      />
+
+      {/* Toolbar */}
+      <div className="workout-toolbar">
+        <div className="toolbar-left">
+          <div className="results-info">
+            <span className="results-count">
+              {filteredWorkouts.length} of {workouts.length} workout{workouts.length !== 1 ? 's' : ''}
+            </span>
+            {selectedWorkouts.size > 0 && (
+              <span className="selection-count">
+                ({selectedWorkouts.size} selected)
+              </span>
+            )}
           </div>
-          
-          <div className="results-count">
-            {filteredWorkouts.length} of {workouts.length} workouts
+        </div>
+
+        <div className="toolbar-right">
+          {/* Selection Controls */}
+          {isSelectionMode && (
+            <div className="selection-controls">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSelectAll}
+              >
+                {selectedWorkouts.size === filteredWorkouts.length ? 'Deselect All' : 'Select All'}
+              </Button>
+              {selectedWorkouts.size > 0 && onBulkDelete && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  className="danger"
+                >
+                  <Trash2 size={14} />
+                  Delete ({selectedWorkouts.size})
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* View Mode Toggle */}
+          <div className="view-controls">
+            <button
+              className={`selection-mode-btn ${isSelectionMode ? 'active' : ''}`}
+              onClick={() => {
+                setIsSelectionMode(!isSelectionMode);
+                if (!isSelectionMode) {
+                  setSelectedWorkouts(new Set());
+                }
+              }}
+              title="Toggle selection mode"
+            >
+              {isSelectionMode ? <CheckSquare size={16} /> : <Square size={16} />}
+            </button>
+
+            <div className="view-mode-toggle">
+              <button 
+                className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                onClick={() => setViewMode('grid')}
+                title="Grid view"
+              >
+                <Grid size={16} />
+              </button>
+              <button 
+                className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}
+                onClick={() => setViewMode('list')}
+                title="List view"
+              >
+                <List size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -260,18 +502,23 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
           </Button>
         </div>
       ) : (
-        <div className={`workouts-container ${viewMode}`}>
+        <div className={`enhanced-workouts-container ${viewMode}`}>
           {filteredWorkouts.map(workout => (
-            <WorkoutCard
+            <EnhancedWorkoutCard
               key={workout.id}
-              workout={workout}
+              workout={workout as any}
               viewMode={viewMode}
+              isSelected={selectedWorkouts.has(workout.id.toString())}
+              isSelectionMode={isSelectionMode}
               onSelect={() => onWorkoutSelect(workout)}
               onEdit={() => onWorkoutEdit(workout)}
-              onDelete={() => onWorkoutDelete(workout.id)}
+              onDelete={() => onWorkoutDelete(workout.id.toString())}
               onDuplicate={() => onWorkoutDuplicate(workout)}
               onCreateSimilar={() => onCreateSimilar(workout)}
-              onMarkComplete={() => onMarkComplete(workout.id)}
+              onMarkComplete={() => onMarkComplete(workout.id.toString())}
+              onToggleSelection={handleToggleSelection}
+              onToggleFavorite={onToggleFavorite}
+              onRate={onRateWorkout}
             />
           ))}
         </div>
@@ -280,4 +527,6 @@ export const WorkoutGrid: React.FC<WorkoutGridProps> = ({
   );
 };
 
-export default WorkoutGrid; 
+// Maintain backward compatibility
+export const WorkoutGrid = EnhancedWorkoutGrid;
+export default EnhancedWorkoutGrid; 

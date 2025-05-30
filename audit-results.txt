@@ -1,0 +1,10 @@
+PHP Deprecated:  WP_CLI\Runner::get_subcommand_suggestion(): Implicitly marking parameter $root_command as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Runner.php on line 1958
+
+Deprecated: WP_CLI\Runner::get_subcommand_suggestion(): Implicitly marking parameter $root_command as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Runner.php on line 1958
+PHP Deprecated:  Mustache_Engine::loadSource(): Implicitly marking parameter $cache as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/local/bin/wp/vendor/mustache/mustache/src/Mustache/Engine.php on line 727
+
+Deprecated: Mustache_Engine::loadSource(): Implicitly marking parameter $cache as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/local/bin/wp/vendor/mustache/mustache/src/Mustache/Engine.php on line 727
+PHP Deprecated:  Mustache_Parser::buildTree(): Implicitly marking parameter $parent as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/local/bin/wp/vendor/mustache/mustache/src/Mustache/Parser.php on line 73
+
+Deprecated: Mustache_Parser::buildTree(): Implicitly marking parameter $parent as nullable is deprecated, the explicit nullable type must be used instead in phar:///usr/local/bin/wp/vendor/mustache/mustache/src/Mustache/Parser.php on line 73
+Error: Error establishing a database connection.

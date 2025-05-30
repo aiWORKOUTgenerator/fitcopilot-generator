@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import Card from '../components/ui/Card/Card';
 import Button from '../components/ui/Button/Button';
 import './styles/Dashboard.scss';
@@ -10,6 +10,9 @@ import { ProfileProvider, useProfile } from '../features/profile/context';
 import { ProfileFeature } from '../features/profile';
 import type { UserProfile } from '../features/profile/types';
 
+// Import workout context
+import { WorkoutProvider, useWorkoutContext } from '../features/workout-generator/context/WorkoutContext';
+
 // Import new tab system components
 import { 
   TabContainer, 
@@ -20,11 +23,18 @@ import {
 } from './components/TabSystem';
 import type { TabType } from './components/TabSystem';
 
+// Import enhanced components
+import { EnhancedDashboardHeader, type QuickActionType } from './components/EnhancedHeader';
+import { EnhancedTabHeader } from './components/TabSystem/EnhancedTabHeader';
+
 // Import enhanced tab content components
 import { ProfileSummary } from './components/ProfileTab/ProfileSummary';
-import { WorkoutGrid } from './components/SavedWorkoutsTab/WorkoutGrid';
+import { EnhancedWorkoutGrid } from './components/SavedWorkoutsTab/WorkoutGrid';
 import ApiUsage from './components/ApiUsage';
 import { RegistrationSteps } from './components';
+
+// Import new unified modal system
+import { UnifiedWorkoutModal, type ModalMode } from './components/UnifiedModal';
 
 /**
  * Transform real UserProfile data to ProfileSummary format
@@ -113,7 +123,9 @@ const Dashboard: React.FC = () => {
   return (
     <ProfileProvider>
       <DashboardProvider>
-        <DashboardInner />
+        <WorkoutProvider>
+          <DashboardInner />
+        </WorkoutProvider>
       </DashboardProvider>
     </ProfileProvider>
   );
@@ -127,29 +139,6 @@ const DashboardInner: React.FC = () => {
 
   return (
     <div className="fitcopilot-dashboard enhanced">
-      {/* Dashboard Header */}
-      <header className="dashboard-header">
-        <div className="header-content">
-          <div className="header-main">
-            <h1 className="dashboard-title">FitCopilot Dashboard</h1>
-            <p className="dashboard-subtitle">
-              Manage your fitness profile and generate personalized workouts
-            </p>
-          </div>
-          
-          <div className="header-actions">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={refreshDashboard}
-              disabled={state.isLoading}
-            >
-              {state.isLoading ? 'Refreshing...' : 'Refresh'}
-            </Button>
-          </div>
-        </div>
-      </header>
-
       {/* Main Dashboard Content */}
       <main className="dashboard-main">
         {/* Tabbed Interface */}
@@ -210,6 +199,27 @@ const DashboardInner: React.FC = () => {
 const TabContentWrapper: React.FC = () => {
   const { activeTab, switchTab, isTabActive } = useTabNavigation();
   const { profile, isLoading, error, fetchProfile, updateUserProfile } = useProfile();
+  const { refreshDashboard } = useDashboard();
+  
+  // Load workout list with real data
+  const { 
+    workouts, 
+    isLoading: workoutsLoading, 
+    error: workoutsError, 
+    refreshWorkouts,
+    saveWorkoutAndRefresh,
+    deleteWorkoutAndRefresh,
+    updateWorkoutAndRefresh,
+    addWorkoutOptimistic,
+    removeWorkoutOptimistic,
+    updateWorkoutOptimistic
+  } = useWorkoutContext();
+
+  // Enhanced modal state management
+  const [modalWorkout, setModalWorkout] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<ModalMode>('view');
+  const [isModalLoading, setIsModalLoading] = useState(false);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -236,6 +246,28 @@ const TabContentWrapper: React.FC = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [switchTab]);
 
+  // Handle quick actions from enhanced header
+  const handleQuickAction = (action: QuickActionType) => {
+    switch (action) {
+      case 'generate':
+        // Scroll to generator section
+        document.querySelector('.dashboard-generator-section')?.scrollIntoView({ 
+          behavior: 'smooth' 
+        });
+        break;
+      case 'library':
+        switchTab('saved-workouts');
+        break;
+      case 'profile':
+        switchTab('profile');
+        break;
+      case 'settings':
+        // TODO: Open settings modal or switch to settings tab
+        console.log('Settings action');
+        break;
+    }
+  };
+
   // Transform profile data for ProfileSummary
   const transformedProfile = transformProfileData(profile);
 
@@ -260,32 +292,191 @@ const TabContentWrapper: React.FC = () => {
     switchTab('profile');
   };
 
+  // Enhanced modal handlers
+  const handleOpenModal = (workout: any, mode: ModalMode = 'view') => {
+    setModalWorkout(workout);
+    setModalMode(mode);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalWorkout(null);
+    setModalMode('view');
+    setIsModalLoading(false);
+  };
+
+  const handleModeChange = (newMode: ModalMode) => {
+    setModalMode(newMode);
+  };
+
+  const handleModalSave = async (updatedWorkout: any) => {
+    setIsModalLoading(true);
+    try {
+      await updateWorkoutAndRefresh(updatedWorkout);
+      setModalWorkout(updatedWorkout); // Update the modal workout with saved data
+    } catch (error) {
+      console.error('Failed to save workout:', error);
+      throw error; // Re-throw to let modal handle error display
+    } finally {
+      setIsModalLoading(false);
+    }
+  };
+
+  const handleModalDelete = async (workoutId: string) => {
+    setIsModalLoading(true);
+    try {
+      await deleteWorkoutAndRefresh(workoutId);
+      handleCloseModal(); // Close modal after successful deletion
+    } catch (error) {
+      console.error('Failed to delete workout:', error);
+      throw error; // Re-throw to let modal handle error display
+    } finally {
+      setIsModalLoading(false);
+    }
+  };
+
+  const handleModalDuplicate = async (workout: any) => {
+    try {
+      // Create a new workout based on the existing one
+      const duplicatedWorkout = {
+        ...workout,
+        id: `duplicate-${Date.now()}`,
+        title: `${workout.title} (Copy)`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      await saveWorkoutAndRefresh(duplicatedWorkout);
+    } catch (error) {
+      console.error('Failed to duplicate workout:', error);
+      throw error;
+    }
+  };
+
+  const handleModalStart = (workout: any) => {
+    console.log('Starting workout:', workout);
+    // TODO: Implement workout start functionality
+    // This could navigate to a workout player/timer component
+  };
+
+  // Workout grid handlers
+  const handleWorkoutSelect = (workout: any) => {
+    handleOpenModal(workout, 'view');
+  };
+
+  const handleWorkoutEdit = (workout: any) => {
+    handleOpenModal(workout, 'edit');
+  };
+
+  const handleWorkoutDelete = async (workoutId: string) => {
+    console.log('Delete workout:', workoutId);
+    try {
+      await deleteWorkoutAndRefresh(workoutId);
+    } catch (error) {
+      console.error('Failed to delete workout:', error);
+      // Error message is handled by the context
+    }
+  };
+
+  const handleWorkoutDuplicate = async (workout: any) => {
+    console.log('Duplicate workout:', workout);
+    try {
+      await handleModalDuplicate(workout);
+    } catch (error) {
+      console.error('Failed to duplicate workout:', error);
+      // Error message is handled by the context
+    }
+  };
+
+  const handleCreateSimilar = async (workout: any) => {
+    console.log('Create similar workout:', workout);
+    // TODO: Generate a similar workout based on the selected one
+  };
+
+  const handleMarkComplete = async (workoutId: string) => {
+    console.log('Mark workout complete:', workoutId);
+    // TODO: Mark workout as completed and update stats
+  };
+
+  // Enhanced bulk operations
+  const handleBulkDelete = async (workoutIds: string[]) => {
+    console.log('Bulk delete workouts:', workoutIds);
+    try {
+      // Delete each workout - in a real app, you'd want a bulk delete API
+      await Promise.all(workoutIds.map(id => deleteWorkoutAndRefresh(id)));
+    } catch (error) {
+      console.error('Failed to bulk delete workouts:', error);
+      // Error message is handled by the context
+    }
+  };
+
+  const handleToggleFavorite = async (workoutId: string) => {
+    console.log('Toggle favorite for workout:', workoutId);
+    // TODO: Implement favorite toggle functionality
+  };
+
+  const handleRateWorkout = async (workoutId: string, rating: number) => {
+    console.log('Rate workout:', workoutId, 'Rating:', rating);
+    // TODO: Implement workout rating functionality
+  };
+
+  // Tab configuration with enhanced features
+  const tabConfig = [
+    {
+      id: 'register' as TabType,
+      label: 'Get Started',
+      icon: '🚀',
+      shortcut: 'Alt+1'
+    },
+    {
+      id: 'profile' as TabType,
+      label: 'Profile',
+      icon: '👤',
+      shortcut: 'Alt+2'
+    },
+    {
+      id: 'saved-workouts' as TabType,
+      label: 'My Workouts',
+      icon: '💪',
+      badge: workouts?.length || 0,
+      shortcut: 'Alt+3'
+    }
+  ];
+
   return (
     <>
-      {/* Tab Navigation */}
-      <TabHeader 
-        tabs={[
-          { id: 'register', label: 'Register', icon: '📝' },
-          { id: 'profile', label: 'Profile', icon: '👤' },
-          { id: 'saved-workouts', label: 'Saved Workouts', icon: '💾' }
-        ]}
+      {/* Enhanced Dashboard Header */}
+      <EnhancedDashboardHeader
+        activeTab={activeTab}
+        onQuickAction={handleQuickAction}
+        onTabSwitch={switchTab}
+        onRefresh={refreshDashboard}
+        isLoading={isLoading || workoutsLoading}
+      />
+
+      {/* Enhanced Tab Header */}
+      <EnhancedTabHeader
+        tabs={tabConfig}
+        showShortcuts={true}
+        enableMobileMenu={true}
       />
 
       {/* Tab Content */}
       <TabContent>
-        {/* Register Tab - Multi-step Profile Registration Form */}
+        {/* Registration Tab */}
         <TabPanel tabId="register">
           <div className="tab-panel-content">
             <div className="register-tab-layout">
+              {/* Registration Header */}
               <div className="register-header">
-                <h2>Profile Registration</h2>
+                <h2>Welcome to FitCopilot</h2>
                 <p className="register-description">
-                  Complete your fitness profile to get personalized workout recommendations. 
-                  This is the original multi-step registration form that guides you through 
-                  all the necessary information to create your comprehensive fitness profile.
+                  Let's set up your fitness profile to get personalized workout recommendations 
+                  tailored to your goals, preferences, and available equipment.
                 </p>
               </div>
               
+              {/* Registration Form */}
               <div className="register-form-section">
                 <Card className="register-form-card">
                   <ProfileFeature 
@@ -295,9 +486,33 @@ const TabContentWrapper: React.FC = () => {
                 </Card>
               </div>
               
+              {/* Registration Info */}
               <div className="register-info-section">
                 <Card className="register-info-card">
-                  <RegistrationSteps />
+                  <h3>Why Complete Your Profile?</h3>
+                  <div className="steps-overview">
+                    <div className="step-item">
+                      <div className="step-number">1</div>
+                      <div className="step-content">
+                        <strong>Personalized Workouts</strong>
+                        <p>Get AI-generated workouts that match your fitness level and goals</p>
+                      </div>
+                    </div>
+                    <div className="step-item">
+                      <div className="step-number">2</div>
+                      <div className="step-content">
+                        <strong>Equipment Optimization</strong>
+                        <p>Workouts designed for the equipment you actually have</p>
+                      </div>
+                    </div>
+                    <div className="step-item">
+                      <div className="step-number">3</div>
+                      <div className="step-content">
+                        <strong>Progress Tracking</strong>
+                        <p>Monitor your fitness journey with detailed statistics</p>
+                      </div>
+                    </div>
+                  </div>
                 </Card>
               </div>
             </div>
@@ -330,22 +545,98 @@ const TabContentWrapper: React.FC = () => {
         <TabPanel tabId="saved-workouts">
           <div className="tab-panel-content">
             <div className="saved-workouts-tab-layout">
-              <WorkoutGrid 
-                workouts={[]}
-                isLoading={false}
-                onWorkoutSelect={(workout) => console.log('Select workout:', workout)}
-                onWorkoutEdit={(workout) => console.log('Edit workout:', workout)}
-                onWorkoutDelete={(workoutId) => console.log('Delete workout:', workoutId)}
-                onWorkoutDuplicate={(workout) => console.log('Duplicate workout:', workout)}
-                onCreateSimilar={(workout) => console.log('Create similar:', workout)}
-                onMarkComplete={(workoutId) => console.log('Mark complete:', workoutId)}
+              {/* Enhanced Workout Grid */}
+              <EnhancedWorkoutGrid
+                workouts={workouts || []}
+                isLoading={workoutsLoading}
+                onWorkoutSelect={handleWorkoutSelect}
+                onWorkoutEdit={handleWorkoutEdit}
+                onWorkoutDelete={handleWorkoutDelete}
+                onWorkoutDuplicate={handleWorkoutDuplicate}
+                onCreateSimilar={handleCreateSimilar}
+                onMarkComplete={handleMarkComplete}
+                onBulkDelete={handleBulkDelete}
+                onToggleFavorite={handleToggleFavorite}
+                onRateWorkout={handleRateWorkout}
               />
             </div>
           </div>
         </TabPanel>
       </TabContent>
+
+      {/* Unified Workout Modal */}
+      {isModalOpen && modalWorkout && (
+        <UnifiedWorkoutModal
+          workout={modalWorkout}
+          isOpen={isModalOpen}
+          mode={modalMode}
+          isLoading={isModalLoading}
+          onClose={handleCloseModal}
+          onModeChange={handleModeChange}
+          onSave={handleModalSave}
+          onDelete={handleModalDelete}
+          onDuplicate={handleModalDuplicate}
+          onStart={handleModalStart}
+        />
+      )}
     </>
   );
 };
+
+/**
+ * Error Boundary component for catching React errors
+ */
+class WorkoutGridErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('WorkoutGrid Error Boundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="workout-grid-error-boundary">
+          <div className="error-content">
+            <div className="error-icon">⚠️</div>
+            <h3 className="error-title">Unable to Load Workouts</h3>
+            <p className="error-message">
+              There was a problem displaying your saved workouts. This might be due to a data formatting issue.
+            </p>
+            <div className="error-actions">
+              <Button 
+                variant="primary" 
+                onClick={() => {
+                  this.setState({ hasError: false });
+                  window.location.reload();
+                }}
+              >
+                Reload Page
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => this.setState({ hasError: false })}
+              >
+                Try Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 export default Dashboard; 
