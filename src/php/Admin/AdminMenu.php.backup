@@ -224,7 +224,6 @@ class AdminMenu {
                     <div id="fitcopilot-generator-root"></div>
                 </div>
             </div>
-            <!-- Other dashboard cards -->
             
             <div class="dashboard-container">
                 <div class="dashboard-card">

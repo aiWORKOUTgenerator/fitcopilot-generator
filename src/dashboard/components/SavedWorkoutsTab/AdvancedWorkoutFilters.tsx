@@ -1,47 +1,31 @@
 /**
- * Advanced Workout Filters Component
+ * Advanced Workout Filters Component - REFACTORED
  * 
- * Enhanced filtering system with presets, advanced criteria,
- * real-time search, and improved user experience.
+ * Enhanced filtering system using extracted components for better maintainability.
+ * Week 2 Component Splitting: Reduced from 520 lines to composition-focused design.
  */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   Filter, 
-  Search, 
-  X, 
   ChevronDown, 
   ChevronUp,
   RotateCcw,
-  Bookmark,
-  Calendar,
-  Clock,
-  Target,
-  Zap,
   CheckCircle,
-  Circle
+  Circle,
+  Clock
 } from 'lucide-react';
 import Button from '../../../components/ui/Button/Button';
+
+// Import extracted components
+import { FilterPresets, DEFAULT_PRESETS } from './components/Filters/FilterPresets';
+import { DifficultyFilter } from './components/Filters/FilterComponents';
+import { DurationFilter } from './components/Filters/FilterComponents';
+import { WorkoutSearch } from './components/Search';
+
+// Import types
+import type { FilterPreset, WorkoutFilters } from './components/Filters/FilterPresets';
+
 import './AdvancedFilters.scss';
-
-interface WorkoutFilters {
-  difficulty: string[];
-  workoutType: string[];
-  equipment: string[];
-  duration: { min: number; max: number };
-  completed: 'all' | 'completed' | 'pending';
-  sortBy: 'date' | 'title' | 'duration' | 'difficulty';
-  sortOrder: 'asc' | 'desc';
-  tags: string[];
-  createdDate: { start: Date | null; end: Date | null };
-  searchQuery: string;
-}
-
-interface FilterPreset {
-  id: string;
-  name: string;
-  filters: Partial<WorkoutFilters>;
-  isDefault?: boolean;
-}
 
 interface AdvancedWorkoutFiltersProps {
   filters: WorkoutFilters;
@@ -51,73 +35,14 @@ interface AdvancedWorkoutFiltersProps {
   onSearchChange: (query: string) => void;
 }
 
-const DIFFICULTY_OPTIONS = [
-  { value: 'beginner', label: 'Beginner', icon: '🟢', color: 'green' },
-  { value: 'intermediate', label: 'Intermediate', icon: '🟡', color: 'yellow' },
-  { value: 'advanced', label: 'Advanced', icon: '🔴', color: 'red' }
-];
-
 const COMPLETION_OPTIONS = [
   { value: 'all', label: 'All Workouts', icon: Circle },
   { value: 'completed', label: 'Completed', icon: CheckCircle },
   { value: 'pending', label: 'Pending', icon: Clock }
 ];
 
-const SORT_OPTIONS = [
-  { value: 'date', label: 'Date Created', icon: Calendar },
-  { value: 'title', label: 'Title', icon: Target },
-  { value: 'duration', label: 'Duration', icon: Clock },
-  { value: 'difficulty', label: 'Difficulty', icon: Zap }
-];
-
-const DEFAULT_PRESETS: FilterPreset[] = [
-  {
-    id: 'all',
-    name: 'All Workouts',
-    filters: {},
-    isDefault: true
-  },
-  {
-    id: 'recent',
-    name: 'Recent Workouts',
-    filters: {
-      sortBy: 'date',
-      sortOrder: 'desc'
-    },
-    isDefault: true
-  },
-  {
-    id: 'quick-workouts',
-    name: 'Quick Workouts',
-    filters: {
-      duration: { min: 0, max: 30 },
-      sortBy: 'duration',
-      sortOrder: 'asc'
-    },
-    isDefault: true
-  },
-  {
-    id: 'completed',
-    name: 'Completed',
-    filters: {
-      completed: 'completed',
-      sortBy: 'date',
-      sortOrder: 'desc'
-    },
-    isDefault: true
-  },
-  {
-    id: 'favorites',
-    name: 'My Favorites',
-    filters: {
-      tags: ['favorite']
-    },
-    isDefault: true
-  }
-];
-
 /**
- * Advanced Workout Filters Component
+ * Advanced Workout Filters Component - Now uses modular sub-components
  */
 export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
   filters,
@@ -127,17 +52,7 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
   onSearchChange
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [searchValue, setSearchValue] = useState(filters.searchQuery || '');
   const [activePreset, setActivePreset] = useState<string | null>(null);
-
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onSearchChange(searchValue);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchValue, onSearchChange]);
 
   // Extract unique filter options from workouts
   const filterOptions = useMemo(() => {
@@ -150,7 +65,8 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
       workoutTypes: workoutTypes.sort(),
       equipment: equipment.sort(),
       tags: tags.sort(),
-      maxDuration: Math.ceil(maxDuration / 15) * 15
+      maxDuration: Math.ceil(maxDuration / 15) * 15,
+      searchSuggestions: [...workoutTypes, ...equipment, ...tags, ...workouts.map(w => w.title)].filter(Boolean)
     };
   }, [workouts]);
 
@@ -172,13 +88,13 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
   const handlePresetSelect = useCallback((preset: FilterPreset) => {
     setActivePreset(preset.id);
     
-    // Apply preset filters
+    // Apply preset filters with defaults
     const presetFilters = {
       difficulty: [],
       workoutType: [],
       equipment: [],
       tags: [],
-      duration: { min: 0, max: 120 },
+      duration: { min: 0, max: filterOptions.maxDuration },
       completed: 'all' as const,
       sortBy: 'date' as const,
       sortOrder: 'desc' as const,
@@ -188,8 +104,7 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
     };
     
     onChange(presetFilters);
-    setSearchValue(presetFilters.searchQuery || '');
-  }, [onChange]);
+  }, [onChange, filterOptions.maxDuration]);
 
   // Handle individual filter changes
   const handleFilterChange = useCallback((filterName: keyof WorkoutFilters, value: any) => {
@@ -197,92 +112,62 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
     onChange({ [filterName]: value });
   }, [onChange]);
 
-  // Handle array filter toggle
-  const handleArrayFilterToggle = useCallback((filterName: 'difficulty' | 'workoutType' | 'equipment' | 'tags', value: string) => {
-    const currentValues = filters[filterName] as string[];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value];
+  // Handle array filter toggle (for multi-select filters)
+  const handleArrayFilterToggle = useCallback((filterName: keyof WorkoutFilters, value: string) => {
+    const currentArray = filters[filterName] as string[];
+    const newArray = currentArray.includes(value)
+      ? currentArray.filter(item => item !== value)
+      : [...currentArray, value];
     
-    handleFilterChange(filterName, newValues);
+    handleFilterChange(filterName, newArray);
   }, [filters, handleFilterChange]);
 
-  // Handle duration range change
-  const handleDurationChange = useCallback((type: 'min' | 'max', value: number) => {
-    handleFilterChange('duration', {
-      ...filters.duration,
-      [type]: value
-    });
-  }, [filters.duration, handleFilterChange]);
-
-  // Clear all filters
+  // Handle clear all filters
   const handleClearAll = useCallback(() => {
-    setActivePreset('all');
-    setSearchValue('');
+    setActivePreset(null);
     onClear();
   }, [onClear]);
 
   return (
     <div className="advanced-workout-filters">
-      {/* Search Bar */}
-      <div className="filter-search-section">
-        <div className="search-container">
-          <Search size={18} className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search workouts by title, description, or tags..."
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            className="search-input"
-          />
-          {searchValue && (
-            <button
-              className="clear-search"
-              onClick={() => setSearchValue('')}
-              aria-label="Clear search"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
+      {/* Search Section - Always visible */}
+      <div className="filter-section filter-section--search">
+        <WorkoutSearch
+          searchQuery={filters.searchQuery}
+          onSearchChange={onSearchChange}
+          suggestions={filterOptions.searchSuggestions}
+          placeholder="Search workouts by title, exercise, or equipment..."
+        />
       </div>
 
-      {/* Filter Presets */}
-      <div className="filter-presets">
-        <div className="preset-buttons">
-          {DEFAULT_PRESETS.map(preset => (
-            <button
-              key={preset.id}
-              className={`preset-btn ${activePreset === preset.id ? 'active' : ''}`}
-              onClick={() => handlePresetSelect(preset)}
-            >
-              <Bookmark size={14} />
-              {preset.name}
-            </button>
-          ))}
-        </div>
+      {/* Filter Presets - Always visible */}
+      <div className="filter-section filter-section--presets">
+        <FilterPresets
+          activePreset={activePreset}
+          onPresetSelect={handlePresetSelect}
+        />
       </div>
 
-      {/* Filter Toggle */}
-      <div className="filter-header">
-        <button
-          className="filter-toggle"
+      {/* Advanced Filters Toggle */}
+      <div className="filter-section filter-section--toggle">
+        <Button
+          variant="outline"
           onClick={() => setIsExpanded(!isExpanded)}
+          className="filters-toggle"
         >
           <Filter size={16} />
-          <span>Advanced Filters</span>
+          Advanced Filters
           {activeFilterCount > 0 && (
             <span className="filter-count">{activeFilterCount}</span>
           )}
           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
+        </Button>
 
         {activeFilterCount > 0 && (
           <Button
             variant="outline"
-            size="sm"
             onClick={handleClearAll}
-            className="clear-all-btn"
+            className="clear-filters"
           >
             <RotateCcw size={14} />
             Clear All
@@ -290,183 +175,106 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
         )}
       </div>
 
-      {/* Expanded Filters */}
+      {/* Expanded Advanced Filters */}
       {isExpanded && (
-        <div className="filter-content">
-          <div className="filter-grid">
-            {/* Difficulty Filter */}
-            <div className="filter-section">
-              <h4 className="filter-title">
-                <Zap size={16} />
-                Difficulty
-              </h4>
-              <div className="checkbox-group">
-                {DIFFICULTY_OPTIONS.map(option => (
-                  <label key={option.value} className="checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={filters.difficulty.includes(option.value)}
-                      onChange={() => handleArrayFilterToggle('difficulty', option.value)}
-                    />
-                    <span className={`checkbox-label ${option.color}`}>
-                      <span className="difficulty-icon">{option.icon}</span>
-                      {option.label}
-                    </span>
-                  </label>
-                ))}
-              </div>
+        <div className="advanced-filters-expanded">
+          {/* Difficulty Filter */}
+          <div className="filter-section">
+            <DifficultyFilter
+              selectedDifficulties={filters.difficulty}
+              onChange={(difficulties) => handleFilterChange('difficulty', difficulties)}
+            />
+          </div>
+
+          {/* Duration Filter */}
+          <div className="filter-section">
+            <DurationFilter
+              duration={filters.duration}
+              maxDuration={filterOptions.maxDuration}
+              onChange={(duration) => handleFilterChange('duration', duration)}
+            />
+          </div>
+
+          {/* Workout Type Filter */}
+          <div className="filter-section">
+            <div className="filter-section__header">
+              <h4 className="filter-section__title">Workout Type</h4>
+              <button
+                type="button"
+                className="filter-section__action"
+                onClick={() => handleFilterChange('workoutType', [])}
+              >
+                Clear
+              </button>
             </div>
-
-            {/* Workout Type Filter */}
-            {filterOptions.workoutTypes.length > 0 && (
-              <div className="filter-section">
-                <h4 className="filter-title">
-                  <Target size={16} />
-                  Workout Type
-                </h4>
-                <div className="checkbox-group">
-                  {filterOptions.workoutTypes.map(type => (
-                    <label key={type} className="checkbox-item">
-                      <input
-                        type="checkbox"
-                        checked={filters.workoutType.includes(type)}
-                        onChange={() => handleArrayFilterToggle('workoutType', type)}
-                      />
-                      <span className="checkbox-label">{type}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Equipment Filter */}
-            {filterOptions.equipment.length > 0 && (
-              <div className="filter-section">
-                <h4 className="filter-title">
-                  <Target size={16} />
-                  Equipment
-                </h4>
-                <div className="checkbox-group">
-                  {filterOptions.equipment.map(equipment => (
-                    <label key={equipment} className="checkbox-item">
-                      <input
-                        type="checkbox"
-                        checked={filters.equipment.includes(equipment)}
-                        onChange={() => handleArrayFilterToggle('equipment', equipment)}
-                      />
-                      <span className="checkbox-label">{equipment}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Duration Filter */}
-            <div className="filter-section">
-              <h4 className="filter-title">
-                <Clock size={16} />
-                Duration (minutes)
-              </h4>
-              <div className="duration-filter">
-                <div className="duration-inputs">
-                  <div className="duration-input-group">
-                    <label htmlFor="duration-min">Min</label>
-                    <input
-                      id="duration-min"
-                      type="number"
-                      min="0"
-                      max={filterOptions.maxDuration}
-                      value={filters.duration.min}
-                      onChange={(e) => handleDurationChange('min', parseInt(e.target.value) || 0)}
-                      className="duration-input"
-                    />
-                  </div>
-                  <span className="duration-separator">to</span>
-                  <div className="duration-input-group">
-                    <label htmlFor="duration-max">Max</label>
-                    <input
-                      id="duration-max"
-                      type="number"
-                      min={filters.duration.min}
-                      max={filterOptions.maxDuration}
-                      value={filters.duration.max}
-                      onChange={(e) => handleDurationChange('max', parseInt(e.target.value) || 120)}
-                      className="duration-input"
-                    />
-                  </div>
-                </div>
-                <div className="duration-range">
+            <div className="filter-options">
+              {filterOptions.workoutTypes.map(type => (
+                <label key={type} className={`filter-option ${filters.workoutType.includes(type) ? 'filter-option--selected' : ''}`}>
                   <input
-                    type="range"
-                    min="0"
-                    max={filterOptions.maxDuration}
-                    value={filters.duration.min}
-                    onChange={(e) => handleDurationChange('min', parseInt(e.target.value))}
-                    className="range-slider range-min"
+                    type="checkbox"
+                    checked={filters.workoutType.includes(type)}
+                    onChange={() => handleArrayFilterToggle('workoutType', type)}
+                    className="filter-option__input"
                   />
-                  <input
-                    type="range"
-                    min="0"
-                    max={filterOptions.maxDuration}
-                    value={filters.duration.max}
-                    onChange={(e) => handleDurationChange('max', parseInt(e.target.value))}
-                    className="range-slider range-max"
-                  />
-                </div>
-              </div>
+                  <span className="filter-option__label">{type}</span>
+                </label>
+              ))}
             </div>
+          </div>
 
-            {/* Completion Status Filter */}
-            <div className="filter-section">
-              <h4 className="filter-title">
-                <CheckCircle size={16} />
-                Status
-              </h4>
-              <div className="radio-group">
-                {COMPLETION_OPTIONS.map(option => (
-                  <label key={option.value} className="radio-item">
+          {/* Equipment Filter */}
+          <div className="filter-section">
+            <div className="filter-section__header">
+              <h4 className="filter-section__title">Equipment</h4>
+              <button
+                type="button"
+                className="filter-section__action"
+                onClick={() => handleFilterChange('equipment', [])}
+              >
+                Clear
+              </button>
+            </div>
+            <div className="filter-options">
+              {filterOptions.equipment.map(item => (
+                <label key={item} className={`filter-option ${filters.equipment.includes(item) ? 'filter-option--selected' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={filters.equipment.includes(item)}
+                    onChange={() => handleArrayFilterToggle('equipment', item)}
+                    className="filter-option__input"
+                  />
+                  <span className="filter-option__label">{item}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Completion Status Filter */}
+          <div className="filter-section">
+            <div className="filter-section__header">
+              <h4 className="filter-section__title">Status</h4>
+            </div>
+            <div className="filter-options">
+              {COMPLETION_OPTIONS.map(option => {
+                const Icon = option.icon;
+                return (
+                  <label
+                    key={option.value}
+                    className={`filter-option ${filters.completed === option.value ? 'filter-option--selected' : ''}`}
+                  >
                     <input
                       type="radio"
                       name="completion"
                       value={option.value}
                       checked={filters.completed === option.value}
                       onChange={() => handleFilterChange('completed', option.value)}
+                      className="filter-option__input"
                     />
-                    <span className="radio-label">
-                      <option.icon size={16} />
-                      {option.label}
-                    </span>
+                    <Icon size={16} className="filter-option__icon" />
+                    <span className="filter-option__label">{option.label}</span>
                   </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Sort Options */}
-            <div className="filter-section">
-              <h4 className="filter-title">
-                <Calendar size={16} />
-                Sort By
-              </h4>
-              <div className="sort-controls">
-                <select
-                  value={filters.sortBy}
-                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  className="sort-select"
-                >
-                  {SORT_OPTIONS.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  className={`sort-order-btn ${filters.sortOrder}`}
-                  onClick={() => handleFilterChange('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')}
-                  title={`Sort ${filters.sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
-                >
-                  {filters.sortOrder === 'asc' ? '↑' : '↓'}
-                </button>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -475,40 +283,74 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
       {/* Active Filters Summary */}
       {activeFilterCount > 0 && (
         <div className="active-filters-summary">
-          <span className="summary-text">
-            {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active
-          </span>
-          <div className="active-filter-tags">
-            {filters.difficulty.map(diff => (
-              <span key={`diff-${diff}`} className="filter-tag">
-                {diff}
-                <button onClick={() => handleArrayFilterToggle('difficulty', diff)}>
-                  <X size={12} />
-                </button>
+          <div className="active-filters-summary__header">
+            <span className="active-filters-summary__title">
+              Active Filters ({activeFilterCount})
+            </span>
+            <button
+              type="button"
+              onClick={handleClearAll}
+              className="active-filters-summary__clear"
+            >
+              Clear All
+            </button>
+          </div>
+          
+          <div className="active-filters-summary__tags">
+            {filters.searchQuery && (
+              <span className="filter-tag">
+                Search: "{filters.searchQuery}"
+                <button onClick={() => onSearchChange('')} className="filter-tag__remove">×</button>
+              </span>
+            )}
+            
+            {filters.difficulty.map(difficulty => (
+              <span key={difficulty} className="filter-tag">
+                {difficulty}
+                <button 
+                  onClick={() => handleArrayFilterToggle('difficulty', difficulty)}
+                  className="filter-tag__remove"
+                >×</button>
               </span>
             ))}
+            
             {filters.workoutType.map(type => (
-              <span key={`type-${type}`} className="filter-tag">
+              <span key={type} className="filter-tag">
                 {type}
-                <button onClick={() => handleArrayFilterToggle('workoutType', type)}>
-                  <X size={12} />
-                </button>
+                <button 
+                  onClick={() => handleArrayFilterToggle('workoutType', type)}
+                  className="filter-tag__remove"
+                >×</button>
               </span>
             ))}
-            {filters.equipment.map(eq => (
-              <span key={`eq-${eq}`} className="filter-tag">
-                {eq}
-                <button onClick={() => handleArrayFilterToggle('equipment', eq)}>
-                  <X size={12} />
-                </button>
+            
+            {filters.equipment.map(item => (
+              <span key={item} className="filter-tag">
+                {item}
+                <button 
+                  onClick={() => handleArrayFilterToggle('equipment', item)}
+                  className="filter-tag__remove"
+                >×</button>
               </span>
             ))}
+            
+            {(filters.duration.min > 0 || filters.duration.max < filterOptions.maxDuration) && (
+              <span className="filter-tag">
+                Duration: {filters.duration.min}-{filters.duration.max}min
+                <button 
+                  onClick={() => handleFilterChange('duration', { min: 0, max: filterOptions.maxDuration })}
+                  className="filter-tag__remove"
+                >×</button>
+              </span>
+            )}
+            
             {filters.completed !== 'all' && (
               <span className="filter-tag">
-                {filters.completed}
-                <button onClick={() => handleFilterChange('completed', 'all')}>
-                  <X size={12} />
-                </button>
+                Status: {filters.completed}
+                <button 
+                  onClick={() => handleFilterChange('completed', 'all')}
+                  className="filter-tag__remove"
+                >×</button>
               </span>
             )}
           </div>
@@ -518,4 +360,5 @@ export const AdvancedWorkoutFilters: React.FC<AdvancedWorkoutFiltersProps> = ({
   );
 };
 
+// Maintain backward compatibility
 export default AdvancedWorkoutFilters; 

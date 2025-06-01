@@ -17,16 +17,24 @@ const API_BASE = '';
  */
 export async function getWorkout(id: string): Promise<GeneratedWorkout> {
   try {
+    console.log(`[WorkoutService] Loading workout ${id}...`);
+    
     // apiFetch returns the data directly, not a wrapped response
     const data = await apiFetch<any>(`/workouts/${id}`);
+    
+    console.log('[WorkoutService] Raw API response:', data);
     
     if (!data) {
       throw new Error('Workout not found');
     }
     
-    return transformWorkoutResponse(data);
+    const transformedWorkout = transformWorkoutResponse(data);
+    console.log('[WorkoutService] Transformed workout:', transformedWorkout);
+    console.log('[WorkoutService] Exercise count:', transformedWorkout.exercises?.length || 0);
+    
+    return transformedWorkout;
   } catch (error) {
-    console.error('Failed to get workout:', error);
+    console.error('[WorkoutService] Failed to get workout:', error);
     throw error;
   }
 }
@@ -166,13 +174,67 @@ export async function completeWorkout(id: string): Promise<GeneratedWorkout> {
  * Transform workout response from API format to frontend format
  */
 function transformWorkoutResponse(apiData: any): GeneratedWorkout {
+  // Extract sections if they exist for legacy workouts
+  const sections = apiData.sections || [];
+  
+  // Handle exercises - they might be at root level or need extraction from sections
+  let exercises = apiData.exercises || [];
+  
+  // If no exercises at root but we have sections, extract them
+  if (exercises.length === 0 && sections.length > 0) {
+    exercises = [];
+    sections.forEach((section: any) => {
+      if (section.exercises && Array.isArray(section.exercises)) {
+        exercises.push(...section.exercises);
+      }
+    });
+  }
+  
+  // Transform exercises to ensure proper structure
+  const transformedExercises = exercises.map((exercise: any, index: number) => {
+    // Handle different exercise formats
+    const transformed: any = {
+      id: exercise.id || `exercise-${index}`,
+      name: exercise.name || 'Unnamed Exercise',
+      description: exercise.description || exercise.instructions || ''
+    };
+    
+    // Handle duration-based exercises (warm-up, cool-down)
+    if (exercise.duration) {
+      transformed.duration = exercise.duration;
+      transformed.type = exercise.section?.toLowerCase() || 'timed';
+    }
+    
+    // Handle sets/reps-based exercises
+    if (exercise.sets || exercise.reps) {
+      transformed.sets = exercise.sets || 1;
+      transformed.reps = exercise.reps || 10;
+      transformed.type = 'strength';
+    }
+    
+    // If neither duration nor sets/reps, default to sets/reps
+    if (!exercise.duration && !exercise.sets && !exercise.reps) {
+      transformed.sets = 1;
+      transformed.reps = 10;
+      transformed.type = 'strength';
+    }
+    
+    // Preserve original section information
+    if (exercise.section) {
+      transformed.section = exercise.section;
+    }
+    
+    return transformed;
+  });
+  
   return {
     id: apiData.id || apiData.post_id,
-    title: apiData.title,
-    description: apiData.description || apiData.content || '',
-    duration: apiData.duration || 30,
+    title: apiData.title || 'Untitled Workout',
+    description: apiData.description || apiData.content || apiData.notes || '',
+    duration: Number(apiData.duration) || 30,
     difficulty: apiData.difficulty || 'intermediate',
-    exercises: apiData.exercises || apiData.workout_data?.exercises || [],
+    exercises: transformedExercises,
+    sections: sections, // Preserve original sections structure
     created_at: apiData.date || apiData.created_at || new Date().toISOString(),
     updated_at: apiData.modified || apiData.updated_at || new Date().toISOString(),
     // Additional fields from API

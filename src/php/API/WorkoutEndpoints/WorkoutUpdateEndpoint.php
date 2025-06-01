@@ -81,14 +81,59 @@ class WorkoutUpdateEndpoint extends AbstractEndpoint {
                 );
             }
             
+            // Prepare post update data
+            $post_update_data = ['ID' => $post_id];
+            
             // Update title if provided and not the test default title
             if (!empty($params['title']) && 
                 $params['title'] !== 'Updated Direct Workout Title' && 
                 $params['title'] !== 'Updated Wrapped Workout Title') {
-                wp_update_post([
-                    'ID'         => $post_id,
-                    'post_title' => sanitize_text_field($params['title']),
+                $post_update_data['post_title'] = sanitize_text_field($params['title']);
+            }
+            
+            // CRITICAL FIX: Update post content for notes/descriptions
+            if (isset($params['notes'])) {
+                $post_update_data['post_content'] = sanitize_textarea_field($params['notes']);
+                error_log("FitCopilot: Updating post content for workout {$post_id}");
+            } elseif (isset($params['description'])) {
+                $post_update_data['post_content'] = sanitize_textarea_field($params['description']);
+                error_log("FitCopilot: Updating post content (from description) for workout {$post_id}");
+            }
+            
+            // Apply post updates if we have any
+            if (count($post_update_data) > 1) {
+                wp_update_post($post_update_data);
+            }
+            
+            // CRITICAL FIX: Update exercise data in _workout_data
+            if (isset($params['exercises']) && is_array($params['exercises'])) {
+                error_log("FitCopilot: Updating exercises for workout {$post_id} with " . count($params['exercises']) . " exercises");
+                
+                // Get existing workout data to preserve other fields
+                $existing_data_raw = get_post_meta($post_id, '_workout_data', true);
+                $existing_data = $existing_data_raw ? json_decode($existing_data_raw, true) : [];
+                
+                // Update the exercise data while preserving other fields
+                $updated_workout_data = array_merge($existing_data, [
+                    'exercises' => $params['exercises'],
+                    'title' => $params['title'] ?? $existing_data['title'] ?? get_the_title($post_id),
+                    'metadata' => array_merge($existing_data['metadata'] ?? [], [
+                        'last_updated' => current_time('mysql'),
+                        'updated_via' => 'manual_edit'
+                    ])
                 ]);
+                
+                // Update other workout data fields if provided
+                $workout_data_fields = ['sections', 'description'];
+                foreach ($workout_data_fields as $field) {
+                    if (isset($params[$field])) {
+                        $updated_workout_data[$field] = $params[$field];
+                    }
+                }
+                
+                // Save updated workout data
+                update_post_meta($post_id, '_workout_data', wp_json_encode($updated_workout_data));
+                error_log("FitCopilot: Saved updated _workout_data for workout {$post_id}");
             }
             
             // Update metadata if provided
@@ -169,6 +214,8 @@ class WorkoutUpdateEndpoint extends AbstractEndpoint {
             // Set the ETag header for the response
             APIUtils::set_etag_header($metadata['version']);
             
+            error_log("FitCopilot: Successfully updated workout {$post_id}");
+            
             return APIUtils::create_api_response(
                 APIUtils::add_version_metadata_to_response(
                     [
@@ -183,6 +230,8 @@ class WorkoutUpdateEndpoint extends AbstractEndpoint {
         } catch (\Exception $e) {
             // Rollback the transaction on any error
             VersioningUtils::rollback_transaction($versioning_service);
+            
+            error_log("FitCopilot: Error updating workout {$post_id}: " . $e->getMessage());
             
             return APIUtils::create_api_error(
                 'update_failed',

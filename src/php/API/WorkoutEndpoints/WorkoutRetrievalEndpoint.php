@@ -148,51 +148,32 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
      */
     public function get_workout(\WP_REST_Request $request) {
         $post_id = $request->get_param('id');
-        $post = get_post($post_id);
+        $user_id = get_current_user_id();
         
-        if (!$post || ($post->post_type !== 'fc_workout' && $post->post_type !== 'wg_workout') || $post->post_author != get_current_user_id()) {
+        // Use the defensive Utilities::get_workout() method to handle format inconsistencies
+        $workout = Utilities::get_workout($post_id, $user_id);
+        
+        if ($workout === false) {
             return APIUtils::create_not_found_error(__('Workout not found.', 'fitcopilot'));
         }
         
-        // Get version metadata
-        $metadata = VersioningUtils::get_version_metadata($post_id, $post);
+        // Get version metadata (already included in $workout from Utilities::get_workout)
+        $metadata = [
+            'version' => $workout['version'],
+            'last_modified' => $workout['last_modified'],
+            'modified_by' => $workout['modified_by']
+        ];
         
         // Check If-None-Match header for conditional GET
         if (!APIUtils::is_modified($metadata['version'], $request)) {
             return APIUtils::create_not_modified_response($metadata['version']);
         }
         
-        // Get the workout data
-        $workout_data = get_post_meta($post_id, '_workout_data', true);
-        $workout_data = $workout_data ? json_decode($workout_data, true) : [];
-        
-        // Get workout metadata
-        $difficulty = get_post_meta($post_id, '_workout_difficulty', true);
-        $duration = get_post_meta($post_id, '_workout_duration', true);
-        $equipment = get_post_meta($post_id, '_workout_equipment', true);
-        $goals = get_post_meta($post_id, '_workout_goals', true);
-        $restrictions = get_post_meta($post_id, '_workout_restrictions', true);
-        $specific_request = get_post_meta($post_id, '_workout_specific_request', true);
-        
         // Set the ETag header for the response
         APIUtils::set_etag_header($metadata['version']);
         
-        // Format the response
-        $workout = [
-            'id' => $post_id,
-            'title' => $post->post_title,
-            'date' => $post->post_date,
-            'modified' => $post->post_modified,
-            'difficulty' => $difficulty,
-            'duration' => $duration,
-            'equipment' => $equipment,
-            'goals' => $goals,
-            'restrictions' => $restrictions,
-            'specific_request' => $specific_request,
-            'workout_data' => $workout_data,
-        ];
-        
-        // Add version metadata to the response
+        // The workout data is already properly formatted by Utilities::get_workout()
+        // Add version metadata to the response for consistency
         $workout = APIUtils::add_version_metadata_to_response($workout, $metadata);
         
         return APIUtils::create_api_response(

@@ -331,6 +331,49 @@ function enqueue_admin_dashboard_assets() {
         return;
     }
 
+    // 🔧 CRITICAL FIX: Add universal authentication setup for ALL dashboard functionality
+    // This ensures API authentication works regardless of which specific scripts are loaded
+    wp_add_inline_script(
+        'wp-api-fetch', // WordPress core script that's always loaded in admin
+        '
+        // 🔧 UNIVERSAL API AUTHENTICATION SETUP
+        (function() {
+            console.log("🔧 Setting up universal FitCopilot API authentication...");
+            
+            // Set up global fitcopilotData for all components
+            window.fitcopilotData = window.fitcopilotData || {
+                nonce: "' . wp_create_nonce('wp_rest') . '",
+                apiBase: "' . rest_url('fitcopilot/v1') . '",
+                restUrl: "' . rest_url() . '",
+                isLoggedIn: ' . (is_user_logged_in() ? 'true' : 'false') . ',
+                currentUserId: ' . get_current_user_id() . ',
+                debug: true
+            };
+            
+            // Set up wp.apiFetch with proper authentication
+            if (window.wp && window.wp.apiFetch) {
+                // Clear any existing middleware to avoid conflicts
+                window.wp.apiFetch.use(window.wp.apiFetch.createNonceMiddleware("' . wp_create_nonce('wp_rest') . '"));
+                window.wp.apiFetch.use(window.wp.apiFetch.createRootURLMiddleware("' . rest_url() . '"));
+                console.log("✅ wp.apiFetch configured with nonce middleware");
+            }
+            
+            // Set up standard fetch headers for manual API calls
+            window.fitcopilotApiHeaders = {
+                "Content-Type": "application/json",
+                "X-WP-Nonce": "' . wp_create_nonce('wp_rest') . '"
+            };
+            
+            console.log("🔧 FitCopilot API authentication configured globally");
+            console.log("📡 API Base:", window.fitcopilotData.apiBase);
+            console.log("🔐 Nonce available:", !!window.fitcopilotData.nonce);
+            console.log("👤 User logged in:", window.fitcopilotData.isLoggedIn);
+            console.log("🔑 Auth headers:", window.fitcopilotApiHeaders);
+        })();
+        ',
+        'after'
+    );
+
     // Enqueue vendors script
     wp_enqueue_script(
         'fitcopilot-vendors-admin',
@@ -355,18 +398,6 @@ function enqueue_admin_dashboard_assets() {
         FITCOPILOT_URL . 'dist/css/profile.css',
         [],
         FITCOPILOT_VERSION
-    );
-    
-    // Localize script with necessary data
-    wp_localize_script(
-        'fitcopilot-profile',
-        'fitcopilotData',
-        [
-            'nonce' => wp_create_nonce('wp_rest'),
-            'apiBase' => rest_url('fitcopilot/v1'),
-            'isLoggedIn' => is_user_logged_in(),
-            'debug' => true, // Enable debug mode
-        ]
     );
 }
 add_action('admin_enqueue_scripts', 'FitCopilot\\enqueue_admin_dashboard_assets'); 

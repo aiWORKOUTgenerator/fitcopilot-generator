@@ -95,34 +95,50 @@ const ExerciseSection: React.FC<ExerciseSectionProps> = ({
       
       <div className={`section-content ${isExpanded ? 'expanded' : ''}`}>
         <div className="exercises-list">
-          {exercises.map((exercise, index) => (
-            <div key={index} className="exercise-item">
-              <div className="exercise-header">
-                <h4 className="exercise-name">{exercise.name}</h4>
-                <div className="exercise-details">
-                  {exercise.sets && (
-                    <span className="exercise-sets">
-                      {exercise.sets} sets
-                    </span>
-                  )}
-                  {exercise.reps && (
-                    <span className="exercise-reps">
-                      {exercise.reps} reps
-                    </span>
-                  )}
-                  {exercise.duration && (
-                    <span className="exercise-duration">
-                      <Clock size={12} />
-                      {exercise.duration}
-                    </span>
-                  )}
+          {exercises.map((exercise, index) => {
+            // Type-safe check for exercise format
+            const isTimeBased = 'duration' in exercise && exercise.duration;
+            const hasSetReps = 'sets' in exercise || 'reps' in exercise;
+            
+            return (
+              <div key={index} className="exercise-item">
+                <div className="exercise-header">
+                  <h4 className="exercise-name">{exercise.name || 'Unnamed Exercise'}</h4>
+                  <div className="exercise-details">
+                    {isTimeBased && (
+                      <span className="exercise-duration">
+                        <Clock size={12} />
+                        {exercise.duration}
+                      </span>
+                    )}
+                    {hasSetReps && (
+                      <>
+                        {exercise.sets && (
+                          <span className="exercise-sets">
+                            {exercise.sets} sets
+                          </span>
+                        )}
+                        {exercise.reps && (
+                          <span className="exercise-reps">
+                            {exercise.reps} reps
+                          </span>
+                        )}
+                      </>
+                    )}
+                    {/* Fallback for exercises without clear format */}
+                    {!isTimeBased && !hasSetReps && (
+                      <span className="exercise-fallback">
+                        Exercise details
+                      </span>
+                    )}
+                  </div>
                 </div>
+                {exercise.description && (
+                  <p className="exercise-description">{exercise.description}</p>
+                )}
               </div>
-              {exercise.description && (
-                <p className="exercise-description">{exercise.description}</p>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -486,23 +502,35 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
               <div className="exercise-sections">
                 {currentWorkout.exercises && currentWorkout.exercises.length > 0 ? (
                   <>
+                    {/* Group exercises by type/section */}
                     <ExerciseSection
                       title="Warm-up"
-                      exercises={currentWorkout.exercises.filter(ex => ex.type === 'warm-up') || []}
+                      exercises={currentWorkout.exercises.filter(ex => 
+                        ex.type === 'warm-up' || 
+                        (ex.section && ex.section.toLowerCase().includes('warm'))
+                      ) || []}
                       isExpanded={expandedSections.has('warm-up')}
                       onToggle={() => handleSectionToggle('warm-up')}
                       mode={mode}
                     />
                     <ExerciseSection
                       title="Main Workout"
-                      exercises={currentWorkout.exercises.filter(ex => ex.type === 'main' || !ex.type) || currentWorkout.exercises}
+                      exercises={currentWorkout.exercises.filter(ex => 
+                        ex.type === 'main' || 
+                        ex.type === 'strength' ||
+                        !ex.type ||
+                        (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
+                      ) || currentWorkout.exercises}
                       isExpanded={expandedSections.has('main')}
                       onToggle={() => handleSectionToggle('main')}
                       mode={mode}
                     />
                     <ExerciseSection
                       title="Cool-down"
-                      exercises={currentWorkout.exercises.filter(ex => ex.type === 'cool-down') || []}
+                      exercises={currentWorkout.exercises.filter(ex => 
+                        ex.type === 'cool-down' || 
+                        (ex.section && ex.section.toLowerCase().includes('cool'))
+                      ) || []}
                       isExpanded={expandedSections.has('cool-down')}
                       onToggle={() => handleSectionToggle('cool-down')}
                       mode={mode}
@@ -510,7 +538,18 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
                   </>
                 ) : (
                   <div className="no-exercises">
-                    <p>No exercises found in this workout.</p>
+                    <p>⚠️ No exercises found in this workout.</p>
+                    <p style={{ fontSize: '0.875rem', marginTop: '0.5rem', opacity: 0.7 }}>
+                      This may indicate a data loading issue. Try refreshing the page or contact support if the problem persists.
+                    </p>
+                    {currentWorkout.sections && currentWorkout.sections.length > 0 && (
+                      <details style={{ marginTop: '1rem', fontSize: '0.75rem' }}>
+                        <summary style={{ cursor: 'pointer', opacity: 0.7 }}>Debug: Show raw data</summary>
+                        <pre style={{ background: 'rgba(0,0,0,0.2)', padding: '0.5rem', marginTop: '0.5rem', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
+                          {JSON.stringify(currentWorkout, null, 2)}
+                        </pre>
+                      </details>
+                    )}
                   </div>
                 )}
               </div>

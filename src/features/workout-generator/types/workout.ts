@@ -12,19 +12,25 @@ export type FormSteps = 'input' | 'preview' | 'generating' | 'completed';
  * Exercise with duration (for warm-up/cool-down)
  */
 export interface TimedExercise {
+  id?: string;
   name: string;
   duration: string;
   description: string;
+  type?: 'timed' | 'warm-up' | 'cool-down';
+  section?: string;
 }
 
 /**
  * Exercise with sets and reps (for main workout)
  */
 export interface SetsExercise {
+  id?: string;
   name: string;
   sets: number;
   reps: number;
   description: string;
+  type?: 'strength' | 'main';
+  section?: string;
 }
 
 /**
@@ -56,9 +62,54 @@ export interface GeneratedWorkout {
   title: string;
   
   /**
-   * Workout sections (warm-up, main workout, cool-down)
+   * Workout description/notes
    */
-  sections: WorkoutSection[];
+  description?: string;
+  
+  /**
+   * Workout duration in minutes
+   */
+  duration?: number;
+  
+  /**
+   * Workout difficulty level
+   */
+  difficulty?: WorkoutDifficulty;
+  
+  /**
+   * List of exercises (can be mixed duration/sets-based)
+   */
+  exercises: Exercise[];
+  
+  /**
+   * Workout sections (warm-up, main workout, cool-down) - optional
+   */
+  sections?: WorkoutSection[];
+  
+  /**
+   * Creation timestamp
+   */
+  created_at?: string;
+  
+  /**
+   * Last updated timestamp
+   */
+  updated_at?: string;
+  
+  /**
+   * Workout version for editing
+   */
+  version?: number;
+  
+  /**
+   * Last modified timestamp
+   */
+  lastModified?: string;
+  
+  /**
+   * User who last modified
+   */
+  modifiedBy?: string | number;
 }
 
 /**

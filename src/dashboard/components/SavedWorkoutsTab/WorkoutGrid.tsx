@@ -3,6 +3,8 @@
  * 
  * Displays saved workouts in a responsive grid layout with enhanced filtering,
  * search, bulk selection capabilities, and improved visual design.
+ * 
+ * Updated for Week 1 Foundation Sprint - now uses extracted WorkoutTransformer service.
  */
 import React, { useState, useMemo, useCallback } from 'react';
 import { 
@@ -24,6 +26,10 @@ import EnhancedWorkoutCard from './EnhancedWorkoutCard';
 import './SavedWorkoutsTab.scss';
 import './AdvancedFilters.scss';
 import './EnhancedWorkoutCard.scss';
+
+// Import the extracted services
+import { WorkoutTransformer } from './services/workoutData/WorkoutTransformer';
+import { FilterEngine } from './services/filtering/FilterEngine';
 
 interface DisplayWorkout {
   id: string | number;
@@ -73,120 +79,43 @@ interface EnhancedWorkoutGridProps {
   onRateWorkout?: (workoutId: string, rating: number) => void;
 }
 
+// 🔄 MIGRATION NOTE: The following functions have been moved to WorkoutTransformer service
+// but are temporarily kept here for backward compatibility until Week 2 component splitting
+
 /**
- * Transform API workout data for grid display
+ * @deprecated Use WorkoutTransformer.transformForDisplay() instead
+ * Legacy function maintained for backward compatibility during Week 1 refactor
  */
 const transformWorkoutForDisplay = (workout: any): DisplayWorkout => {
-  // Defensive coding: ensure workout is an object
-  if (!workout || typeof workout !== 'object') {
-    console.warn('Invalid workout data received:', workout);
-    return createDefaultWorkout();
-  }
-
-  try {
-    // Extract equipment from exercises if not provided
-    const equipment = workout.equipment || extractEquipmentFromExercises(workout.exercises);
-    
-    // Determine workout type from exercises or use default
-    const workoutType = workout.workoutType || deriveWorkoutTypeFromExercises(workout.exercises);
-    
-    return {
-      id: workout.id || `temp-${Date.now()}`,
-      title: workout.title || 'Untitled Workout',
-      description: workout.description || '',
-      duration: typeof workout.duration === 'number' ? workout.duration : 30,
-      difficulty: ['beginner', 'intermediate', 'advanced'].includes(workout.difficulty) ? workout.difficulty : 'intermediate',
-      exercises: Array.isArray(workout.exercises) ? workout.exercises : [],
-      created_at: workout.created_at || new Date().toISOString(),
-      updated_at: workout.updated_at || new Date().toISOString(),
-      workoutType,
-      equipment,
-      isCompleted: Boolean(workout.isCompleted),
-      tags: Array.isArray(workout.tags) ? workout.tags : [],
-      completedAt: workout.completedAt,
-      createdAt: workout.createdAt || workout.created_at || new Date().toISOString(),
-      lastModified: workout.lastModified || workout.updated_at || new Date().toISOString(),
-      isFavorite: Boolean(workout.isFavorite),
-      rating: typeof workout.rating === 'number' ? workout.rating : undefined
-    };
-  } catch (error) {
-    console.error('Error transforming workout data:', error, workout);
-    return createDefaultWorkout();
-  }
+  console.warn('🔄 MIGRATION: transformWorkoutForDisplay is deprecated. Use WorkoutTransformer.transformForDisplay() instead.');
+  return WorkoutTransformer.transformForDisplay(workout);
 };
 
 /**
- * Create a default workout object for error cases
+ * @deprecated Use WorkoutTransformer.createDefaultWorkout() instead
+ * Legacy function maintained for backward compatibility during Week 1 refactor
  */
-const createDefaultWorkout = (): DisplayWorkout => ({
-  id: `error-${Date.now()}`,
-  title: 'Error Loading Workout',
-  description: 'There was an error loading this workout data.',
-  duration: 30,
-  difficulty: 'intermediate',
-  exercises: [],
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  workoutType: 'General',
-  equipment: [],
-  isCompleted: false,
-  tags: [],
-  createdAt: new Date().toISOString(),
-  lastModified: new Date().toISOString(),
-  isFavorite: false
-});
+const createDefaultWorkout = (): DisplayWorkout => {
+  console.warn('🔄 MIGRATION: createDefaultWorkout is deprecated. Use WorkoutTransformer.createDefaultWorkout() instead.');
+  return WorkoutTransformer.createDefaultWorkout();
+};
 
 /**
- * Extract equipment from exercises
+ * @deprecated Use WorkoutTransformer.extractEquipmentFromExercises() instead
+ * Legacy function maintained for backward compatibility during Week 1 refactor
  */
 const extractEquipmentFromExercises = (exercises: any[]): string[] => {
-  if (!Array.isArray(exercises)) return [];
-  
-  try {
-    const equipment = new Set<string>();
-    exercises.forEach(exercise => {
-      if (exercise && exercise.equipment) {
-        if (Array.isArray(exercise.equipment)) {
-          exercise.equipment.forEach((eq: string) => equipment.add(eq));
-        } else if (typeof exercise.equipment === 'string') {
-          equipment.add(exercise.equipment);
-        }
-      }
-    });
-    return Array.from(equipment).filter(Boolean);
-  } catch (error) {
-    console.warn('Error extracting equipment:', error);
-    return [];
-  }
+  console.warn('🔄 MIGRATION: extractEquipmentFromExercises is deprecated. Use WorkoutTransformer.extractEquipmentFromExercises() instead.');
+  return WorkoutTransformer.extractEquipmentFromExercises(exercises);
 };
 
 /**
- * Derive workout type from exercises
+ * @deprecated Use WorkoutTransformer.deriveWorkoutTypeFromExercises() instead
+ * Legacy function maintained for backward compatibility during Week 1 refactor
  */
 const deriveWorkoutTypeFromExercises = (exercises: any[]): string => {
-  if (!Array.isArray(exercises) || exercises.length === 0) return 'General';
-  
-  try {
-    // Simple heuristic based on exercise names
-    const exerciseNames = exercises
-      .map(ex => ex && ex.name && typeof ex.name === 'string' ? ex.name.toLowerCase() : '')
-      .filter(name => name.length > 0)
-      .join(' ');
-    
-    if (exerciseNames.includes('cardio') || exerciseNames.includes('running') || exerciseNames.includes('cycling')) {
-      return 'Cardio';
-    }
-    if (exerciseNames.includes('strength') || exerciseNames.includes('weights') || exerciseNames.includes('lifting')) {
-      return 'Strength';
-    }
-    if (exerciseNames.includes('yoga') || exerciseNames.includes('stretch')) {
-      return 'Flexibility';
-    }
-  } catch (error) {
-    console.warn('Error deriving workout type:', error);
-  }
-  
-  return 'General';
+  console.warn('🔄 MIGRATION: deriveWorkoutTypeFromExercises is deprecated. Use WorkoutTransformer.deriveWorkoutTypeFromExercises() instead.');
+  return WorkoutTransformer.deriveWorkoutTypeFromExercises(exercises);
 };
 
 /**
@@ -205,102 +134,36 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
   onToggleFavorite,
   onRateWorkout
 }) => {
-  const [filters, setFilters] = useState<WorkoutFilters>({
-    difficulty: [],
-    workoutType: [],
-    equipment: [],
-    duration: { min: 0, max: 120 },
-    completed: 'all',
-    sortBy: 'date',
-    sortOrder: 'desc',
-    tags: [],
-    createdDate: { start: null, end: null },
-    searchQuery: ''
-  });
+  const [filters, setFilters] = useState<WorkoutFilters>(
+    // 🚀 WEEK 1 IMPROVEMENT: Use FilterEngine.getDefaultFilters instead of hardcoded defaults
+    FilterEngine.getDefaultFilters()
+  );
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedWorkouts, setSelectedWorkouts] = useState<Set<string>>(new Set());
+  const [transformationErrors, setTransformationErrors] = useState<Map<string, string>>(new Map());
 
   // Filter and sort workouts based on current filters and search
   const filteredWorkouts = useMemo(() => {
-    // Transform raw API data to display format
-    const transformedWorkouts = workouts.map(transformWorkoutForDisplay);
-    
-    let filtered = transformedWorkouts.filter(workout => {
-      // Search filter
-      if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
-        const matchesSearch = 
-          workout.title.toLowerCase().includes(query) ||
-          workout.description.toLowerCase().includes(query) ||
-          workout.workoutType.toLowerCase().includes(query) ||
-          workout.tags.some((tag: string) => tag.toLowerCase().includes(query));
-        
-        if (!matchesSearch) return false;
-      }
-
-      // Difficulty filter
-      if (filters.difficulty.length > 0 && !filters.difficulty.includes(workout.difficulty)) {
-        return false;
-      }
-
-      // Workout type filter
-      if (filters.workoutType.length > 0 && !filters.workoutType.includes(workout.workoutType)) {
-        return false;
-      }
-
-      // Equipment filter
-      if (filters.equipment.length > 0) {
-        const hasRequiredEquipment = filters.equipment.some(eq => 
-          workout.equipment.includes(eq)
-        );
-        if (!hasRequiredEquipment) return false;
-      }
-
-      // Duration filter
-      if (workout.duration < filters.duration.min || workout.duration > filters.duration.max) {
-        return false;
-      }
-
-      // Completion status filter
-      if (filters.completed === 'completed' && !workout.isCompleted) return false;
-      if (filters.completed === 'pending' && workout.isCompleted) return false;
-
-      // Tags filter
-      if (filters.tags.length > 0) {
-        const hasRequiredTags = filters.tags.some(tag => 
-          workout.tags.includes(tag)
-        );
-        if (!hasRequiredTags) return false;
-      }
-
-      return true;
-    });
-
-    // Sort workouts
-    filtered.sort((a, b) => {
-      let comparison = 0;
+    try {
+      // 🚀 WEEK 1 IMPROVEMENT: Use extracted WorkoutTransformer and FilterEngine services
+      const transformedWorkouts = WorkoutTransformer.transformMultipleForDisplay(workouts);
       
-      switch (filters.sortBy) {
-        case 'date':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          break;
-        case 'title':
-          comparison = a.title.localeCompare(b.title);
-          break;
-        case 'duration':
-          comparison = a.duration - b.duration;
-          break;
-        case 'difficulty':
-          const difficultyOrder: Record<string, number> = { beginner: 1, intermediate: 2, advanced: 3 };
-          comparison = (difficultyOrder[a.difficulty] || 2) - (difficultyOrder[b.difficulty] || 2);
-          break;
-      }
-
-      return filters.sortOrder === 'desc' ? -comparison : comparison;
-    });
-
-    return filtered;
+      // Track any transformation errors for debugging
+      const errors = new Map<string, string>();
+      transformedWorkouts.forEach(workout => {
+        if (workout.exercises.length === 0 && workout.id) {
+          errors.set(workout.id.toString(), 'No exercises found - may indicate data transformation issue');
+        }
+      });
+      setTransformationErrors(errors);
+      
+      // Apply all filters and sorting using the FilterEngine service
+      return FilterEngine.applyFilters(transformedWorkouts, filters);
+    } catch (error) {
+      console.error('🔄 WorkoutGrid: Error filtering workouts:', error);
+      return [];
+    }
   }, [workouts, filters]);
 
   // Handle filter changes
@@ -315,19 +178,9 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
 
   // Clear all filters
   const handleClearFilters = useCallback(() => {
-    setFilters({
-      difficulty: [],
-      workoutType: [],
-      equipment: [],
-      duration: { min: 0, max: 120 },
-      completed: 'all',
-      sortBy: 'date',
-      sortOrder: 'desc',
-      tags: [],
-      createdDate: { start: null, end: null },
-      searchQuery: ''
-    });
-  }, []);
+    // 🚀 WEEK 1 IMPROVEMENT: Use FilterEngine.clearFilters instead of hardcoded defaults
+    setFilters(FilterEngine.clearFilters(filters));
+  }, [filters]);
 
   // Selection handlers
   const handleToggleSelection = useCallback((workoutId: string) => {
@@ -391,9 +244,14 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
           <Button 
             variant="primary" 
             onClick={() => {
-              // Scroll to workout generator
-              const generator = document.querySelector('.workout-generator-feature');
-              generator?.scrollIntoView({ behavior: 'smooth' });
+              // 🚀 WEEK 1 IMPROVEMENT: More robust navigation to generator
+              const generator = document.querySelector('.workout-generator-feature, [data-tab="generator"], .workout-generator');
+              if (generator) {
+                generator.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                // Fallback: dispatch custom event for parent component to handle
+                window.dispatchEvent(new CustomEvent('fitcopilot:navigate-to-generator'));
+              }
             }}
           >
             Create Your First Workout
@@ -413,6 +271,29 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
         onClear={handleClearFilters}
         onSearchChange={handleSearchChange}
       />
+
+      {/* 🚀 WEEK 1 IMPROVEMENT: Show transformation errors in development */}
+      {process.env.NODE_ENV === 'development' && transformationErrors.size > 0 && (
+        <div className="workout-grid-debug-info" style={{
+          background: '#fff3cd',
+          border: '1px solid #ffeaa7',
+          borderRadius: '4px',
+          padding: '12px',
+          marginBottom: '16px',
+          fontSize: '12px'
+        }}>
+          <details>
+            <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+              ⚠️ {transformationErrors.size} workout{transformationErrors.size !== 1 ? 's' : ''} with transformation issues
+            </summary>
+            <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+              {Array.from(transformationErrors.entries()).map(([id, error]) => (
+                <li key={id}>Workout {id}: {error}</li>
+              ))}
+            </ul>
+          </details>
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="workout-toolbar">

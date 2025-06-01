@@ -170,9 +170,17 @@ class GenerateEndpoint extends AbstractEndpoint {
         $user_id = get_current_user_id();
         $now = current_time('mysql');
         
-        // Create post
+        // Create post with proper content
+        $post_content = '';
+        if (!empty($workout['description'])) {
+            $post_content = $workout['description'];
+        } elseif (!empty($workout['notes'])) {
+            $post_content = $workout['notes'];
+        }
+        
         $post_id = wp_insert_post([
             'post_title'  => $workout['title'] ?? __('Generated Workout', 'fitcopilot'),
+            'post_content' => sanitize_textarea_field($post_content),
             'post_type'   => 'fc_workout',
             'post_status' => 'publish',
             'post_author' => $user_id,
@@ -182,10 +190,30 @@ class GenerateEndpoint extends AbstractEndpoint {
             throw new \Exception($post_id->get_error_message());
         }
         
+        // CRITICAL FIX: Extract exercises from sections if they exist
+        $exercises = $workout['exercises'] ?? [];
+        
+        // If exercises array is empty but sections contain exercises, extract them
+        if (empty($exercises) && !empty($workout['sections'])) {
+            error_log('FitCopilot: Extracting exercises from sections for workout ' . $post_id);
+            
+            foreach ($workout['sections'] as $section) {
+                if (isset($section['exercises']) && is_array($section['exercises'])) {
+                    foreach ($section['exercises'] as $exercise) {
+                        // Add section context to exercise
+                        $exercise['section'] = $section['name'] ?? 'Unnamed Section';
+                        $exercises[] = $exercise;
+                    }
+                }
+            }
+            
+            error_log('FitCopilot: Extracted ' . count($exercises) . ' exercises from sections');
+        }
+        
         // Standardize workout data format for consistency
         $standardized_workout = [
             'title' => $workout['title'] ?? __('Generated Workout', 'fitcopilot'),
-            'exercises' => $workout['exercises'] ?? [],
+            'exercises' => $exercises,  // Now properly populated from sections
             'sections' => $workout['sections'] ?? [],
             'duration' => $workout['duration'] ?? $params['duration'],
             'difficulty' => $workout['difficulty'] ?? $params['difficulty'],
@@ -197,7 +225,8 @@ class GenerateEndpoint extends AbstractEndpoint {
                 'created_at' => $now,
                 'generation_params' => $params,
                 'openai_model' => $workout['model'] ?? 'unknown',
-                'format_version' => '1.0'
+                'format_version' => '1.0',
+                'exercises_extracted_from_sections' => !empty($workout['sections']) && empty($workout['exercises'])
             ]
         ];
         
@@ -216,6 +245,8 @@ class GenerateEndpoint extends AbstractEndpoint {
         update_post_meta($post_id, '_workout_version', 1);
         update_post_meta($post_id, '_workout_last_modified', $now);
         update_post_meta($post_id, '_workout_modified_by', $user_id);
+        
+        error_log("FitCopilot: Saved workout {$post_id} with " . count($exercises) . " exercises");
         
         return $post_id;
     }

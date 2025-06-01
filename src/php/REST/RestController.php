@@ -1,6 +1,29 @@
 <?php
 /**
- * REST API Controller for FitCopilot
+ * DEPRECATED: Legacy REST API Controller for FitCopilot
+ * 
+ * ⚠️  CRITICAL: This file has been DISABLED due to endpoint conflicts.
+ * 
+ * This legacy REST controller was causing critical conflicts with the new
+ * WorkoutEndpoints system by registering duplicate routes for:
+ * - GET/POST /fitcopilot/v1/workouts  
+ * - GET/PUT /fitcopilot/v1/workouts/{id}
+ * - POST /fitcopilot/v1/workouts/{id}/complete
+ * 
+ * The conflicts resulted in:
+ * - Inconsistent data storage formats
+ * - Route registration conflicts  
+ * - 500 errors during workout retrieval
+ * - Frontend crashes due to malformed responses
+ * 
+ * This system has been superseded by the new WorkoutEndpoints architecture:
+ * @see FitCopilot\API\WorkoutEndpoints\WorkoutEndpointsController
+ * @see FitCopilot\API\WorkoutEndpoints\WorkoutRetrievalEndpoint  
+ * @see FitCopilot\API\WorkoutEndpoints\WorkoutUpdateEndpoint
+ * 
+ * @deprecated Since v1.2.0 - Use WorkoutEndpoints system instead
+ * @status DISABLED - Route registration commented out
+ * @removal Planned for v2.0.0
  */
 
 namespace FitCopilot\REST;
@@ -12,6 +35,8 @@ if (!defined('ABSPATH')) {
 
 /**
  * Initialize REST API endpoints
+ * 
+ * ⚠️ DISABLED: This function is no longer called to prevent endpoint conflicts
  */
 function register_rest_routes() {
     // Register other endpoints
@@ -104,7 +129,19 @@ function register_rest_routes() {
         ]
     );
 }
-add_action('rest_api_init', 'FitCopilot\\REST\\register_rest_routes');
+
+// ⚠️ DISABLED: Legacy route registration commented out to fix endpoint conflicts
+// This was causing duplicate route registrations that conflicted with the new
+// WorkoutEndpoints system and resulted in inconsistent data storage formats.
+// 
+// The new system provides the same functionality with better architecture:
+// - Proper versioning support
+// - Consistent data formats  
+// - Better error handling
+// - Defensive programming for data retrieval
+//
+// Original line: add_action('rest_api_init', 'FitCopilot\\REST\\register_rest_routes');
+// add_action('rest_api_init', 'FitCopilot\\REST\\register_rest_routes'); // DISABLED - Using new WorkoutEndpoints system
 
 /**
  * Permission callback for API endpoints
