@@ -156,7 +156,6 @@ export interface UserProfile {
   medicalConditions?: string;
   
   // Workout preferences
-  preferredWorkoutDuration?: number; // in minutes
   workoutFrequency: WorkoutFrequency;
   customFrequency?: string;
   favoriteExercises?: string[];

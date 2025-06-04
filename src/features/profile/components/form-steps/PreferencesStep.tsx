@@ -20,12 +20,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
   errors,
   onChange
 }) => {
-  // Handle duration change
-  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    onChange('preferredWorkoutDuration', isNaN(value) ? undefined : value);
-  };
-  
   // Handle frequency change
   const handleFrequencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange('workoutFrequency', e.target.value as WorkoutFrequency);
@@ -52,26 +46,6 @@ const PreferencesStep: React.FC<PreferencesStepProps> = ({
       <p className="step-description">
         Help us tailor your workout experience to your preferences and schedule.
       </p>
-      
-      <div className="form-section">
-        <h3>How long do you prefer your workouts to be?</h3>
-        
-        <div className="range-slider">
-          <input
-            type="range"
-            id="preferredWorkoutDuration"
-            name="preferredWorkoutDuration"
-            min="10"
-            max="120"
-            step="5"
-            value={formData.preferredWorkoutDuration || 30}
-            onChange={handleDurationChange}
-          />
-          <div className="duration-display">
-            {formData.preferredWorkoutDuration || 30} minutes
-          </div>
-        </div>
-      </div>
       
       <div className="form-section">
         <h3>How often do you plan to work out?</h3>

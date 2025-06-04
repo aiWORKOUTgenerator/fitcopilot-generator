@@ -17,7 +17,7 @@ export interface WorkoutEditorData {
   /** Difficulty level of the workout */
   difficulty: WorkoutDifficulty;
   /** Duration in minutes */
-  duration: number;
+  duration?: number;
   /** List of equipment required for the workout */
   equipment: string[];
   /** List of fitness goals this workout targets */
@@ -192,7 +192,7 @@ export function convertToEditorFormat(workout: GeneratedWorkout, postId?: number
     postId: resolvedPostId,
     title: workout.title || '',
     difficulty: workout.difficulty || 'intermediate',
-    duration: workout.duration || totalDuration || 30,
+    duration: workout.duration,
     equipment: workout.equipment || [],
     goals: workout.goals || [],
     exercises,

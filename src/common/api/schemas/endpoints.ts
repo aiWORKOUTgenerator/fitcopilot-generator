@@ -79,7 +79,7 @@ export const WORKOUT_RESPONSE_SCHEMA = {
  */
 export const PROFILE_REQUEST_SCHEMA = {
   type: 'object',
-  required: ['fitnessLevel', 'workoutGoals', 'equipmentAvailable', 'workoutFrequency', 'workoutDuration'],
+  required: ['fitnessLevel', 'workoutGoals', 'equipmentAvailable', 'workoutFrequency'],
   properties: {
     fitnessLevel: {
       type: 'string',
@@ -98,11 +98,6 @@ export const PROFILE_REQUEST_SCHEMA = {
       type: 'number',
       minimum: 1,
       maximum: 7
-    },
-    workoutDuration: {
-      type: 'number',
-      minimum: 10,
-      maximum: 180
     },
     preferences: {
       type: 'object',

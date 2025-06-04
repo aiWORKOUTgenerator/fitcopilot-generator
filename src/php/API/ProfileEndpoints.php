@@ -137,7 +137,6 @@ class ProfileEndpoints {
             'goals' => ['general_fitness'],
             'availableEquipment' => ['none'],
             'workoutFrequency' => '3-4',
-            'preferredWorkoutDuration' => 30,
             'preferredLocation' => 'home',
             'limitations' => ['none'],
             'profileComplete' => false,
@@ -189,7 +188,6 @@ class ProfileEndpoints {
             $limitation_notes = get_user_meta($user_id, '_profile_limitationNotes', true);
             $workout_frequency = get_user_meta($user_id, '_profile_workoutFrequency', true);
             $custom_frequency = get_user_meta($user_id, '_profile_customFrequency', true);
-            $preferred_workout_duration = get_user_meta($user_id, '_profile_preferredWorkoutDuration', true);
             $favorite_exercises = get_user_meta($user_id, '_profile_favoriteExercises', true);
             $disliked_exercises = get_user_meta($user_id, '_profile_dislikedExercises', true);
             $medical_conditions = get_user_meta($user_id, '_profile_medicalConditions', true);
@@ -229,7 +227,6 @@ class ProfileEndpoints {
                 'limitationNotes' => $limitation_notes ?: '',
                 'workoutFrequency' => $workout_frequency ?: '3-4',
                 'customFrequency' => $custom_frequency ?: '',
-                'preferredWorkoutDuration' => intval($preferred_workout_duration) ?: 30,
                 'favoriteExercises' => is_array($favorite_exercises) ? $favorite_exercises : [],
                 'dislikedExercises' => is_array($disliked_exercises) ? $disliked_exercises : [],
                 'medicalConditions' => is_array($medical_conditions) ? implode(', ', $medical_conditions) : ($medical_conditions ?: ''),
@@ -285,11 +282,6 @@ class ProfileEndpoints {
             // Validate workoutFrequency
             if (isset($params['workoutFrequency']) && !in_array($params['workoutFrequency'], ['1-2', '3-4', '5+', 'custom'])) {
                 $validation_errors['workoutFrequency'] = 'Workout frequency must be one of: 1-2, 3-4, 5+, custom';
-            }
-            
-            // Validate preferredWorkoutDuration
-            if (isset($params['preferredWorkoutDuration']) && (!is_numeric($params['preferredWorkoutDuration']) || $params['preferredWorkoutDuration'] < 10 || $params['preferredWorkoutDuration'] > 120)) {
-                $validation_errors['preferredWorkoutDuration'] = 'Workout duration must be a number between 10 and 120';
             }
             
             // Validate goals
@@ -383,10 +375,6 @@ class ProfileEndpoints {
             
             if (isset($params['customFrequency'])) {
                 update_user_meta($user_id, '_profile_customFrequency', sanitize_textarea_field($params['customFrequency']));
-            }
-            
-            if (isset($params['preferredWorkoutDuration'])) {
-                update_user_meta($user_id, '_profile_preferredWorkoutDuration', intval($params['preferredWorkoutDuration']));
             }
             
             if (isset($params['favoriteExercises']) && is_array($params['favoriteExercises'])) {

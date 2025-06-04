@@ -406,7 +406,7 @@ function transformWorkoutResponse(apiData: any): GeneratedWorkout {
     id: apiData.id || apiData.post_id,
     title: apiData.title || 'Untitled Workout',
     description: apiData.description || apiData.content || apiData.notes || '',
-    duration: Number(apiData.duration) || 30,
+    duration: Number(apiData.duration),
     difficulty: apiData.difficulty || 'intermediate',
     exercises: transformedExercises,
     sections: sections, // Preserve original sections structure

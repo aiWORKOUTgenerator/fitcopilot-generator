@@ -126,8 +126,21 @@ class GenerateEndpoint extends AbstractEndpoint {
             // Get version metadata for the newly created workout
             $metadata = VersioningUtils::get_version_metadata($post_id);
             
+            // CRITICAL FIX: Return standardized workout data instead of raw OpenAI response
+            // Get the standardized workout that includes the user's duration from params
+            $standardized_workout = [
+                'title' => $workout['title'] ?? __('Generated Workout', 'fitcopilot'),
+                'exercises' => $workout['exercises'] ?? [],
+                'sections' => $workout['sections'] ?? [],
+                'duration' => $workout['duration'] ?? $generation_params['duration'], // ✅ User's duration preserved
+                'difficulty' => $workout['difficulty'] ?? $generation_params['difficulty'],
+                'equipment' => $workout['equipment'] ?? $generation_params['equipment'],
+                'goals' => $workout['goals'] ?? $generation_params['goals'],
+                'restrictions' => $workout['restrictions'] ?? $generation_params['restrictions'],
+            ];
+            
             // Add post_id and version metadata to response
-            $response_data = $workout;
+            $response_data = $standardized_workout;
             $response_data['post_id'] = $post_id;
             $response_data = APIUtils::add_version_metadata_to_response(
                 $response_data, 

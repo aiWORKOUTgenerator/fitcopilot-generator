@@ -493,7 +493,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
                     hint="Choose the appropriate difficulty level"
                   >
                     <select
-                      value={workout.difficulty}
+                      value={workout.difficulty || ''}
                       onChange={(e) => handleDifficultyChange(e.target.value)}
                     >
                       <option value="beginner">Beginner</option>
@@ -512,7 +512,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
                   >
                     <input
                       type="number"
-                      value={workout.duration.toString()}
+                      value={workout.duration?.toString() || ''}
                       onChange={handleDurationChange}
                       onBlur={handleBlur}
                       min={1}

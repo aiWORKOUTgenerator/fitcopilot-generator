@@ -192,11 +192,6 @@ export const FIELD_DISPLAY_CONFIG: Record<ProfileFieldKey, {
     formatter: (value: string) => value ? `${value} times per week` : 'Not set',
     isRequired: true 
   },
-  preferredWorkoutDuration: { 
-    label: "Duration", 
-    formatter: (value: number) => value ? `${value} minutes` : 'Not set',
-    isRequired: true 
-  },
   
   // Meta fields (not displayed in step cards)
   id: { label: "ID" },
