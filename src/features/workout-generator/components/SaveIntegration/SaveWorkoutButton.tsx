@@ -48,6 +48,28 @@ export const SaveWorkoutButton: React.FC<SaveWorkoutButtonProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
+  // CRITICAL FIX: Determine if workout is already saved by checking both id and post_id
+  const workoutId = workout.id || (workout as any).post_id;
+  const isWorkoutSaved = !!(workoutId && 
+                           workoutId !== 'new' && 
+                           workoutId !== '' && 
+                           workoutId !== 'undefined' &&
+                           (typeof workoutId === 'number' || 
+                            (typeof workoutId === 'string' && !isNaN(Number(workoutId)) && Number(workoutId) > 0)));
+  
+  // Use the explicit isExisting prop or determine from workout data
+  const shouldUpdate = isExisting || isWorkoutSaved;
+
+  console.log('[SaveWorkoutButton] Save decision logic:', {
+    'workout.id': workout.id,
+    'workout.post_id': (workout as any).post_id,
+    'resolved_workoutId': workoutId,
+    'isWorkoutSaved': isWorkoutSaved,
+    'isExisting_prop': isExisting,
+    'shouldUpdate': shouldUpdate,
+    'title': workout.title
+  });
+
   const handleSave = async () => {
     if (isSaving) return;
 
@@ -57,11 +79,13 @@ export const SaveWorkoutButton: React.FC<SaveWorkoutButtonProps> = ({
     try {
       let savedWorkout: GeneratedWorkout;
       
-      if (isExisting) {
+      if (shouldUpdate) {
         // Update existing workout
+        console.log('[SaveWorkoutButton] Updating existing workout:', workoutId);
         savedWorkout = await updateWorkoutAndRefresh(workout);
       } else {
         // Save new workout
+        console.log('[SaveWorkoutButton] Saving new workout');
         savedWorkout = await saveWorkoutAndRefresh(workout);
       }
 
@@ -93,13 +117,13 @@ export const SaveWorkoutButton: React.FC<SaveWorkoutButtonProps> = ({
     
     switch (saveStatus) {
       case 'saving':
-        return isExisting ? 'Updating...' : 'Saving...';
+        return shouldUpdate ? 'Updating...' : 'Saving...';
       case 'success':
-        return isExisting ? 'Updated!' : 'Saved!';
+        return shouldUpdate ? 'Updated!' : 'Saved!';
       case 'error':
         return 'Save Failed';
       default:
-        return isExisting ? 'Update Workout' : 'Save Workout';
+        return shouldUpdate ? 'Update Workout' : 'Save Workout';
     }
   };
 
@@ -142,12 +166,12 @@ export const SaveWorkoutButton: React.FC<SaveWorkoutButtonProps> = ({
         <div className={`save-status ${saveStatus}`}>
           {saveStatus === 'saving' && (
             <span className="status-text">
-              {isExisting ? 'Updating your workout...' : 'Saving your workout...'}
+              {shouldUpdate ? 'Updating your workout...' : 'Saving your workout...'}
             </span>
           )}
           {saveStatus === 'success' && (
             <span className="status-text">
-              {isExisting 
+              {shouldUpdate 
                 ? `"${workout.title}" updated successfully!` 
                 : `"${workout.title}" saved successfully!`
               }
@@ -155,7 +179,7 @@ export const SaveWorkoutButton: React.FC<SaveWorkoutButtonProps> = ({
           )}
           {saveStatus === 'error' && (
             <span className="status-text">
-              Failed to {isExisting ? 'update' : 'save'} workout. Please try again.
+              Failed to {shouldUpdate ? 'update' : 'save'} workout. Please try again.
             </span>
           )}
         </div>

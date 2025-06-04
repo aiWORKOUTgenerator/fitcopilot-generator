@@ -10,7 +10,7 @@ import { WorkoutRequestForm } from './components/Form';
 import { ErrorBoundary, DebugControls, TipsCard } from './components/common';
 import { SubscriptionModalWrapper, ProfileSetupPrompt } from './components/Modals';
 import { NavigationProvider } from './navigation/NavigationContext';
-import WorkoutEditorContainer from './containers/WorkoutEditorContainer';
+import WorkoutEditorModal from './components/WorkoutEditor/WorkoutEditorModal';
 
 // Import theme initialization
 import './utils/themeInit';
@@ -72,8 +72,8 @@ export const WorkoutGeneratorFeature: React.FC = () => {
               onComplete={() => {/* re-check profile & proceed */}}
             />
             
-            {/* Workout Editor Container - handles modal or full page display */}
-            <WorkoutEditorContainer />
+            {/* Integrated Workout Editor Modal - handles both view and edit modes */}
+            <WorkoutEditorModal />
           </div>
         </WorkoutGeneratorProvider>
       </NavigationProvider>

@@ -1,347 +1,386 @@
 /**
  * WorkoutValidator Service
  * 
- * Handles validation of workout data structures and integrity checks.
- * Part of Week 1 Foundation Sprint - extracted validation logic.
+ * Validates workout data integrity and provides validation utilities.
+ * Created during Week 1 Foundation Sprint.
  */
 
-// Import types (using existing DisplayWorkout interface from WorkoutGrid for now)
-interface DisplayWorkout {
-  id: string | number;
-  title: string;
-  description: string;
-  duration: number;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  exercises: any[];
-  created_at: string;
-  updated_at: string;
-  workoutType: string;
-  equipment: string[];
-  isCompleted: boolean;
-  completedAt?: string;
-  tags: string[];
-  createdAt: string; // For backward compatibility
-  lastModified: string; // For backward compatibility
-  isFavorite?: boolean;
-  rating?: number;
-}
+import { VALIDATION_CONSTANTS, ERROR_MESSAGES } from '../../constants/workoutConstants';
+import type { DisplayWorkout } from './WorkoutTransformer';
 
-interface ValidationResult {
+export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
 }
 
+export interface ExerciseValidationResult {
+  isValid: boolean;
+  errors: string[];
+  exerciseIndex?: number;
+}
+
 export class WorkoutValidator {
   /**
-   * Validate if a workout has the minimum required data
-   * 
-   * @param workout - Workout object to validate
-   * @returns True if workout has minimum required data
-   */
-  static isValidWorkout(workout: any): boolean {
-    if (!workout || typeof workout !== 'object') {
-      return false;
-    }
-    
-    const hasId = !!(workout.id || workout.post_id);
-    const hasTitle = !!(workout.title || workout.post_title);
-    
-    return hasId && hasTitle;
-  }
-
-  /**
-   * Comprehensive workout validation with detailed feedback
+   * Validate a complete workout object
    * 
    * @param workout - Workout object to validate
    * @returns Validation result with errors and warnings
    */
   static validateWorkout(workout: any): ValidationResult {
-    const errors: string[] = [];
-    const warnings: string[] = [];
+    const result: ValidationResult = {
+      isValid: true,
+      errors: [],
+      warnings: []
+    };
 
-    // Basic existence check
-    if (!workout || typeof workout !== 'object') {
-      return {
-        isValid: false,
-        errors: ['Workout is null, undefined, or not an object'],
-        warnings: []
-      };
+    try {
+      // Check if workout exists
+      if (!workout) {
+        result.errors.push('Workout object is null or undefined');
+        result.isValid = false;
+        return result;
+      }
+
+      // Validate required fields
+      this.validateRequiredFields(workout, result);
+      
+      // Validate field formats and values
+      this.validateFieldFormats(workout, result);
+      
+      // Validate exercises
+      this.validateExercises(workout, result);
+      
+      // Validate metadata
+      this.validateMetadata(workout, result);
+
+      // Set overall validity
+      result.isValid = result.errors.length === 0;
+
+    } catch (error) {
+      result.errors.push(`Validation error: ${error.message}`);
+      result.isValid = false;
     }
 
-    // Required fields validation
-    if (!workout.id && !workout.post_id) {
-      errors.push('Workout must have an id or post_id');
-    }
+    return result;
+  }
 
-    if (!workout.title && !workout.post_title) {
-      errors.push('Workout must have a title or post_title');
-    }
-
-    // Title validation
-    const title = workout.title || workout.post_title;
-    if (title && typeof title === 'string') {
-      if (title.trim().length === 0) {
-        warnings.push('Workout title is empty');
-      } else if (title.length > 200) {
-        warnings.push('Workout title is very long (>200 characters)');
+  /**
+   * Validate required fields are present
+   * 
+   * @param workout - Workout to validate
+   * @param result - Validation result to update
+   */
+  private static validateRequiredFields(workout: any, result: ValidationResult): void {
+    const requiredFields = ['id', 'title'];
+    
+    for (const field of requiredFields) {
+      if (workout[field] === undefined || workout[field] === null) {
+        result.errors.push(`Missing required field: ${field}`);
       }
     }
 
-    // Duration validation
+    // Check for empty strings
+    if (typeof workout.title === 'string' && workout.title.trim().length === 0) {
+      result.errors.push('Title cannot be empty');
+    }
+  }
+
+  /**
+   * Validate field formats and value ranges
+   * 
+   * @param workout - Workout to validate
+   * @param result - Validation result to update
+   */
+  private static validateFieldFormats(workout: any, result: ValidationResult): void {
+    // Validate title length
+    if (typeof workout.title === 'string') {
+      if (workout.title.length < VALIDATION_CONSTANTS.MIN_WORKOUT_TITLE_LENGTH) {
+        result.errors.push(`Title too short (minimum ${VALIDATION_CONSTANTS.MIN_WORKOUT_TITLE_LENGTH} characters)`);
+      }
+      if (workout.title.length > VALIDATION_CONSTANTS.MAX_WORKOUT_TITLE_LENGTH) {
+        result.errors.push(`Title too long (maximum ${VALIDATION_CONSTANTS.MAX_WORKOUT_TITLE_LENGTH} characters)`);
+      }
+    }
+
+    // Validate description length
+    if (workout.description && typeof workout.description === 'string') {
+      if (workout.description.length > VALIDATION_CONSTANTS.MAX_WORKOUT_DESCRIPTION_LENGTH) {
+        result.errors.push(`Description too long (maximum ${VALIDATION_CONSTANTS.MAX_WORKOUT_DESCRIPTION_LENGTH} characters)`);
+      }
+    }
+
+    // Validate duration
     if (workout.duration !== undefined) {
-      if (typeof workout.duration !== 'number') {
-        warnings.push('Workout duration should be a number');
-      } else if (workout.duration < 0) {
-        warnings.push('Workout duration cannot be negative');
-      } else if (workout.duration > 480) { // 8 hours
-        warnings.push('Workout duration seems very long (>8 hours)');
+      if (typeof workout.duration !== 'number' || isNaN(workout.duration)) {
+        result.errors.push('Duration must be a valid number');
+      } else {
+        if (workout.duration < VALIDATION_CONSTANTS.MIN_DURATION_MINUTES) {
+          result.errors.push(`Duration too short (minimum ${VALIDATION_CONSTANTS.MIN_DURATION_MINUTES} minutes)`);
+        }
+        if (workout.duration > VALIDATION_CONSTANTS.MAX_DURATION_MINUTES) {
+          result.errors.push(`Duration too long (maximum ${VALIDATION_CONSTANTS.MAX_DURATION_MINUTES} minutes)`);
+        }
       }
     }
 
-    // Difficulty validation
+    // Validate difficulty
     if (workout.difficulty !== undefined) {
       const validDifficulties = ['beginner', 'intermediate', 'advanced'];
       if (!validDifficulties.includes(workout.difficulty)) {
-        warnings.push(`Invalid difficulty level: ${workout.difficulty}. Valid options: ${validDifficulties.join(', ')}`);
+        result.errors.push(`Invalid difficulty level: ${workout.difficulty}`);
       }
     }
 
-    // Date validation
-    const dateFields = ['created_at', 'updated_at', 'post_date', 'post_modified', 'date', 'modified'];
-    dateFields.forEach(field => {
-      if (workout[field] && !this.isValidDateString(workout[field])) {
-        warnings.push(`Invalid date format in field: ${field}`);
+    // Validate rating
+    if (workout.rating !== undefined) {
+      if (typeof workout.rating !== 'number' || 
+          workout.rating < VALIDATION_CONSTANTS.MIN_RATING || 
+          workout.rating > VALIDATION_CONSTANTS.MAX_RATING) {
+        result.errors.push(`Rating must be between ${VALIDATION_CONSTANTS.MIN_RATING} and ${VALIDATION_CONSTANTS.MAX_RATING}`);
       }
-    });
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-      warnings
-    };
-  }
-
-  /**
-   * Validate exercise data structure
-   * 
-   * @param exercise - Exercise object to validate
-   * @returns True if exercise has valid structure
-   */
-  static isValidExercise(exercise: any): boolean {
-    if (!exercise || typeof exercise !== 'object') {
-      return false;
     }
-    
-    const hasName = typeof exercise.name === 'string' && exercise.name.trim().length > 0;
-    const hasActivity = exercise.hasOwnProperty('sets') || exercise.hasOwnProperty('duration') || exercise.hasOwnProperty('reps');
-    
-    return hasName && hasActivity;
+
+    // Validate dates
+    this.validateDates(workout, result);
   }
 
   /**
-   * Validate workout_data JSON structure
+   * Validate date fields
    * 
-   * @param workoutData - Workout data to validate (string or object)
-   * @returns True if workout data is valid JSON structure
+   * @param workout - Workout to validate
+   * @param result - Validation result to update
    */
-  static isValidWorkoutData(workoutData: any): boolean {
-    try {
-      const parsed = typeof workoutData === 'string' 
-        ? JSON.parse(workoutData) 
-        : workoutData;
-      return !!(parsed && (parsed.exercises || parsed.sections));
-    } catch {
-      return false;
+  private static validateDates(workout: any, result: ValidationResult): void {
+    const dateFields = ['createdAt', 'created_at', 'updatedAt', 'updated_at', 'completedAt'];
+    
+    for (const field of dateFields) {
+      if (workout[field] !== undefined) {
+        const date = new Date(workout[field]);
+        if (isNaN(date.getTime())) {
+          result.errors.push(`Invalid date format for ${field}: ${workout[field]}`);
+        } else {
+          // Check for unreasonable dates
+          const now = new Date();
+          const minDate = new Date('2020-01-01'); // Reasonable minimum date
+          const maxDate = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // 1 year in future
+          
+          if (date < minDate) {
+            result.warnings.push(`${field} seems too old: ${workout[field]}`);
+          }
+          if (date > maxDate) {
+            result.warnings.push(`${field} is in the future: ${workout[field]}`);
+          }
+        }
+      }
     }
   }
 
   /**
    * Validate exercises array
    * 
-   * @param exercises - Array of exercises to validate
-   * @returns Validation result for exercises
+   * @param workout - Workout to validate
+   * @param result - Validation result to update
    */
-  static validateExercises(exercises: any[]): ValidationResult {
-    const errors: string[] = [];
-    const warnings: string[] = [];
-
-    if (!Array.isArray(exercises)) {
-      return {
-        isValid: false,
-        errors: ['Exercises must be an array'],
-        warnings: []
-      };
+  private static validateExercises(workout: any, result: ValidationResult): void {
+    if (!workout.exercises) {
+      result.warnings.push('No exercises array found');
+      return;
     }
 
-    if (exercises.length === 0) {
-      warnings.push('Workout has no exercises');
+    if (!Array.isArray(workout.exercises)) {
+      result.errors.push('Exercises must be an array');
+      return;
     }
 
-    exercises.forEach((exercise, index) => {
-      if (!this.isValidExercise(exercise)) {
-        errors.push(`Exercise ${index + 1} is invalid or missing required fields`);
-      } else {
-        // Additional exercise validation
-        if (!exercise.name || exercise.name.trim().length === 0) {
-          errors.push(`Exercise ${index + 1} has no name`);
-        }
-        
-        if (!exercise.sets && !exercise.duration && !exercise.reps) {
-          warnings.push(`Exercise ${index + 1} (${exercise.name}) has no sets, reps, or duration specified`);
-        }
+    if (workout.exercises.length === 0) {
+      result.warnings.push('Workout has no exercises');
+      return;
+    }
 
-        if (exercise.hasOwnProperty('sets') && (typeof exercise.sets !== 'number' || exercise.sets < 1)) {
-          warnings.push(`Exercise ${index + 1} (${exercise.name}) has invalid sets value`);
-        }
-
-        if (exercise.hasOwnProperty('reps') && (typeof exercise.reps !== 'number' || exercise.reps < 1)) {
-          warnings.push(`Exercise ${index + 1} (${exercise.name}) has invalid reps value`);
-        }
+    // Validate individual exercises
+    workout.exercises.forEach((exercise: any, index: number) => {
+      const exerciseResult = this.validateExercise(exercise, index);
+      if (!exerciseResult.isValid) {
+        result.errors.push(...exerciseResult.errors);
       }
     });
+  }
 
-    return {
-      isValid: errors.length === 0,
-      errors,
-      warnings
+  /**
+   * Validate individual exercise
+   * 
+   * @param exercise - Exercise to validate
+   * @param index - Exercise index in array
+   * @returns Exercise validation result
+   */
+  static validateExercise(exercise: any, index?: number): ExerciseValidationResult {
+    const result: ExerciseValidationResult = {
+      isValid: true,
+      errors: [],
+      exerciseIndex: index
     };
-  }
 
-  /**
-   * Validate equipment array
-   * 
-   * @param equipment - Equipment array to validate
-   * @returns True if equipment array is valid
-   */
-  static isValidEquipment(equipment: any): boolean {
-    if (!Array.isArray(equipment)) return false;
+    if (!exercise) {
+      result.errors.push(`Exercise ${index !== undefined ? index + 1 : ''} is null or undefined`);
+      result.isValid = false;
+      return result;
+    }
+
+    // Check for required exercise fields
+    if (!exercise.name || typeof exercise.name !== 'string' || exercise.name.trim().length === 0) {
+      result.errors.push(`Exercise ${index !== undefined ? index + 1 : ''} missing or invalid name`);
+    }
+
+    // Validate exercise has either sets/reps or duration
+    const hasSetsReps = (exercise.sets && exercise.reps) || exercise.repetitions;
+    const hasDuration = exercise.duration && typeof exercise.duration === 'number';
     
-    return equipment.every(item => 
-      typeof item === 'string' && item.trim().length > 0
-    );
-  }
+    if (!hasSetsReps && !hasDuration) {
+      result.warnings.push(`Exercise ${index !== undefined ? index + 1 : ''} (${exercise.name}) has no sets/reps or duration`);
+    }
 
-  /**
-   * Validate tags array
-   * 
-   * @param tags - Tags array to validate
-   * @returns True if tags array is valid
-   */
-  static isValidTags(tags: any): boolean {
-    if (!Array.isArray(tags)) return false;
-    
-    return tags.every(tag => 
-      typeof tag === 'string' && tag.trim().length > 0
-    );
-  }
-
-  /**
-   * Check if a string is a valid date
-   * 
-   * @param dateString - Date string to validate
-   * @returns True if valid date string
-   */
-  static isValidDateString(dateString: any): boolean {
-    if (typeof dateString !== 'string') return false;
-    
-    const date = new Date(dateString);
-    return !isNaN(date.getTime()) && date.getFullYear() > 1900;
-  }
-
-  /**
-   * Validate rating value
-   * 
-   * @param rating - Rating to validate
-   * @returns True if rating is valid (1-5)
-   */
-  static isValidRating(rating: any): boolean {
-    return typeof rating === 'number' && 
-           rating >= 1 && 
-           rating <= 5 && 
-           Number.isInteger(rating);
-  }
-
-  /**
-   * Check for potential data corruption issues
-   * 
-   * @param workout - Workout to check for corruption
-   * @returns Array of corruption indicators
-   */
-  static checkDataCorruption(workout: any): string[] {
-    const issues: string[] = [];
-
-    // Check for malformed workout_data
-    if (workout.workout_data && typeof workout.workout_data === 'string') {
-      try {
-        JSON.parse(workout.workout_data);
-      } catch {
-        issues.push('workout_data contains invalid JSON');
+    // Validate sets and reps if present
+    if (exercise.sets !== undefined) {
+      if (typeof exercise.sets !== 'number' || exercise.sets < 1 || exercise.sets > 50) {
+        result.errors.push(`Exercise ${index !== undefined ? index + 1 : ''} has invalid sets: ${exercise.sets}`);
       }
     }
 
-    // Check for missing critical data
-    if (!workout.exercises && !workout.workout_data && !workout.sections) {
-      issues.push('No exercise data found in any expected location');
+    if (exercise.reps !== undefined) {
+      if (typeof exercise.reps !== 'number' || exercise.reps < 1 || exercise.reps > 1000) {
+        result.errors.push(`Exercise ${index !== undefined ? index + 1 : ''} has invalid reps: ${exercise.reps}`);
+      }
     }
 
-    // Check for inconsistent IDs
-    if (workout.id && workout.post_id && workout.id !== workout.post_id) {
-      issues.push('Inconsistent ID values between id and post_id');
-    }
-
-    // Check for inconsistent titles
-    if (workout.title && workout.post_title && workout.title !== workout.post_title) {
-      issues.push('Inconsistent title values between title and post_title');
-    }
-
-    // Check for future dates
-    const now = new Date();
-    const createdDate = new Date(workout.created_at || workout.post_date || '');
-    if (createdDate > now) {
-      issues.push('Created date is in the future');
-    }
-
-    return issues;
+    result.isValid = result.errors.length === 0;
+    return result;
   }
 
   /**
-   * Sanitize workout data by removing invalid entries
+   * Validate workout metadata
    * 
-   * @param workout - Workout to sanitize
-   * @returns Sanitized workout data
+   * @param workout - Workout to validate
+   * @param result - Validation result to update
    */
-  static sanitizeWorkout(workout: any): any {
-    if (!workout || typeof workout !== 'object') {
-      return null;
+  private static validateMetadata(workout: any, result: ValidationResult): void {
+    // Validate equipment array
+    if (workout.equipment !== undefined) {
+      if (!Array.isArray(workout.equipment)) {
+        result.errors.push('Equipment must be an array');
+      } else {
+        // Check for valid equipment strings
+        workout.equipment.forEach((eq: any, index: number) => {
+          if (typeof eq !== 'string' || eq.trim().length === 0) {
+            result.warnings.push(`Equipment item ${index + 1} is not a valid string`);
+          }
+        });
+      }
     }
 
-    const sanitized = { ...workout };
-
-    // Sanitize arrays
-    if (sanitized.tags && !this.isValidTags(sanitized.tags)) {
-      sanitized.tags = [];
+    // Validate tags array
+    if (workout.tags !== undefined) {
+      if (!Array.isArray(workout.tags)) {
+        result.warnings.push('Tags should be an array');
+      } else {
+        workout.tags.forEach((tag: any, index: number) => {
+          if (typeof tag !== 'string' || tag.trim().length === 0) {
+            result.warnings.push(`Tag ${index + 1} is not a valid string`);
+          }
+        });
+      }
     }
 
-    if (sanitized.equipment && !this.isValidEquipment(sanitized.equipment)) {
-      sanitized.equipment = [];
+    // Validate boolean fields
+    const booleanFields = ['isCompleted', 'isFavorite'];
+    for (const field of booleanFields) {
+      if (workout[field] !== undefined && typeof workout[field] !== 'boolean') {
+        result.warnings.push(`${field} should be a boolean value`);
+      }
+    }
+  }
+
+  /**
+   * Quick validation for basic workout requirements
+   * 
+   * @param workout - Workout to validate
+   * @returns True if workout meets minimum requirements
+   */
+  static isValidBasicWorkout(workout: any): boolean {
+    return !!(
+      workout &&
+      (workout.id || workout.id === 0) &&
+      workout.title &&
+      typeof workout.title === 'string' &&
+      workout.title.trim().length > 0
+    );
+  }
+
+  /**
+   * Validate workout data from API response
+   * 
+   * @param workoutData - Raw workout data from API
+   * @returns Validation result
+   */
+  static validateApiResponse(workoutData: any): ValidationResult {
+    const result: ValidationResult = {
+      isValid: true,
+      errors: [],
+      warnings: []
+    };
+
+    if (!workoutData) {
+      result.errors.push('API response is empty');
+      result.isValid = false;
+      return result;
     }
 
-    // Sanitize rating
-    if (sanitized.rating && !this.isValidRating(sanitized.rating)) {
-      delete sanitized.rating;
+    // Check for WordPress post structure
+    if (workoutData.post_type && workoutData.post_type !== 'wg_workout') {
+      result.warnings.push(`Unexpected post type: ${workoutData.post_type}`);
     }
 
-    // Sanitize boolean fields
-    if (sanitized.isCompleted !== undefined) {
-      sanitized.isCompleted = Boolean(sanitized.isCompleted);
+    // Validate workout_data field if present
+    if (workoutData.workout_data) {
+      try {
+        const parsedData = typeof workoutData.workout_data === 'string' 
+          ? JSON.parse(workoutData.workout_data) 
+          : workoutData.workout_data;
+          
+        if (!parsedData.exercises && !parsedData.sections) {
+          result.warnings.push('workout_data contains no exercises or sections');
+        }
+      } catch (error) {
+        result.errors.push(`Invalid JSON in workout_data: ${error.message}`);
+      }
     }
 
-    if (sanitized.isFavorite !== undefined) {
-      sanitized.isFavorite = Boolean(sanitized.isFavorite);
+    result.isValid = result.errors.length === 0;
+    return result;
+  }
+
+  /**
+   * Get validation summary for debugging
+   * 
+   * @param workout - Workout to analyze
+   * @returns Human-readable validation summary
+   */
+  static getValidationSummary(workout: any): string {
+    const validation = this.validateWorkout(workout);
+    
+    const parts = [
+      `Workout ${workout?.id || 'unknown'}: ${validation.isValid ? 'VALID' : 'INVALID'}`
+    ];
+
+    if (validation.errors.length > 0) {
+      parts.push(`Errors: ${validation.errors.join(', ')}`);
     }
 
-    return sanitized;
+    if (validation.warnings.length > 0) {
+      parts.push(`Warnings: ${validation.warnings.join(', ')}`);
+    }
+
+    return parts.join(' | ');
   }
 }
 

@@ -16,6 +16,7 @@ export interface TimedExercise {
   name: string;
   duration: string;
   description: string;
+  notes?: string;
   type?: 'timed' | 'warm-up' | 'cool-down';
   section?: string;
 }
@@ -27,8 +28,9 @@ export interface SetsExercise {
   id?: string;
   name: string;
   sets: number;
-  reps: number;
+  reps: number | string;
   description: string;
+  notes?: string;
   type?: 'strength' | 'main';
   section?: string;
 }
@@ -48,7 +50,7 @@ export interface WorkoutSection {
 }
 
 /**
- * Generated workout structure
+ * Generated workout structure - aligned with WordPress response format
  */
 export interface GeneratedWorkout {
   /**
@@ -57,14 +59,24 @@ export interface GeneratedWorkout {
   id?: string | number;
   
   /**
+   * WordPress post ID (backend response format)
+   */
+  post_id?: string | number;
+  
+  /**
    * Workout title
    */
   title: string;
   
   /**
-   * Workout description/notes
+   * Workout description/notes - WordPress field
    */
   description?: string;
+  
+  /**
+   * Workout notes - WordPress field (alternative naming)
+   */
+  notes?: string;
   
   /**
    * Workout duration in minutes
@@ -75,6 +87,16 @@ export interface GeneratedWorkout {
    * Workout difficulty level
    */
   difficulty?: WorkoutDifficulty;
+  
+  /**
+   * Equipment required - WordPress field
+   */
+  equipment?: string[];
+  
+  /**
+   * Fitness goals - WordPress field
+   */
+  goals?: string[];
   
   /**
    * List of exercises (can be mixed duration/sets-based)

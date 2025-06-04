@@ -1,9 +1,11 @@
 /**
- * Enhanced Workout Editor Modal
+ * Simplified Workout Editor Modal - Pure UI Component
  * 
- * Accessible modal container for the workout editor with
- * proper focus management, keyboard navigation, intelligent sizing,
- * and premium glass morphism styling to match EnhancedWorkoutModal.
+ * This component is now a simple modal wrapper that:
+ * - Receives workout data as props
+ * - Handles only modal UI behavior (open/close, accessibility)
+ * - Passes through save/cancel functions
+ * - Has zero business logic or data fetching
  */
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -11,128 +13,79 @@ import { GeneratedWorkout } from '../../types/workout';
 import { WorkoutEditorProvider } from './WorkoutEditorContext';
 import WorkoutEditor from './WorkoutEditor';
 import { convertToEditorFormat } from '../../types/editor';
-import { convertToGeneratedWorkout } from '../../services/workoutEditorService';
+import { EnhancedWorkoutModal } from './EnhancedWorkoutModal';
 import { useNavigation } from '../../navigation/NavigationContext';
-import { useDimensionObserver } from '../../../../components/ui/hooks/useContentResize';
+import { useWorkoutGenerator } from '../../context';
+import { getWorkout } from '../../services/workoutService';
 import './workoutEditor.scss';
 
 interface WorkoutEditorModalProps {
-  /**
-   * The workout to edit
-   */
-  workout: GeneratedWorkout;
-  
-  /**
-   * Optional post ID if the workout is already saved
-   */
-  postId?: number;
-  
-  /**
-   * Callback when the workout is saved
-   */
-  onSave: (workout: GeneratedWorkout) => void;
-  
-  /**
-   * Whether the modal is open
-   */
+  // Modal state
   isOpen: boolean;
+  mode: 'view' | 'edit';
+  isTransitioning?: boolean;
+  
+  // Workout data
+  workout: GeneratedWorkout | null;
+  isLoading?: boolean;
+  error?: string | null;
+  
+  // Functions
+  onClose: () => void;
+  onEdit?: () => void;
+  onSave?: () => Promise<void>;
+  onCancel?: () => void;
+  
+  // Optional settings
+  isSaving?: boolean;
 }
 
 /**
- * Enhanced modal component for the workout editor with intelligent sizing
+ * Pure UI modal wrapper for workout editing
  */
-const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
+const WorkoutEditorModalUI: React.FC<WorkoutEditorModalProps> = ({
+  isOpen,
+  mode,
+  isTransitioning = false,
   workout,
-  postId,
+  isLoading = false,
+  error = null,
+  onClose,
+  onEdit,
   onSave,
-  isOpen
+  onCancel,
+  isSaving = false
 }) => {
-  // Use navigation context for modal state management
-  const { closeEditor } = useNavigation();
-  
-  // Convert the workout to editor format
-  const editorWorkout = convertToEditorFormat(workout, postId);
-  
-  // Track loading and visibility state
-  const [isLoading, setIsLoading] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  
-  // Track modal content dimensions for intelligent sizing
-  const [contentHeight, setContentHeight] = useState(0);
-  const [modalDimensions, setModalDimensions] = useState({ width: 0, height: 0 });
-  
-  // Refs for modal elements
   const modalRef = useRef<HTMLDivElement>(null);
-  const modalContentRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-  
-  // Handle modal visibility with animation
+
+  // Handle modal visibility
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
       document.body.style.overflow = 'hidden';
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      
+      if (modalRef.current) {
+        modalRef.current.focus();
+      }
     } else {
-      setIsVisible(false);
       document.body.style.overflow = '';
+      
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+      }
     }
 
     return () => {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
-  
-  // Set up dimension observer for content
-  const { observe: observeContent, disconnect: disconnectContentObserver } = useDimensionObserver(
-    (dimensions) => {
-      setModalDimensions(dimensions);
-      
-      // Calculate optimal modal height based on content and viewport
-      const viewportHeight = window.innerHeight;
-      const maxModalHeight = viewportHeight * 0.95; // Use 95% of viewport height max
-      const minModalHeight = Math.min(400, viewportHeight * 0.5); // Minimum 400px or 50% of viewport
-      
-      // Determine if we need scrolling
-      const optimalHeight = Math.max(minModalHeight, Math.min(dimensions.height + 100, maxModalHeight));
-      setContentHeight(optimalHeight);
-    },
-    200 // Debounce for performance
-  );
-  
-  // Store the previously focused element when the modal opens
-  useEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
-      
-      // Focus the modal when it opens
-      if (modalRef.current) {
-        modalRef.current.focus();
-      }
-    }
-    
-    return () => {
-      // Restore focus when the modal closes
-      if (previousFocusRef.current && !isOpen) {
-        previousFocusRef.current.focus();
-      }
-    };
-  }, [isOpen]);
-  
-  // Set up content observation for intelligent sizing
-  useEffect(() => {
-    if (modalContentRef.current && isOpen) {
-      observeContent(modalContentRef.current);
-    }
-    
-    return () => {
-      disconnectContentObserver();
-    };
-  }, [observeContent, disconnectContentObserver, isOpen]);
-  
-  // Handle escape key press
+
+  // Handle escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        closeEditor();
+        onClose();
       }
     };
     
@@ -143,9 +96,9 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [closeEditor, isOpen]);
+  }, [onClose, isOpen]);
 
-  // Trap focus within the modal
+  // Trap focus within modal
   useEffect(() => {
     if (!isOpen) return;
     
@@ -158,13 +111,10 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
       
-      // If shift+tab and focus is on first element, move to last element
       if (e.shiftKey && document.activeElement === firstElement) {
         e.preventDefault();
         lastElement.focus();
-      } 
-      // If tab and focus is on last element, move to first element
-      else if (!e.shiftKey && document.activeElement === lastElement) {
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
         e.preventDefault();
         firstElement.focus();
       }
@@ -176,59 +126,11 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     };
   }, [isOpen]);
 
-  // Handle window resize for responsive modal sizing
-  useEffect(() => {
-    if (!isOpen) return;
-    
-    const handleWindowResize = () => {
-      if (modalContentRef.current) {
-        observeContent(modalContentRef.current);
-      }
-    };
-    
-    window.addEventListener('resize', handleWindowResize);
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, [observeContent, isOpen]);
-
   // Handle backdrop click
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === modalRef.current) {
-      closeEditor();
+      onClose();
     }
-  };
-
-  // Function to handle saving
-  const handleSave = async (updatedWorkout: any) => {
-    try {
-      setIsLoading(true);
-      
-      // Convert from editor format back to GeneratedWorkout format
-      const generatedWorkout = convertToGeneratedWorkout(updatedWorkout);
-      
-      // Pass to parent component for saving
-      await onSave(generatedWorkout);
-      
-      // Close the editor modal after save
-      closeEditor();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Function to handle cancel
-  const handleCancel = () => {
-    closeEditor();
-  };
-
-  // Calculate modal content styles based on dimensions
-  const modalContentStyle: React.CSSProperties = {
-    height: contentHeight > 0 ? `${contentHeight}px` : 'auto',
-    maxHeight: '95vh',
-    minHeight: '600px',
-    display: 'flex',
-    flexDirection: 'column',
   };
 
   // Don't render if not open
@@ -236,38 +138,216 @@ const WorkoutEditorModal: React.FC<WorkoutEditorModalProps> = ({
     return null;
   }
 
-  return createPortal(
-    <div 
-      ref={modalRef}
-      className={`workout-editor-modal__overlay ${isVisible ? 'visible' : ''}`}
-      onClick={handleBackdropClick}
-      aria-modal="true"
-      role="dialog"
-      aria-labelledby="workout-editor-title"
-    >
+  // Show loading state
+  if (isLoading && !workout) {
+    return createPortal(
       <div 
-        className="workout-editor-modal__content workout-editor-modal__content--adaptive"
-        style={modalContentStyle}
-        onClick={(e) => e.stopPropagation()}
-        tabIndex={-1} // Make the modal container focusable but not in tab order
-        aria-busy={isLoading}
+        ref={modalRef}
+        className="workout-editor-modal__overlay visible"
+        tabIndex={-1}
+        aria-modal="true"
+        role="dialog"
+        aria-labelledby="loading-title"
+      >
+        <div className="workout-editor-modal__content">
+          <div className="workout-editor-loading">
+            <div className="loading-spinner"></div>
+            <span id="loading-title">Loading workout...</span>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return createPortal(
+      <div 
+        ref={modalRef}
+        className="workout-editor-modal__overlay visible"
+        tabIndex={-1}
+        aria-modal="true"
+        role="dialog"
+        aria-labelledby="error-title"
+      >
+        <div className="workout-editor-modal__content">
+          <div className="workout-editor-error">
+            <h2 id="error-title">Error</h2>
+            <div className="error-message">{error}</div>
+            <button onClick={onClose} className="error-close-button">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
+  // Show transition state
+  if (isTransitioning) {
+    return createPortal(
+      <div className="modal-transition-overlay">
+        <div className="transition-spinner"></div>
+      </div>,
+      document.body
+    );
+  }
+
+  // Must have workout to proceed
+  if (!workout) {
+    return null;
+  }
+
+  // Convert workout for editor
+  const editorWorkout = convertToEditorFormat(workout, workout.id ? Number(workout.id) : undefined);
+
+  // Render view mode
+  if (mode === 'view') {
+    return createPortal(
+      <EnhancedWorkoutModal
+        workout={workout}
+        isOpen={true}
+        onClose={onClose}
+        onSave={onSave || (async () => { onClose(); })}
+        onEdit={onEdit || (() => {})}
+        isSaving={isSaving}
+        isTransitioning={isTransitioning}
+        postId={workout.id ? Number(workout.id) : undefined}
+      />,
+      document.body
+    );
+  }
+
+  // Render edit mode
+  if (mode === 'edit') {
+    return createPortal(
+      <div 
+        ref={modalRef}
+        className="workout-editor-modal__overlay visible"
+        onClick={handleBackdropClick}
+        aria-modal="true"
+        role="dialog"
+        aria-labelledby="workout-editor-title"
       >
         <div 
-          ref={modalContentRef}
-          className="workout-editor-modal__inner-content"
+          className="workout-editor-modal__content workout-editor-modal__content--adaptive"
+          onClick={(e) => e.stopPropagation()}
+          tabIndex={-1}
+          aria-busy={isSaving}
         >
           <WorkoutEditorProvider initialWorkout={editorWorkout}>
             <WorkoutEditor
-              onSave={handleSave}
-              onCancel={handleCancel}
-              isNewWorkout={!postId}
-              isLoading={isLoading}
+              onSave={onSave || (async () => { onClose(); })}
+              onCancel={onCancel || onClose}
+              isNewWorkout={!workout.id}
+              isLoading={isSaving}
             />
           </WorkoutEditorProvider>
         </div>
-      </div>
-    </div>,
-    document.body
+      </div>,
+      document.body
+    );
+  }
+
+  return null;
+};
+
+/**
+ * Smart wrapper component that connects simplified modal to navigation context
+ * Handles all business logic and data fetching
+ */
+const WorkoutEditorModal: React.FC = () => {
+  // Navigation context for modal state management
+  const { 
+    isEditorOpen, 
+    isEditModalOpen, 
+    currentWorkoutId, 
+    modalMode,
+    isTransitioning,
+    closeEditor,
+    transitionToEdit,
+    transitionToView 
+  } = useNavigation();
+  
+  // Get workout generator context to access the generated workout
+  const { state } = useWorkoutGenerator();
+  const generatedWorkout = state.domain.generatedWorkout;
+  
+  // State for workout data and UI
+  const [workout, setWorkout] = useState<GeneratedWorkout | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Load workout data based on navigation context
+  useEffect(() => {
+    // Reset states when the editor closes
+    if (!isEditorOpen) {
+      setWorkout(null);
+      setError(null);
+      return;
+    }
+    
+    // If we have a current workout ID of 'new', use the generated workout
+    if (currentWorkoutId === 'new' && generatedWorkout) {
+      setWorkout(generatedWorkout);
+      return;
+    }
+    
+    // If we have a workout ID but no workout data, fetch it
+    if (currentWorkoutId && currentWorkoutId !== 'new') {
+      const fetchWorkout = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          const fetchedWorkout = await getWorkout(currentWorkoutId);
+          setWorkout(fetchedWorkout);
+        } catch (err) {
+          console.error('Failed to load workout:', err);
+          setError('Failed to load workout. Please try again.');
+          closeEditor();
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchWorkout();
+    }
+  }, [isEditorOpen, currentWorkoutId, generatedWorkout, closeEditor]);
+
+  // Handle save function - the WorkoutEditor now handles saves directly
+  const handleSave = async () => {
+    // Since WorkoutEditor now handles saves directly, this is just a placeholder
+    // The actual save logic is in WorkoutEditor.tsx
+    closeEditor();
+  };
+
+  // Handle edit transition
+  const handleEdit = () => {
+    transitionToEdit();
+  };
+
+  // Determine which modal mode to show
+  const isOpen = isEditorOpen || isEditModalOpen;
+  const mode: 'view' | 'edit' = modalMode === 'edit' ? 'edit' : 'view';
+
+  return (
+    <WorkoutEditorModalUI
+      isOpen={isOpen}
+      mode={mode}
+      isTransitioning={isTransitioning}
+      workout={workout}
+      isLoading={loading}
+      error={error}
+      onClose={closeEditor}
+      onEdit={handleEdit}
+      onSave={handleSave}
+      onCancel={closeEditor}
+      isSaving={isSaving}
+    />
   );
 };
 

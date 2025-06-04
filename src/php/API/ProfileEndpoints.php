@@ -453,7 +453,6 @@ class ProfileEndpoints {
             'authentication' => [
                 'is_user_logged_in' => is_user_logged_in(),
                 'current_user_id' => get_current_user_id(),
-                'wp_get_current_user_id' => wp_get_current_user_id(),
             ],
             'wordpress_user' => null,
             'profile_meta_exists' => false,

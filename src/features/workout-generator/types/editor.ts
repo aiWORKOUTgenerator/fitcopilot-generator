@@ -5,7 +5,7 @@
  * These types represent the data models used throughout the editor workflow.
  */
 
-import { GeneratedWorkout, WorkoutDifficulty, Exercise } from './workout';
+import { GeneratedWorkout, WorkoutDifficulty, Exercise, SetsExercise, TimedExercise } from './workout';
 
 /**
  * Core workout editor data model
@@ -98,82 +98,106 @@ export interface WorkoutEditorState {
 }
 
 /**
- * API request/response types following guidelines
- */
-export interface SaveWorkoutRequest {
-  /** Workout data to save */
-  workout: WorkoutEditorData;
-}
-
-/**
- * Response from saving a workout
- */
-export interface SaveWorkoutResponse {
-  /** Saved workout data */
-  workout: WorkoutEditorData;
-  /** Post ID of the saved workout */
-  postId: number;
-}
-
-/**
  * Convert GeneratedWorkout to editor format
  * 
+ * @deprecated This conversion function will be removed in SPRINT PLAN Story 3 & 5
+ * As per SPRINT PLAN: "Remove data conversion calls" and "No data transformation layers"
+ * Future: Use direct WordPress response format parsing instead
+ * 
  * @param workout - The generated workout to convert
- * @param postId - Optional post ID if the workout is already saved
+ * @param postId - Optional post ID if the workout is already saved (legacy parameter)
  * @returns The workout in editor format
  */
 export function convertToEditorFormat(workout: GeneratedWorkout, postId?: number): WorkoutEditorData {
+  // Extract postId from workout.id or use provided postId parameter
+  const resolvedPostId = workout.id ? Number(workout.id) : postId;
+  
   // Extract exercises from all workout sections
   const exercises: EditorExercise[] = [];
   let totalDuration = 0;
   
-  // Process all sections to get exercises
-  workout.sections.forEach((section, sectionIndex) => {
-    // Track total duration
-    totalDuration += section.duration || 0;
-    
-    // Process exercises in each section
-    section.exercises.forEach((exercise, exerciseIndex) => {
-      const exerciseId = `exercise-${sectionIndex}-${exerciseIndex}`;
-      
-      // Handle sets-based exercises
-      if ('sets' in exercise) {
+  // Helper function to check if exercise is SetsExercise
+  const isSetsExercise = (exercise: Exercise): exercise is SetsExercise => {
+    return 'sets' in exercise && 'reps' in exercise;
+  };
+  
+  // Helper function to check if exercise is TimedExercise
+  const isTimedExercise = (exercise: Exercise): exercise is TimedExercise => {
+    return 'duration' in exercise;
+  };
+  
+  // FIRST: Check if workout has direct exercises array (new format)
+  if (workout.exercises && Array.isArray(workout.exercises)) {
+    workout.exercises.forEach((exercise) => {
+      if (isSetsExercise(exercise)) {
         exercises.push({
-          id: exerciseId,
+          id: exercise.id || `${exercises.length + 1}`,
           name: exercise.name,
           sets: exercise.sets,
           reps: exercise.reps,
-          notes: `${section.name}: ${exercise.description}`
+          notes: exercise.description || exercise.notes || ''
         });
-      }
-      // Handle timed exercises (convert to sets format for editor)
-      else if ('duration' in exercise) {
+      } else if (isTimedExercise(exercise)) {
+        // Convert timed exercises to sets format for editor
         exercises.push({
-          id: exerciseId,
+          id: exercise.id || `${exercises.length + 1}`,
           name: exercise.name,
-          sets: 1, // Default to 1 set for timed exercises
-          reps: exercise.duration, // Use duration as "reps"
-          notes: `${section.name} (Timed): ${exercise.description}`
+          sets: 1,
+          reps: exercise.duration, // Use duration as reps
+          notes: exercise.description || exercise.notes || ''
+        });
+        
+        // Add to total duration if it's a number
+        const durationNum = parseInt(exercise.duration);
+        if (!isNaN(durationNum)) {
+          totalDuration += durationNum;
+        }
+      }
+    });
+  }
+  
+  // FALLBACK: Extract from sections if exercises array is empty
+  if (exercises.length === 0 && workout.sections && Array.isArray(workout.sections)) {
+    workout.sections.forEach((section) => {
+      if (section.exercises && Array.isArray(section.exercises)) {
+        section.exercises.forEach((exercise) => {
+          if (isSetsExercise(exercise)) {
+            exercises.push({
+              id: exercise.id || `section-${exercises.length + 1}`,
+              name: exercise.name,
+              sets: exercise.sets,
+              reps: exercise.reps,
+              notes: exercise.description || exercise.notes || ''
+            });
+          } else if (isTimedExercise(exercise)) {
+            exercises.push({
+              id: exercise.id || `section-${exercises.length + 1}`,
+              name: exercise.name,
+              sets: 1,
+              reps: exercise.duration,
+              notes: exercise.description || exercise.notes || ''
+            });
+            
+            const durationNum = parseInt(exercise.duration);
+            if (!isNaN(durationNum)) {
+              totalDuration += durationNum;
+            }
+          }
         });
       }
     });
-  });
-  
-  // If no exercises were found, log for debugging
-  if (exercises.length === 0) {
-    console.warn('No exercises were extracted from the workout:', workout);
   }
   
   return {
-    title: workout.title,
+    postId: resolvedPostId,
+    title: workout.title || '',
     difficulty: workout.difficulty || 'intermediate',
-    duration: totalDuration || 30,
+    duration: workout.duration || totalDuration || 30,
     equipment: workout.equipment || [],
     goals: workout.goals || [],
     exercises,
-    notes: workout.notes || '',
-    postId,
-    lastModified: new Date().toISOString(),
-    version: 1
+    notes: workout.notes || workout.description || '',
+    lastModified: workout.lastModified || new Date().toISOString(),
+    version: workout.version
   };
 } 

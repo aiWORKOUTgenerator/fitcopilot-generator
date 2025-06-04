@@ -333,8 +333,30 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
       // If the response includes data, dispatch success
       if (response.success && response.data) {
         try {
-          const workoutData = response.data;
-          console.log('Success! Workout data received');
+          const rawWorkoutData = response.data as any; // Raw response may have post_id
+          
+          // CRITICAL FIX: Transform the response to map post_id to id
+          // This ensures the frontend recognizes the workout as already saved
+          const workoutData: GeneratedWorkout = {
+            ...rawWorkoutData,
+            // Map post_id from backend to id expected by frontend
+            id: rawWorkoutData.post_id || rawWorkoutData.id,
+            // Ensure version is properly set
+            version: rawWorkoutData.version || 1,
+            // Ensure created_at and updated_at are set
+            created_at: rawWorkoutData.created_at || new Date().toISOString(),
+            updated_at: rawWorkoutData.updated_at || new Date().toISOString()
+          };
+          
+          console.log('[WorkoutGeneratorContext] Generated workout transformed:', {
+            originalPostId: rawWorkoutData.post_id,
+            mappedId: workoutData.id,
+            version: workoutData.version,
+            hasId: !!workoutData.id,
+            title: workoutData.title,
+            exerciseCount: workoutData.exercises?.length || 0
+          });
+          
           dispatch(setGenerationSuccess(workoutData));
           return workoutData;
         } catch (parseError) {

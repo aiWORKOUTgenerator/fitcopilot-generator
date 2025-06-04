@@ -1,0 +1,691 @@
+/**
+ * Enhanced Workout Card Styles
+ * 
+ * Premium card design with micro-interactions, hover effects,
+ * and enhanced visual hierarchy for better user experience.
+ */
+
+.enhanced-workout-card {
+  --card-bg: rgba(30, 30, 30, 0.95);
+  --card-glass-bg: rgba(255, 255, 255, 0.05);
+  --card-glass-border: rgba(255, 255, 255, 0.1);
+  --card-text-primary: #ffffff;
+  --card-text-secondary: #b3b3b3;
+  --card-text-muted: #888888;
+  --card-accent: #6366f1;
+  --card-accent-hover: #5855eb;
+  --card-success: #10b981;
+  --card-warning: #f59e0b;
+  --card-error: #ef4444;
+  --card-spacing: 1rem;
+  --card-radius: 12px;
+  --card-radius-sm: 8px;
+  --card-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --card-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.25);
+
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--card-glass-border);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--card-transition);
+  backdrop-filter: blur(16px);
+
+  /* Hover Effects */
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(255, 255, 255, 0.2);
+
+    .workout-thumbnail {
+      transform: scale(1.05);
+    }
+
+    .hover-enhancement {
+      opacity: 1;
+    }
+  }
+
+  /* Selection Mode */
+  &.selection-mode {
+    cursor: default;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow);
+    }
+
+    &.selected {
+      border-color: var(--card-accent);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2), var(--card-shadow);
+    }
+  }
+
+  /* Completion States */
+  &.completed {
+    .completion-indicator {
+      opacity: 1;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--card-success), #22c55e);
+    }
+  }
+
+  /* View Modes */
+  &.list {
+    .card-header {
+      flex-direction: row;
+      align-items: center;
+      padding: var(--card-spacing);
+
+      .workout-thumbnail-container {
+        flex-shrink: 0;
+        margin-right: var(--card-spacing);
+
+        .workout-thumbnail {
+          width: 60px;
+          height: 60px;
+        }
+      }
+
+      .workout-info {
+        flex: 1;
+        min-width: 0;
+
+        .workout-description {
+          display: none;
+        }
+
+        .equipment-tags {
+          display: none;
+        }
+      }
+
+      .card-actions {
+        flex-shrink: 0;
+      }
+    }
+
+    .card-footer {
+      padding: 0 var(--card-spacing) var(--card-spacing);
+      border-top: 1px solid var(--card-glass-border);
+      margin-top: var(--card-spacing);
+      padding-top: var(--card-spacing);
+    }
+  }
+
+  /* Selection Overlay */
+  .selection-overlay {
+    position: absolute;
+    top: calc(var(--card-spacing) * 0.75);
+    left: calc(var(--card-spacing) * 0.75);
+    z-index: 10;
+
+    .selection-checkbox {
+      background: var(--card-glass-bg);
+      border: 1px solid var(--card-glass-border);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--card-transition-fast);
+      backdrop-filter: blur(8px);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--card-accent);
+      }
+
+      &.selected {
+        background: var(--card-accent);
+        border-color: var(--card-accent);
+        color: white;
+      }
+    }
+  }
+
+  /* Card Header */
+  .card-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: var(--card-spacing);
+
+    /* Workout Thumbnail */
+    .workout-thumbnail-container {
+      position: relative;
+      margin-bottom: var(--card-spacing);
+
+      .workout-thumbnail {
+        width: 100%;
+        height: 120px;
+        border-radius: var(--card-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform var(--card-transition);
+        overflow: hidden;
+
+        .thumbnail-icon {
+          font-size: 2.5rem;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+      }
+
+      /* Quick Actions Overlay */
+      .quick-actions-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        gap: calc(var(--card-spacing) * 0.5);
+        opacity: 0;
+        transition: all var(--card-transition);
+        animation: fadeInScale 0.3s ease-out forwards;
+
+        .quick-action-btn {
+          background: rgba(0, 0, 0, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          cursor: pointer;
+          transition: all var(--card-transition-fast);
+          backdrop-filter: blur(8px);
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: var(--card-accent);
+            transform: scale(1.1);
+          }
+
+          &.primary {
+            background: var(--card-accent);
+            border-color: var(--card-accent);
+
+            &:hover {
+              background: var(--card-accent-hover);
+            }
+          }
+        }
+      }
+    }
+
+    /* Workout Info */
+    .workout-info {
+      flex: 1;
+      min-width: 0;
+
+      .workout-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: calc(var(--card-spacing) * 0.75);
+
+        .workout-title {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: var(--card-text-primary);
+          margin: 0;
+          line-height: 1.3;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+
+        .favorite-btn {
+          background: none;
+          border: none;
+          color: var(--card-text-muted);
+          cursor: pointer;
+          padding: 0.25rem;
+          border-radius: 50%;
+          transition: all var(--card-transition-fast);
+          flex-shrink: 0;
+          margin-left: calc(var(--card-spacing) * 0.5);
+
+          &:hover {
+            color: var(--card-error);
+            background: rgba(239, 68, 68, 0.1);
+          }
+
+          &.favorited {
+            color: var(--card-error);
+          }
+        }
+      }
+
+      .workout-meta {
+        margin-bottom: calc(var(--card-spacing) * 0.75);
+
+        .meta-badges {
+          display: flex;
+          gap: calc(var(--card-spacing) * 0.5);
+          margin-bottom: calc(var(--card-spacing) * 0.5);
+
+          .difficulty-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem calc(var(--card-spacing) * 0.5);
+            border-radius: calc(var(--card-radius-sm) * 0.75);
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid currentColor;
+
+            .difficulty-icon {
+              font-size: 0.7rem;
+            }
+          }
+
+          .workout-type-badge {
+            padding: 0.25rem calc(var(--card-spacing) * 0.5);
+            background: var(--card-glass-bg);
+            border: 1px solid var(--card-glass-border);
+            border-radius: calc(var(--card-radius-sm) * 0.75);
+            font-size: 0.75rem;
+            color: var(--card-text-secondary);
+            font-weight: 500;
+          }
+        }
+
+        .meta-stats {
+          display: flex;
+          gap: var(--card-spacing);
+
+          .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            color: var(--card-text-secondary);
+            font-weight: 500;
+
+            svg {
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+
+      .workout-description {
+        font-size: 0.875rem;
+        color: var(--card-text-secondary);
+        line-height: 1.5;
+        margin: 0 0 calc(var(--card-spacing) * 0.75) 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+
+      .equipment-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: calc(var(--card-spacing) * 0.25);
+
+        .equipment-tag {
+          background: rgba(99, 102, 241, 0.1);
+          border: 1px solid rgba(99, 102, 241, 0.2);
+          border-radius: calc(var(--card-radius-sm) * 0.5);
+          padding: 0.125rem calc(var(--card-spacing) * 0.375);
+          font-size: 0.7rem;
+          color: var(--card-accent);
+          font-weight: 500;
+        }
+
+        .equipment-more {
+          background: var(--card-glass-bg);
+          border: 1px solid var(--card-glass-border);
+          border-radius: calc(var(--card-radius-sm) * 0.5);
+          padding: 0.125rem calc(var(--card-spacing) * 0.375);
+          font-size: 0.7rem;
+          color: var(--card-text-muted);
+          font-weight: 500;
+        }
+      }
+    }
+
+    /* Card Actions */
+    .card-actions {
+      position: relative;
+
+      .more-actions-btn {
+        background: none;
+        border: none;
+        color: var(--card-text-muted);
+        cursor: pointer;
+        padding: calc(var(--card-spacing) * 0.375);
+        border-radius: 50%;
+        transition: all var(--card-transition-fast);
+
+        &:hover {
+          color: var(--card-text-primary);
+          background: var(--card-glass-bg);
+        }
+      }
+
+      .actions-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--card-bg);
+        border: 1px solid var(--card-glass-border);
+        border-radius: var(--card-radius-sm);
+        min-width: 160px;
+        box-shadow: var(--card-shadow);
+        backdrop-filter: blur(16px);
+        z-index: 20;
+        animation: slideDown 0.2s ease-out;
+
+        .action-item {
+          display: flex;
+          align-items: center;
+          gap: calc(var(--card-spacing) * 0.5);
+          width: 100%;
+          background: none;
+          border: none;
+          padding: calc(var(--card-spacing) * 0.5) calc(var(--card-spacing) * 0.75);
+          color: var(--card-text-secondary);
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all var(--card-transition-fast);
+          text-align: left;
+
+          &:hover {
+            background: var(--card-glass-bg);
+            color: var(--card-text-primary);
+          }
+
+          &.danger {
+            color: var(--card-error);
+
+            &:hover {
+              background: rgba(239, 68, 68, 0.1);
+            }
+          }
+        }
+
+        .action-divider {
+          height: 1px;
+          background: var(--card-glass-border);
+          margin: calc(var(--card-spacing) * 0.25) 0;
+        }
+      }
+    }
+  }
+
+  /* Card Footer */
+  .card-footer {
+    padding: 0 var(--card-spacing) var(--card-spacing);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--card-spacing) * 0.25);
+
+      .status-info {
+        .status-badge {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          font-size: 0.75rem;
+          font-weight: 500;
+
+          &.completed {
+            color: var(--card-success);
+          }
+
+          &.pending {
+            color: var(--card-text-muted);
+          }
+        }
+      }
+
+      .creation-date {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.7rem;
+        color: var(--card-text-muted);
+      }
+    }
+
+    .footer-right {
+      .rating-stars {
+        display: flex;
+        gap: 0.125rem;
+
+        .star {
+          background: none;
+          border: none;
+          color: var(--card-text-muted);
+          cursor: pointer;
+          padding: 0.125rem;
+          border-radius: 50%;
+          transition: all var(--card-transition-fast);
+
+          &:hover {
+            color: var(--card-warning);
+            transform: scale(1.2);
+          }
+
+          &.active {
+            color: var(--card-warning);
+          }
+        }
+      }
+    }
+  }
+
+  /* Completion Indicator */
+  .completion-indicator {
+    position: absolute;
+    top: calc(var(--card-spacing) * 0.75);
+    right: calc(var(--card-spacing) * 0.75);
+    background: var(--card-success);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--card-transition);
+    z-index: 5;
+
+    svg {
+      color: white;
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+}
+
+/* Loading State */
+.enhanced-workout-card.loading {
+  pointer-events: none;
+
+  .card-header {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: var(--card-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  .workout-info {
+    opacity: 0.5;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: light) {
+  .enhanced-workout-card {
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-glass-bg: rgba(0, 0, 0, 0.03);
+    --card-glass-border: rgba(0, 0, 0, 0.08);
+    --card-text-primary: #1f2937;
+    --card-text-secondary: #6b7280;
+    --card-text-muted: #9ca3af;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+    border-color: var(--card-glass-border);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .enhanced-workout-card {
+    .card-header {
+      .workout-thumbnail-container {
+        .workout-thumbnail {
+          height: 100px;
+        }
+      }
+
+      .workout-info {
+        .workout-title-row {
+          .workout-title {
+            font-size: 1rem;
+          }
+        }
+
+        .workout-meta {
+          .meta-badges {
+            gap: calc(var(--card-spacing) * 0.25);
+
+            .difficulty-badge,
+            .workout-type-badge {
+              font-size: 0.7rem;
+              padding: 0.125rem calc(var(--card-spacing) * 0.375);
+            }
+          }
+
+          .meta-stats {
+            gap: calc(var(--card-spacing) * 0.75);
+
+            .stat-item {
+              font-size: 0.75rem;
+            }
+          }
+        }
+
+        .workout-description {
+          font-size: 0.8rem;
+          -webkit-line-clamp: 2;
+        }
+      }
+    }
+
+    .card-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: calc(var(--card-spacing) * 0.5);
+
+      .footer-left,
+      .footer-right {
+        width: 100%;
+      }
+
+      .footer-right {
+        .rating-stars {
+          justify-content: flex-end;
+        }
+      }
+    }
+
+    &.list {
+      .card-header {
+        flex-direction: column;
+        align-items: stretch;
+
+        .workout-thumbnail-container {
+          margin-right: 0;
+          margin-bottom: calc(var(--card-spacing) * 0.5);
+
+          .workout-thumbnail {
+            width: 100%;
+            height: 80px;
+          }
+        }
+      }
+    }
+  }
+} 

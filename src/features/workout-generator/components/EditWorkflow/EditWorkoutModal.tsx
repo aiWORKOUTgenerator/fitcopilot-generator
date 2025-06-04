@@ -83,12 +83,24 @@ export const EditWorkoutModal: React.FC<EditWorkoutModalProps> = ({
 
     setIsSaving(true);
     try {
-      const updatedWorkout = {
+      // CRITICAL FIX: Ensure the workout has proper ID for updating
+      // Map post_id to id if needed for consistency
+      const workoutToSave = {
         ...editedWorkout,
+        // Ensure id is set from either id or post_id
+        id: editedWorkout.id || (editedWorkout as any).post_id,
         updated_at: new Date().toISOString()
       };
 
-      const savedWorkout = await updateWorkoutAndRefresh(updatedWorkout);
+      console.log('[EditWorkoutModal] Saving workout with ID mapping:', {
+        'original_id': editedWorkout.id,
+        'original_post_id': (editedWorkout as any).post_id,
+        'resolved_id': workoutToSave.id,
+        'title': workoutToSave.title,
+        'version': workoutToSave.version
+      });
+
+      const savedWorkout = await updateWorkoutAndRefresh(workoutToSave);
       
       setHasChanges(false);
       onEditComplete?.(savedWorkout);

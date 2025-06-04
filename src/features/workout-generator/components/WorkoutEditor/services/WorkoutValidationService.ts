@@ -369,7 +369,23 @@ export class WorkoutValidationService {
   private generateCacheKey(type: string, value: any, context?: any): string {
     const valueHash = JSON.stringify(value);
     const contextHash = context ? JSON.stringify(context) : '';
-    return `${type}_${btoa(valueHash + contextHash).replace(/[^a-zA-Z0-9]/g, '')}`;
+    
+    // CRITICAL FIX: Replace btoa with safe encoding for Unicode characters
+    // btoa() only handles Latin1 characters, but workout data may contain emojis/special chars
+    const combinedString = valueHash + contextHash;
+    
+    // Create a simple hash that's safe for all Unicode characters
+    let hash = 0;
+    for (let i = 0; i < combinedString.length; i++) {
+      const char = combinedString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    
+    // Convert to positive hex string
+    const hashString = Math.abs(hash).toString(16);
+    
+    return `${type}_${hashString}`.replace(/[^a-zA-Z0-9_]/g, '');
   }
 
   private getCachedResult(key: string): EnhancedValidationResult | null {

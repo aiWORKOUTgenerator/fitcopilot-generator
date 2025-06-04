@@ -1,18 +1,19 @@
 /**
  * Card Footer Component
  * 
- * Displays workout status, creation date, and rating stars.
+ * Displays workout footer information including creation date, rating, and completion status.
  * Extracted from EnhancedWorkoutCard as part of Week 2 Component Splitting.
  */
 import React from 'react';
-import { CheckCircle, Circle, Calendar, Star } from 'lucide-react';
+import { Star, Calendar, CheckCircle } from 'lucide-react';
+import { WorkoutFormatters } from '../../../utils/ui/formatters';
 
 interface CardFooterProps {
   workout: {
     id: string | number;
+    createdAt: string;
     isCompleted: boolean;
     completedAt?: string;
-    createdAt: string;
     rating?: number;
   };
   onRate?: (id: string, rating: number) => void;
@@ -20,46 +21,14 @@ interface CardFooterProps {
 }
 
 /**
- * CardFooter Component - Displays status, dates, and rating
+ * CardFooter Component - Displays footer information
  */
 export const CardFooter: React.FC<CardFooterProps> = ({
   workout,
   onRate,
   showDetailedDate = false
 }) => {
-  // Format date display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) return 'Today';
-    if (diffDays === 2) return 'Yesterday';
-    if (diffDays <= 7) return `${diffDays} days ago`;
-    
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-    });
-  };
-
-  // Format detailed date with time for debugging
-  const formatDetailedDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
-  const handleRating = (rating: number, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleRating = (rating: number) => {
     if (onRate) {
       onRate(workout.id.toString(), rating);
     }
@@ -67,57 +36,49 @@ export const CardFooter: React.FC<CardFooterProps> = ({
 
   return (
     <div className="card-footer">
+      {/* Left side - Date info */}
       <div className="footer-left">
-        {/* Status Info */}
-        <div className="status-info">
-          {workout.isCompleted ? (
-            <div className="status-badge completed">
-              <CheckCircle size={14} />
-              <span>Completed {workout.completedAt ? formatDate(workout.completedAt) : ''}</span>
-            </div>
-          ) : (
-            <div className="status-badge pending">
-              <Circle size={14} />
-              <span>Not completed</span>
-            </div>
-          )}
-        </div>
-        
-        {/* Creation Date */}
-        <div className="creation-date">
-          <Calendar size={12} />
-          <span>Created {formatDate(workout.createdAt)}</span>
-          
-          {/* Debug: Show detailed date info */}
-          {showDetailedDate && (
-            <div style={{ 
-              fontSize: '0.6rem', 
-              opacity: 0.6, 
-              marginTop: '2px' 
-            }}>
-              {formatDetailedDate(workout.createdAt)}
-            </div>
-          )}
-        </div>
+        {workout.isCompleted && workout.completedAt ? (
+          <div className="completion-info">
+            <CheckCircle size={12} className="completion-icon" />
+            <span>Completed {WorkoutFormatters.formatRelativeDate(workout.completedAt)}</span>
+          </div>
+        ) : (
+          <div className="creation-info">
+            <Calendar size={12} />
+            <span>Created {WorkoutFormatters.formatRelativeDate(workout.createdAt)}</span>
+          </div>
+        )}
+
+        {/* Detailed date for debugging */}
+        {showDetailedDate && (
+          <div className="detailed-date" style={{ 
+            fontSize: '0.75rem', 
+            color: '#6b7280', 
+            marginTop: '2px' 
+          }}>
+            Full date: {WorkoutFormatters.formatDate(workout.createdAt)}
+          </div>
+        )}
       </div>
 
-      <div className="footer-right">
-        {/* Rating Stars */}
-        {workout.rating !== undefined && onRate && (
+      {/* Right side - Rating */}
+      {onRate && (
+        <div className="footer-right">
           <div className="rating-stars">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
-                className={`star ${star <= (workout.rating || 0) ? 'filled' : ''}`}
-                onClick={(e) => handleRating(star, e)}
+                className={`star-btn ${workout.rating && workout.rating >= star ? 'filled' : ''}`}
+                onClick={() => handleRating(star)}
                 title={`Rate ${star} star${star !== 1 ? 's' : ''}`}
               >
-                <Star size={12} />
+                <Star size={14} />
               </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

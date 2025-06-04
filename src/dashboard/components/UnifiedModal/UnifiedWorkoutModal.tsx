@@ -18,11 +18,13 @@ import {
   Zap,
   ChevronDown,
   ChevronRight,
-  Loader
+  Loader,
+  Plus,
+  Minus
 } from 'lucide-react';
 import Button from '../../../components/ui/Button/Button';
 import { useWorkoutContext } from '../../../features/workout-generator/context/WorkoutContext';
-import { GeneratedWorkout } from '../../../features/workout-generator/types/workout';
+import { GeneratedWorkout, Exercise, TimedExercise, SetsExercise } from '../../../features/workout-generator/types/workout';
 import './UnifiedModal.scss';
 
 export type ModalMode = 'view' | 'edit';
@@ -146,6 +148,197 @@ const ExerciseSection: React.FC<ExerciseSectionProps> = ({
 };
 
 /**
+ * Editable Exercise Section Component for edit mode
+ */
+interface EditableExerciseSectionProps {
+  title: string;
+  exercises: Exercise[];
+  sectionType: 'warm-up' | 'main' | 'cool-down';
+  isExpanded: boolean;
+  onToggle: () => void;
+  onExercisesChange: (exercises: Exercise[], sectionType: string) => void;
+}
+
+const EditableExerciseSection: React.FC<EditableExerciseSectionProps> = ({
+  title,
+  exercises,
+  sectionType,
+  isExpanded,
+  onToggle,
+  onExercisesChange
+}) => {
+  // Helper function to determine if exercise is timed
+  const isTimedExercise = (exercise: Exercise): exercise is TimedExercise => {
+    return 'duration' in exercise;
+  };
+
+  // Helper function to determine if exercise is sets-based
+  const isSetsExercise = (exercise: Exercise): exercise is SetsExercise => {
+    return 'sets' in exercise && 'reps' in exercise;
+  };
+
+  // Update individual exercise
+  const updateExercise = (index: number, updatedExercise: Exercise) => {
+    const newExercises = [...exercises];
+    newExercises[index] = updatedExercise;
+    onExercisesChange(newExercises, sectionType);
+  };
+
+  // Remove exercise
+  const removeExercise = (index: number) => {
+    const newExercises = exercises.filter((_, i) => i !== index);
+    onExercisesChange(newExercises, sectionType);
+  };
+
+  // Add new exercise
+  const addExercise = () => {
+    const newExercise: Exercise = sectionType === 'main' 
+      ? {
+          name: '',
+          sets: 3,
+          reps: 12,
+          description: '',
+          type: 'main',
+          section: title
+        }
+      : {
+          name: '',
+          duration: '30 seconds',
+          description: '',
+          type: sectionType as 'warm-up' | 'cool-down',
+          section: title
+        };
+    
+    const newExercises = [...exercises, newExercise];
+    onExercisesChange(newExercises, sectionType);
+  };
+
+  return (
+    <div className={`exercise-section editable ${isExpanded ? 'expanded' : ''}`}>
+      <div className="section-header" onClick={onToggle}>
+        <div className="section-info">
+          <h3 className="section-title">{title}</h3>
+          <div className="section-meta">
+            <span className="exercise-count">
+              <Target size={14} />
+              {exercises.length} exercise{exercises.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+        <div className="section-toggle">
+          {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+        </div>
+      </div>
+      
+      <div className={`section-content ${isExpanded ? 'expanded' : ''}`}>
+        <div className="exercises-list">
+          {exercises.map((exercise, index) => (
+            <div key={index} className="exercise-item editable">
+              <div className="exercise-form">
+                {/* Exercise Name */}
+                <div className="form-row">
+                  <label className="form-label">Exercise Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={exercise.name}
+                    onChange={(e) => updateExercise(index, { ...exercise, name: e.target.value })}
+                    placeholder="Enter exercise name"
+                  />
+                  <Button
+                    variant="text"
+                    size="sm"
+                    onClick={() => removeExercise(index)}
+                    className="remove-exercise-btn"
+                    aria-label="Remove exercise"
+                  >
+                    <Minus size={16} />
+                  </Button>
+                </div>
+
+                {/* Exercise Details - Timed vs Sets */}
+                <div className="form-row">
+                  {isTimedExercise(exercise) ? (
+                    <>
+                      <div className="form-field">
+                        <label className="form-label">Duration</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={exercise.duration}
+                          onChange={(e) => updateExercise(index, { ...exercise, duration: e.target.value })}
+                          placeholder="e.g., 30 seconds, 2 minutes"
+                        />
+                      </div>
+                    </>
+                  ) : isSetsExercise(exercise) ? (
+                    <>
+                      <div className="form-field">
+                        <label className="form-label">Sets</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          min="1"
+                          max="20"
+                          value={exercise.sets}
+                          onChange={(e) => updateExercise(index, { 
+                            ...exercise, 
+                            sets: parseInt(e.target.value) || 1 
+                          })}
+                        />
+                      </div>
+                      <div className="form-field">
+                        <label className="form-label">Reps</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          min="1"
+                          max="100"
+                          value={exercise.reps}
+                          onChange={(e) => updateExercise(index, { 
+                            ...exercise, 
+                            reps: parseInt(e.target.value) || 1 
+                          })}
+                        />
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+
+                {/* Exercise Description */}
+                <div className="form-row">
+                  <label className="form-label">Description</label>
+                  <textarea
+                    className="form-textarea"
+                    value={exercise.description}
+                    onChange={(e) => updateExercise(index, { ...exercise, description: e.target.value })}
+                    placeholder="Exercise instructions or notes"
+                    rows={2}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Add Exercise Button */}
+          <div className="add-exercise-section">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addExercise}
+              className="add-exercise-btn"
+            >
+              <Plus size={16} />
+              Add Exercise
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
  * Unified Workout Modal Component
  */
 export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
@@ -178,52 +371,117 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
     }
   }, [mode, workout]);
 
-  // Handle escape key
+  // Handle escape key with proper cleanup
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen && !isSaving && !isDeleting) {
-        handleClose();
+        onClose();
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, isSaving, isDeleting]);
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
 
-  // Memoized workout statistics
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, isSaving, isDeleting, onClose]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      // Any resize-specific logic can go here
+    };
+
+    if (isOpen) {
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isOpen]);
+
+  // Workout statistics computation
   const workoutStats = useMemo(() => {
     if (!workout) return null;
-    
-    const totalExercises = workout.exercises?.length || 0;
+
+    const exercises = workout.exercises || [];
     const estimatedDuration = workout.duration || 30;
     const difficulty = workout.difficulty || 'intermediate';
-    
+
     return {
-      totalExercises,
+      totalExercises: exercises.length,
       estimatedDuration,
       difficulty
     };
   }, [workout]);
 
   // Section toggle handler
-  const handleSectionToggle = useCallback((sectionKey: string) => {
+  const handleSectionToggle = useCallback((sectionId: string) => {
     setExpandedSections(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(sectionKey)) {
-        newSet.delete(sectionKey);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
       } else {
-        newSet.add(sectionKey);
+        newSet.add(sectionId);
       }
       return newSet;
     });
   }, []);
 
-  // Mode switch with transition
-  const handleModeSwitch = useCallback(async (newMode: ModalMode) => {
-    if (mode === newMode || isTransitioning) return;
+  // Exercise update handler for edit mode
+  const handleExercisesChange = useCallback((newExercises: Exercise[], sectionType: string) => {
+    if (mode !== 'edit' || !editedWorkout) return;
 
-    // Check for unsaved changes when switching from edit to view
-    if (mode === 'edit' && hasChanges) {
+    // Get all exercises and replace the ones for this section
+    const allExercises = editedWorkout.exercises || [];
+    
+    // Filter out exercises from the current section
+    const otherExercises = allExercises.filter(ex => {
+      const exerciseSection = ex.section?.toLowerCase() || '';
+      const exerciseType = ex.type || '';
+      
+      if (sectionType === 'warm-up') {
+        return exerciseType !== 'warm-up' && !exerciseSection.includes('warm');
+      } else if (sectionType === 'cool-down') {
+        return exerciseType !== 'cool-down' && !exerciseSection.includes('cool');
+      } else {
+        return exerciseType === 'warm-up' || exerciseType === 'cool-down' || 
+               exerciseSection.includes('warm') || exerciseSection.includes('cool');
+      }
+    });
+
+    // Combine other exercises with new exercises for this section
+    const updatedExercises = [...otherExercises, ...newExercises];
+
+    setEditedWorkout(prev => prev ? {
+      ...prev,
+      exercises: updatedExercises
+    } : null);
+    setHasChanges(true);
+  }, [mode, editedWorkout]);
+
+  // Close handler with unsaved changes check
+  const handleClose = useCallback(() => {
+    if (hasChanges && mode === 'edit') {
+      const confirmClose = window.confirm(
+        'You have unsaved changes. Are you sure you want to close without saving?'
+      );
+      if (!confirmClose) return;
+    }
+    onClose();
+  }, [hasChanges, mode, onClose]);
+
+  // Mode switch handler with transition
+  const handleModeSwitch = useCallback((newMode: ModalMode) => {
+    if (newMode === mode || isTransitioning) return;
+
+    if (hasChanges && mode === 'edit' && newMode === 'view') {
       const confirmSwitch = window.confirm(
         'You have unsaved changes. Are you sure you want to switch to view mode without saving?'
       );
@@ -231,33 +489,17 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
     }
 
     setIsTransitioning(true);
-    
-    // Brief transition delay for smooth UX
+    onModeChange(newMode);
+
+    // Reset transition state after animation
     setTimeout(() => {
-      onModeChange(newMode);
       setIsTransitioning(false);
-      
-      // Reset changes when switching away from edit mode
-      if (newMode !== 'edit') {
+      if (newMode === 'view') {
         setHasChanges(false);
         setEditedWorkout(null);
       }
     }, 150);
   }, [mode, hasChanges, onModeChange, isTransitioning]);
-
-  // Close handler with unsaved changes check
-  const handleClose = useCallback(() => {
-    if (mode === 'edit' && hasChanges && !isSaving) {
-      const confirmClose = window.confirm(
-        'You have unsaved changes. Are you sure you want to close without saving?'
-      );
-      if (!confirmClose) return;
-    }
-    
-    setEditedWorkout(null);
-    setHasChanges(false);
-    onClose();
-  }, [mode, hasChanges, isSaving, onClose]);
 
   // Input change handler for edit mode
   const handleInputChange = useCallback((field: keyof GeneratedWorkout, value: any) => {
@@ -276,24 +518,43 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
 
     setIsSaving(true);
     try {
+      console.log('[UnifiedWorkoutModal] Preparing to save workout:', {
+        id: editedWorkout.id,
+        title: editedWorkout.title,
+        originalVersion: workout?.version,
+        editedVersion: editedWorkout.version,
+        exerciseCount: editedWorkout.exercises?.length || 0
+      });
+
+      // CRITICAL FIX: Ensure version is preserved from original workout
       const updatedWorkout = {
         ...editedWorkout,
+        // Preserve version from original workout if not already set
+        version: editedWorkout.version || workout?.version || 1,
         updated_at: new Date().toISOString()
       };
 
+      console.log('[UnifiedWorkoutModal] Saving workout with version:', {
+        id: updatedWorkout.id,
+        version: updatedWorkout.version,
+        title: updatedWorkout.title
+      });
+
       await onSave(updatedWorkout);
       setHasChanges(false);
+      
+      console.log('[UnifiedWorkoutModal] Workout saved successfully');
       
       // Auto-switch to view mode after saving
       setTimeout(() => {
         handleModeSwitch('view');
       }, 500);
     } catch (error) {
-      console.error('Failed to save workout:', error);
+      console.error('[UnifiedWorkoutModal] Failed to save workout:', error);
     } finally {
       setIsSaving(false);
     }
-  }, [editedWorkout, isSaving, mode, onSave, handleModeSwitch]);
+  }, [editedWorkout, isSaving, mode, onSave, handleModeSwitch, workout]);
 
   // Delete handler
   const handleDelete = useCallback(async () => {
@@ -306,10 +567,11 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
 
     setIsDeleting(true);
     try {
+      const workoutId = workout.id?.toString() || '';
       if (onDelete) {
-        await onDelete(workout.id);
+        await onDelete(workoutId);
       } else {
-        await deleteWorkoutAndRefresh(workout.id);
+        await deleteWorkoutAndRefresh(workoutId);
       }
       onClose();
     } catch (error) {
@@ -351,39 +613,45 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
 
   return (
     <div 
-      className={`unified-workout-modal-overlay ${isOpen ? 'visible' : ''}`}
+      className={`unified-workout-modal-overlay ${isOpen ? 'visible' : ''} glass-morphism`}
       onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
     >
-      <div className={`unified-workout-modal ${isTransitioning ? 'transitioning' : ''}`}>
-        {/* Modal Header */}
-        <div className="modal-header">
+      <div className={`unified-workout-modal glass-surface ${isTransitioning ? 'transitioning' : ''}`}>
+        {/* Enhanced Modal Header with Glass Morphism */}
+        <div className="modal-header glass-header">
           <div className="header-content">
             <div className="workout-info">
               {mode === 'edit' ? (
                 <input
+                  id="modal-title"
                   type="text"
-                  className="workout-title-input"
+                  className="workout-title-input glass-input"
                   value={currentWorkout.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   disabled={isSaving}
                   placeholder="Enter workout title"
+                  aria-label="Workout title"
                 />
               ) : (
-                <h2 className="workout-title">{currentWorkout.title}</h2>
+                <h2 id="modal-title" className="workout-title">{currentWorkout.title}</h2>
               )}
               
               {workoutStats && (
-                <div className="workout-stats">
-                  <div className="stat">
-                    <Target size={16} />
+                <div className="workout-stats" id="modal-description">
+                  <div className="stat glass-stat">
+                    <Target size={16} aria-hidden="true" />
                     <span>{workoutStats.totalExercises} exercises</span>
                   </div>
-                  <div className="stat">
-                    <Clock size={16} />
+                  <div className="stat glass-stat">
+                    <Clock size={16} aria-hidden="true" />
                     <span>{workoutStats.estimatedDuration} min</span>
                   </div>
-                  <div className="stat">
-                    <Zap size={16} />
+                  <div className="stat glass-stat">
+                    <Zap size={16} aria-hidden="true" />
                     <span className={`difficulty difficulty-${workoutStats.difficulty}`}>
                       {workoutStats.difficulty}
                     </span>
@@ -419,7 +687,7 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
 
               {/* Close Button */}
               <Button
-                variant="ghost"
+                variant="text"
                 size="sm"
                 onClick={handleClose}
                 disabled={isSaving || isDeleting}
@@ -502,39 +770,88 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
               <div className="exercise-sections">
                 {currentWorkout.exercises && currentWorkout.exercises.length > 0 ? (
                   <>
-                    {/* Group exercises by type/section */}
-                    <ExerciseSection
-                      title="Warm-up"
-                      exercises={currentWorkout.exercises.filter(ex => 
-                        ex.type === 'warm-up' || 
-                        (ex.section && ex.section.toLowerCase().includes('warm'))
-                      ) || []}
-                      isExpanded={expandedSections.has('warm-up')}
-                      onToggle={() => handleSectionToggle('warm-up')}
-                      mode={mode}
-                    />
-                    <ExerciseSection
-                      title="Main Workout"
-                      exercises={currentWorkout.exercises.filter(ex => 
-                        ex.type === 'main' || 
-                        ex.type === 'strength' ||
-                        !ex.type ||
-                        (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
-                      ) || currentWorkout.exercises}
-                      isExpanded={expandedSections.has('main')}
-                      onToggle={() => handleSectionToggle('main')}
-                      mode={mode}
-                    />
-                    <ExerciseSection
-                      title="Cool-down"
-                      exercises={currentWorkout.exercises.filter(ex => 
-                        ex.type === 'cool-down' || 
-                        (ex.section && ex.section.toLowerCase().includes('cool'))
-                      ) || []}
-                      isExpanded={expandedSections.has('cool-down')}
-                      onToggle={() => handleSectionToggle('cool-down')}
-                      mode={mode}
-                    />
+                    {mode === 'edit' ? (
+                      // Edit Mode - Use Editable Exercise Sections
+                      <>
+                        <EditableExerciseSection
+                          title="Warm-up"
+                          exercises={currentWorkout.exercises.filter(ex => 
+                            ex.type === 'warm-up' || 
+                            (ex.section && ex.section.toLowerCase().includes('warm'))
+                          ) || []}
+                          sectionType="warm-up"
+                          isExpanded={expandedSections.has('warm-up')}
+                          onToggle={() => handleSectionToggle('warm-up')}
+                          onExercisesChange={(exercises, sectionType) => {
+                            handleExercisesChange(exercises, sectionType);
+                          }}
+                        />
+                        <EditableExerciseSection
+                          title="Main Workout"
+                          exercises={currentWorkout.exercises.filter(ex => 
+                            ex.type === 'main' || 
+                            ex.type === 'strength' ||
+                            !ex.type ||
+                            (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
+                          ) || currentWorkout.exercises}
+                          sectionType="main"
+                          isExpanded={expandedSections.has('main')}
+                          onToggle={() => handleSectionToggle('main')}
+                          onExercisesChange={(exercises, sectionType) => {
+                            handleExercisesChange(exercises, sectionType);
+                          }}
+                        />
+                        <EditableExerciseSection
+                          title="Cool-down"
+                          exercises={currentWorkout.exercises.filter(ex => 
+                            ex.type === 'cool-down' || 
+                            (ex.section && ex.section.toLowerCase().includes('cool'))
+                          ) || []}
+                          sectionType="cool-down"
+                          isExpanded={expandedSections.has('cool-down')}
+                          onToggle={() => handleSectionToggle('cool-down')}
+                          onExercisesChange={(exercises, sectionType) => {
+                            handleExercisesChange(exercises, sectionType);
+                          }}
+                        />
+                      </>
+                    ) : (
+                      // View Mode - Use Regular Exercise Sections
+                      <>
+                        <ExerciseSection
+                          title="Warm-up"
+                          exercises={currentWorkout.exercises.filter(ex => 
+                            ex.type === 'warm-up' || 
+                            (ex.section && ex.section.toLowerCase().includes('warm'))
+                          ) || []}
+                          isExpanded={expandedSections.has('warm-up')}
+                          onToggle={() => handleSectionToggle('warm-up')}
+                          mode={mode}
+                        />
+                        <ExerciseSection
+                          title="Main Workout"
+                          exercises={currentWorkout.exercises.filter(ex => 
+                            ex.type === 'main' || 
+                            ex.type === 'strength' ||
+                            !ex.type ||
+                            (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
+                          ) || currentWorkout.exercises}
+                          isExpanded={expandedSections.has('main')}
+                          onToggle={() => handleSectionToggle('main')}
+                          mode={mode}
+                        />
+                        <ExerciseSection
+                          title="Cool-down"
+                          exercises={currentWorkout.exercises.filter(ex => 
+                            ex.type === 'cool-down' || 
+                            (ex.section && ex.section.toLowerCase().includes('cool'))
+                          ) || []}
+                          isExpanded={expandedSections.has('cool-down')}
+                          onToggle={() => handleSectionToggle('cool-down')}
+                          mode={mode}
+                        />
+                      </>
+                    )}
                   </>
                 ) : (
                   <div className="no-exercises">

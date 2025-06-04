@@ -14,6 +14,7 @@ import { AutoResizeTextareaWithCounter } from '../../../../components/ui/AutoRes
 import { FormFieldEnhanced } from '../../../profile/components/enhanced/FormFieldEnhanced';
 import { X, Save, Loader, Edit3, FileText, Clock, Target, Dumbbell } from 'lucide-react';
 import { WorkoutDifficulty } from '../../types/workout';
+import { saveWorkout } from '../../services/workoutService';
 import ExerciseList from './ExerciseList';
 
 // Import our modular enhancements
@@ -65,18 +66,58 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
   const { state, dispatch, clearError, clearAllErrors } = useWorkoutEditor();
   const { workout, isDirty, isSaving, validationErrors } = state;
 
-  // Handle save button click (moved up to be available for hooks)
+  // ===== STEP 5: MODULAR HOOK INTEGRATION =====
+  
+  // Single consolidated save function that handles everything
   const handleSave = async (): Promise<{ success: boolean; data?: any; error?: string; timestamp: number; duration: number }> => {
     const startTime = Date.now();
     
-    // Validate the form before saving
+    console.log('[WorkoutEditor] SIMPLIFIED SAVE FUNCTION:', {
+      'workout_exists': !!workout,
+      'workout_title': workout?.title || 'undefined',
+      'workout_exercises_length': workout?.exercises?.length || 0,
+      'isNewWorkout': isNewWorkout,
+      'isDirty': isDirty
+    });
+
+    // GUARD: Check if workout data exists
+    if (!workout) {
+      console.error('[WorkoutEditor] SAVE FAILED: workout data is undefined');
+      return {
+        success: false,
+        error: 'Workout data not available',
+        timestamp: Date.now(),
+        duration: Date.now() - startTime
+      };
+    }
+
+    // INLINE VALIDATION - Check validation hook first
+    if (validation.hasErrors) {
+      console.log('[WorkoutEditor] SAVE BLOCKED by validation hook:', validation.workoutValidation.errors);
+      // Convert validation result to the format expected by the editor
+      const errors: Record<string, string> = {};
+      validation.workoutValidation.errors.forEach((error: any) => {
+        if (error.field) {
+          errors[error.field] = error.message;
+        }
+      });
+      dispatch({ type: 'SET_VALIDATION_ERRORS', payload: errors });
+      return {
+        success: false,
+        error: 'Validation failed',
+        timestamp: Date.now(),
+        duration: Date.now() - startTime
+      };
+    }
+    
+    // INLINE VALIDATION - Basic field checks
     const errors: Record<string, string> = {};
     
-    if (!workout.title.trim()) {
+    if (!workout.title?.trim()) {
       errors.title = 'Title is required';
     }
     
-    if (workout.exercises.length === 0) {
+    if (!workout.exercises || workout.exercises.length === 0) {
       errors.exercises = 'At least one exercise is required';
     }
     
@@ -89,21 +130,102 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
         duration: Date.now() - startTime
       };
     }
-    
+
     // Set saving state
     dispatch({ type: 'SET_SAVING', payload: true });
     
     try {
-      // Call the save callback
-      await onSave(workout);
+      // CRITICAL FIX: Convert editor format to GeneratedWorkout format
+      // Check if this workout is already saved (has postId)
+      const workoutId = workout.postId;
+      const isExistingWorkout = !!(workoutId && 
+                                  workoutId !== 0 &&
+                                  typeof workoutId === 'number' && 
+                                  workoutId > 0);
+      
+      // Convert editor exercises to GeneratedWorkout exercise format
+      const convertedExercises = workout.exercises.map(exercise => ({
+        id: exercise.id,
+        name: exercise.name,
+        sets: exercise.sets,
+        reps: exercise.reps,
+        description: exercise.notes || '', // Map notes to description
+        notes: exercise.notes
+      }));
+      
+      // Prepare workout data in GeneratedWorkout format
+      const workoutToSave = {
+        id: workoutId, // Use postId as id
+        title: workout.title,
+        description: workout.notes || '',
+        duration: workout.duration,
+        difficulty: workout.difficulty,
+        equipment: workout.equipment,
+        goals: workout.goals,
+        exercises: convertedExercises,
+        version: workout.version || 1,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('[WorkoutEditor] SAVE PREPARATION:', {
+        'workout.postId': workout.postId,
+        'resolved_workoutId': workoutId,
+        'isExistingWorkout': isExistingWorkout,
+        'has_exercises': !!workoutToSave.exercises,
+        'exercises_length': workoutToSave.exercises?.length || 0,
+        'version': workoutToSave.version,
+        'save_method': isExistingWorkout ? 'UPDATE' : 'CREATE'
+      });
+
+      // Call the appropriate save service
+      const savedWorkout = await saveWorkout(workoutToSave);
+      
+      console.log('[WorkoutEditor] SAVE RESPONSE:', {
+        'response_id': savedWorkout.id,
+        'response_post_id': (savedWorkout as any).post_id,
+        'response_version': savedWorkout.version,
+        'response_exercises_count': savedWorkout.exercises?.length || 0,
+        'operation': isExistingWorkout ? 'UPDATE' : 'CREATE'
+      });
+      
+      // FIXED: Merge save response with existing workout instead of replacing
+      const updatedWorkout = {
+        ...workout,
+        // Update with save metadata from response
+        postId: typeof savedWorkout.id === 'number' ? savedWorkout.id : 
+                (typeof (savedWorkout as any).post_id === 'number' ? (savedWorkout as any).post_id : workout.postId),
+        version: savedWorkout.version || workout.version,
+        lastModified: savedWorkout.lastModified || workout.lastModified,
+        // Keep all existing workout data (exercises, title, etc.)
+        exercises: workout.exercises, // Preserve exercises array
+        title: workout.title,         // Preserve title
+        notes: workout.notes,         // Use notes field (not description)
+        difficulty: workout.difficulty,
+        duration: workout.duration,
+        equipment: workout.equipment || [],
+        goals: workout.goals || []
+      };
+      
+      console.log('[WorkoutEditor] MERGED WORKOUT DATA:', {
+        'has_exercises': !!updatedWorkout.exercises,
+        'exercises_length': updatedWorkout.exercises?.length || 0,
+        'has_title': !!updatedWorkout.title,
+        'version': updatedWorkout.version,
+        'postId': updatedWorkout.postId
+      });
+      
+      // Update local state with merged workout data
+      dispatch({ type: 'SET_WORKOUT', payload: updatedWorkout });
+      
       return {
         success: true,
-        data: workout,
+        data: updatedWorkout,
         timestamp: Date.now(),
         duration: Date.now() - startTime
       };
     } catch (error) {
-      console.error('Save failed:', error);
+      console.error('[WorkoutEditor] SAVE FAILED:', error);
       // Handle save error
       dispatch({ type: 'SET_FIELD_ERROR', payload: { field: 'general', message: 'Save failed. Please try again.' } });
       return {
@@ -117,8 +239,6 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
     }
   };
 
-  // ===== STEP 5: MODULAR HOOK INTEGRATION =====
-  
   // Auto-save functionality with debounced saves
   const autoSave = useAutoSave(handleSave, {
     debounceMs: 2000,
@@ -147,25 +267,6 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
       autoSaveEnabled: !isNewWorkout // Enable auto-save for existing workouts
     }
   );
-
-  // Enhanced save function that uses validation and auto-save
-  const enhancedHandleSave = async () => {
-    // If validation errors exist, show them and don't save
-    if (validation.hasErrors) {
-      // Convert validation result to the format expected by the editor
-      const errors: Record<string, string> = {};
-      validation.workoutValidation.errors.forEach((error: any) => {
-        if (error.field) {
-          errors[error.field] = error.message;
-        }
-      });
-      dispatch({ type: 'SET_VALIDATION_ERRORS', payload: errors });
-      return;
-    }
-    
-    // Use the regular save function
-    await handleSave();
-  };
 
   // Clear all validation errors when component unmounts
   useEffect(() => {
@@ -241,6 +342,23 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
 
   // Determine if save button should be disabled
   const isSaveDisabled = isLoading || isSaving || (!isDirty && !isNewWorkout);
+  
+  // Debug save button state only when values change (prevent infinite loop)
+  useEffect(() => {
+    console.log('[WorkoutEditor] SAVE BUTTON STATE DEBUG:', {
+      'isSaveDisabled': isSaveDisabled,
+      'isLoading': isLoading,
+      'isSaving': isSaving,
+      'isDirty': isDirty,
+      'isNewWorkout': isNewWorkout,
+      'conditions': {
+        'isLoading_OR_isSaving': isLoading || isSaving,
+        'NOT_isDirty_AND_NOT_isNewWorkout': (!isDirty && !isNewWorkout),
+        'should_be_enabled_for_new': isNewWorkout,
+        'should_be_enabled_for_dirty': isDirty
+      }
+    });
+  }, [isSaveDisabled, isLoading, isSaving, isDirty, isNewWorkout]); // Only log when these values change
 
   // Calculate workout stats for display
   const totalExercises = workout.exercises.length;
@@ -502,7 +620,7 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
             <Button
               variant="gradient"
               size="lg"
-              onClick={enhancedHandleSave}
+              onClick={handleSave}
               disabled={isSaveDisabled}
               startIcon={isSaving ? <Loader size={18} /> : <Save size={18} />}
               aria-label={isSaving ? "Saving workout" : "Save workout"}

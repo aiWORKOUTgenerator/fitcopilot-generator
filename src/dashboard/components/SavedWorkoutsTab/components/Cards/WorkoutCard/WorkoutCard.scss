@@ -1,0 +1,283 @@
+/**
+ * Basic Workout Card Styles
+ * 
+ * Phase 2, Day 5: Modular styling for base WorkoutCard component
+ * Extracted from legacy SavedWorkoutsTab.scss and optimized
+ */
+
+// Import shared card styles
+@import '../shared/shared-cards';
+
+// ===========================================
+// Card Foundation
+// ===========================================
+
+.workout-card {
+  @include card-base;
+  @include card-hover;
+  @include card-focus;
+
+  // Selection state
+  &--selected {
+    @include card-selected;
+  }
+  
+  // View mode variations
+  &--grid {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 280px;
+  }
+
+  &--list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 100px;
+    padding: var(--space-lg);
+  }
+  
+  // Completion states
+  &--completed {
+    @extend .card-completed;
+  }
+
+  &--pending {
+    // Default state
+  }
+
+  // Loading state
+  &--loading {
+    @extend .card-loading;
+  }
+
+  // Error state  
+  &--error {
+    @extend .card-error;
+  }
+
+  // Action visibility
+  &--actions-visible {
+    .workout-card__actions {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+// ===========================================
+// Card Header
+// ===========================================
+
+.workout-card__header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--surface-light);
+  
+  .workout-card--list & {
+    border-bottom: none;
+    background: transparent;
+    padding: 0 var(--space-lg) 0 0;
+    flex: 0 0 200px;
+  }
+}
+
+.workout-card__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  line-height: 1.4;
+  
+  @include truncate-text(2);
+  
+  .workout-card--list & {
+    margin-bottom: var(--space-xs);
+    @include truncate-text(1);
+  }
+}
+
+.workout-card__meta {
+  display: flex;
+  gap: var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  
+  .workout-card--list & {
+    gap: var(--space-sm);
+  }
+}
+
+.workout-card__duration,
+.workout-card__difficulty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.workout-card__difficulty {
+  &--beginner { color: #10B981; }
+  &--intermediate { color: #F59E0B; }
+  &--advanced { color: #EF4444; }
+}
+
+// ===========================================
+// Card Content
+// ===========================================
+
+.workout-card__content {
+  padding: var(--space-lg);
+  flex: 1;
+  
+  .workout-card--list & {
+    flex: 1;
+    padding: 0 var(--space-lg);
+  }
+}
+
+.workout-card__description {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+  
+  @include truncate-text(3);
+  
+  .workout-card--list & {
+    @include truncate-text(2);
+    margin-bottom: var(--space-sm);
+  }
+}
+
+.workout-card__exercises {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+  
+  strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+}
+
+.workout-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--space-md);
+  
+  .workout-card--list & {
+    margin-top: var(--space-sm);
+  }
+}
+
+.workout-card__tag {
+  @extend .card-tag;
+}
+
+// ===========================================
+// Card Actions
+// ===========================================
+
+.workout-card__actions {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-light);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  
+  .workout-card--list & {
+    border-top: none;
+    background: transparent;
+    padding: 0;
+    flex: 0 0 auto;
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  // Show on hover (grid mode only)
+  .workout-card:hover & {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.workout-card__action-group {
+  display: flex;
+  gap: 6px;
+}
+
+.workout-card__action {
+  @extend .card-action;
+}
+
+// ===========================================
+// Responsive Design
+// ===========================================
+
+@include mobile-only {
+  .workout-card {
+    &--grid {
+      min-height: 240px;
+    }
+    
+    &--list {
+      flex-direction: column;
+      align-items: stretch;
+      
+      .workout-card__header,
+      .workout-card__content,
+      .workout-card__actions {
+        padding: var(--space-md);
+        flex: none;
+      }
+      
+      .workout-card__actions {
+        opacity: 1;
+        visibility: visible;
+        border-top: 1px solid var(--border-light);
+        background: var(--surface-light);
+      }
+    }
+  }
+  
+  .workout-card__title {
+    font-size: 15px;
+  }
+  
+  .workout-card__actions {
+    flex-wrap: wrap;
+  }
+  
+  .workout-card__action {
+    font-size: var(--text-xs);
+    padding: 5px 10px;
+  }
+}
+
+// ===========================================
+// Dark Mode Support
+// ===========================================
+
+@media (prefers-color-scheme: dark) {
+  .workout-card {
+    --card-bg: #1f2937;
+    --surface-light: #374151;
+    --surface-accent: #4b5563;
+    --border-color: #4b5563;
+    --border-light: #374151;
+    --border-hover: #6b7280;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+  }
+} 

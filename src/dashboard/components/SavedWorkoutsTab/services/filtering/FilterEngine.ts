@@ -5,8 +5,8 @@
  * Extracted from WorkoutGrid.tsx as part of Week 1 Foundation Sprint.
  */
 
-// Import types (using existing interfaces from WorkoutGrid for now)
-interface DisplayWorkout {
+// Export types for external use
+export interface DisplayWorkout {
   id: string | number;
   title: string;
   description: string;
@@ -26,7 +26,7 @@ interface DisplayWorkout {
   rating?: number;
 }
 
-interface WorkoutFilters {
+export interface WorkoutFilters {
   difficulty: string[];
   workoutType: string[];
   equipment: string[];
@@ -37,6 +37,12 @@ interface WorkoutFilters {
   tags: string[];
   createdDate: { start: Date | null; end: Date | null };
   searchQuery: string;
+}
+
+export interface FilterResult {
+  filteredWorkouts: DisplayWorkout[];
+  totalCount: number;
+  appliedFilters: string[];
 }
 
 export class FilterEngine {

@@ -6,7 +6,7 @@
  */
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import { useWorkoutList } from '../hooks/useWorkoutList';
-import { saveWorkout, deleteWorkout, updateWorkout } from '../services/workoutService';
+import { saveWorkout, deleteWorkout } from '../services/workoutService';
 import { GeneratedWorkout } from '../types/workout';
 
 interface WorkoutContextValue {
@@ -152,12 +152,38 @@ export const WorkoutProvider: React.FC<WorkoutProviderProps> = ({ children }) =>
       // Store original for rollback
       const originalWorkout = workouts.find(w => w.id === workout.id);
       
+      // CRITICAL FIX: Ensure version is included for proper versioning
+      const workoutWithVersion = {
+        ...workout,
+        // If version is missing or invalid, get it from the original or default to 1
+        version: (workout.version !== undefined && workout.version !== null) 
+          ? workout.version 
+          : (originalWorkout?.version !== undefined && originalWorkout?.version !== null)
+            ? originalWorkout.version 
+            : 1
+      };
+      
+      console.log('[WorkoutContext] Updating workout with version:', {
+        id: workoutWithVersion.id,
+        title: workoutWithVersion.title,
+        version: workoutWithVersion.version,
+        originalVersion: originalWorkout?.version,
+        exerciseCount: workoutWithVersion.exercises?.length || 0
+      });
+      
       // Optimistic update
-      updateWorkout(workout);
+      updateWorkout(workoutWithVersion);
       showSuccessMessage('Updating workout...');
 
-      // Perform update operation
-      const updatedWorkout = await updateWorkout(workout);
+      // CRITICAL FIX: Use saveWorkout API function (not updateWorkout which doesn't exist)
+      const updatedWorkout = await saveWorkout(workoutWithVersion);
+      
+      console.log('[WorkoutContext] Workout updated successfully:', {
+        id: updatedWorkout.id,
+        newVersion: updatedWorkout.version,
+        title: updatedWorkout.title,
+        exerciseCount: updatedWorkout.exercises?.length || 0
+      });
       
       // Refresh to get server state
       await refreshWorkouts();
@@ -165,18 +191,17 @@ export const WorkoutProvider: React.FC<WorkoutProviderProps> = ({ children }) =>
       showSuccessMessage(`Workout "${updatedWorkout.title}" updated successfully!`);
       return updatedWorkout;
     } catch (error) {
-      // Revert to original state on error
+      // Revert optimistic update on error
+      console.error('[WorkoutContext] Update failed, reverting:', error);
       if (originalWorkout) {
         updateWorkout(originalWorkout);
-      } else {
-        await refreshWorkouts();
       }
       
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update workout';
-      showErrorMessage(`Update failed: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      showErrorMessage(`Failed to update workout: ${errorMessage}`);
       throw error;
     }
-  }, [workouts, updateWorkout, refreshWorkouts, showSuccessMessage, showErrorMessage]);
+  }, [workouts, updateWorkout, saveWorkout, refreshWorkouts, showSuccessMessage, showErrorMessage]);
 
   // Optimistic update functions (for immediate UI feedback)
   const addWorkoutOptimistic = useCallback((workout: GeneratedWorkout) => {

@@ -1,160 +1,143 @@
 /**
  * Duration Filter Component
  * 
- * Handles workout duration range filtering with slider interface.
+ * Provides range slider for filtering workouts by duration.
  * Extracted from AdvancedWorkoutFilters as part of Week 2 Component Splitting.
  */
-import React, { useCallback, useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { WorkoutFormatters } from '../../../utils/ui/formatters';
 
 interface DurationFilterProps {
-  duration: { min: number; max: number };
-  maxDuration: number;
-  onChange: (duration: { min: number; max: number }) => void;
-  showLabel?: boolean;
+  value: { min: number; max: number };
+  onChange: (value: { min: number; max: number }) => void;
+  workouts: any[];
 }
 
 /**
- * DurationFilter Component - Range slider for workout duration
+ * DurationFilter Component - Range slider for duration filtering
  */
 export const DurationFilter: React.FC<DurationFilterProps> = ({
-  duration,
-  maxDuration,
+  value,
   onChange,
-  showLabel = true
+  workouts
 }) => {
-  const [localMin, setLocalMin] = useState(duration.min);
-  const [localMax, setLocalMax] = useState(duration.max);
+  const [localMin, setLocalMin] = useState(value.min);
+  const [localMax, setLocalMax] = useState(value.max);
+  const [isDragging, setIsDragging] = useState(false);
 
-  // Sync local state with props
+  // Calculate min/max from workout data
+  const workoutDurations = workouts
+    .map(w => typeof w.duration === 'number' ? w.duration : 0)
+    .filter(d => d > 0);
+  
+  const dataMin = workoutDurations.length > 0 ? Math.min(...workoutDurations) : 0;
+  const dataMax = workoutDurations.length > 0 ? Math.max(...workoutDurations) : 120;
+  const rangeMin = Math.max(0, dataMin - 5);
+  const rangeMax = Math.min(300, dataMax + 10);
+
+  // Update local state when prop changes (external reset)
   useEffect(() => {
-    setLocalMin(duration.min);
-    setLocalMax(duration.max);
-  }, [duration]);
-
-  const handleMinChange = useCallback((value: number) => {
-    const newMin = Math.min(value, localMax - 5); // Ensure min is at least 5 minutes less than max
-    setLocalMin(newMin);
-    onChange({ min: newMin, max: localMax });
-  }, [localMax, onChange]);
-
-  const handleMaxChange = useCallback((value: number) => {
-    const newMax = Math.max(value, localMin + 5); // Ensure max is at least 5 minutes more than min
-    setLocalMax(newMax);
-    onChange({ min: localMin, max: newMax });
-  }, [localMin, onChange]);
-
-  const handleReset = useCallback(() => {
-    const resetDuration = { min: 0, max: maxDuration };
-    setLocalMin(0);
-    setLocalMax(maxDuration);
-    onChange(resetDuration);
-  }, [maxDuration, onChange]);
-
-  const formatDuration = (minutes: number): string => {
-    if (minutes < 60) {
-      return `${minutes}min`;
+    if (!isDragging) {
+      setLocalMin(value.min);
+      setLocalMax(value.max);
     }
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  }, [value, isDragging]);
+
+  // Debounced update to parent
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (localMin !== value.min || localMax !== value.max) {
+        onChange({ min: localMin, max: localMax });
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [localMin, localMax, onChange, value]);
+
+  const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newMin = parseInt(e.target.value);
+    if (newMin <= localMax) {
+      setLocalMin(newMin);
+    }
   };
 
-  const isFiltered = localMin > 0 || localMax < maxDuration;
+  const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newMax = parseInt(e.target.value);
+    if (newMax >= localMin) {
+      setLocalMax(newMax);
+    }
+  };
 
   return (
     <div className="duration-filter">
-      {showLabel && (
-        <div className="filter-section__header">
-          <h4 className="filter-section__title">
-            <Clock size={16} />
-            Duration
-          </h4>
-          {isFiltered && (
-            <button
-              type="button"
-              className="filter-section__action"
-              onClick={handleReset}
-            >
-              Reset
-            </button>
-          )}
-        </div>
-      )}
+      <label className="filter-label">Duration Range</label>
       
-      <div className="duration-filter__controls">
-        <div className="duration-filter__values">
-          <span className="duration-value">
-            {formatDuration(localMin)}
-          </span>
-          <span className="duration-separator">to</span>
-          <span className="duration-value">
-            {formatDuration(localMax)}
-          </span>
+      <div className="range-container">
+        <div className="range-values">
+          <span className="range-value min">{WorkoutFormatters.formatDuration(localMin)}</span>
+          <span className="range-separator">to</span>
+          <span className="range-value max">{WorkoutFormatters.formatDuration(localMax)}</span>
         </div>
-        
-        <div className="duration-filter__sliders">
-          <div className="range-slider">
-            <input
-              type="range"
-              min="0"
-              max={maxDuration}
-              step="5"
-              value={localMin}
-              onChange={(e) => handleMinChange(parseInt(e.target.value))}
-              className="range-slider__input range-slider__input--min"
-            />
-            <input
-              type="range"
-              min="0"
-              max={maxDuration}
-              step="5"
-              value={localMax}
-              onChange={(e) => handleMaxChange(parseInt(e.target.value))}
-              className="range-slider__input range-slider__input--max"
-            />
-            <div className="range-slider__track">
-              <div 
-                className="range-slider__fill"
-                style={{
-                  left: `${(localMin / maxDuration) * 100}%`,
-                  width: `${((localMax - localMin) / maxDuration) * 100}%`
-                }}
-              />
-            </div>
-          </div>
+
+        <div className="range-sliders">
+          <input
+            type="range"
+            min={rangeMin}
+            max={rangeMax}
+            value={localMin}
+            onChange={handleMinChange}
+            onMouseDown={() => setIsDragging(true)}
+            onMouseUp={() => setIsDragging(false)}
+            onTouchStart={() => setIsDragging(true)}
+            onTouchEnd={() => setIsDragging(false)}
+            className="range-slider min"
+          />
+          <input
+            type="range"
+            min={rangeMin}
+            max={rangeMax}
+            value={localMax}
+            onChange={handleMaxChange}
+            onMouseDown={() => setIsDragging(true)}
+            onMouseUp={() => setIsDragging(false)}
+            onTouchStart={() => setIsDragging(true)}
+            onTouchEnd={() => setIsDragging(false)}
+            className="range-slider max"
+          />
         </div>
-        
-        <div className="duration-filter__presets">
-          <button
-            type="button"
-            className={`duration-preset ${localMin === 0 && localMax === 30 ? 'duration-preset--active' : ''}`}
-            onClick={() => onChange({ min: 0, max: 30 })}
-          >
-            Quick (≤30min)
-          </button>
-          <button
-            type="button"
-            className={`duration-preset ${localMin === 30 && localMax === 60 ? 'duration-preset--active' : ''}`}
-            onClick={() => onChange({ min: 30, max: 60 })}
-          >
-            Medium (30-60min)
-          </button>
-          <button
-            type="button"
-            className={`duration-preset ${localMin === 60 && localMax === maxDuration ? 'duration-preset--active' : ''}`}
-            onClick={() => onChange({ min: 60, max: maxDuration })}
-          >
-            Long (60min+)
-          </button>
+
+        <div className="range-track">
+          <div 
+            className="range-fill"
+            style={{
+              left: `${((localMin - rangeMin) / (rangeMax - rangeMin)) * 100}%`,
+              width: `${((localMax - localMin) / (rangeMax - rangeMin)) * 100}%`
+            }}
+          />
         </div>
       </div>
-      
-      {isFiltered && (
-        <div className="duration-filter__summary">
-          <span className="filter-summary">
-            Showing workouts from {formatDuration(localMin)} to {formatDuration(localMax)}
+
+      <div className="range-labels">
+        <span className="range-label-min">{WorkoutFormatters.formatDuration(rangeMin)}</span>
+        <span className="range-label-max">{WorkoutFormatters.formatDuration(rangeMax)}</span>
+      </div>
+
+      {/* Active filter indicator */}
+      {(localMin > rangeMin || localMax < rangeMax) && (
+        <div className="active-filter-indicator">
+          <span className="filter-text">
+            Showing workouts from {WorkoutFormatters.formatDuration(localMin)} to {WorkoutFormatters.formatDuration(localMax)}
           </span>
+          <button 
+            className="clear-filter-btn"
+            onClick={() => {
+              setLocalMin(rangeMin);
+              setLocalMax(rangeMax);
+            }}
+            title="Reset duration filter"
+          >
+            ✕
+          </button>
         </div>
       )}
     </div>

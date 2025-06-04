@@ -4,7 +4,7 @@
  * Displays saved workouts in a responsive grid layout with enhanced filtering,
  * search, bulk selection capabilities, and improved visual design.
  * 
- * Updated for Week 1 Foundation Sprint - now uses extracted WorkoutTransformer service.
+ * Updated for Week 1 Foundation Sprint - now uses extracted services.
  */
 import React, { useState, useMemo, useCallback } from 'react';
 import { 
@@ -27,43 +27,15 @@ import './SavedWorkoutsTab.scss';
 import './AdvancedFilters.scss';
 import './EnhancedWorkoutCard.scss';
 
-// Import the extracted services
-import { WorkoutTransformer } from './services/workoutData/WorkoutTransformer';
-import { FilterEngine } from './services/filtering/FilterEngine';
-
-interface DisplayWorkout {
-  id: string | number;
-  title: string;
-  description: string;
-  duration: number;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  exercises: any[];
-  created_at: string;
-  updated_at: string;
-  // Computed/derived properties for display
-  workoutType: string;
-  equipment: string[];
-  isCompleted: boolean;
-  completedAt?: string;
-  tags: string[];
-  createdAt: string; // For backward compatibility
-  lastModified: string; // For backward compatibility
-  isFavorite?: boolean;
-  rating?: number;
-}
-
-interface WorkoutFilters {
-  difficulty: string[];
-  workoutType: string[];
-  equipment: string[];
-  duration: { min: number; max: number };
-  completed: 'all' | 'completed' | 'pending';
-  sortBy: 'date' | 'title' | 'duration' | 'difficulty';
-  sortOrder: 'asc' | 'desc';
-  tags: string[];
-  createdDate: { start: Date | null; end: Date | null };
-  searchQuery: string;
-}
+// Import all services from centralized index
+import { 
+  WorkoutTransformer, 
+  FilterEngine, 
+  WorkoutFormatters,
+  UI_CONSTANTS,
+  type DisplayWorkout,
+  type WorkoutFilters 
+} from './services';
 
 interface EnhancedWorkoutGridProps {
   workouts: any[]; // Accept any workout format from API
@@ -78,45 +50,6 @@ interface EnhancedWorkoutGridProps {
   onToggleFavorite?: (workoutId: string) => void;
   onRateWorkout?: (workoutId: string, rating: number) => void;
 }
-
-// 🔄 MIGRATION NOTE: The following functions have been moved to WorkoutTransformer service
-// but are temporarily kept here for backward compatibility until Week 2 component splitting
-
-/**
- * @deprecated Use WorkoutTransformer.transformForDisplay() instead
- * Legacy function maintained for backward compatibility during Week 1 refactor
- */
-const transformWorkoutForDisplay = (workout: any): DisplayWorkout => {
-  console.warn('🔄 MIGRATION: transformWorkoutForDisplay is deprecated. Use WorkoutTransformer.transformForDisplay() instead.');
-  return WorkoutTransformer.transformForDisplay(workout);
-};
-
-/**
- * @deprecated Use WorkoutTransformer.createDefaultWorkout() instead
- * Legacy function maintained for backward compatibility during Week 1 refactor
- */
-const createDefaultWorkout = (): DisplayWorkout => {
-  console.warn('🔄 MIGRATION: createDefaultWorkout is deprecated. Use WorkoutTransformer.createDefaultWorkout() instead.');
-  return WorkoutTransformer.createDefaultWorkout();
-};
-
-/**
- * @deprecated Use WorkoutTransformer.extractEquipmentFromExercises() instead
- * Legacy function maintained for backward compatibility during Week 1 refactor
- */
-const extractEquipmentFromExercises = (exercises: any[]): string[] => {
-  console.warn('🔄 MIGRATION: extractEquipmentFromExercises is deprecated. Use WorkoutTransformer.extractEquipmentFromExercises() instead.');
-  return WorkoutTransformer.extractEquipmentFromExercises(exercises);
-};
-
-/**
- * @deprecated Use WorkoutTransformer.deriveWorkoutTypeFromExercises() instead
- * Legacy function maintained for backward compatibility during Week 1 refactor
- */
-const deriveWorkoutTypeFromExercises = (exercises: any[]): string => {
-  console.warn('🔄 MIGRATION: deriveWorkoutTypeFromExercises is deprecated. Use WorkoutTransformer.deriveWorkoutTypeFromExercises() instead.');
-  return WorkoutTransformer.deriveWorkoutTypeFromExercises(exercises);
-};
 
 /**
  * Enhanced WorkoutGrid displays saved workouts with advanced filtering and search
@@ -135,7 +68,7 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
   onRateWorkout
 }) => {
   const [filters, setFilters] = useState<WorkoutFilters>(
-    // 🚀 WEEK 1 IMPROVEMENT: Use FilterEngine.getDefaultFilters instead of hardcoded defaults
+    // 🚀 WEEK 1 IMPROVEMENT: Use FilterEngine.getDefaultFilters
     FilterEngine.getDefaultFilters()
   );
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -178,7 +111,7 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
 
   // Clear all filters
   const handleClearFilters = useCallback(() => {
-    // 🚀 WEEK 1 IMPROVEMENT: Use FilterEngine.clearFilters instead of hardcoded defaults
+    // 🚀 WEEK 1 IMPROVEMENT: Use FilterEngine.clearFilters
     setFilters(FilterEngine.clearFilters(filters));
   }, [filters]);
 
@@ -220,7 +153,7 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
     return (
       <div className="enhanced-workout-grid loading">
         <div className="loading-grid">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: UI_CONSTANTS.SKELETON_CARDS_COUNT }).map((_, index) => (
             <div key={index} className="workout-card-skeleton">
               <div className="skeleton-header"></div>
               <div className="skeleton-content"></div>
@@ -296,77 +229,75 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
       )}
 
       {/* Toolbar */}
-      <div className="workout-toolbar">
+      <div className="workout-grid-toolbar">
         <div className="toolbar-left">
-          <div className="results-info">
-            <span className="results-count">
-              {filteredWorkouts.length} of {workouts.length} workout{workouts.length !== 1 ? 's' : ''}
-            </span>
-            {selectedWorkouts.size > 0 && (
-              <span className="selection-count">
-                ({selectedWorkouts.size} selected)
+          <div className="results-count">
+            {WorkoutFormatters.formatExerciseCount(filteredWorkouts.length).replace('exercises', 'workouts')}
+            {transformationErrors.size > 0 && (
+              <span className="error-indicator" title={`${transformationErrors.size} workouts have data issues`}>
+                ⚠️ {transformationErrors.size} with issues
               </span>
             )}
           </div>
         </div>
 
         <div className="toolbar-right">
-          {/* Selection Controls */}
-          {isSelectionMode && (
-            <div className="selection-controls">
-              <Button
-                variant="outline"
-                size="sm"
+          {/* View mode toggle */}
+          <div className="view-mode-toggle">
+            <button
+              className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="Grid view"
+            >
+              <Grid size={16} />
+            </button>
+            <button
+              className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="List view"
+            >
+              <List size={16} />
+            </button>
+          </div>
+
+          {/* Selection mode toggle */}
+          <button
+            className={`selection-toggle ${isSelectionMode ? 'active' : ''}`}
+            onClick={() => {
+              setIsSelectionMode(!isSelectionMode);
+              if (!isSelectionMode) {
+                setSelectedWorkouts(new Set());
+              }
+            }}
+            title={isSelectionMode ? 'Exit selection mode' : 'Select multiple workouts'}
+          >
+            {isSelectionMode ? <CheckSquare size={16} /> : <Square size={16} />}
+            {isSelectionMode ? 'Exit Select' : 'Select'}
+          </button>
+
+          {/* Bulk actions */}
+          {isSelectionMode && selectedWorkouts.size > 0 && (
+            <div className="bulk-actions">
+              <button
+                className="bulk-action-btn select-all"
                 onClick={handleSelectAll}
+                title={selectedWorkouts.size === filteredWorkouts.length ? 'Deselect all' : 'Select all'}
               >
                 {selectedWorkouts.size === filteredWorkouts.length ? 'Deselect All' : 'Select All'}
-              </Button>
-              {selectedWorkouts.size > 0 && onBulkDelete && (
-                <Button
-                  variant="outline"
-                  size="sm"
+              </button>
+              
+              {onBulkDelete && (
+                <button
+                  className="bulk-action-btn delete"
                   onClick={handleBulkDelete}
-                  className="danger"
+                  title={`Delete ${selectedWorkouts.size} selected workouts`}
                 >
                   <Trash2 size={14} />
                   Delete ({selectedWorkouts.size})
-                </Button>
+                </button>
               )}
             </div>
           )}
-
-          {/* View Mode Toggle */}
-          <div className="view-controls">
-            <button
-              className={`selection-mode-btn ${isSelectionMode ? 'active' : ''}`}
-              onClick={() => {
-                setIsSelectionMode(!isSelectionMode);
-                if (!isSelectionMode) {
-                  setSelectedWorkouts(new Set());
-                }
-              }}
-              title="Toggle selection mode"
-            >
-              {isSelectionMode ? <CheckSquare size={16} /> : <Square size={16} />}
-            </button>
-
-            <div className="view-mode-toggle">
-              <button 
-                className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                title="Grid view"
-              >
-                <Grid size={16} />
-              </button>
-              <button 
-                className={`view-mode-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-                title="List view"
-              >
-                <List size={16} />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 

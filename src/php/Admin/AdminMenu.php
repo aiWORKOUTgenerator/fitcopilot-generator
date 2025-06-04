@@ -261,7 +261,60 @@ class AdminMenu {
                 // Check profile component loading
                 var profileContainer = document.querySelector('[data-fitcopilot-profile]');
                 if (profileContainer) {
-                    console.log('Profile container found');
+                    console.log('✅ Profile container found');
+                    
+                    // Enhanced debugging function
+                    function checkProfileComponent() {
+                        console.log('🔧 [Dashboard Debug] Profile component check:', {
+                            container: {
+                                exists: !!profileContainer,
+                                isEmpty: profileContainer.innerHTML.trim() === '',
+                                hasMountedFlag: profileContainer.hasAttribute('data-profile-mounted'),
+                                innerHTML: profileContainer.innerHTML.substring(0, 100) + '...'
+                            },
+                            scripts: {
+                                profileJs: Array.from(document.getElementsByTagName('script')).some(s => s.src.includes('profile.js')),
+                                vendorsJs: Array.from(document.getElementsByTagName('script')).some(s => s.src.includes('vendors.js')),
+                                react: typeof window.React !== 'undefined',
+                                reactDOM: typeof window.ReactDOM !== 'undefined'
+                            },
+                            authentication: {
+                                fitcopilotData: !!window.fitcopilotData,
+                                hasNonce: !!(window.fitcopilotData && window.fitcopilotData.nonce),
+                                apiBase: window.fitcopilotData ? window.fitcopilotData.apiBase : 'Not available'
+                            },
+                            debugFunctions: {
+                                debugProfileAuth: typeof window.debugProfileAuth === 'function',
+                                initializeProfileComponents: typeof window.initializeProfileComponents === 'function',
+                                debugProfileMount: typeof window.debugProfileMount === 'function'
+                            }
+                        });
+                        
+                        // Test API connectivity if auth is available
+                        if (window.fitcopilotData && window.fitcopilotData.nonce) {
+                            console.log('🔧 [Dashboard Debug] Testing profile API...');
+                            fetch('/wp-json/fitcopilot/v1/profile', {
+                                method: 'GET',
+                                headers: {
+                                    'X-WP-Nonce': window.fitcopilotData.nonce,
+                                    'Content-Type': 'application/json'
+                                },
+                                credentials: 'same-origin'
+                            })
+                            .then(response => {
+                                console.log('🔧 [Dashboard Debug] API response status:', response.status);
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log('🔧 [Dashboard Debug] API response data:', data);
+                            })
+                            .catch(error => {
+                                console.error('🔧 [Dashboard Debug] API test failed:', error);
+                            });
+                        } else {
+                            console.warn('🔧 [Dashboard Debug] Cannot test API - authentication not available');
+                        }
+                    }
                     
                     // Check if scripts were loaded
                     function checkProfileScripts() {
@@ -272,7 +325,10 @@ class AdminMenu {
                         var scripts = document.getElementsByTagName('script');
                         for (var i = 0; i < scripts.length; i++) {
                             if (scripts[i].src.indexOf('profile.js') !== -1) {
-                                document.getElementById('profile-check-script').innerHTML = '✅';
+                                var profileCheckElement = document.getElementById('profile-check-script');
+                                if (profileCheckElement) {
+                                    profileCheckElement.innerHTML = '✅';
+                                }
                                 profileScriptLoaded = true;
                                 break;
                             }
@@ -282,7 +338,10 @@ class AdminMenu {
                         var styles = document.getElementsByTagName('link');
                         for (var j = 0; j < styles.length; j++) {
                             if (styles[j].href.indexOf('profile.css') !== -1) {
-                                document.getElementById('profile-check-styles').innerHTML = '✅';
+                                var stylesCheckElement = document.getElementById('profile-check-styles');
+                                if (stylesCheckElement) {
+                                    stylesCheckElement.innerHTML = '✅';
+                                }
                                 profileStylesLoaded = true;
                                 break;
                             }
@@ -291,24 +350,68 @@ class AdminMenu {
                         return { script: profileScriptLoaded, styles: profileStylesLoaded };
                     }
                     
-                    // Check if profile container is empty after a short delay
+                    // Run enhanced check after a delay
                     setTimeout(function() {
-                        if (profileContainer.children.length === 0) {
-                            console.log('Profile container is empty. Showing debug info.');
+                        checkProfileComponent();
+                        
+                        // If profile container is empty after 3 seconds, show debug info
+                        if (profileContainer.innerHTML.trim() === '' || profileContainer.innerHTML.includes('Profile Component Failed')) {
+                            console.warn('⚠️ [Dashboard Debug] Profile container appears to be empty or failed to load');
                             
-                            // Check scripts
-                            var scriptsLoaded = checkProfileScripts();
-                            if (!scriptsLoaded.script) {
-                                document.getElementById('profile-check-script').innerHTML = '❌';
-                            }
-                            if (!scriptsLoaded.styles) {
-                                document.getElementById('profile-check-styles').innerHTML = '❌';
+                            // Show the debug panel
+                            var debugPanel = document.getElementById('profile-debug-info');
+                            if (debugPanel) {
+                                debugPanel.style.display = 'block';
                             }
                             
-                            // Show debug info
-                            document.getElementById('profile-debug-info').style.display = 'block';
+                            // Add manual initialization button to the debug panel
+                            if (debugPanel && !debugPanel.querySelector('.manual-init-btn')) {
+                                var initButton = document.createElement('button');
+                                initButton.textContent = 'Try Manual Initialization';
+                                initButton.className = 'manual-init-btn';
+                                initButton.style.cssText = 'background: #2271b1; color: white; border: none; border-radius: 4px; padding: 8px 16px; margin: 8px 4px 0 0; cursor: pointer;';
+                                initButton.onclick = function() {
+                                    console.log('🔧 [Dashboard Debug] Manual initialization triggered');
+                                    if (typeof window.initializeProfileComponents === 'function') {
+                                        window.initializeProfileComponents();
+                                    } else {
+                                        console.error('❌ initializeProfileComponents function not available');
+                                    }
+                                };
+                                
+                                var debugButton = document.createElement('button');
+                                debugButton.textContent = 'Run Profile Debug';
+                                debugButton.className = 'debug-profile-btn';
+                                debugButton.style.cssText = 'background: #6366f1; color: white; border: none; border-radius: 4px; padding: 8px 16px; margin: 8px 4px 0 0; cursor: pointer;';
+                                debugButton.onclick = function() {
+                                    if (typeof window.debugProfileAuth === 'function') {
+                                        window.debugProfileAuth().then(function(result) {
+                                            console.log('🔧 Debug result:', result);
+                                            alert('Debug completed. Check browser console for details.');
+                                        }).catch(function(error) {
+                                            console.error('❌ Debug failed:', error);
+                                            alert('Debug failed: ' + error.message);
+                                        });
+                                    } else if (typeof window.debugProfileMount === 'function') {
+                                        window.debugProfileMount();
+                                        alert('Mount debug completed. Check browser console for details.');
+                                    } else {
+                                        alert('Debug functions not available.');
+                                    }
+                                };
+                                
+                                debugPanel.appendChild(initButton);
+                                debugPanel.appendChild(debugButton);
+                            }
+                        } else {
+                            console.log('✅ [Dashboard Debug] Profile container has content - component likely loaded successfully');
                         }
                     }, 3000);
+                    
+                    // Run initial script check
+                    checkProfileScripts();
+                } else {
+                    console.warn('⚠️ Profile container not found on this page');
                 }
             });
             /* ]]> */

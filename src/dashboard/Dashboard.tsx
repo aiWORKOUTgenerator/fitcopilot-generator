@@ -311,15 +311,37 @@ const TabContentWrapper: React.FC = () => {
   };
 
   const handleModalSave = async (updatedWorkout: any) => {
-    setIsModalLoading(true);
     try {
-      await updateWorkoutAndRefresh(updatedWorkout);
-      setModalWorkout(updatedWorkout); // Update the modal workout with saved data
+      console.log('[Dashboard] Saving workout from modal:', {
+        id: updatedWorkout.id,
+        title: updatedWorkout.title,
+        version: updatedWorkout.version,
+        exerciseCount: updatedWorkout.exercises?.length || 0
+      });
+
+      // CRITICAL FIX: Ensure we have version information for proper versioning
+      if (!updatedWorkout.version && modalWorkout?.version) {
+        updatedWorkout.version = modalWorkout.version;
+        console.log('[Dashboard] Added missing version from modal workout:', updatedWorkout.version);
+      }
+
+      // Use the context method for saving with proper versioning
+      const savedWorkout = await updateWorkoutAndRefresh(updatedWorkout);
+      
+      console.log('[Dashboard] Workout saved successfully:', {
+        id: savedWorkout.id,
+        newVersion: savedWorkout.version,
+        title: savedWorkout.title
+      });
+
+      // Update the modal workout to reflect the new version
+      setModalWorkout(savedWorkout);
+      
+      // Switch to view mode after successful save
+      setModalMode('view');
     } catch (error) {
-      console.error('Failed to save workout:', error);
-      throw error; // Re-throw to let modal handle error display
-    } finally {
-      setIsModalLoading(false);
+      console.error('[Dashboard] Failed to save workout:', error);
+      // Modal will show the error state
     }
   };
 

@@ -1,0 +1,209 @@
+# **🚀 SPRINT 4: Workout Editor Save/Version Workflow**
+
+## **🎯 SPRINT GOAL**
+Fix duplicate workout creation by implementing proven versioning/save patterns from working API test tool.
+
+---
+
+## **📋 PROBLEM ANALYSIS**
+
+**Current Issue:**
+- WorkoutEditor creates NEW workouts instead of updating existing ones
+- Save logic not properly detecting existing `postId`
+- Versioning system working on backend but frontend not using it correctly
+
+**Working API Evidence:**
+```json
+PUT /workouts/299 → {
+  "success": true,
+  "data": {
+    "id": "299", 
+    "version": 2,  // ✅ Version incremented
+    "change_type": "metadata",
+    "change_summary": "difficulty updated, duration updated"
+  }
+}
+```
+
+---
+
+## **📋 SPRINT BACKLOG**
+
+### **🔍 STORY 1: Audit Current Save Logic**
+**Priority:** CRITICAL | **Duration:** 0.5 day
+
+**Trace exact save flow to identify where postId is lost**
+
+**Tasks:**
+- [ ] Map complete save flow: `WorkoutEditorModal → WorkoutEditor → workoutEditorService`
+- [ ] Identify where `workout.postId` vs `workout.id` confusion occurs
+- [ ] Document exact request payload sent to API
+- [ ] Compare with working test tool's PUT request format
+- [ ] Find the exact line where "create new" vs "update existing" decision is made
+
+**Acceptance Criteria:**
+- ✅ Exact save flow documented with line numbers
+- ✅ postId/id mapping issue identified
+- ✅ Request payload comparison with test tool
+- ✅ Root cause pinpointed to specific code location
+
+---
+
+### **⚡ STORY 2: Create Simplified Save Service**
+**Priority:** HIGH | **Duration:** 1 day
+
+**Build clean save service using proven test tool patterns**
+
+**Tasks:**
+- [ ] Create `workoutSaveService.ts` with ONLY save functionality
+- [ ] Implement `saveWorkout(workoutData, postId?)` function
+- [ ] Use exact same request format as working test tool
+- [ ] Handle both create (POST) and update (PUT) scenarios
+- [ ] Use WordPress standard headers/nonce exactly like test tool
+
+**Acceptance Criteria:**
+- ✅ Single focused service file for saves only
+- ✅ Matches test tool request format exactly
+- ✅ Correctly uses PUT for updates, POST for creates
+- ✅ Proper postId detection and handling
+- ✅ Returns standardized response format
+
+---
+
+### **🎯 STORY 3: Fix WorkoutEditor Save Integration**
+**Priority:** HIGH | **Duration:** 1 day
+
+**Replace complex save logic with simplified service**
+
+**Tasks:**
+- [ ] Update `WorkoutEditor.tsx` save function (line ~147)
+- [ ] Use new `workoutSaveService.saveWorkout()` 
+- [ ] Fix `isNewWorkout` logic to check `workout.postId` correctly
+- [ ] Remove duplicate postId fallback logic
+- [ ] Add proper error handling for save failures
+
+**Acceptance Criteria:**
+- ✅ WorkoutEditor uses new save service
+- ✅ Correctly detects new vs existing workouts
+- ✅ No duplicate creation logic
+- ✅ Proper error handling and user feedback
+- ✅ Maintains existing UI/UX behavior
+
+---
+
+### **🔧 STORY 4: Fix Modal Data Passing**
+**Priority:** HIGH | **Duration:** 0.5 day
+
+**Ensure WorkoutEditorModal passes postId correctly**
+
+**Tasks:**
+- [ ] Verify `WorkoutEditorModal.tsx` passes `workout.id` as `postId`
+- [ ] Ensure editor receives correct workout identification
+- [ ] Fix any id/postId mapping in conversion functions
+- [ ] Remove conflicting postId assignment logic
+
+**Acceptance Criteria:**
+- ✅ Modal correctly passes workout ID to editor
+- ✅ No id/postId confusion in data flow
+- ✅ Editor receives proper workout identification
+- ✅ Save function gets correct postId parameter
+
+---
+
+### **✅ STORY 5: Integration Testing**
+**Priority:** MEDIUM | **Duration:** 0.5 day
+
+**Verify save/version workflow matches test tool**
+
+**Tasks:**
+- [ ] Test edit existing workout → save → verify UPDATE not CREATE
+- [ ] Test version increment on successful update
+- [ ] Compare API requests with test tool format
+- [ ] Verify error handling for save failures
+- [ ] Test edge cases (missing postId, network errors)
+
+**Acceptance Criteria:**
+- ✅ Existing workouts update instead of creating duplicates
+- ✅ Version numbers increment correctly
+- ✅ API requests match test tool format exactly
+- ✅ Proper error handling and user feedback
+- ✅ No regression in existing functionality
+
+---
+
+## **🎯 IMPLEMENTATION STRATEGY**
+
+### **Phase 1: Isolate the Problem (Story 1)**
+```typescript
+// Find this exact flow:
+WorkoutEditorModal (workout.id) → 
+WorkoutEditor (postId?) → 
+workoutEditorService.saveWorkout(data, postId?) →
+API PUT/POST decision
+```
+
+### **Phase 2: Proven Save Pattern (Story 2)**
+```typescript
+// Copy exact test tool pattern:
+const saveWorkout = async (workoutData, postId) => {
+  const method = postId ? 'PUT' : 'POST';
+  const url = postId ? `/workouts/${postId}` : '/workouts';
+  
+  return fetch(url, {
+    method,
+    headers: { 'X-WP-Nonce': wpRestNonce },
+    body: JSON.stringify(workoutData) // DIRECT format like test tool
+  });
+};
+```
+
+### **Phase 3: Simple Integration (Stories 3-4)**
+```typescript
+// In WorkoutEditor:
+const handleSave = async () => {
+  const result = await workoutSaveService.saveWorkout(
+    workout, 
+    workout.postId // Clear postId passing
+  );
+};
+```
+
+---
+
+## **🔍 SUCCESS CRITERIA**
+
+| **Metric** | **Before** | **After** | **Evidence** |
+|------------|------------|-----------|--------------|
+| Duplicate creation | Always creates new | Updates existing | API shows PUT not POST |
+| Version increment | No versioning | Proper versioning | Version number increases |
+| Request format | Complex/wrapped | Direct like test tool | Request matches exactly |
+| Save logic | 3 different paths | 1 simple path | Single save function |
+
+---
+
+## **⚠️ CRITICAL CONSTRAINTS**
+
+1. **EXACT REPLICATION**: Must match test tool API format exactly
+2. **SURGICAL CHANGES**: Only touch save/version workflow, nothing else
+3. **PRESERVE UX**: No changes to user interface or experience
+4. **BACKWARD COMPATIBILITY**: Don't break existing workouts
+
+---
+
+## **🎯 DEFINITION OF DONE**
+
+**Sprint complete when:**
+- [ ] Edit existing workout → Save → Updates (no duplicate)
+- [ ] Version number increments on successful save
+- [ ] API request format matches test tool exactly
+- [ ] No regression in existing functionality
+- [ ] Manual testing confirms fix works
+
+---
+
+**Sprint Duration:** 3.5 days  
+**Focus:** Fix save workflow using proven patterns  
+**Risk:** Low (copying working test tool)  
+**Success Measure:** No more duplicate workouts created
+
+Ready to start with the save logic audit? 
