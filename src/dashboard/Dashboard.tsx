@@ -577,10 +577,13 @@ const TabContentWrapper: React.FC = () => {
         <TabPanel tabId="saved-workouts">
           <div className="tab-panel-content">
             <div className="saved-workouts-tab-layout">
-              {/* Enhanced Workout Grid */}
+              {/* 🚀 TASK 1.2.1: Enhanced Workout Grid with Unified Data Service */}
               <EnhancedWorkoutGrid
                 workouts={workouts || []}
                 isLoading={workoutsLoading}
+                enableUnifiedDataService={true}
+                enableVersionTracking={true}
+                showDataQuality={true}
                 onWorkoutSelect={handleWorkoutSelect}
                 onWorkoutEdit={handleWorkoutEdit}
                 onWorkoutDelete={handleWorkoutDelete}

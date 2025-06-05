@@ -16,6 +16,9 @@ import {
   CardSelection
 } from './components/Cards/shared';
 
+// Import version-aware components
+import { VersionAwareCardMeta } from './components/Cards/shared/VersionAwareCardMeta';
+
 import './EnhancedWorkoutCard.scss';
 
 interface GeneratedWorkout {
@@ -50,6 +53,10 @@ interface EnhancedWorkoutCardProps {
   onToggleSelection?: (id: string) => void;
   onToggleFavorite?: (id: string) => void;
   onRate?: (id: string, rating: number) => void;
+  
+  // NEW: Version-aware display options
+  enableVersionDisplay?: boolean;
+  showVersionDebug?: boolean;
 }
 
 /**
@@ -60,6 +67,8 @@ export const EnhancedWorkoutCard: React.FC<EnhancedWorkoutCardProps> = ({
   viewMode,
   isSelected = false,
   isSelectionMode = false,
+  enableVersionDisplay = false,
+  showVersionDebug = false,
   onSelect,
   onEdit,
   onDelete,
@@ -132,12 +141,22 @@ export const EnhancedWorkoutCard: React.FC<EnhancedWorkoutCardProps> = ({
           </div>
 
           {/* Workout Meta Information */}
-          <CardMeta
-            workout={workout}
-            viewMode={viewMode}
-            showDescription={true}
-            showDebugInfo={process.env.NODE_ENV === 'development'}
-          />
+          {enableVersionDisplay ? (
+            <VersionAwareCardMeta
+              workout={workout as any} // Cast to enhanced workout type
+              viewMode={viewMode}
+              showDescription={true}
+              showVersionInfo={true}
+              showDebugInfo={showVersionDebug || process.env.NODE_ENV === 'development'}
+            />
+          ) : (
+            <CardMeta
+              workout={workout}
+              viewMode={viewMode}
+              showDescription={true}
+              showDebugInfo={process.env.NODE_ENV === 'development'}
+            />
+          )}
         </div>
 
         {/* More Actions Menu */}

@@ -16,6 +16,7 @@ import { convertToEditorFormat } from '../../types/editor';
 import { EnhancedWorkoutModal } from './EnhancedWorkoutModal';
 import { useNavigation } from '../../navigation/NavigationContext';
 import { useWorkoutGenerator } from '../../context';
+import { useWorkoutContext } from '../../context/WorkoutContext';
 import { getWorkout } from '../../services/workoutService';
 import './workoutEditor.scss';
 
@@ -280,6 +281,9 @@ const WorkoutEditorModal: React.FC = () => {
   const { state } = useWorkoutGenerator();
   const generatedWorkout = state.domain.generatedWorkout;
   
+  // 🚀 TASK 1.1.1: Inject WorkoutContext for automatic grid refresh
+  const { updateWorkoutAndRefresh } = useWorkoutContext();
+  
   // State for workout data and UI
   const [workout, setWorkout] = useState<GeneratedWorkout | null>(null);
   const [loading, setLoading] = useState(false);
@@ -367,10 +371,10 @@ const WorkoutEditorModal: React.FC = () => {
     }
   }, [isEditorOpen, currentWorkoutId, modalMode, generatedWorkout, closeEditor]); // Include modalMode to trigger on edit transitions
 
-  // CRITICAL FIX: Handle save success with navigation context update
+  // 🚀 TASK 1.1.2: Use WorkoutContext for automatic grid refresh
   const handleSave = async (savedWorkout?: any) => {
     try {
-      console.log('[WorkoutEditorModal] Save completed successfully:', {
+      console.log('[WorkoutEditorModal] 🚀 Using updateWorkoutAndRefresh for save operation:', {
         currentWorkoutId: currentWorkoutId,
         savedWorkoutId: savedWorkout?.postId || savedWorkout?.id,
         wasNewWorkout: currentWorkoutId === 'new',
@@ -383,11 +387,23 @@ const WorkoutEditorModal: React.FC = () => {
         updateCurrentWorkoutId(savedWorkout.postId.toString());
       }
       
-      // Close the editor after successful save
+      // 🚀 NEW: Use WorkoutContext to save and automatically refresh the grid
+      // This ensures data consistency between modal and grid
+      const workoutToSave = {
+        id: savedWorkout?.postId || savedWorkout?.id,
+        ...savedWorkout
+      };
+      
+      console.log('[WorkoutEditorModal] 🔄 Triggering grid refresh via context...');
+      await updateWorkoutAndRefresh(workoutToSave);
+      
+      console.log('[WorkoutEditorModal] ✅ Save and refresh completed successfully');
+      
+      // Close the editor after successful save and refresh
       closeEditor();
     } catch (error) {
-      console.error('[WorkoutEditorModal] Save callback error:', error);
-      setError('Failed to complete save operation. Please try again.');
+      console.error('[WorkoutEditorModal] ❌ Save with refresh failed:', error);
+      setError('Failed to save workout and refresh grid. Please try again.');
     }
   };
 
