@@ -326,8 +326,24 @@ function transformWorkoutResponse(apiData: any): GeneratedWorkout {
   console.log('[WorkoutService] Raw API response structure:', Object.keys(apiData));
   console.log('[WorkoutService] workout_data:', apiData.workout_data);
   
-  // Extract sections if they exist for legacy workouts
-  const sections = apiData.sections || [];
+  // CRITICAL FIX: Extract sections from multiple possible locations
+  let sections = [];
+  
+  // Method 1: Direct sections field
+  if (apiData.sections && Array.isArray(apiData.sections)) {
+    sections = apiData.sections;
+    console.log('[WorkoutService] Found sections in direct field:', sections.length);
+  }
+  // Method 2: From workout_data field
+  else if (apiData.workout_data && apiData.workout_data.sections && Array.isArray(apiData.workout_data.sections)) {
+    sections = apiData.workout_data.sections;
+    console.log('[WorkoutService] Found sections in workout_data field:', sections.length);
+  }
+  // Method 3: Check if workout structure suggests sections (fallback)
+  else {
+    sections = [];
+    console.log('[WorkoutService] No sections found in API response');
+  }
   
   // CRITICAL FIX: Handle exercises from different possible locations
   let exercises = [];
@@ -446,6 +462,22 @@ function transformWorkoutForSave(workout: GeneratedWorkout): any {
     duration: workout.duration,
     exercises: workout.exercises
   };
+  
+  // CRITICAL FIX: Preserve sections structure if it exists
+  if (workout.sections && Array.isArray(workout.sections) && workout.sections.length > 0) {
+    transformed.sections = workout.sections;
+    console.log('[WorkoutService] PRESERVING SECTIONS:', {
+      'sections_count': workout.sections.length,
+      'section_names': workout.sections.map(s => s.name),
+      'total_exercises_in_sections': workout.sections.reduce((total, section) => total + (section.exercises?.length || 0), 0)
+    });
+  } else {
+    console.log('[WorkoutService] NO SECTIONS TO PRESERVE:', {
+      'has_sections_field': 'sections' in workout,
+      'sections_is_array': Array.isArray(workout.sections),
+      'sections_length': workout.sections?.length || 0
+    });
+  }
   
   // CRITICAL FIX: Explicit version handling - never use complex conditional spreading
   if (hasValidVersion) {

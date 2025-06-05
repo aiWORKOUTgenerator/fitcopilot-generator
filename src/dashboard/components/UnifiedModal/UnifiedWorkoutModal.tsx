@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import Button from '../../../components/ui/Button/Button';
 import { useWorkoutContext } from '../../../features/workout-generator/context/WorkoutContext';
+import { useNavigation } from '../../../features/workout-generator/navigation/NavigationContext';
 import { GeneratedWorkout, Exercise, TimedExercise, SetsExercise } from '../../../features/workout-generator/types/workout';
 import './UnifiedModal.scss';
 
@@ -354,6 +355,7 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
   onStart
 }) => {
   const { updateWorkoutAndRefresh, deleteWorkoutAndRefresh } = useWorkoutContext();
+  const { openEditor } = useNavigation();
   
   // Local state management
   const [editedWorkout, setEditedWorkout] = useState<GeneratedWorkout | null>(null);
@@ -477,7 +479,37 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
     onClose();
   }, [hasChanges, mode, onClose]);
 
-  // Mode switch handler with transition
+  // Dual Modal System Handlers
+  const handleOpenEnhancedView = useCallback(() => {
+    if (!workout || !workout.id) return;
+    
+    const workoutId = workout.id;
+    console.log('[UnifiedWorkoutModal] Opening EnhancedWorkoutModal for view:', {
+      id: workoutId,
+      title: workout.title
+    });
+    
+    // Close current modal and open EnhancedWorkoutModal
+    onClose();
+    openEditor(workoutId.toString(), { referrer: 'library' });
+  }, [workout, onClose, openEditor]);
+
+  const handleOpenWorkoutEditor = useCallback(() => {
+    if (!workout || !workout.id) return;
+    
+    const workoutId = workout.id;
+    console.log('[UnifiedWorkoutModal] Opening WorkoutEditorModal for edit:', {
+      id: workoutId,
+      title: workout.title
+    });
+    
+    // Close current modal and open WorkoutEditorModal
+    onClose();
+    // The openEditor will open the EnhancedWorkoutModal first, then user can switch to edit
+    openEditor(workoutId.toString(), { referrer: 'library' });
+  }, [workout, onClose, openEditor]);
+
+  // Legacy mode switch handler (kept for backward compatibility)
   const handleModeSwitch = useCallback((newMode: ModalMode) => {
     if (newMode === mode || isTransitioning) return;
 
@@ -661,24 +693,26 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
             </div>
 
             <div className="header-actions">
-              {/* Mode Switch Buttons */}
+              {/* Dual Modal System Buttons */}
               <div className="mode-switches">
                 <Button
-                  variant={mode === 'view' ? 'primary' : 'outline'}
+                  variant="primary"
                   size="sm"
-                  onClick={() => handleModeSwitch('view')}
+                  onClick={handleOpenEnhancedView}
                   disabled={isTransitioning || isSaving || isDeleting}
                   className="mode-btn"
+                  title="Open in Enhanced View Mode"
                 >
                   <Eye size={16} />
                   View
                 </Button>
                 <Button
-                  variant={mode === 'edit' ? 'primary' : 'outline'}
+                  variant="outline"
                   size="sm"
-                  onClick={() => handleModeSwitch('edit')}
+                  onClick={handleOpenWorkoutEditor}
                   disabled={isTransitioning || isSaving || isDeleting}
                   className="mode-btn"
+                  title="Open in Workout Editor"
                 >
                   <Edit3 size={16} />
                   Edit

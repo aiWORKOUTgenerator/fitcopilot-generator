@@ -39,8 +39,17 @@ const transformWorkoutData = (workout: GeneratedWorkout): GeneratedWorkout => {
     return workout;
   }
   
-  // Transform exercises-only format to sections format for display
-  if ('exercises' in workout && workout.exercises && workout.exercises.length > 0) {
+  // ONLY transform exercises-only format if no sections exist at all
+  // This preserves multi-section workouts and only creates a fallback for simple exercise lists
+  if ('exercises' in workout && workout.exercises && workout.exercises.length > 0 && 
+      (!('sections' in workout) || !workout.sections || workout.sections.length === 0)) {
+    
+    console.log('[EnhancedWorkoutModal] Transforming exercises-only workout to sections format:', {
+      title: workout.title,
+      exerciseCount: workout.exercises.length,
+      hasExistingSections: 'sections' in workout && workout.sections && workout.sections.length > 0
+    });
+    
     const section: WorkoutSection = {
       name: 'Main Workout',
       duration: workout.duration || 30,
@@ -53,10 +62,19 @@ const transformWorkoutData = (workout: GeneratedWorkout): GeneratedWorkout => {
     };
   }
   
-  // Fallback: empty workout structure
+  // Preserve original workout structure even if sections array is empty
+  // This allows for proper debugging and maintains the original data integrity
+  console.log('[EnhancedWorkoutModal] Using workout as-is (may have empty sections):', {
+    title: workout.title,
+    hasSections: 'sections' in workout,
+    sectionsLength: workout.sections?.length || 0,
+    hasExercises: 'exercises' in workout && workout.exercises?.length > 0,
+    exercisesLength: workout.exercises?.length || 0
+  });
+  
   return {
     ...workout,
-    sections: []
+    sections: workout.sections || []
   };
 };
 
@@ -75,6 +93,26 @@ export const EnhancedWorkoutModal: React.FC<EnhancedWorkoutModalProps> = ({
 }) => {
   // Transform workout data to ensure compatible structure
   const workout = transformWorkoutData(rawWorkout);
+  
+  // Debug logging to help troubleshoot section display issues
+  useEffect(() => {
+    if (isOpen) {
+      console.log('[EnhancedWorkoutModal] Modal opened with workout data:', {
+        title: workout.title,
+        hasSections: workout.sections && workout.sections.length > 0,
+        sectionsCount: workout.sections?.length || 0,
+        sectionNames: workout.sections?.map(s => s.name) || [],
+        hasExercises: 'exercises' in workout && workout.exercises && workout.exercises.length > 0,
+        exercisesCount: workout.exercises?.length || 0,
+        originalWorkout: {
+          title: rawWorkout.title,
+          hasSections: 'sections' in rawWorkout && rawWorkout.sections && rawWorkout.sections.length > 0,
+          sectionsCount: rawWorkout.sections?.length || 0,
+          hasExercises: 'exercises' in rawWorkout && rawWorkout.exercises && rawWorkout.exercises.length > 0
+        }
+      });
+    }
+  }, [isOpen, workout, rawWorkout]);
   
   const [isVisible, setIsVisible] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);

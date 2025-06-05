@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Component } from 'react';
+import React, { useState, useEffect, Component, useCallback } from 'react';
 import Card from '../components/ui/Card/Card';
 import Button from '../components/ui/Button/Button';
 import './styles/Dashboard.scss';
@@ -9,9 +9,11 @@ import { WorkoutGeneratorFeature } from '../features/workout-generator/WorkoutGe
 import { ProfileProvider, useProfile } from '../features/profile/context';
 import { ProfileFeature } from '../features/profile';
 import type { UserProfile } from '../features/profile/types';
+import type { Profile } from '../features/profile/api/profileApi';
 
 // Import workout context
 import { WorkoutProvider, useWorkoutContext } from '../features/workout-generator/context/WorkoutContext';
+import { WorkoutGeneratorProvider } from '../features/workout-generator/context/WorkoutGeneratorContext';
 
 // Import new tab system components
 import { 
@@ -36,10 +38,15 @@ import { RegistrationSteps } from './components';
 // Import new unified modal system
 import { UnifiedWorkoutModal, type ModalMode } from './components/UnifiedModal';
 
+// Import dual modal system
+import { NavigationProvider, useNavigation } from '../features/workout-generator/navigation/NavigationContext';
+import { EnhancedWorkoutModal as DualEnhancedWorkoutModal } from '../features/workout-generator/components/WorkoutEditor/EnhancedWorkoutModal';
+import WorkoutEditorModal from '../features/workout-generator/components/WorkoutEditor/WorkoutEditorModal';
+
 /**
- * Transform real UserProfile data to ProfileSummary format
+ * Transform real Profile data to ProfileSummary format
  */
-const transformProfileData = (profile: UserProfile | null) => {
+const transformProfileData = (profile: Profile | null) => {
   if (!profile) {
     return {
       name: 'User',
@@ -105,14 +112,14 @@ const transformProfileData = (profile: UserProfile | null) => {
   return {
     name: userName,
     email: userEmail,
-    fitnessLevel: profile.fitnessLevel,
-    fitnessGoals: profile.goals?.map(goal => goalMap[goal] || goal) || ['General Fitness'],
+    fitnessLevel: profile.fitnessLevel as any, // Type compatibility fix
+    fitnessGoals: profile.goals?.map((goal: string) => goalMap[goal] || goal) || ['General Fitness'],
     preferredWorkoutTypes: [], // TODO: Derive from goals or add to profile
-    availableEquipment: profile.availableEquipment?.map(eq => equipmentMap[eq] || eq) || ['None'],
+    availableEquipment: profile.availableEquipment?.map((eq: string) => equipmentMap[eq] || eq) || ['None'],
     completedWorkouts: profile.completedWorkouts || 0,
     currentStreak: 0, // TODO: Calculate from workout history
     totalMinutesExercised: 0, // TODO: Calculate from workout history
-    profileCompleteness: calculateCompleteness(profile)
+    profileCompleteness: calculateCompleteness(profile as any) // Type compatibility fix
   };
 };
 
@@ -124,7 +131,11 @@ const Dashboard: React.FC = () => {
     <ProfileProvider>
       <DashboardProvider>
         <WorkoutProvider>
-          <DashboardInner />
+          <WorkoutGeneratorProvider>
+            <NavigationProvider>
+              <DashboardInner />
+            </NavigationProvider>
+          </WorkoutGeneratorProvider>
         </WorkoutProvider>
       </DashboardProvider>
     </ProfileProvider>
@@ -198,7 +209,8 @@ const DashboardInner: React.FC = () => {
  */
 const TabContentWrapper: React.FC = () => {
   const { activeTab, switchTab, isTabActive } = useTabNavigation();
-  const { profile, isLoading, error, fetchProfile, updateUserProfile } = useProfile();
+  const { state: profileState, getProfile, updateProfile, clearError } = useProfile();
+  const { profile, loading: isLoading, error } = profileState;
   const { refreshDashboard } = useDashboard();
   
   // Load workout list with real data
@@ -287,7 +299,7 @@ const TabContentWrapper: React.FC = () => {
   const handleProfileComplete = () => {
     console.log('Profile registration completed!');
     // Refresh profile data
-    fetchProfile();
+    getProfile();
     // Switch to profile tab to show the completed profile
     switchTab('profile');
   };
@@ -381,6 +393,7 @@ const TabContentWrapper: React.FC = () => {
     // This could navigate to a workout player/timer component
   };
 
+  // Dual Modal System Handlers - NEW IMPLEMENTATION
   // Workout grid handlers
   const handleWorkoutSelect = (workout: any) => {
     handleOpenModal(workout, 'view');
@@ -501,10 +514,7 @@ const TabContentWrapper: React.FC = () => {
               {/* Registration Form */}
               <div className="register-form-section">
                 <Card className="register-form-card">
-                  <ProfileFeature 
-                    onProfileComplete={handleProfileComplete}
-                    className="dashboard-profile-feature"
-                  />
+                  <ProfileFeature />
                 </Card>
               </div>
               
@@ -586,7 +596,7 @@ const TabContentWrapper: React.FC = () => {
         </TabPanel>
       </TabContent>
 
-      {/* Unified Workout Modal */}
+      {/* Legacy Unified Workout Modal - TODO: Remove after dual modal migration */}
       {isModalOpen && modalWorkout && (
         <UnifiedWorkoutModal
           workout={modalWorkout}
@@ -601,6 +611,9 @@ const TabContentWrapper: React.FC = () => {
           onStart={handleModalStart}
         />
       )}
+
+      {/* NEW: Dual Modal System Integration */}
+      <WorkoutEditorModal />
     </>
   );
 };
