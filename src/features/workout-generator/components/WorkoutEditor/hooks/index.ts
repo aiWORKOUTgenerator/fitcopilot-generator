@@ -2,6 +2,7 @@
  * Custom Hooks Export
  * 
  * Central export point for all custom hooks used in the workout editor.
+ * Updated with Day 1 architectural fix hooks following established patterns.
  */
 
 // Auto-save hooks
@@ -30,4 +31,23 @@ export {
   type UnsavedChangesState,
   type UnsavedChangesActions,
   type UseUnsavedChangesReturn
-} from './useUnsavedChanges'; 
+} from './useUnsavedChanges';
+
+// ===========================================
+// DAY 1: ARCHITECTURAL FIX HOOKS
+// ===========================================
+// ✅ Context isolation and version management hooks
+
+// Context isolation hooks
+export {
+  useWorkoutEditorIsolation,
+  type UseWorkoutEditorIsolationOptions,
+  type UseWorkoutEditorIsolationReturn
+} from './useWorkoutEditorIsolation';
+
+// Version management hooks
+export {
+  useVersionManagement,
+  type UseVersionManagementOptions,
+  type UseVersionManagementReturn
+} from './useVersionManagement'; 

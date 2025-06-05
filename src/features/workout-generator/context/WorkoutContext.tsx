@@ -152,31 +152,30 @@ export const WorkoutProvider: React.FC<WorkoutProviderProps> = ({ children }) =>
       // Store original for rollback
       const originalWorkout = workouts.find(w => w.id === workout.id);
       
-      // CRITICAL FIX: Ensure version is included for proper versioning
-      const workoutWithVersion = {
+      // CRITICAL FIX: Use the workout's current version without fallbacks
+      // Let the API handle version validation properly
+      const workoutToSave = {
         ...workout,
-        // If version is missing or invalid, get it from the original or default to 1
-        version: (workout.version !== undefined && workout.version !== null) 
-          ? workout.version 
-          : (originalWorkout?.version !== undefined && originalWorkout?.version !== null)
-            ? originalWorkout.version 
-            : 1
+        // Keep the version as-is from the workout data
+        // Don't fallback to potentially stale originalWorkout version
+        version: workout.version
       };
       
-      console.log('[WorkoutContext] Updating workout with version:', {
-        id: workoutWithVersion.id,
-        title: workoutWithVersion.title,
-        version: workoutWithVersion.version,
+      console.log('[WorkoutContext] Updating workout with exact version:', {
+        id: workoutToSave.id,
+        title: workoutToSave.title,
+        version: workoutToSave.version,
         originalVersion: originalWorkout?.version,
-        exerciseCount: workoutWithVersion.exercises?.length || 0
+        exerciseCount: workoutToSave.exercises?.length || 0,
+        versionSource: workout.version !== undefined ? 'workout_param' : 'undefined'
       });
       
       // Optimistic update
-      updateWorkout(workoutWithVersion);
+      updateWorkout(workoutToSave);
       showSuccessMessage('Updating workout...');
 
       // CRITICAL FIX: Use saveWorkout API function (not updateWorkout which doesn't exist)
-      const updatedWorkout = await saveWorkout(workoutWithVersion);
+      const updatedWorkout = await saveWorkout(workoutToSave);
       
       console.log('[WorkoutContext] Workout updated successfully:', {
         id: updatedWorkout.id,

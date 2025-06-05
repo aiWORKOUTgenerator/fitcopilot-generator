@@ -210,7 +210,7 @@ class Utilities {
     }
     
     /**
-     * Save workout version
+     * Save a workout version record
      *
      * @param int $post_id The post ID
      * @param int $user_id The user ID
@@ -220,7 +220,7 @@ class Utilities {
      * @return int|false New version number or false on failure
      */
     public static function save_workout_version($post_id, $user_id, $state, $change_type, $change_summary) {
-        // Check if versioning service is available
+        // ARCHITECTURAL FIX: Always use VersioningService as the single source of truth
         if (class_exists('\\FitCopilot\\Service\\Versioning\\VersioningService')) {
             $versioning_service = new \FitCopilot\Service\Versioning\VersioningService();
             return $versioning_service->create_workout_version_record(
@@ -232,7 +232,10 @@ class Utilities {
             );
         }
         
-        // Fallback if versioning service is not available
+        // CRITICAL ERROR: VersioningService should always be available
+        error_log("FitCopilot CRITICAL ERROR: VersioningService class not found! Version record not created for workout $post_id");
+        
+        // Fallback: Only update version metadata without creating version record
         $current_version = (int) get_post_meta($post_id, '_workout_version', true) ?: 1;
         $new_version = $current_version + 1;
         $now = current_time('mysql');
@@ -242,24 +245,7 @@ class Utilities {
         update_post_meta($post_id, '_workout_last_modified', $now);
         update_post_meta($post_id, '_workout_modified_by', $user_id);
         
-        // Save version history if we have a custom table
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'fc_workout_versions';
-        
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
-            $wpdb->insert(
-                $table_name,
-                [
-                    'workout_id' => $post_id,
-                    'version' => $new_version,
-                    'user_id' => $user_id,
-                    'date_created' => $now,
-                    'state' => wp_json_encode($state),
-                    'change_type' => $change_type,
-                    'change_summary' => $change_summary
-                ]
-            );
-        }
+        error_log("FitCopilot: Version metadata updated to $new_version for workout $post_id (no version record created)");
         
         return $new_version;
     }

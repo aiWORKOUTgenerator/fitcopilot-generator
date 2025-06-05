@@ -64,7 +64,6 @@ const initialState: WorkoutEditorState = {
   workout: {
     title: '',
     difficulty: 'intermediate',
-    duration: 30,
     equipment: [],
     goals: [],
     exercises: []

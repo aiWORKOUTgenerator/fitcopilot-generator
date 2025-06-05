@@ -29,6 +29,9 @@ class VersioningSchema {
         
         // Hook to run migration for existing workouts
         add_action('admin_init', [$this, 'maybe_migrate_existing_workouts']);
+        
+        // ARCHITECTURAL FIX: Ensure table exists on every init (handles activation hook failures)
+        add_action('init', [$this, 'ensure_tables_exist'], 5);
     }
     
     /**
@@ -220,6 +223,28 @@ class VersioningSchema {
                 '%s', // change_summary
             ]
         );
+    }
+    
+    /**
+     * Ensure database tables exist (creates them if missing)
+     * This handles cases where activation hook wasn't fired properly
+     */
+    public function ensure_tables_exist() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'fc_workout_versions';
+        
+        // Check if table exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            error_log("FitCopilot: Version table $table_name not found, creating...");
+            $this->create_tables();
+            
+            // Verify table was created
+            if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
+                error_log("FitCopilot: Version table $table_name created successfully");
+            } else {
+                error_log("FitCopilot CRITICAL ERROR: Failed to create version table $table_name");
+            }
+        }
     }
 }
 

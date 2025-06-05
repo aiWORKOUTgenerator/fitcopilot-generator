@@ -1,0 +1,84 @@
+/**
+ * Day 1 Status Indicators - Minimal focused styling
+ * Surgical addition for context isolation and version management feedback
+ */
+
+// Modal layout adjustments for status indicators
+.workout-editor-modal__content--adaptive {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 90vh; // Ensure modal doesn't exceed viewport
+}
+
+.workout-editor-modal__status-area {
+  flex-shrink: 0; // Don't compress status area
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+}
+
+.workout-editor-modal__editor-area {
+  flex: 1; // Take remaining space
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // Allow shrinking
+  overflow: hidden; // Let WorkoutEditor handle scrolling
+}
+
+.workout-editor__status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: slideInTop 0.15s ease-in-out;
+  
+  &--warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-left: 3px solid #f59e0b;
+    color: #92400e;
+  }
+  
+  &--info {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-left: 3px solid #3b82f6;
+    color: #1e40af;
+  }
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+.workout-editor__status-action {
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  
+  &:hover {
+    background: currentColor;
+    color: white;
+  }
+}
+
+@keyframes slideInTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

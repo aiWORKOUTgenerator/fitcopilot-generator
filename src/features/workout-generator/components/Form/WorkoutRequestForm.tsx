@@ -412,6 +412,7 @@ function WorkoutRequestFormInner({ className = '' }: WorkoutRequestFormProps) {
           {derivedStep === 'completed' && generatedWorkout && (
             <ResultStep 
               workout={generatedWorkout} 
+              postId={generatedWorkout.id ? Number(generatedWorkout.id) : undefined}
               error={flowErrorMessage}
               onGenerateNew={handleRestart}
             />

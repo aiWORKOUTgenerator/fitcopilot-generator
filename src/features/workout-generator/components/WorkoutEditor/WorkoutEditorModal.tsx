@@ -237,14 +237,18 @@ const WorkoutEditorModalUI: React.FC<WorkoutEditorModalProps> = ({
           tabIndex={-1}
           aria-busy={isSaving}
         >
-          <WorkoutEditorProvider initialWorkout={editorWorkout}>
-            <WorkoutEditor
-              onSave={onSave || (async () => { onClose(); })}
-              onCancel={onCancel || onClose}
-              isNewWorkout={!workout.id}
-              isLoading={isSaving}
-            />
-          </WorkoutEditorProvider>
+
+
+          <div className="workout-editor-modal__editor-area">
+            <WorkoutEditorProvider initialWorkout={editorWorkout}>
+              <WorkoutEditor
+                onSave={onSave || (async () => { onClose(); })}
+                onCancel={onCancel || onClose}
+                isNewWorkout={!workout.id}
+                isLoading={isSaving}
+              />
+            </WorkoutEditorProvider>
+          </div>
         </div>
       </div>,
       document.body
@@ -256,7 +260,7 @@ const WorkoutEditorModalUI: React.FC<WorkoutEditorModalProps> = ({
 
 /**
  * Smart wrapper component that connects simplified modal to navigation context
- * Handles all business logic and data fetching
+ * Handles all business logic and data fetching with robust versioning support
  */
 const WorkoutEditorModal: React.FC = () => {
   // Navigation context for modal state management
@@ -268,7 +272,8 @@ const WorkoutEditorModal: React.FC = () => {
     isTransitioning,
     closeEditor,
     transitionToEdit,
-    transitionToView 
+    transitionToView,
+    updateCurrentWorkoutId
   } = useNavigation();
   
   // Get workout generator context to access the generated workout
@@ -281,7 +286,11 @@ const WorkoutEditorModal: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   
-  // Load workout data based on navigation context
+  // Simplified: No complex version conflict detection needed
+  // The fix is simple: always fetch fresh data when user clicks Edit
+  
+  // UNIFIED DATA FETCHING: Always fetch latest data from server
+  // This ensures user ALWAYS sees the most recent version, regardless of modal mode or previous data
   useEffect(() => {
     // Reset states when the editor closes
     if (!isEditorOpen) {
@@ -290,43 +299,107 @@ const WorkoutEditorModal: React.FC = () => {
       return;
     }
     
-    // If we have a current workout ID of 'new', use the generated workout
-    if (currentWorkoutId === 'new' && generatedWorkout) {
-      setWorkout(generatedWorkout);
-      return;
-    }
+    // REMOVED: Since workouts are auto-saved during generation, we never have 'new' IDs
+    // All generated workouts get real IDs immediately from the backend
     
-    // If we have a workout ID but no workout data, fetch it
+    // CRITICAL FIX: ALWAYS fetch fresh data when modal opens OR when transitioning to edit
+    // This handles both initial open AND edit transitions with a single data path
     if (currentWorkoutId && currentWorkoutId !== 'new') {
-      const fetchWorkout = async () => {
+      const fetchLatestData = async () => {
+        const isEditMode = modalMode === 'edit';
+        const reason = isEditMode ? 'User clicked Edit - ensuring fresh data' : 'Modal opened - loading workout';
+        
+        console.log('[WorkoutEditorModal] 🔄 FETCHING LATEST DATA:', {
+          id: currentWorkoutId,
+          mode: modalMode,
+          currentCachedVersion: workout?.version,
+          title: workout?.title,
+          reason: reason,
+          isInitialLoad: !workout,
+          isEditTransition: isEditMode && workout,
+          timestamp: new Date().toISOString()
+        });
+        
         setLoading(true);
         setError(null);
         
         try {
-          const fetchedWorkout = await getWorkout(currentWorkoutId);
-          setWorkout(fetchedWorkout);
-        } catch (err) {
-          console.error('Failed to load workout:', err);
-          setError('Failed to load workout. Please try again.');
-          closeEditor();
+          // ALWAYS fetch fresh data from server - this guarantees latest version
+          const latestWorkout = await getWorkout(currentWorkoutId);
+          
+          console.log('[WorkoutEditorModal] ✅ LATEST DATA LOADED:', {
+            id: latestWorkout.id,
+            title: latestWorkout.title,
+            version: latestWorkout.version,
+            previousVersion: workout?.version,
+            versionChanged: workout ? latestWorkout.version !== workout.version : false,
+            versionDiff: workout ? `${workout.version} → ${latestWorkout.version}` : `new_load → ${latestWorkout.version}`,
+            mode: modalMode,
+            exerciseCount: latestWorkout.exercises?.length || 0,
+            timestamp: new Date().toISOString()
+          });
+          
+          // Update with fresh data - this ensures user sees latest version
+          setWorkout(latestWorkout);
+          
+        } catch (error) {
+          console.error('[WorkoutEditorModal] ❌ Failed to fetch latest workout data:', error);
+          
+          if (error instanceof Error) {
+            if (error.message.includes('404')) {
+              setError('Workout not found. It may have been deleted.');
+              closeEditor();
+            } else if (error.message.includes('403')) {
+              setError('You do not have permission to edit this workout.');
+              closeEditor();
+            } else {
+              setError('Failed to load latest workout data. Please try again.');
+            }
+          } else {
+            setError('An unexpected error occurred. Please try again.');
+          }
         } finally {
           setLoading(false);
         }
       };
-      
-      fetchWorkout();
-    }
-  }, [isEditorOpen, currentWorkoutId, generatedWorkout, closeEditor]);
 
-  // Handle save function - the WorkoutEditor now handles saves directly
-  const handleSave = async () => {
-    // Since WorkoutEditor now handles saves directly, this is just a placeholder
-    // The actual save logic is in WorkoutEditor.tsx
-    closeEditor();
+      fetchLatestData();
+    }
+  }, [isEditorOpen, currentWorkoutId, modalMode, generatedWorkout, closeEditor]); // Include modalMode to trigger on edit transitions
+
+  // CRITICAL FIX: Handle save success with navigation context update
+  const handleSave = async (savedWorkout?: any) => {
+    try {
+      console.log('[WorkoutEditorModal] Save completed successfully:', {
+        currentWorkoutId: currentWorkoutId,
+        savedWorkoutId: savedWorkout?.postId || savedWorkout?.id,
+        wasNewWorkout: currentWorkoutId === 'new',
+        title: savedWorkout?.title
+      });
+      
+      // CRITICAL: Update navigation context if this was a new workout
+      if (currentWorkoutId === 'new' && savedWorkout?.postId) {
+        console.log('[WorkoutEditorModal] 🔄 Updating navigation context: new → ' + savedWorkout.postId);
+        updateCurrentWorkoutId(savedWorkout.postId.toString());
+      }
+      
+      // Close the editor after successful save
+      closeEditor();
+    } catch (error) {
+      console.error('[WorkoutEditorModal] Save callback error:', error);
+      setError('Failed to complete save operation. Please try again.');
+    }
   };
 
-  // Handle edit transition
+  // Handle edit transition with enhanced logging
   const handleEdit = () => {
+    console.log('[WorkoutEditorModal] Transitioning to edit mode:', {
+      workoutId: currentWorkoutId,
+      currentVersion: workout?.version,
+      title: workout?.title,
+      timestamp: new Date().toISOString()
+    });
+    
     transitionToEdit();
   };
 

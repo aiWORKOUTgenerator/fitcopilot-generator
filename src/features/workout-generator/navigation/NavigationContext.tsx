@@ -48,6 +48,9 @@ interface NavigationActions {
   
   // Set the user's preference for editor display
   setEditorPreference: (preference: 'modal' | 'page') => void;
+  
+  // Update the current workout ID (used after save operations)
+  updateCurrentWorkoutId: (workoutId: string) => void;
 }
 
 // Combined type for the context value
@@ -73,6 +76,7 @@ const NavigationContext = createContext<NavigationContextValue>({
   transitionToEdit: () => {},
   transitionToView: () => {},
   setEditorPreference: () => {},
+  updateCurrentWorkoutId: () => {},
 });
 
 /**
@@ -253,6 +257,24 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       console.warn('Failed to save editor preference to localStorage:', error);
     }
   };
+
+  // Function to update the current workout ID (used after save operations)
+  const updateCurrentWorkoutId = (workoutId: string) => {
+    console.log('[NavigationContext] Updating currentWorkoutId:', {
+      from: state.currentWorkoutId,
+      to: workoutId,
+      reason: 'Save operation completed'
+    });
+    
+    // Update the URL hash with the new workout ID
+    setHashParam(HASH_PARAMS.WORKOUT_EDITOR, workoutId);
+    
+    // Update the state
+    setState(prev => ({
+      ...prev,
+      currentWorkoutId: workoutId,
+    }));
+  };
   
   // Load editor preference from localStorage on mount
   useEffect(() => {
@@ -279,6 +301,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     transitionToEdit,
     transitionToView,
     setEditorPreference,
+    updateCurrentWorkoutId,
   };
   
   return (

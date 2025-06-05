@@ -70,7 +70,6 @@ const initialState: WorkoutGeneratorState = {
   },
   domain: {
     formValues: {
-      duration: 30,
       difficulty: 'intermediate',
       equipment: [],
       goals: '',

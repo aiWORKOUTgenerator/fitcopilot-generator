@@ -49,10 +49,18 @@ export const WorkoutEditorUIComponents = {
 
 // Re-export all types as a collection
 export type WorkoutEditorUITypes = {
-  SaveStatusIndicatorProps: SaveStatusIndicatorProps;
-  ValidationFeedbackProps: ValidationFeedbackProps;
-  ValidationMessage: ValidationMessage;
-  UnsavedChangesWarningProps: UnsavedChangesWarningProps;
-  SuggestionTooltipProps: SuggestionTooltipProps;
-  SuggestionItem: SuggestionItem;
-}; 
+  SaveStatusIndicatorProps: import('./SaveStatusIndicator').SaveStatusIndicatorProps;
+  ValidationFeedbackProps: import('./ValidationFeedback').ValidationFeedbackProps;
+  ValidationMessage: import('./ValidationFeedback').ValidationMessage;
+  UnsavedChangesWarningProps: import('./UnsavedChangesWarning').UnsavedChangesWarningProps;
+  SuggestionTooltipProps: import('./SuggestionTooltip').SuggestionTooltipProps;
+  SuggestionItem: import('./SuggestionTooltip').SuggestionItem;
+};
+
+/**
+ * WorkoutEditor Components Barrel Exports
+ * 
+ * Centralized exports for all WorkoutEditor sub-components
+ */
+
+export { ConflictResolutionPanel } from './ConflictResolutionPanel'; 

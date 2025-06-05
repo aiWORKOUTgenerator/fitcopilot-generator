@@ -84,13 +84,21 @@ class VersioningService {
         global $wpdb;
         $table_name = $wpdb->prefix . 'fc_workout_versions';
         
+        // ARCHITECTURAL FIX: Validate table exists before attempting insert
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            error_log("FitCopilot ERROR: Version table $table_name does not exist when trying to create version record for workout $workout_id");
+            return false;
+        }
+        
         // Get the current version number
         $current_version = (int) get_post_meta($workout_id, '_workout_version', true) ?: 1;
         
         // New version will be current + 1
         $new_version = $current_version + 1;
         
-        // Insert version record
+        error_log("FitCopilot: Creating version record for workout $workout_id - version $current_version -> $new_version");
+        
+        // Insert version record with CORRECT schema (created_at, data)
         $result = $wpdb->insert(
             $table_name,
             [
@@ -114,6 +122,7 @@ class VersioningService {
         );
         
         if ($result === false) {
+            error_log("FitCopilot ERROR: Failed to insert version record for workout $workout_id. WPDB Error: " . $wpdb->last_error);
             return false;
         }
         
@@ -121,6 +130,8 @@ class VersioningService {
         update_post_meta($workout_id, '_workout_version', $new_version);
         update_post_meta($workout_id, '_workout_last_modified', current_time('mysql'));
         update_post_meta($workout_id, '_workout_modified_by', $user_id);
+        
+        error_log("FitCopilot SUCCESS: Created version record $new_version for workout $workout_id with change: $change_summary");
         
         return $new_version;
     }
@@ -332,6 +343,15 @@ class VersioningService {
         global $wpdb;
         $table_name = $wpdb->prefix . 'fc_workout_versions';
         
+        // Check if table exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            error_log("FitCopilot: Version history table $table_name does not exist");
+            return [
+                'versions' => [],
+                'total' => 0,
+            ];
+        }
+        
         // Default arguments
         $defaults = [
             'from_version' => 0,
@@ -366,15 +386,33 @@ class VersioningService {
             $where .= $wpdb->prepare(" AND created_at <= %s", $args['to_date'] . ' 23:59:59');
         }
         
-        // Get total count (will be implemented in day 2)
+        // Get total count for pagination
         $total_query = "SELECT COUNT(*) FROM $table_name $where";
-        $total = 0; // Placeholder for day 2
+        $total = (int) $wpdb->get_var($total_query);
         
         // Get versions with limit and offset
         $query = "SELECT * FROM $table_name $where ORDER BY version DESC LIMIT %d OFFSET %d";
         $query = $wpdb->prepare($query, $args['limit'], $args['offset']);
         
-        $versions = []; // Placeholder for day 2
+        $raw_versions = $wpdb->get_results($query, ARRAY_A);
+        
+        // Transform versions for API response
+        $versions = [];
+        if ($raw_versions) {
+            foreach ($raw_versions as $version) {
+                $versions[] = [
+                    'version' => (int) $version['version'],
+                    'user_id' => (int) $version['user_id'],
+                    'created_at' => $version['created_at'],
+                    'change_type' => $version['change_type'],
+                    'change_summary' => $version['change_summary'],
+                    // Don't include full data in list view for performance
+                    'has_data' => !empty($version['data'])
+                ];
+            }
+        }
+        
+        error_log("FitCopilot: Version history query for workout $workout_id returned " . count($versions) . " versions");
         
         // Return results
         return [

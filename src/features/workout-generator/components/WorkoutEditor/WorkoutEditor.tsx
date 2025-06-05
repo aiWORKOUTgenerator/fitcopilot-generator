@@ -218,6 +218,18 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
       // Update local state with merged workout data
       dispatch({ type: 'SET_WORKOUT', payload: updatedWorkout });
       
+      // CRITICAL FIX: Call onSave prop to notify parent component of successful save
+      console.log('[WorkoutEditor] Calling onSave prop with saved workout data:', {
+        postId: updatedWorkout.postId,
+        title: updatedWorkout.title,
+        version: updatedWorkout.version
+      });
+      
+      // Call the parent's save callback with the updated workout
+      if (onSave) {
+        onSave(updatedWorkout);
+      }
+      
       return {
         success: true,
         data: updatedWorkout,
