@@ -607,37 +607,32 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
               </div>
 
               {/* Equipment Selection */}
-              <div className="workout-editor__form-field workout-editor__form-field--equipment">
+              <div className="workout-editor__form-field workout-editor__form-field--full-width">
                 <FormFieldEnhanced
                   label="Available Equipment"
-                  error={validationErrors.equipment}
                   disabled={isLoading || isSaving}
-                  hint="Select all equipment available for this workout"
+                  hint="Select all equipment you have access to for this workout"
                 >
                   <div className="workout-editor__checkbox-grid">
                     {EQUIPMENT_OPTIONS.map(equipment => {
-                      const isChecked = (workout.equipment || []).includes(equipment.id);
+                      const isSelected = (workout.equipment || []).includes(equipment.id);
                       const isDisabled = isLoading || isSaving;
                       
                       return (
                         <label 
                           key={equipment.id} 
-                          className={`workout-editor__checkbox-label ${
-                            isChecked ? 'workout-editor__checkbox-label--checked' : ''
-                          } ${
-                            isDisabled ? 'workout-editor__checkbox-label--disabled' : ''
-                          }`.trim()}
+                          className={`workout-editor__checkbox-label ${isSelected ? 'checkbox-label--selected' : ''}`}
                         >
                           <input
                             type="checkbox"
                             className="workout-editor__checkbox-input"
                             value={equipment.id}
-                            checked={isChecked}
+                            checked={isSelected}
                             onChange={() => handleEquipmentToggle(equipment.id)}
                             disabled={isDisabled}
                           />
                           <div className="workout-editor__checkbox-box">
-                            <Settings size={14} className="workout-editor__checkbox-indicator" />
+                            <Dumbbell size={14} className="workout-editor__checkbox-indicator" />
                           </div>
                           <span className="workout-editor__checkbox-text">{equipment.label}</span>
                         </label>
@@ -648,32 +643,27 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
               </div>
 
               {/* Goals Selection */}
-              <div className="workout-editor__form-field workout-editor__form-field--goals">
+              <div className="workout-editor__form-field workout-editor__form-field--full-width">
                 <FormFieldEnhanced
                   label="Workout Goals"
-                  error={validationErrors.goals}
                   disabled={isLoading || isSaving}
-                  hint="Select all goals this workout should target"
+                  hint="Select the primary goals for this workout (you can choose multiple)"
                 >
                   <div className="workout-editor__checkbox-grid">
                     {GOAL_OPTIONS.map(goal => {
-                      const isChecked = (workout.goals || []).includes(goal.value);
+                      const isSelected = (workout.goals || []).includes(goal.value);
                       const isDisabled = isLoading || isSaving;
                       
                       return (
                         <label 
                           key={goal.value} 
-                          className={`workout-editor__checkbox-label ${
-                            isChecked ? 'workout-editor__checkbox-label--checked' : ''
-                          } ${
-                            isDisabled ? 'workout-editor__checkbox-label--disabled' : ''
-                          }`.trim()}
+                          className={`workout-editor__checkbox-label ${isSelected ? 'checkbox-label--selected' : ''}`}
                         >
                           <input
                             type="checkbox"
                             className="workout-editor__checkbox-input"
                             value={goal.value}
-                            checked={isChecked}
+                            checked={isSelected}
                             onChange={() => handleGoalToggle(goal.value)}
                             disabled={isDisabled}
                           />

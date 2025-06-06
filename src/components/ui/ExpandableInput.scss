@@ -23,8 +23,8 @@
   white-space: normal;
   word-wrap: break-word;
   
-  // Ensure text color is black to match workout editor
-  color: #000000 !important;
+  // Ensure text color is light to match workout editor theme
+  color: #e5e7eb !important;
   
   // Enhanced expanded state
   &--expanded {
@@ -244,6 +244,25 @@
     // Exercise-specific styling for better content display
     &.workout-editor__exercise-name-input {
       font-weight: 500;
+      color: #e5e7eb !important; // Light text for consistency
+      background-color: rgba(55, 65, 81, 0.4) !important; // Consistent with form fields
+      border-color: rgba(75, 85, 99, 0.6) !important; // Subtle border
+      
+      &::placeholder {
+        color: #9ca3af !important; // Light placeholder
+      }
+      
+      &:focus {
+        color: #f3f4f6 !important; // Even lighter when focused
+        background-color: rgba(55, 65, 81, 0.6) !important;
+        border-color: rgba(139, 92, 246, 0.5) !important; // Purple focus border
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2) !important;
+      }
+      
+      &:hover:not(:focus) {
+        background-color: rgba(55, 65, 81, 0.5) !important;
+        border-color: rgba(75, 85, 99, 0.8) !important;
+      }
       
       // Allow more generous sizing for exercise names
       &:focus,
@@ -260,6 +279,26 @@
     
     // Field-specific styling
     &.exercise-field-input {
+      color: #e5e7eb !important; // Light text for all exercise fields
+      background-color: rgba(55, 65, 81, 0.4) !important; // Consistent background
+      border-color: rgba(75, 85, 99, 0.6) !important; // Subtle border
+      
+      &::placeholder {
+        color: #9ca3af !important; // Light placeholder
+      }
+      
+      &:focus {
+        color: #f3f4f6 !important; // Lighter when focused
+        background-color: rgba(55, 65, 81, 0.6) !important;
+        border-color: rgba(139, 92, 246, 0.5) !important; // Purple focus
+        box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2) !important;
+      }
+      
+      &:hover:not(:focus) {
+        background-color: rgba(55, 65, 81, 0.5) !important;
+        border-color: rgba(75, 85, 99, 0.8) !important;
+      }
+      
       &--name {
         font-weight: 500;
         
