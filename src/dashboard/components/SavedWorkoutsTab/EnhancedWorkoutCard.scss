@@ -5,6 +5,8 @@
  * and enhanced visual hierarchy for better user experience.
  */
 
+@import '../../../styles/design-system';
+
 .enhanced-workout-card {
   --card-bg: rgba(30, 30, 30, 0.95);
   --card-glass-bg: rgba(255, 255, 255, 0.05);
@@ -166,19 +168,283 @@
 
     /* Workout Thumbnail */
     .workout-thumbnail-container {
+      @include responsive-card-container();
       position: relative;
       margin-bottom: var(--card-spacing);
 
       .workout-thumbnail {
-        width: 100%;
-        height: 120px;
-        border-radius: var(--card-radius-sm);
+        @include responsive-thumbnail-container();
         display: flex;
         align-items: center;
         justify-content: center;
         transition: transform var(--card-transition);
-        overflow: hidden;
+        // 🚀 FIX: Remove fixed height to allow dynamic expansion
+        min-height: 120px; // Minimum height for consistency
+        height: auto; // Allow expansion for content
 
+        // 🚀 NEW: Title Display in Thumbnail Header (Task 1.1.2)
+        .thumbnail-title-container {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem;
+          text-align: center;
+          
+          .thumbnail-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-1);
+            position: relative;
+            width: 100%;
+            min-height: 0;
+            flex: 1;
+          }
+        }
+
+        .thumbnail-title,
+        .thumbnail-emoji {
+          // 🚀 STORY 2.1 & 3.1: Use design system mixins for optimal text readability
+          @include card-thumbnail-title();
+          @include card-thumbnail-title-hover();
+          @include text-respect-motion-preferences();
+          @include text-focus-accessible();
+          
+          // 🚀 FIX: Enhanced text layout for dynamic containers
+          line-height: 1.3;
+          word-break: break-word;
+          hyphens: auto;
+          max-width: 100%;
+          
+          // 🚀 FIX: Semi-transparent background container for title text
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(4px);
+          border-radius: 8px;
+          padding: 0.75rem 1rem;
+          min-height: 4.5rem; // Space for 3 lines of text (1.3 line-height * 3 + padding)
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          
+          // 🚀 STORY 3.1: Enhanced hover effects for processed titles
+          &.processed {
+            position: relative;
+            
+            &:hover {
+              transform: scale(1.02);
+              text-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.9),
+                0 0 12px rgba(255, 255, 255, 0.3);
+            }
+          }
+          
+          // 🚀 STORY 3.1: Custom tooltip for truncated text
+          &[title]:hover {
+            &::after {
+              content: attr(title);
+              position: absolute;
+              bottom: 120%;
+              left: 50%;
+              transform: translateX(-50%);
+              background: rgba(0, 0, 0, 0.95);
+              color: white;
+              padding: var(--space-2) var(--space-3);
+              border-radius: var(--space-1);
+              font-size: var(--font-size-sm);
+              white-space: nowrap;
+              max-width: 200px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              z-index: 1000;
+              opacity: 0;
+              animation: tooltip-fade-in 0.2s ease-out 0.5s forwards;
+              pointer-events: none;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+              
+              // Arrow
+              &::before {
+                content: '';
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 5px solid transparent;
+                border-top-color: rgba(0, 0, 0, 0.95);
+              }
+            }
+          }
+        }
+        
+        // 🚀 STORY 3.2: Emoji fallback mode styling
+        .thumbnail-emoji {
+          font-size: 2.5rem;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+          line-height: 1;
+          
+          // Responsive emoji sizing
+          @media (max-width: 768px) {
+            font-size: 2rem;
+          }
+          
+          @media (max-width: 480px) {
+            font-size: 1.8rem;
+          }
+          
+          @media (min-width: 1200px) {
+            font-size: 3rem;
+          }
+        }
+        
+        // 🚀 STORY 3.2: Source-specific styling for titles
+        .thumbnail-title {
+          &.source-fallback {
+            font-style: italic;
+            opacity: 0.9;
+          }
+          
+          &.source-error {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+          }
+          
+          &.source-truncated {
+            position: relative;
+            
+            &::after {
+              content: '…';
+              font-weight: bold;
+            }
+          }
+          
+          &.source-description {
+            font-size: 0.9em;
+            line-height: 1.2;
+          }
+        }
+        
+        // 🚀 STORY 3.1: Advanced text formatting indicators
+        .thumbnail-indicators {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--space-1-5);
+          flex-wrap: wrap;
+          // 🚀 FIX: Ensure indicators have proper spacing and don't get cut off
+          margin-top: var(--space-1);
+          flex-shrink: 0;
+          
+          .title-processed-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            backdrop-filter: blur(2px);
+            transition: all 0.2s ease;
+            cursor: help;
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.3);
+              transform: scale(1.1);
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+          }
+          
+          .workout-type-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--space-1);
+            padding: var(--space-1);
+            backdrop-filter: blur(2px);
+            transition: all 0.2s ease;
+            cursor: help;
+            
+            .workout-type-icon {
+              color: rgba(255, 255, 255, 0.9);
+              filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+            }
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.25);
+              transform: scale(1.05);
+              
+              .workout-type-icon {
+                color: white;
+              }
+            }
+            
+            // 🚀 STORY 3.2: Debug indicator for development
+            .debug-source-indicator {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 0.7rem;
+              background: rgba(255, 0, 0, 0.2);
+              border: 1px solid rgba(255, 0, 0, 0.4);
+              border-radius: 50%;
+              width: 18px;
+              height: 18px;
+              cursor: help;
+              
+              &:hover {
+                background: rgba(255, 0, 0, 0.3);
+                transform: scale(1.1);
+              }
+            }
+          }
+        }
+        
+        // 🚀 STORY 3.1: Enhanced tooltip animation
+        @keyframes tooltip-fade-in {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-5px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+        
+        // 🚀 STORY 3.1: High contrast mode support for indicators
+        @media (prefers-contrast: high) {
+          .thumbnail-indicators {
+            .title-processed-indicator,
+            .workout-type-indicator {
+              background: rgba(0, 0, 0, 0.8);
+              border: 1px solid rgba(255, 255, 255, 0.5);
+            }
+          }
+        }
+        
+        // 🚀 STORY 3.1: Reduced motion support
+        @media (prefers-reduced-motion: reduce) {
+          .thumbnail-title,
+          .title-processed-indicator,
+          .workout-type-indicator {
+            transition: none;
+            animation: none;
+            
+            &:hover {
+              transform: none;
+            }
+          }
+          
+          .thumbnail-title[title]:hover::after {
+            animation: none;
+            opacity: 1;
+          }
+        }
+
+        // 🚀 LEGACY: Keep for backward compatibility
         .thumbnail-icon {
           font-size: 2.5rem;
           filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
@@ -234,6 +500,36 @@
       flex: 1;
       min-width: 0;
 
+      // 🚀 TASK 1.2.2: Updated layout - title removed, actions repositioned
+      .workout-actions-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        margin-bottom: calc(var(--card-spacing) * 0.5); // Reduced spacing since no title
+        min-height: 2rem; // Maintain some height for actions
+
+        .favorite-btn {
+          background: none;
+          border: none;
+          color: var(--card-text-muted);
+          cursor: pointer;
+          padding: 0.25rem;
+          border-radius: 50%;
+          transition: all var(--card-transition-fast);
+          flex-shrink: 0;
+
+          &:hover {
+            color: var(--card-error);
+            background: rgba(239, 68, 68, 0.1);
+          }
+
+          &.favorited {
+            color: var(--card-error);
+          }
+        }
+      }
+
+      // 🚀 LEGACY: Keep for backward compatibility with title-based layouts
       .workout-title-row {
         display: flex;
         align-items: flex-start;
@@ -570,10 +866,19 @@
         margin-bottom: calc(var(--card-spacing) * 0.75);
 
         .workout-thumbnail {
-          height: 100px;
+          // 🚀 FIX: Use min-height instead of fixed height on mobile
+          min-height: 100px;
+          height: auto;
 
           .thumbnail-icon {
             font-size: 2rem;
+          }
+          
+          // 🚀 FIX: Adjust semi-transparent container for mobile
+          .thumbnail-title {
+            min-height: 4rem; // Slightly smaller on mobile
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
           }
         }
       }
@@ -609,10 +914,20 @@
       .card-header {
         .workout-thumbnail-container .workout-thumbnail {
           width: 50px;
-          height: 50px;
+          // 🚀 FIX: Use min-height for list mode as well
+          min-height: 50px;
+          height: auto;
 
           .thumbnail-icon {
             font-size: 1.5rem;
+          }
+          
+          // 🚀 FIX: Compact semi-transparent container for list mode
+          .thumbnail-title {
+            min-height: 3rem; // Very compact for list mode
+            padding: 0.4rem 0.6rem;
+            font-size: 0.75rem;
+            line-height: 1.2;
           }
         }
       }

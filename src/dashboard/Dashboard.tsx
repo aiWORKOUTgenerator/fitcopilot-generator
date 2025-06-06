@@ -43,6 +43,8 @@ import { NavigationProvider, useNavigation } from '../features/workout-generator
 import { EnhancedWorkoutModal as DualEnhancedWorkoutModal } from '../features/workout-generator/components/WorkoutEditor/EnhancedWorkoutModal';
 import WorkoutEditorModal from '../features/workout-generator/components/WorkoutEditor/WorkoutEditorModal';
 
+
+
 /**
  * Transform real Profile data to ProfileSummary format
  */
@@ -148,6 +150,8 @@ const Dashboard: React.FC = () => {
 const DashboardInner: React.FC = () => {
   const { state, refreshDashboard } = useDashboard();
 
+
+
   return (
     <div className="fitcopilot-dashboard enhanced">
       {/* Main Dashboard Content */}
@@ -168,9 +172,9 @@ const DashboardInner: React.FC = () => {
             </p>
           </div>
           
-          <div className="generator-content">
-            <WorkoutGeneratorFeature />
-          </div>
+                      <div className="generator-content">
+              <WorkoutGeneratorFeature />
+            </div>
         </section>
       </main>
 

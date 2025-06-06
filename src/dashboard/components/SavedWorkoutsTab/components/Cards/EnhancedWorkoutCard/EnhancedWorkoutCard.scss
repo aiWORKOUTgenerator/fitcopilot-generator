@@ -171,7 +171,9 @@
 
       .workout-thumbnail {
         width: 100%;
-        height: 120px;
+        // 🚀 FIX: Allow dynamic height for title display
+        min-height: 120px;
+        height: auto;
         border-radius: var(--card-radius-sm);
         display: flex;
         align-items: center;
@@ -616,7 +618,9 @@
     .card-header {
       .workout-thumbnail-container {
         .workout-thumbnail {
-          height: 100px;
+          // 🚀 FIX: Use min-height for responsive mobile design
+          min-height: 100px;
+          height: auto;
         }
       }
 
@@ -682,7 +686,9 @@
 
           .workout-thumbnail {
             width: 100%;
-            height: 80px;
+            // 🚀 FIX: Allow expansion for mobile list mode
+            min-height: 80px;
+            height: auto;
           }
         }
       }

@@ -1,0 +1,436 @@
+/**
+ * Text Mixins
+ * 
+ * Typography mixins for text handling, contrast, and accessibility.
+ * Uses design system tokens for consistency.
+ */
+
+@import '../tokens/core/colors';
+@import '../tokens/core/typography';
+
+// ----------------------------------------------------------------------------
+// TEXT CONTRAST MIXINS
+// ----------------------------------------------------------------------------
+
+/**
+ * High contrast text on colored backgrounds
+ * Ensures WCAG AA compliance (4.5:1 contrast ratio)
+ * 
+ * @param {Color} $bg-color - Background color to contrast against
+ * @param {String} $strength - Contrast strength: 'normal' | 'strong' | 'maximum'
+ */
+@mixin text-high-contrast($bg-color: transparent, $strength: 'strong') {
+  $text-color: $color-white;
+  $shadow-color: rgba(0, 0, 0, 0.7);
+  $shadow-blur: 4px;
+  
+  @if $strength == 'normal' {
+    $shadow-color: rgba(0, 0, 0, 0.5);
+    $shadow-blur: 2px;
+  } @else if $strength == 'maximum' {
+    $shadow-color: rgba(0, 0, 0, 0.9);
+    $shadow-blur: 6px;
+  }
+  
+  color: $text-color;
+  text-shadow: 
+    0 1px $shadow-blur $shadow-color,
+    0 0 $shadow-blur $shadow-color;
+    
+  // Additional background overlay for extreme contrast
+  @if $strength == 'maximum' {
+    background: linear-gradient(
+      transparent 0%, 
+      rgba(0, 0, 0, 0.3) 100%
+    );
+    backdrop-filter: blur(1px);
+  }
+}
+
+/**
+ * Adaptive text color based on background luminance
+ * Automatically chooses white or black text for optimal contrast
+ * 
+ * @param {Color} $bg-color - Background color to evaluate
+ */
+@mixin text-adaptive-contrast($bg-color) {
+  // Calculate relative luminance (simplified)
+  // For full WCAG compliance, use a proper luminance calculation
+  
+  // Default to white text with shadow for safety
+  color: $color-white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  
+  // Override for known light colors
+  @if lightness($bg-color) > 70% {
+    color: $color-gray-900;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+}
+
+/**
+ * Text with guaranteed readability on any background
+ * Uses multiple techniques for maximum accessibility
+ */
+@mixin text-readable-on-any-background() {
+  color: $color-white;
+  font-weight: var(--font-weight-semibold);
+  text-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.8),
+    0 0 6px rgba(0, 0, 0, 0.6),
+    1px 1px 0 rgba(0, 0, 0, 0.9),
+    -1px -1px 0 rgba(0, 0, 0, 0.9),
+    1px -1px 0 rgba(0, 0, 0, 0.9),
+    -1px 1px 0 rgba(0, 0, 0, 0.9);
+    
+  // Subtle background for extra safety
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  
+  // High contrast mode support
+  @media (prefers-contrast: high) {
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 1),
+      0 0 8px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// TEXT TRUNCATION MIXINS
+// ----------------------------------------------------------------------------
+
+/**
+ * Single line text truncation with ellipsis
+ */
+@mixin text-truncate() {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/**
+ * Multi-line text truncation using webkit line clamp
+ * 
+ * @param {Number} $lines - Number of lines to show before truncating
+ */
+@mixin text-truncate-lines($lines: 2) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  line-height: var(--line-height-snug); // 1.375
+  
+  // Fallback for browsers without webkit-line-clamp
+  @supports not (-webkit-line-clamp: $lines) {
+    max-height: calc(#{$lines} * 1.375em);
+    text-overflow: ellipsis;
+  }
+}
+
+/**
+ * Responsive text truncation
+ * Adjusts line count based on screen size and orientation
+ */
+@mixin text-truncate-responsive() {
+  @include text-truncate-lines(3);
+  
+  // Tablet portrait and mobile landscape
+  @media (max-width: 768px) {
+    -webkit-line-clamp: 2;
+    max-height: calc(2 * 1.375em);
+  }
+  
+  // Small mobile portrait
+  @media (max-width: 480px) {
+    -webkit-line-clamp: 2;
+    max-height: calc(2 * 1.2em);
+    line-height: 1.2;
+  }
+  
+  // Large tablets and small desktops
+  @media (min-width: 769px) and (max-width: 1199px) {
+    -webkit-line-clamp: 3;
+    max-height: calc(3 * 1.375em);
+  }
+  
+  // Large desktop screens
+  @media (min-width: 1200px) {
+    -webkit-line-clamp: 4;
+    max-height: calc(4 * 1.375em);
+  }
+  
+  // Ultra-wide screens
+  @media (min-width: 1600px) {
+    -webkit-line-clamp: 5;
+    max-height: calc(5 * 1.375em);
+  }
+  
+  // Landscape orientation adjustments
+  @media (max-height: 600px) and (orientation: landscape) {
+    -webkit-line-clamp: 2;
+    max-height: calc(2 * 1.2em);
+    line-height: 1.2;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// CARD TITLE SPECIFIC MIXINS
+// ----------------------------------------------------------------------------
+
+/**
+ * Card thumbnail title styling
+ * Optimized for colored card headers with responsive design
+ */
+@mixin card-thumbnail-title() {
+  @include text-readable-on-any-background();
+  @include text-truncate-responsive();
+  
+  // Design system typography
+  font-family: var(--font-family-sans);
+  font-size: clamp(var(--font-size-sm), 2.5vw, var(--font-size-md));
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--letter-spacing-tight);
+  
+  // Layout
+  width: 100%;
+  text-align: center;
+  word-break: break-word;
+  padding: var(--space-3);
+  border-radius: var(--space-1);
+  
+  // Enhanced readability
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  // Responsive adjustments with enhanced breakpoints
+  
+  // Large tablets and small desktops (769px - 1199px)
+  @media (min-width: 769px) and (max-width: 1199px) {
+    font-size: var(--font-size-md);
+    padding: var(--space-2-5);
+  }
+  
+  // Tablet portrait and mobile landscape (481px - 768px)
+  @media (max-width: 768px) {
+    font-size: var(--font-size-sm);
+    padding: var(--space-2);
+    letter-spacing: var(--letter-spacing-normal);
+  }
+  
+  // Small mobile portrait (≤480px)
+  @media (max-width: 480px) {
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-tight);
+    padding: var(--space-1-5);
+    letter-spacing: var(--letter-spacing-normal);
+  }
+  
+  // Large desktop screens (≥1200px)
+  @media (min-width: 1200px) {
+    font-size: var(--font-size-lg);
+    padding: var(--space-4);
+    letter-spacing: var(--letter-spacing-tight);
+  }
+  
+  // Ultra-wide screens (≥1600px)
+  @media (min-width: 1600px) {
+    font-size: var(--font-size-xl);
+    padding: var(--space-5);
+  }
+  
+  // Landscape orientation on mobile devices
+  @media (max-height: 600px) and (orientation: landscape) {
+    font-size: var(--font-size-xs);
+    padding: var(--space-1);
+    line-height: var(--line-height-tight);
+  }
+  
+  // High DPI displays enhancement
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/**
+ * Title hover effects for enhanced interactivity
+ */
+@mixin card-thumbnail-title-hover() {
+  transition: all 0.2s ease-out;
+  
+  &:hover {
+    transform: scale(1.02);
+    text-shadow: 
+      0 2px 6px rgba(0, 0, 0, 0.9),
+      0 0 8px rgba(0, 0, 0, 0.7);
+  }
+}
+
+// ----------------------------------------------------------------------------
+// ACCESSIBILITY MIXINS
+// ----------------------------------------------------------------------------
+
+/**
+ * Enhanced focus states for text elements
+ */
+@mixin text-focus-accessible() {
+  &:focus,
+  &:focus-visible {
+    outline: 2px solid var(--color-info-500);
+    outline-offset: 2px;
+    border-radius: var(--space-1);
+  }
+  
+  // High contrast mode support
+  @media (prefers-contrast: high) {
+    &:focus,
+    &:focus-visible {
+      outline-width: 3px;
+      outline-color: var(--color-info-700);
+    }
+  }
+}
+
+/**
+ * Reduced motion support for text animations
+ */
+@mixin text-respect-motion-preferences() {
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+    animation: none;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// UTILITY MIXINS
+// ----------------------------------------------------------------------------
+
+/**
+ * Screen reader only text (accessible but visually hidden)
+ */
+@mixin text-sr-only() {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/**
+ * Optimized text rendering for performance
+ */
+@mixin text-optimize-rendering() {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1;
+}
+
+// ----------------------------------------------------------------------------
+// RESPONSIVE LAYOUT MIXINS
+// ----------------------------------------------------------------------------
+
+/**
+ * Responsive card grid layout helper
+ * Ensures cards maintain proper proportions across screen sizes
+ */
+@mixin responsive-card-container() {
+  // Base container styles
+  width: 100%;
+  min-height: 120px; // Consistent minimum height
+  display: flex;
+  flex-direction: column;
+  
+  // Mobile portrait (≤480px)
+  @media (max-width: 480px) {
+    min-height: 100px;
+  }
+  
+  // Tablet portrait (481px - 768px)
+  @media (min-width: 481px) and (max-width: 768px) {
+    min-height: 110px;
+  }
+  
+  // Large tablets and small desktops (769px - 1199px)
+  @media (min-width: 769px) and (max-width: 1199px) {
+    min-height: 125px;
+  }
+  
+  // Large desktop screens (≥1200px)
+  @media (min-width: 1200px) {
+    min-height: 140px;
+  }
+  
+  // Ultra-wide screens (≥1600px)
+  @media (min-width: 1600px) {
+    min-height: 160px;
+  }
+  
+  // Landscape orientation adjustments
+  @media (max-height: 600px) and (orientation: landscape) {
+    min-height: 80px;
+  }
+}
+
+/**
+ * Responsive thumbnail container
+ * Maintains aspect ratio and text visibility
+ */
+@mixin responsive-thumbnail-container() {
+  position: relative;
+  width: 100%;
+  border-radius: var(--space-2);
+  overflow: hidden;
+  
+  // Ensure consistent aspect ratio
+  aspect-ratio: 16 / 9;
+  
+  // Fallback for browsers without aspect-ratio support
+  @supports not (aspect-ratio: 16 / 9) {
+    &::before {
+      content: '';
+      display: block;
+      padding-top: 56.25%; // 16:9 aspect ratio
+    }
+    
+    .thumbnail-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+  
+  // Responsive aspect ratio adjustments
+  @media (max-width: 480px) {
+    aspect-ratio: 4 / 3; // More square on mobile
+    
+    @supports not (aspect-ratio: 4 / 3) {
+      &::before {
+        padding-top: 75%; // 4:3 aspect ratio
+      }
+    }
+  }
+  
+  @media (min-width: 1600px) {
+    aspect-ratio: 2 / 1; // Wider on ultra-wide screens
+    
+    @supports not (aspect-ratio: 2 / 1) {
+      &::before {
+        padding-top: 50%; // 2:1 aspect ratio
+      }
+    }
+  }
+} 

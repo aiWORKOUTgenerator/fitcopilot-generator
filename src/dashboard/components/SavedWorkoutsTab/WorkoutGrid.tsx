@@ -6,7 +6,7 @@
  * 
  * Updated for Week 1 Foundation Sprint - now uses extracted services.
  */
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { 
   Grid, 
   List, 
@@ -239,6 +239,46 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
     }
   }, [workouts, filters, enableUnifiedDataService, enableVersionTracking, versionAwareData.versionErrors]);
 
+  // 🚀 PERFORMANCE: Virtualization for large lists
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 20 });
+  
+  // 🚀 PERFORMANCE: Calculate visible items for virtualization
+  const visibleWorkouts = useMemo(() => {
+    if (filteredWorkouts.length <= 50) {
+      // For small lists, show all items
+      return filteredWorkouts;
+    }
+    
+    // For large lists, show only visible range
+    return filteredWorkouts.slice(visibleRange.start, visibleRange.end);
+  }, [filteredWorkouts, visibleRange]);
+
+  // 🚀 PERFORMANCE: Scroll handler for virtualization
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current || filteredWorkouts.length <= 50) return;
+    
+    const container = containerRef.current;
+    const scrollTop = container.scrollTop;
+    const itemHeight = viewMode === 'grid' ? 300 : 120; // Approximate heights
+    const containerHeight = container.clientHeight;
+    
+    const start = Math.floor(scrollTop / itemHeight);
+    const visibleCount = Math.ceil(containerHeight / itemHeight) + 5; // Buffer
+    const end = Math.min(start + visibleCount, filteredWorkouts.length);
+    
+    setVisibleRange({ start, end });
+  }, [filteredWorkouts.length, viewMode]);
+
+  // 🚀 PERFORMANCE: Setup scroll listener
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || filteredWorkouts.length <= 50) return;
+    
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [handleScroll, filteredWorkouts.length]);
+
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: Partial<WorkoutFilters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
@@ -288,6 +328,9 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
       }
     }
   }, [selectedWorkouts, onBulkDelete]);
+
+  // 🚀 PERFORMANCE: Memoized workout card for better rendering performance
+  const MemoizedEnhancedWorkoutCard = React.memo(EnhancedWorkoutCard);
 
   if (isLoading) {
     return (
@@ -581,10 +624,34 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
           </Button>
         </div>
       ) : (
-        <div className={`enhanced-workouts-container ${viewMode}`}>
-          {filteredWorkouts.map(workout => (
-            <EnhancedWorkoutCard
-              key={workout.id}
+        <div 
+          ref={containerRef}
+          className={`enhanced-workouts-container ${viewMode}`}
+          style={{
+            maxHeight: filteredWorkouts.length > 50 ? '600px' : 'auto',
+            overflowY: filteredWorkouts.length > 50 ? 'auto' : 'visible'
+          }}
+        >
+          {/* 🚀 PERFORMANCE: Show performance indicator for large lists */}
+          {filteredWorkouts.length > 50 && process.env.NODE_ENV === 'development' && (
+            <div style={{
+              position: 'sticky',
+              top: 0,
+              background: '#f0f9ff',
+              border: '1px solid #0ea5e9',
+              borderRadius: '4px',
+              padding: '8px',
+              marginBottom: '12px',
+              fontSize: '12px',
+              zIndex: 10
+            }}>
+              🚀 Virtualization Active: Showing {visibleWorkouts.length} of {filteredWorkouts.length} workouts
+            </div>
+          )}
+          
+          {visibleWorkouts.map(workout => (
+            <MemoizedEnhancedWorkoutCard
+              key={`workout-${workout.id}-${workout.lastModified || workout.updated_at}`}
               workout={workout as any}
               viewMode={viewMode}
               isSelected={selectedWorkouts.has(workout.id.toString())}

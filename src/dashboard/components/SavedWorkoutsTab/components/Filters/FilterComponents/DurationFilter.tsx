@@ -8,51 +8,49 @@ import React, { useState, useEffect } from 'react';
 import { WorkoutFormatters } from '../../../utils/ui/formatters';
 
 interface DurationFilterProps {
-  value: { min: number; max: number };
+  duration: { min: number; max: number };
+  maxDuration: number;
   onChange: (value: { min: number; max: number }) => void;
-  workouts: any[];
 }
 
 /**
  * DurationFilter Component - Range slider for duration filtering
  */
 export const DurationFilter: React.FC<DurationFilterProps> = ({
-  value,
-  onChange,
-  workouts
+  duration,
+  maxDuration,
+  onChange
 }) => {
-  const [localMin, setLocalMin] = useState(value.min);
-  const [localMax, setLocalMax] = useState(value.max);
+  // Add null/undefined checks and provide defaults
+  const safeDuration = duration || { min: 0, max: maxDuration || 120 };
+  const safeMaxDuration = maxDuration || 120;
+  
+  const [localMin, setLocalMin] = useState(safeDuration.min);
+  const [localMax, setLocalMax] = useState(safeDuration.max);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Calculate min/max from workout data
-  const workoutDurations = workouts
-    .map(w => typeof w.duration === 'number' ? w.duration : 0)
-    .filter(d => d > 0);
-  
-  const dataMin = workoutDurations.length > 0 ? Math.min(...workoutDurations) : 0;
-  const dataMax = workoutDurations.length > 0 ? Math.max(...workoutDurations) : 120;
-  const rangeMin = Math.max(0, dataMin - 5);
-  const rangeMax = Math.min(300, dataMax + 10);
+  // Calculate range bounds
+  const rangeMin = 0;
+  const rangeMax = safeMaxDuration;
 
   // Update local state when prop changes (external reset)
   useEffect(() => {
-    if (!isDragging) {
-      setLocalMin(value.min);
-      setLocalMax(value.max);
+    if (!isDragging && duration) {
+      setLocalMin(duration.min);
+      setLocalMax(duration.max);
     }
-  }, [value, isDragging]);
+  }, [duration, isDragging]);
 
   // Debounced update to parent
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (localMin !== value.min || localMax !== value.max) {
+      if (localMin !== safeDuration.min || localMax !== safeDuration.max) {
         onChange({ min: localMin, max: localMax });
       }
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [localMin, localMax, onChange, value]);
+  }, [localMin, localMax, onChange, safeDuration.min, safeDuration.max]);
 
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newMin = parseInt(e.target.value);

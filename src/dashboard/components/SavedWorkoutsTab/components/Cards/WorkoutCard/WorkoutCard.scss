@@ -83,6 +83,7 @@
   }
 }
 
+// 🚀 TASK 1.2.2: Title display optimization - now in thumbnail header
 .workout-card__title {
   font-size: var(--text-lg);
   font-weight: 600;
@@ -95,6 +96,11 @@
   .workout-card--list & {
     margin-bottom: var(--space-xs);
     @include truncate-text(1);
+  }
+  
+  // Hide title in body when using thumbnail title display
+  .workout-card--enhanced & {
+    display: none;
   }
 }
 

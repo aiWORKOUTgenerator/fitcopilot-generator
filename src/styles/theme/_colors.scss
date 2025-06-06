@@ -6,6 +6,8 @@
  * and CSS custom properties to ensure consistency across the application.
  */
 
+@use 'sass:color';
+
 // ========================================================================
 // HELPER FUNCTIONS
 // ========================================================================
@@ -181,11 +183,11 @@ $background-card: $card-bg;
 
 // Surface colors
 $surface: $card-bg;
-$surface-light: lighten($card-bg, 5%);
-$surface-dark: darken($card-bg, 5%);
-$surface-accent: lighten($card-bg, 10%);
-$surface-hover: lighten($card-bg, 15%);
-$surface-disabled: mix($card-bg, $gray-800, 90%);
+$surface-light: color.adjust($card-bg, $lightness: 5%);
+$surface-dark: color.adjust($card-bg, $lightness: -5%);
+$surface-accent: color.adjust($card-bg, $lightness: 10%);
+$surface-hover: color.adjust($card-bg, $lightness: 15%);
+$surface-disabled: color.mix($card-bg, $gray-800, 90%);
 
 // Text colors
 $text: $white;
@@ -197,8 +199,8 @@ $text-dark: $gray-600;
 $border: $gray-200;
 $border-light: $gray-600;
 $border-dark: $gray-800;
-$border-hover: darken($border, 10%);
-$border-muted: lighten($border, 10%);
+$border-hover: color.adjust($border, $lightness: -10%);
+$border-muted: color.adjust($border, $lightness: 10%);
 $border-focus: $primary;
 $dark-border: $gray-600; // Dark theme border color
 

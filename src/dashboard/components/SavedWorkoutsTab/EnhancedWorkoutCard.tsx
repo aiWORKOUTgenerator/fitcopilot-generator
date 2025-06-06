@@ -125,9 +125,8 @@ export const EnhancedWorkoutCard: React.FC<EnhancedWorkoutCardProps> = ({
 
         {/* Workout Info */}
         <div className="workout-info" onClick={onSelect}>
-          <div className="workout-title-row">
-            <h3 className="workout-title">{workout.title}</h3>
-            
+          {/* 🚀 TASK 1.2.1: Title now displayed in thumbnail header - removed from body */}
+          <div className="workout-actions-row">
             {/* Favorite Button */}
             {onToggleFavorite && (
               <button

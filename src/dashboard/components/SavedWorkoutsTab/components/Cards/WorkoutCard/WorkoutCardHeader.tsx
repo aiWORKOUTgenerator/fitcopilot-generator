@@ -19,7 +19,7 @@ export const WorkoutCardHeader: React.FC<WorkoutCardHeaderProps> = ({ workout })
   return (
     <div className="workout-card__header">
       <div className="workout-card__title-section">
-        <h3 className="workout-card__title">{workout.title}</h3>
+        {/* 🚀 TASK 1.2.1: Title now displayed in thumbnail header - removed from body */}
         
         <div className="workout-card__meta">
           <span className={`workout-card__difficulty-badge workout-card__difficulty-badge--${workout.difficulty}`}>
