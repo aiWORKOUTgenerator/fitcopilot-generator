@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronDown, Dumbbell, CheckSquare } from 'lucide-react';
 import { Textarea } from './Textarea';
+import { useProfile } from '../../features/profile/context';
+import { mapProfileToWorkoutContext } from '../../features/workout-generator/utils/profileMapping';
 import './AdvancedOptionsPanel.scss';
 
 /**
@@ -35,6 +37,8 @@ export interface AdvancedOptionsPanelProps {
   onRestrictionsChange: (restrictions: string) => void;
   /** Additional className to apply */
   className?: string;
+  /** Optional handler for auto-filling equipment from profile */
+  onAutoFillEquipment?: (equipment: string[]) => void;
 }
 
 /**
@@ -54,8 +58,13 @@ export const AdvancedOptionsPanel: React.FC<AdvancedOptionsPanelProps> = ({
   restrictions,
   onRestrictionsChange,
   className = '',
+  onAutoFillEquipment,
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  
+  // Get profile data for equipment badges
+  const { profile, isLoading: profileLoading } = useProfile();
+  const profileMapping = profile ? mapProfileToWorkoutContext(profile) : null;
 
   /**
    * Toggle advanced options visibility
@@ -91,6 +100,15 @@ export const AdvancedOptionsPanel: React.FC<AdvancedOptionsPanelProps> = ({
     onRestrictionsChange(e.target.value);
   };
 
+  /**
+   * Handle auto-fill equipment from profile
+   */
+  const handleAutoFillFromProfile = () => {
+    if (profileMapping && onAutoFillEquipment) {
+      onAutoFillEquipment(profileMapping.availableEquipment);
+    }
+  };
+
   return (
     <div className={`advanced-options-panel ${className}`}>
       <button 
@@ -115,6 +133,53 @@ export const AdvancedOptionsPanel: React.FC<AdvancedOptionsPanelProps> = ({
           {/* Equipment Selection */}
           <div className="advanced-options-panel__section">
             <h3 className="advanced-options-panel__heading">Available Equipment</h3>
+            
+            {/* Profile Equipment Badge - Show user's profile equipment */}
+            {/* Debug: Always show this section for now to test */}
+            {!profileLoading && (
+              <div className="advanced-options-panel__profile-context">
+                <p className="advanced-options-panel__profile-label">
+                  {profileMapping ? 'From your fitness profile:' : 'Profile data not available'}
+                </p>
+                
+                {/* Debug info */}
+                <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '0.5rem' }}>
+                  Debug: Profile exists: {profile ? 'Yes' : 'No'}, 
+                  Equipment count: {profileMapping?.displayData?.equipment?.length || 0}
+                </div>
+                
+                {profileMapping && profileMapping.displayData.equipment.length > 0 ? (
+                  <>
+                    <div className="meta-badges">
+                      {profileMapping.displayData.equipment.slice(0, 4).map((equipment, index) => (
+                        <span 
+                          key={equipment.value}
+                          className="workout-type-badge"
+                          onClick={handleAutoFillFromProfile}
+                          style={{ cursor: 'pointer' }}
+                          title={`Click to use: ${equipment.display}`}
+                        >
+                          {equipment.icon} {equipment.display}
+                        </span>
+                      ))}
+                      {profileMapping.displayData.equipment.length > 4 && (
+                        <span className="equipment-more-indicator">
+                          +{profileMapping.displayData.equipment.length - 4} more
+                        </span>
+                      )}
+                    </div>
+                    <p className="advanced-options-panel__profile-hint">
+                      💡 Click badges to auto-fill from your profile
+                    </p>
+                  </>
+                ) : (
+                  <p style={{ fontSize: '0.875rem', color: '#666', fontStyle: 'italic' }}>
+                    No equipment found in profile. Please update your fitness profile to see equipment badges here.
+                  </p>
+                )}
+              </div>
+            )}
+            
             <div className="advanced-options-panel__checkbox-grid">
               {equipmentOptions.map(option => (
                 <label key={option.id} className="advanced-options-panel__checkbox-label">

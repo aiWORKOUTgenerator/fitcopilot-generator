@@ -2,6 +2,7 @@
  * InputStep Component
  * 
  * First step in the workout generation process where users input their preferences.
+ * Enhanced with profile integration to show user's fitness profile as badges.
  */
 import React, { useState } from 'react';
 import { Card } from '../../../../../components/ui';
@@ -12,6 +13,11 @@ import { WorkoutFormParams, WorkoutDifficulty, SessionSpecificInputs } from '../
 import { ValidationErrors } from '../../../domain/validators';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import SessionInputsPanel from '../SessionInputsPanel';
+import { useProfile } from '../../../../profile/context';
+import { 
+  mapProfileToWorkoutContext, 
+  isProfileSufficientForWorkout 
+} from '../../../utils/profileMapping';
 import './InputStep.scss';
 
 /**
@@ -120,6 +126,14 @@ export const InputStep: React.FC<InputStepProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSessionInputsExpanded, setIsSessionInputsExpanded] = useState(true);
 
+  // 🚀 STORY 1.1: Profile context integration
+  const { state: profileState } = useProfile();
+  const { profile, loading: profileLoading, error: profileError } = profileState;
+  
+  // Map profile data to workout context
+  const profileMapping = profile ? mapProfileToWorkoutContext(profile) : null;
+  const isProfileSufficient = isProfileSufficientForWorkout(profile);
+
   /**
    * Handle form submission
    */
@@ -153,6 +167,87 @@ export const InputStep: React.FC<InputStepProps> = ({
     setActiveDropdown(null);
   };
 
+  /**
+   * 🚀 STORY 1.1: Handle badge click to focus on corresponding form field
+   */
+  const handleBadgeFieldFocus = (fieldName: string) => {
+    const element = document.getElementById(fieldName);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.focus();
+      
+      // Add temporary highlight
+      element.classList.add('field-highlighted');
+      setTimeout(() => element.classList.remove('field-highlighted'), 2000);
+    }
+  };
+
+  /**
+   * 🚀 STORY 1.1: Handle auto-fill from profile data
+   */
+  const handleAutoFillFromProfile = (fieldName: string) => {
+    if (!profileMapping) return;
+
+    switch (fieldName) {
+      case 'difficulty':
+        setDifficulty(profileMapping.fitnessLevel);
+        break;
+      case 'goals':
+        if (profileMapping.goals.length > 0) {
+          setGoals(profileMapping.goals[0]); // Use first goal
+        }
+        break;
+      case 'equipment':
+        setEquipment(profileMapping.availableEquipment);
+        break;
+      case 'environment':
+        // Map profile location to session environment
+        const profileLocation = profileMapping.preferredLocation;
+        let sessionEnvironment: 'gym' | 'home' | 'outdoors' | 'travel' | 'limited-space';
+        
+        switch (profileLocation) {
+          case 'gym':
+            sessionEnvironment = 'gym';
+            break;
+          case 'outdoors':
+            sessionEnvironment = 'outdoors';
+            break;
+          case 'anywhere':
+            sessionEnvironment = 'home'; // Default to home for flexible
+            break;
+          case 'home':
+          default:
+            sessionEnvironment = 'home';
+            break;
+        }
+        
+        const currentSessionInputs = formValues.sessionInputs || {};
+        const newSessionInputs = {
+          ...currentSessionInputs,
+          environment: sessionEnvironment
+        };
+        if (setSessionInputs) {
+          setSessionInputs(newSessionInputs);
+        }
+        break;
+      case 'auto-fill-all':
+        // Auto-fill all available fields
+        setDifficulty(profileMapping.fitnessLevel);
+        if (profileMapping.goals.length > 0) {
+          setGoals(profileMapping.goals[0]);
+        }
+        setEquipment(profileMapping.availableEquipment);
+        break;
+    }
+    
+    // Focus on the field after auto-fill
+    if (fieldName !== 'auto-fill-all') {
+      handleBadgeFieldFocus(fieldName);
+    }
+  };
+
+
+
   return (
     <div className="input-step">
       <Card padding="large" primary elevated>
@@ -166,6 +261,38 @@ export const InputStep: React.FC<InputStepProps> = ({
                 <span className="input-step__error">{getFieldError('goals')}</span>
               )}
             </label>
+            
+            {/* Profile Fitness Goals Badge - Show user's current goals if available */}
+            {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.goals.length > 0 && (
+              <div className="input-step__profile-context">
+                <div className="input-step__profile-label">Your Profile Goals:</div>
+                <div className="meta-badges">
+                  {profileMapping.displayData.goals.slice(0, 2).map((goal, index) => (
+                    <span 
+                      key={goal.value}
+                      className="workout-type-badge"
+                      style={{ 
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => handleAutoFillFromProfile('goals')}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('goals')}
+                      title="Click to use your profile fitness goals"
+                    >
+                      <span className="workout-type-icon">{goal.icon}</span>
+                      {goal.display}
+                    </span>
+                  ))}
+                  {profileMapping.displayData.goals.length > 2 && (
+                    <span className="goals-more-indicator">
+                      +{profileMapping.displayData.goals.length - 2} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            
             <div className="input-step__select-container">
               <select
                 id="goals"
@@ -194,6 +321,32 @@ export const InputStep: React.FC<InputStepProps> = ({
                 <span className="input-step__error">{getFieldError('difficulty')}</span>
               )}
             </label>
+            
+            {/* Profile Fitness Level Badge - Show user's current level if available */}
+            {!profileLoading && !profileError && isProfileSufficient && profileMapping && (
+              <div className="input-step__profile-context">
+                <div className="input-step__profile-label">Your Profile Level:</div>
+                <div className="meta-badges">
+                  <span 
+                    className="difficulty-badge"
+                    style={{ 
+                      backgroundColor: profileMapping.displayData.fitnessLevel.bgColor,
+                      color: profileMapping.displayData.fitnessLevel.color,
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => handleAutoFillFromProfile('difficulty')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('difficulty')}
+                    title="Click to use your profile fitness level"
+                  >
+                    <span className="difficulty-icon">{profileMapping.displayData.fitnessLevel.icon}</span>
+                    {profileMapping.displayData.fitnessLevel.display}
+                  </span>
+                </div>
+              </div>
+            )}
+            
             <div className="input-step__radio-group">
               {DIFFICULTY_OPTIONS.map(option => (
                 <label key={option.value} className="input-step__radio-label">
@@ -240,7 +393,73 @@ export const InputStep: React.FC<InputStepProps> = ({
               </select>
               <ChevronDown className="input-step__select-icon" />
             </div>
-                    </div>
+          </div>
+
+          {/* Environment Selection */}
+          <div className="input-step__form-group">
+            <label htmlFor="environment" className="input-step__label">
+              Where will you be working out?
+            </label>
+            
+            {/* Profile Preferred Location Badge - Show user's current location preference if available */}
+            {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.location && (
+              <div className="input-step__profile-context">
+                <div className="input-step__profile-label">Your Profile Location:</div>
+                <div className="meta-badges">
+                  <span 
+                    className="workout-type-badge"
+                    style={{ 
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => handleAutoFillFromProfile('environment')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('environment')}
+                    title="Click to use your profile location preference"
+                  >
+                    <span className="workout-type-icon">
+                      {profileMapping.displayData.location.value === 'home' && '🏠'}
+                      {profileMapping.displayData.location.value === 'gym' && '🏋️'}
+                      {profileMapping.displayData.location.value === 'outdoors' && '🌳'}
+                      {profileMapping.displayData.location.value === 'anywhere' && '📍'}
+                    </span>
+                    {profileMapping.displayData.location.display}
+                  </span>
+                </div>
+                <div className="input-step__profile-context-hint">
+                  {profileMapping.displayData.location.context}
+                </div>
+              </div>
+            )}
+            
+            <div className="input-step__select-container">
+              <select
+                id="environment"
+                className={`input-step__select ${activeDropdown === 'environment' ? 'input-step__select--focused' : ''}`}
+                value={formValues.sessionInputs?.environment || ''}
+                onChange={e => {
+                  const currentSessionInputs = formValues.sessionInputs || {};
+                  const newSessionInputs = {
+                    ...currentSessionInputs,
+                    environment: e.target.value as 'gym' | 'home' | 'outdoors' | 'travel' | 'limited-space'
+                  };
+                  if (setSessionInputs) {
+                    setSessionInputs(newSessionInputs);
+                  }
+                }}
+                onFocus={() => handleDropdownFocus('environment')}
+                onBlur={handleDropdownBlur}
+              >
+                <option value="">Select environment</option>
+                <option value="home">Home</option>
+                <option value="gym">Gym</option>
+                <option value="outdoors">Outdoors</option>
+                <option value="travel">Travel/Hotel</option>
+                <option value="limited-space">Limited Space</option>
+              </select>
+              <ChevronDown className="input-step__select-icon" />
+            </div>
+          </div>
           
           {/* Session-Specific Inputs */}
           <SessionInputsPanel
@@ -266,6 +485,7 @@ export const InputStep: React.FC<InputStepProps> = ({
             restrictions={formValues.restrictions || ''}
             onRestrictionsChange={setRestrictions}
             className="input-step__advanced-options"
+            onAutoFillEquipment={setEquipment}
           />
 
           {/* Submit Button */}

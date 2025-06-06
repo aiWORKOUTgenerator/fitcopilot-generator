@@ -7,6 +7,42 @@
 @import '../../../../../styles/theme/index.scss';
 @import '../../../styles/components/component-tokens';
 
+// 🚀 STORY 1.1: Profile integration styles
+.profile-error-notice {
+  background: var(--background-warning, #fef3c7);
+  border: 1px solid var(--border-warning, #f59e0b);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  
+  p {
+    margin: 0;
+    color: var(--text-warning, #92400e);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+}
+
+// Field highlight animation for badge interactions
+.field-highlighted {
+  animation: field-highlight 2s ease-out;
+}
+
+@keyframes field-highlight {
+  0% {
+    background-color: color-mix(in srgb, var(--accent-color, #3b82f6) 10%, transparent);
+    border-color: var(--accent-color, #3b82f6);
+  }
+  50% {
+    background-color: color-mix(in srgb, var(--accent-color, #3b82f6) 20%, transparent);
+    border-color: var(--accent-color, #3b82f6);
+  }
+  100% {
+    background-color: transparent;
+    border-color: var(--border-color);
+  }
+}
+
 .input-step {
   width: 100%;
   max-width: 800px;
@@ -808,3 +844,163 @@
     transform: translateY(0);
   }
 }
+
+// 🚀 Profile Context Integration Styles
+.input-step__profile-context {
+  background: var(--background-elevated, color('surface-accent'));
+  border: 1px solid var(--border-color-light, color('border'));
+  border-radius: var(--border-radius-md, 8px);
+  padding: var(--spacing-md, 1rem);
+  margin-bottom: var(--spacing-md, 1rem);
+  
+  .dark-theme & {
+    background: dark-color('surface-accent');
+    border-color: dark-color('border');
+  }
+  
+  .input-step__profile-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary, color('text-muted'));
+    margin-bottom: var(--spacing-sm, 0.5rem);
+    font-weight: 500;
+    
+    .dark-theme & {
+      color: dark-color('text-muted');
+    }
+  }
+  
+  .meta-badges {
+    display: flex;
+    gap: var(--spacing-sm, 0.5rem);
+    
+    .difficulty-badge {
+      // Replicate existing difficulty-badge styling
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      border-radius: 0.375rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+      
+      // Focus styling for accessibility
+      &:focus {
+        outline: 2px solid var(--accent-color, color('primary'));
+        outline-offset: 2px;
+      }
+      
+      .difficulty-icon {
+        margin-right: 0.5rem;
+        font-size: 0.875rem;
+      }
+      
+      .dark-theme & {
+        border-color: rgba(255, 255, 255, 0.1);
+        
+        &:hover {
+          border-color: rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
+    
+    .workout-type-badge {
+      // Replicate existing workout-type-badge styling
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-secondary, color('text-secondary'));
+      font-weight: 500;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent-color, color('primary'));
+        color: var(--text-primary, color('text-primary'));
+        transform: translateY(-1px);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+      
+      // Focus styling for accessibility
+      &:focus {
+        outline: 2px solid var(--accent-color, color('primary'));
+        outline-offset: 2px;
+      }
+      
+      .workout-type-icon {
+        margin-right: 0.375rem;
+        font-size: 0.875rem;
+      }
+      
+      .dark-theme & {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: dark-color('text-secondary');
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: dark-color('primary');
+          color: dark-color('text-primary');
+        }
+      }
+    }
+    
+         .goals-more-indicator {
+       display: inline-flex;
+       align-items: center;
+       padding: 0.25rem 0.5rem;
+       background: var(--background-surface, color('surface'));
+       border: 1px solid var(--border-color-light, color('border'));
+       border-radius: 4px;
+       font-size: 0.7rem;
+       color: var(--text-tertiary, color('text-muted'));
+       font-weight: 500;
+       margin-left: 0.5rem;
+       opacity: 0.8;
+       
+       .dark-theme & {
+         background: dark-color('surface');
+         border-color: dark-color('border');
+         color: dark-color('text-muted');
+       }
+     }
+   }
+   
+   // Profile context hint styling for location badge
+   .input-step__profile-context-hint {
+     font-size: 0.8rem;
+     color: var(--text-tertiary, color('text-muted'));
+     margin-top: var(--spacing-xs, 0.25rem);
+     font-style: italic;
+     opacity: 0.8;
+     
+     .dark-theme & {
+       color: dark-color('text-muted');
+     }
+   }
+ }

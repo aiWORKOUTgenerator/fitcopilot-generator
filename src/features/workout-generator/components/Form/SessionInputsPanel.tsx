@@ -25,16 +25,7 @@ const FOCUS_AREA_OPTIONS = [
   { id: 'recovery', label: 'Recovery/Stretching' }
 ];
 
-/**
- * Environment options for workouts
- */
-const ENVIRONMENT_OPTIONS = [
-  { id: 'gym', label: 'Gym' },
-  { id: 'home', label: 'Home' },
-  { id: 'outdoors', label: 'Outdoors' },
-  { id: 'travel', label: 'Travel' },
-  { id: 'limited-space', label: 'Limited Space' }
-];
+
 
 /**
  * Body areas that might experience soreness
@@ -157,16 +148,7 @@ export const SessionInputsPanel: React.FC<SessionInputsPanelProps> = ({
     });
   };
 
-  /**
-   * Handle change in environment
-   */
-  const handleEnvironmentChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value as SessionSpecificInputs['environment'];
-    onSessionInputsChange({
-      ...sessionInputs,
-      environment: value
-    });
-  };
+
 
   /**
    * Render a rating selector (1-5 scale)
@@ -290,30 +272,7 @@ export const SessionInputsPanel: React.FC<SessionInputsPanelProps> = ({
             )}
           </div>
 
-          {/* Environment */}
-          <div className="session-inputs__form-group">
-            <label htmlFor="environment" className="session-inputs__label">
-              Workout environment
-            </label>
-            <div className="session-inputs__select-container">
-              <select
-                id="environment"
-                className={`session-inputs__select ${activeDropdown === 'environment' ? 'session-inputs__select--focused' : ''}`}
-                value={sessionInputs.environment || ''}
-                onChange={handleEnvironmentChange}
-                onFocus={() => handleDropdownFocus('environment')}
-                onBlur={handleDropdownBlur}
-              >
-                <option value="">Select environment</option>
-                {ENVIRONMENT_OPTIONS.map(option => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="session-inputs__select-icon" />
-            </div>
-          </div>
+
         </div>
       )}
     </div>

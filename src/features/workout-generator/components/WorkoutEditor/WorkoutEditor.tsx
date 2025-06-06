@@ -12,7 +12,7 @@ import { AutoResizeTextarea } from '../../../../components/ui/AutoResizeTextarea
 import { ExpandableInput } from '../../../../components/ui/ExpandableInput';
 import { AutoResizeTextareaWithCounter } from '../../../../components/ui/AutoResizeTextareaWithCounter';
 import { FormFieldEnhanced } from '../../../profile/components/enhanced/FormFieldEnhanced';
-import { X, Save, Loader, Edit3, FileText, Clock, Target, Dumbbell } from 'lucide-react';
+import { X, Save, Loader, Edit3, FileText, Clock, Target, Dumbbell, Settings } from 'lucide-react';
 import { WorkoutDifficulty } from '../../types/workout';
 import { saveWorkout } from '../../services/workoutService';
 import ExerciseList from './ExerciseList';
@@ -31,6 +31,33 @@ import {
 } from './components';
 
 import './workoutEditor.scss';
+
+// Equipment options for workout editor
+const EQUIPMENT_OPTIONS = [
+  { id: 'none', label: 'None/Bodyweight Only' },
+  { id: 'dumbbells', label: 'Dumbbells' },
+  { id: 'kettlebells', label: 'Kettlebells' },
+  { id: 'resistance-bands', label: 'Resistance Bands' },
+  { id: 'pull-up-bar', label: 'Pull-up Bar' },
+  { id: 'yoga-mat', label: 'Yoga Mat' },
+  { id: 'bench', label: 'Bench' },
+  { id: 'barbell', label: 'Barbell' },
+  { id: 'trx', label: 'TRX/Suspension Trainer' },
+  { id: 'medicine-ball', label: 'Medicine Ball' },
+  { id: 'jump-rope', label: 'Jump Rope' },
+  { id: 'stability-ball', label: 'Stability Ball' }
+];
+
+// Goal options for workout editor
+const GOAL_OPTIONS = [
+  { value: 'lose-weight', label: 'Lose Weight' },
+  { value: 'build-muscle', label: 'Build Muscle' },
+  { value: 'improve-endurance', label: 'Improve Endurance' },
+  { value: 'increase-strength', label: 'Increase Strength' },
+  { value: 'enhance-flexibility', label: 'Enhance Flexibility' },
+  { value: 'general-fitness', label: 'General Fitness' },
+  { value: 'sport-specific', label: 'Sport-Specific Training' }
+];
 
 interface WorkoutEditorProps {
   /**
@@ -328,6 +355,51 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
     dispatch({ type: 'UPDATE_EQUIPMENT', payload: equipment });
   };
 
+  // Handle individual equipment toggle
+  const handleEquipmentToggle = (equipmentId: string) => {
+    const currentEquipment = workout.equipment || [];
+    let updatedEquipment: string[];
+    
+    if (currentEquipment.includes(equipmentId)) {
+      // Remove equipment if already selected
+      updatedEquipment = currentEquipment.filter(id => id !== equipmentId);
+    } else {
+      // Add equipment if not selected
+      updatedEquipment = [...currentEquipment, equipmentId];
+      
+      // If "none" is selected, remove all other equipment
+      if (equipmentId === 'none') {
+        updatedEquipment = ['none'];
+      } else {
+        // If other equipment is selected, remove "none"
+        updatedEquipment = updatedEquipment.filter(id => id !== 'none');
+      }
+    }
+    
+    dispatch({ type: 'UPDATE_EQUIPMENT', payload: updatedEquipment });
+  };
+
+  // Handle goals selection change
+  const handleGoalsChange = (goals: string[]) => {
+    dispatch({ type: 'UPDATE_GOALS', payload: goals });
+  };
+
+  // Handle individual goal toggle
+  const handleGoalToggle = (goalValue: string) => {
+    const currentGoals = workout.goals || [];
+    let updatedGoals: string[];
+    
+    if (currentGoals.includes(goalValue)) {
+      // Remove goal if already selected
+      updatedGoals = currentGoals.filter(goal => goal !== goalValue);
+    } else {
+      // Add goal if not selected
+      updatedGoals = [...currentGoals, goalValue];
+    }
+    
+    dispatch({ type: 'UPDATE_GOALS', payload: updatedGoals });
+  };
+
   // Handle notes change
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type: 'UPDATE_NOTES', payload: e.target.value });
@@ -532,6 +604,88 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
                     />
                   </FormFieldEnhanced>
                 </div>
+              </div>
+
+              {/* Equipment Selection */}
+              <div className="workout-editor__form-field workout-editor__form-field--equipment">
+                <FormFieldEnhanced
+                  label="Available Equipment"
+                  error={validationErrors.equipment}
+                  disabled={isLoading || isSaving}
+                  hint="Select all equipment available for this workout"
+                >
+                  <div className="workout-editor__checkbox-grid">
+                    {EQUIPMENT_OPTIONS.map(equipment => {
+                      const isChecked = (workout.equipment || []).includes(equipment.id);
+                      const isDisabled = isLoading || isSaving;
+                      
+                      return (
+                        <label 
+                          key={equipment.id} 
+                          className={`workout-editor__checkbox-label ${
+                            isChecked ? 'workout-editor__checkbox-label--checked' : ''
+                          } ${
+                            isDisabled ? 'workout-editor__checkbox-label--disabled' : ''
+                          }`.trim()}
+                        >
+                          <input
+                            type="checkbox"
+                            className="workout-editor__checkbox-input"
+                            value={equipment.id}
+                            checked={isChecked}
+                            onChange={() => handleEquipmentToggle(equipment.id)}
+                            disabled={isDisabled}
+                          />
+                          <div className="workout-editor__checkbox-box">
+                            <Settings size={14} className="workout-editor__checkbox-indicator" />
+                          </div>
+                          <span className="workout-editor__checkbox-text">{equipment.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </FormFieldEnhanced>
+              </div>
+
+              {/* Goals Selection */}
+              <div className="workout-editor__form-field workout-editor__form-field--goals">
+                <FormFieldEnhanced
+                  label="Workout Goals"
+                  error={validationErrors.goals}
+                  disabled={isLoading || isSaving}
+                  hint="Select all goals this workout should target"
+                >
+                  <div className="workout-editor__checkbox-grid">
+                    {GOAL_OPTIONS.map(goal => {
+                      const isChecked = (workout.goals || []).includes(goal.value);
+                      const isDisabled = isLoading || isSaving;
+                      
+                      return (
+                        <label 
+                          key={goal.value} 
+                          className={`workout-editor__checkbox-label ${
+                            isChecked ? 'workout-editor__checkbox-label--checked' : ''
+                          } ${
+                            isDisabled ? 'workout-editor__checkbox-label--disabled' : ''
+                          }`.trim()}
+                        >
+                          <input
+                            type="checkbox"
+                            className="workout-editor__checkbox-input"
+                            value={goal.value}
+                            checked={isChecked}
+                            onChange={() => handleGoalToggle(goal.value)}
+                            disabled={isDisabled}
+                          />
+                          <div className="workout-editor__checkbox-box">
+                            <Target size={14} className="workout-editor__checkbox-indicator" />
+                          </div>
+                          <span className="workout-editor__checkbox-text">{goal.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </FormFieldEnhanced>
               </div>
               
               {workout.version && (

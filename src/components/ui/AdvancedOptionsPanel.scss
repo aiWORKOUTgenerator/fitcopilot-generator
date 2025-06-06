@@ -361,4 +361,104 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+// 🚀 Profile Context Integration Styles for Equipment
+.advanced-options-panel__profile-context {
+  background: color-alpha('surface', 0.8);
+  border: 1px solid color-alpha('border', 0.5);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  
+  .dark-theme & {
+    background: dark-color-alpha('surface-accent', 0.8);
+    border-color: dark-color-alpha('border', 0.5);
+  }
+  
+  .advanced-options-panel__profile-label {
+    font-size: 0.875rem;
+    color: color('text-secondary');
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    margin: 0 0 0.5rem 0;
+    
+    .dark-theme & {
+      color: dark-color('text-muted');
+    }
+  }
+  
+  .meta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .workout-type-badge {
+    // Reuse existing workout-type-badge styling from WorkoutGrid cards
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: color('text-secondary');
+    font-weight: 500;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    gap: 0.25rem;
+    cursor: pointer;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark-theme & {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: dark-color('text-secondary');
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+  
+  .equipment-more-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    background: color('surface');
+    border: 1px solid color('border');
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: color('text-tertiary');
+    font-weight: 500;
+    opacity: 0.8;
+    
+    .dark-theme & {
+      background: dark-color('surface');
+      border-color: dark-color('border');
+      color: dark-color('text-muted');
+    }
+  }
+  
+  .advanced-options-panel__profile-hint {
+    font-size: 0.75rem;
+    color: color('text-tertiary');
+    margin: 0.5rem 0 0 0;
+    font-style: italic;
+    opacity: 0.9;
+    
+    .dark-theme & {
+      color: dark-color('text-muted');
+    }
+  }
 } 

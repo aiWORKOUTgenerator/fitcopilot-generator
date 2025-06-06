@@ -330,6 +330,142 @@
     color: var(--wg-color-text-light);
     padding: var(--wg-spacing-md) 0;
   }
+
+  // Checkbox Grid for Equipment and Goals
+  &__checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--wg-spacing-sm);
+    margin-top: var(--wg-spacing-xs);
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--wg-spacing-sm);
+    padding: var(--wg-spacing-sm);
+    border: 1px solid var(--wg-color-border);
+    border-radius: var(--wg-radius-sm);
+    cursor: pointer;
+    transition: all var(--wg-transition-fast);
+    background-color: var(--wg-color-background);
+    
+    &:hover {
+      border-color: var(--wg-color-primary);
+      background-color: var(--wg-color-primary-light);
+      box-shadow: var(--wg-shadow-sm);
+    }
+    
+    // Modern browsers with :has() support
+    &:has(input:checked) {
+      border-color: var(--wg-color-primary);
+      background-color: var(--wg-color-primary-light);
+      color: var(--wg-color-primary);
+    }
+    
+    &:has(input:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
+      
+      &:hover {
+        border-color: var(--wg-color-border);
+        background-color: var(--wg-color-background);
+        box-shadow: none;
+      }
+    }
+    
+    // Fallback for browsers without :has() support
+    &.workout-editor__checkbox-label--checked {
+      border-color: var(--wg-color-primary);
+      background-color: var(--wg-color-primary-light);
+      color: var(--wg-color-primary);
+    }
+    
+    &.workout-editor__checkbox-label--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      
+      &:hover {
+        border-color: var(--wg-color-border);
+        background-color: var(--wg-color-background);
+        box-shadow: none;
+      }
+    }
+  }
+
+  &__checkbox-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__checkbox-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--wg-color-border);
+    border-radius: var(--wg-radius-sm);
+    transition: all var(--wg-transition-fast);
+    flex-shrink: 0;
+    
+    .workout-editor__checkbox-label:hover & {
+      border-color: var(--wg-color-primary);
+    }
+    
+    // Modern browsers with :has() support
+    .workout-editor__checkbox-label:has(input:checked) & {
+      border-color: var(--wg-color-primary);
+      background-color: var(--wg-color-primary);
+      color: white;
+    }
+    
+    // Fallback for browsers without :has() support
+    .workout-editor__checkbox-label--checked & {
+      border-color: var(--wg-color-primary);
+      background-color: var(--wg-color-primary);
+      color: white;
+    }
+  }
+
+  &__checkbox-indicator {
+    opacity: 0;
+    transition: opacity var(--wg-transition-fast);
+    
+    // Modern browsers with :has() support
+    .workout-editor__checkbox-label:has(input:checked) & {
+      opacity: 1;
+    }
+    
+    // Fallback for browsers without :has() support
+    .workout-editor__checkbox-label--checked & {
+      opacity: 1;
+    }
+  }
+
+  &__checkbox-text {
+    font-size: var(--wg-font-size-sm);
+    font-weight: 500;
+    color: var(--wg-color-text);
+    line-height: 1.4;
+    
+    // Modern browsers with :has() support
+    .workout-editor__checkbox-label:has(input:checked) & {
+      color: var(--wg-color-primary);
+      font-weight: 600;
+    }
+    
+    // Fallback for browsers without :has() support
+    .workout-editor__checkbox-label--checked & {
+      color: var(--wg-color-primary);
+      font-weight: 600;
+    }
+  }
   
   &__footer {
     display: flex;
