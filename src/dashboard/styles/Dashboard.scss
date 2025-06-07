@@ -228,14 +228,21 @@
     }
     
     /* Workout Generator Section */
-    .workout-generator-section {
-      .workout-generator-card {
+    .dashboard-generator-section {
+      .generator-card {
+        // Match WorkoutGrid background styling
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border-color);
+        
         .generator-header {
           margin-bottom: var(--spacing-lg);
+          text-align: center; // Center the header text
           
-          .card-title {
+          .generator-title {
             font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 0.5rem 0;
             border-bottom: none;
             padding-bottom: 0;
           }
@@ -244,6 +251,7 @@
             color: var(--text-secondary);
             font-size: 0.875rem;
             margin: 0;
+            line-height: 1.5;
           }
         }
         
@@ -251,6 +259,10 @@
           // Ensure the workout generator has proper spacing
           .workout-generator-feature {
             margin: 0;
+            padding: 0;
+            
+            // Override any internal max-width constraints to use full Card width
+            max-width: none;
           }
         }
       }

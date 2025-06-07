@@ -156,26 +156,30 @@ const DashboardInner: React.FC = () => {
     <div className="fitcopilot-dashboard enhanced">
       {/* Main Dashboard Content */}
       <main className="dashboard-main">
-        {/* Tabbed Interface */}
-        <section className="dashboard-tabs-section">
-          <TabContainer>
-            <TabContentWrapper />
-          </TabContainer>
-        </section>
+        <div className="dashboard-content">
+          {/* Tabbed Interface */}
+          <section className="dashboard-tabs-section">
+            <TabContainer>
+              <TabContentWrapper />
+            </TabContainer>
+          </section>
 
-        {/* Always-Visible Workout Generator */}
-        <section className="dashboard-generator-section">
-          <div className="generator-header">
-            <h2 className="generator-title">Workout Generator</h2>
-            <p className="generator-subtitle">
-              Create personalized workouts based on your profile and preferences
-            </p>
-          </div>
-          
-                      <div className="generator-content">
-              <WorkoutGeneratorFeature />
-            </div>
-        </section>
+          {/* Always-Visible Workout Generator */}
+          <section className="dashboard-generator-section">
+            <Card className="generator-card">
+              <div className="generator-header">
+                <h2 className="generator-title">Workout Generator</h2>
+                <p className="generator-subtitle">
+                  Create personalized workouts based on your profile and preferences
+                </p>
+              </div>
+              
+              <div className="generator-content">
+                <WorkoutGeneratorFeature />
+              </div>
+            </Card>
+          </section>
+        </div>
       </main>
 
       {/* Error Display */}

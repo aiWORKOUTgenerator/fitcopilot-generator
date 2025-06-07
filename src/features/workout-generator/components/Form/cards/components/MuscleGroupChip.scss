@@ -1,0 +1,406 @@
+/**
+ * Muscle Group Chip Component Styling
+ * Removable selection chips with visual progress indicators
+ * Integrates with glass morphism design system
+ */
+
+@use "sass:map";
+@use "sass:math";
+
+// Import existing system tokens
+@import '../../../../styles/_variables';
+@import '../../../../styles/_color-tokens';
+
+/* ===========================================================================
+ * MUSCLE GROUP CHIP STRUCTURE
+ * Glass morphism chips with progress indicators
+ * =========================================================================== */
+
+.muscle-group-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  background: rgba($lime-400, 0.1);
+  border: 1px solid rgba($lime-400, 0.3);
+  border-radius: 16px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $lime-400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+  max-width: 200px;
+  
+  // Glass morphism shadow
+  box-shadow: 
+    0 2px 8px rgba($lime-400, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  .dark-theme & {
+    background: rgba($lime-400, 0.12);
+    border-color: rgba($lime-400, 0.35);
+    box-shadow: 
+      0 2px 12px rgba($lime-400, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  
+  &:hover {
+    background: rgba($lime-400, 0.2);
+    border-color: rgba($lime-400, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 
+      0 4px 16px rgba($lime-400, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    
+    .dark-theme & {
+      background: rgba($lime-400, 0.25);
+      border-color: rgba($lime-400, 0.5);
+      box-shadow: 
+        0 6px 20px rgba($lime-400, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($lime-400, 0.6);
+    box-shadow: 
+      0 0 0 3px rgba($lime-400, 0.3),
+      0 4px 16px rgba($lime-400, 0.2);
+  }
+  
+  // Different color variants for visual distinction
+  &.variant-emerald {
+    background: rgba($emerald-400, 0.1);
+    border-color: rgba($emerald-400, 0.3);
+    color: $emerald-400;
+    
+    &:hover {
+      background: rgba($emerald-400, 0.2);
+      border-color: rgba($emerald-400, 0.4);
+    }
+  }
+  
+  &.variant-blue {
+    background: rgba($blue-400, 0.1);
+    border-color: rgba($blue-400, 0.3);
+    color: $blue-400;
+    
+    &:hover {
+      background: rgba($blue-400, 0.2);
+      border-color: rgba($blue-400, 0.4);
+    }
+  }
+  
+  &.variant-violet {
+    background: rgba($violet-400, 0.1);
+    border-color: rgba($violet-400, 0.3);
+    color: $violet-400;
+    
+    &:hover {
+      background: rgba($violet-400, 0.2);
+      border-color: rgba($violet-400, 0.4);
+    }
+  }
+}
+
+/* ===========================================================================
+ * CHIP CONTENT STRUCTURE
+ * =========================================================================== */
+
+.muscle-chip-content {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1-5;
+  flex: 1;
+  min-width: 0; // Allow text truncation
+  
+  .muscle-group-name {
+    font-weight: $font-weight-semibold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+  
+  .muscle-count-badge {
+    background: rgba(255, 255, 255, 0.15);
+    color: inherit;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    line-height: 1;
+    min-width: 18px;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    flex-shrink: 0;
+    
+    .dark-theme & {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+}
+
+/* ===========================================================================
+ * CHIP ACTIONS
+ * Expand/collapse and remove buttons
+ * =========================================================================== */
+
+.muscle-chip-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  flex-shrink: 0;
+  
+  .chip-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: inherit;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: $font-size-xs;
+    backdrop-filter: blur(4px);
+    
+    .dark-theme & {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+      
+      .dark-theme & {
+        background: rgba(255, 255, 255, 0.15);
+      }
+    }
+    
+    &:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
+    
+    &.expand-btn {
+      &.expanded {
+        transform: rotate(180deg);
+      }
+    }
+    
+    &.remove-btn {
+      &:hover {
+        background: rgba($error, 0.2);
+        color: $error;
+      }
+    }
+  }
+}
+
+/* ===========================================================================
+ * PROGRESS INDICATOR
+ * Visual progress bar for muscle selection completion
+ * =========================================================================== */
+
+.muscle-chip-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.3), 
+    rgba(255, 255, 255, 0.1)
+  );
+  border-radius: 0 0 16px 16px;
+  transition: width 0.4s ease;
+  
+  &.progress-0 { width: 0%; }
+  &.progress-25 { width: 25%; }
+  &.progress-50 { width: 50%; }
+  &.progress-75 { width: 75%; }
+  &.progress-100 { width: 100%; }
+  
+  // Completion glow effect
+  &.progress-100 {
+    background: linear-gradient(90deg, 
+      rgba($lime-400, 0.8), 
+      rgba($lime-400, 0.4)
+    );
+    box-shadow: 0 0 8px rgba($lime-400, 0.6);
+  }
+}
+
+/* ===========================================================================
+ * CHIP STATES
+ * Different visual states for user feedback
+ * =========================================================================== */
+
+.muscle-group-chip {
+  &.expanded {
+    background: rgba($lime-400, 0.15);
+    border-color: rgba($lime-400, 0.4);
+    
+    .dark-theme & {
+      background: rgba($lime-400, 0.18);
+      border-color: rgba($lime-400, 0.45);
+    }
+  }
+  
+  &.incomplete {
+    border-style: dashed;
+    
+    .muscle-count-badge {
+      background: rgba($warning, 0.2);
+      color: $warning;
+    }
+  }
+  
+  &.complete {
+    .muscle-count-badge {
+      background: rgba($success, 0.2);
+      color: $success;
+    }
+  }
+  
+  &.removing {
+    animation: chipRemove 0.3s ease-out forwards;
+  }
+}
+
+/* ===========================================================================
+ * CHIP ANIMATIONS
+ * Smooth enter/exit animations
+ * =========================================================================== */
+
+@keyframes chipRemove {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    max-width: 200px;
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.9) translateY(-4px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-8px);
+    max-width: 0;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.muscle-group-chip {
+  &.entering {
+    animation: chipEnter 0.4s ease-out;
+  }
+}
+
+@keyframes chipEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(8px);
+    max-width: 0;
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    max-width: 200px;
+  }
+}
+
+/* ===========================================================================
+ * RESPONSIVE DESIGN
+ * =========================================================================== */
+
+@media (max-width: 768px) {
+  .muscle-group-chip {
+    max-width: 150px;
+    padding: $spacing-1-5 $spacing-2;
+    font-size: $font-size-xs;
+    
+    .muscle-chip-content {
+      gap: $spacing-1;
+    }
+    
+    .chip-action-btn {
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .muscle-group-chip {
+    max-width: 120px;
+    
+    .muscle-group-name {
+      font-size: $font-size-xs;
+    }
+    
+    .muscle-count-badge {
+      min-width: 16px;
+      padding: 1px 4px;
+    }
+  }
+}
+
+/* ===========================================================================
+ * ACCESSIBILITY ENHANCEMENTS
+ * =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .muscle-group-chip {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+    
+    .chip-action-btn {
+      transition: none;
+      
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+  
+  .muscle-chip-progress {
+    transition: none;
+  }
+  
+  .muscle-group-chip {
+    &.entering,
+    &.removing {
+      animation: none;
+    }
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .muscle-group-chip {
+    border-width: 2px;
+    background: rgba($lime-400, 0.3);
+    
+    .chip-action-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid currentColor;
+    }
+  }
+} 

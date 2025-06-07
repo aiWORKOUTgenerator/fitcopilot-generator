@@ -31,6 +31,9 @@ add_action('init', function() {
     new \FitCopilot\API\WorkoutEndpoints\WorkoutEndpointsController();
 }, 5); // Early priority to register endpoints before other systems
 
+// Register Muscle Data API endpoint
+require_once FITCOPILOT_DIR . 'src/php/API/MuscleEndpoints/MuscleDataEndpoint.php';
+
 // Register Analytics API endpoint  
 require_once FITCOPILOT_DIR . 'src/php/REST/AnalyticsController.php';
 

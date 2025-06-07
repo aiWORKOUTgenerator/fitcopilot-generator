@@ -44,10 +44,21 @@ body {
 // Full width styles
 .workout-generator-feature {
   width: 100%;
-  max-width: var(--workout-generator-max-width);
-  margin: 0 auto;
   box-sizing: border-box;
-  padding: 2rem;
+  
+  // Use max-width only when not in dashboard context
+  &:not(.dashboard-generator-section *) {
+    max-width: var(--workout-generator-max-width);
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  // When in dashboard, use full width and let Card handle spacing
+  .dashboard-generator-section & {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
   
   &__title {
     text-align: center;

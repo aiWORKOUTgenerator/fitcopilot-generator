@@ -6,6 +6,7 @@
  */
 
 export { default as WorkoutRequestForm } from './WorkoutRequestForm';
+export { WorkoutGeneratorGrid } from './WorkoutGeneratorGrid';
 export * from './steps/InputStep';
 export * from './steps/PreviewStep';
 export * from './steps/GeneratingStep';

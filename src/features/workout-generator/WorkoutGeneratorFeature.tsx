@@ -11,6 +11,7 @@ import { ErrorBoundary, DebugControls, TipsCard } from './components/common';
 import { SubscriptionModalWrapper, ProfileSetupPrompt } from './components/Modals';
 import { NavigationProvider } from './navigation/NavigationContext';
 import WorkoutEditorModal from './components/WorkoutEditor/WorkoutEditorModal';
+import { WorkoutGeneratorGrid } from './components/Form/WorkoutGeneratorGrid';
 
 // Import theme initialization
 import './utils/themeInit';
@@ -52,10 +53,37 @@ export const WorkoutGeneratorFeature: React.FC = () => {
       <NavigationProvider>
         <WorkoutGeneratorProvider>
           <div className="workout-generator-feature">
-            <h3 className="workout-generator-feature__subtitle">
-              Generate personalized workout plans based on your goals, experience level, and available equipment.
-            </h3>
-            
+            {/* NEW: Premium Grid-based Generator */}
+            <div className="new-generator-section">
+              <h4 style={{ 
+                textAlign: 'center', 
+                color: '#a3e635', 
+                marginBottom: '1rem',
+                fontSize: '1.1rem',
+                fontWeight: '600'
+              }}>
+                🚀 New Premium Interface (Preview)
+              </h4>
+              <WorkoutGeneratorGrid />
+            </div>
+
+            {/* Divider */}
+            <div style={{
+              margin: '3rem 0',
+              padding: '1rem 0',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              textAlign: 'center'
+            }}>
+              <span style={{ 
+                color: '#b3b3b3', 
+                fontSize: '0.875rem',
+                fontWeight: '500'
+              }}>
+                ⬇️ Current Implementation (Functional) ⬇️
+              </span>
+            </div>
+
             <DebugControls />
             <WorkoutRequestForm />
             <TipsCard />

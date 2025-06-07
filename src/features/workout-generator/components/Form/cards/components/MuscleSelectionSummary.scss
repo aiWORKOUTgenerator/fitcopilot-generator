@@ -1,0 +1,630 @@
+/**
+ * Muscle Selection Summary Component Styling
+ * Compact selection overview with validation and guidance
+ * Integrates with glass morphism design system
+ */
+
+@use "sass:map";
+@use "sass:math";
+
+// Import existing system tokens
+@import '../../../../styles/_variables';
+@import '../../../../styles/_color-tokens';
+
+/* ===========================================================================
+ * SUMMARY CONTAINER
+ * Overall container with glass morphism styling
+ * =========================================================================== */
+
+.muscle-selection-summary {
+  background: rgba($gray-800, 0.7);
+  border: 1px solid rgba($lime-400, 0.15);
+  border-radius: $wg-border-radius;
+  padding: $spacing-4;
+  margin-top: $spacing-4;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  
+  // Glass morphism effect
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  
+  .dark-theme & {
+    background: rgba($gray-800, 0.85);
+    border-color: rgba($lime-400, 0.2);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  &.has-validation-errors {
+    border-color: rgba($error, 0.3);
+    
+    .dark-theme & {
+      border-color: rgba($error, 0.4);
+    }
+  }
+  
+  &.valid-selection {
+    border-color: rgba($success, 0.3);
+    
+    .dark-theme & {
+      border-color: rgba($success, 0.4);
+    }
+  }
+  
+  &.at-limit {
+    border-color: rgba($warning, 0.3);
+    
+    .dark-theme & {
+      border-color: rgba($warning, 0.4);
+    }
+  }
+}
+
+/* ===========================================================================
+ * SUMMARY HEADER
+ * Title and overall status indicator
+ * =========================================================================== */
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-3;
+  
+  .summary-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $white;
+    margin: 0;
+    
+    .selection-count {
+      color: $lime-400;
+      font-weight: $font-weight-bold;
+    }
+    
+    .selection-limit {
+      color: $gray-400;
+      font-weight: $font-weight-normal;
+      font-size: $font-size-sm;
+    }
+  }
+  
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: $spacing-1-5;
+    padding: $spacing-1 $spacing-2;
+    border-radius: 12px;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    backdrop-filter: blur(4px);
+    
+    .status-icon {
+      font-size: $font-size-sm;
+    }
+    
+    &.status-empty {
+      background: rgba($gray-600, 0.3);
+      border: 1px solid rgba($gray-600, 0.4);
+      color: $gray-400;
+    }
+    
+    &.status-partial {
+      background: rgba($warning, 0.2);
+      border: 1px solid rgba($warning, 0.3);
+      color: $warning;
+    }
+    
+    &.status-complete {
+      background: rgba($success, 0.2);
+      border: 1px solid rgba($success, 0.3);
+      color: $success;
+    }
+    
+    &.status-limit {
+      background: rgba($error, 0.2);
+      border: 1px solid rgba($error, 0.3);
+      color: $error;
+    }
+  }
+}
+
+/* ===========================================================================
+ * SELECTED GROUPS OVERVIEW
+ * Visual pills showing selected muscle groups
+ * =========================================================================== */
+
+.selected-groups-overview {
+  margin-bottom: $spacing-4;
+  
+  .overview-label {
+    font-size: $font-size-sm;
+    color: $gray-400;
+    margin-bottom: $spacing-2;
+    font-weight: $font-weight-medium;
+  }
+  
+  .groups-pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-2;
+    min-height: 32px;
+    align-items: center;
+    
+    &.empty {
+      .empty-state {
+        color: $gray-500;
+        font-style: italic;
+        font-size: $font-size-sm;
+      }
+    }
+  }
+}
+
+.group-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1-5;
+  padding: $spacing-1-5 $spacing-2-5;
+  background: rgba($lime-400, 0.15);
+  border: 1px solid rgba($lime-400, 0.3);
+  border-radius: 14px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $lime-400;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  
+  .dark-theme & {
+    background: rgba($lime-400, 0.18);
+    border-color: rgba($lime-400, 0.35);
+  }
+  
+  .group-name {
+    font-weight: $font-weight-semibold;
+  }
+  
+  .muscle-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    min-width: 16px;
+    text-align: center;
+    
+    .dark-theme & {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+  
+  .completion-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba($gray-400, 0.5);
+    transition: background-color 0.2s ease;
+    
+    &.complete {
+      background: $success;
+    }
+    
+    &.partial {
+      background: $warning;
+    }
+    
+    &.empty {
+      background: rgba($gray-600, 0.5);
+    }
+  }
+  
+  // Different color variants for visual distinction
+  &.variant-emerald {
+    background: rgba($emerald-400, 0.15);
+    border-color: rgba($emerald-400, 0.3);
+    color: $emerald-400;
+  }
+  
+  &.variant-blue {
+    background: rgba($blue-400, 0.15);
+    border-color: rgba($blue-400, 0.3);
+    color: $blue-400;
+  }
+  
+  &.variant-violet {
+    background: rgba($violet-400, 0.15);
+    border-color: rgba($violet-400, 0.3);
+    color: $violet-400;
+  }
+}
+
+/* ===========================================================================
+ * VALIDATION MESSAGES
+ * Status messages and guidance
+ * =========================================================================== */
+
+.validation-section {
+  margin-bottom: $spacing-3;
+  
+  .validation-message {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-2;
+    padding: $spacing-2-5 $spacing-3;
+    border-radius: 8px;
+    font-size: $font-size-sm;
+    line-height: 1.4;
+    margin-bottom: $spacing-2;
+    backdrop-filter: blur(4px);
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .message-icon {
+      font-size: $font-size-base;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    
+    .message-content {
+      flex: 1;
+      
+      .message-title {
+        font-weight: $font-weight-semibold;
+        margin-bottom: $spacing-0-5;
+      }
+      
+      .message-details {
+        opacity: 0.9;
+        font-size: $font-size-xs;
+      }
+    }
+    
+    &.success {
+      background: rgba($success, 0.1);
+      border: 1px solid rgba($success, 0.2);
+      color: $success;
+    }
+    
+    &.warning {
+      background: rgba($warning, 0.1);
+      border: 1px solid rgba($warning, 0.2);
+      color: $warning;
+    }
+    
+    &.error {
+      background: rgba($error, 0.1);
+      border: 1px solid rgba($error, 0.2);
+      color: $error;
+    }
+    
+    &.info {
+      background: rgba($blue-400, 0.1);
+      border: 1px solid rgba($blue-400, 0.2);
+      color: $blue-400;
+    }
+  }
+}
+
+/* ===========================================================================
+ * HELPFUL TIPS SECTION
+ * Guidance and recommendations
+ * =========================================================================== */
+
+.tips-section {
+  .tips-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    margin-bottom: $spacing-2;
+    
+    .tips-icon {
+      color: $lime-400;
+      font-size: $font-size-base;
+    }
+    
+    .tips-title {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $white;
+      margin: 0;
+    }
+  }
+  
+  .tips-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    
+    .tip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-2;
+      padding: $spacing-1-5;
+      margin-bottom: $spacing-1;
+      background: rgba($gray-700, 0.3);
+      border-radius: 6px;
+      font-size: $font-size-xs;
+      color: $gray-300;
+      line-height: 1.3;
+      
+      .dark-theme & {
+        background: rgba($gray-700, 0.4);
+      }
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .tip-bullet {
+        color: $lime-400;
+        font-weight: $font-weight-bold;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      
+      .tip-text {
+        flex: 1;
+        
+        .highlight {
+          color: $lime-400;
+          font-weight: $font-weight-medium;
+        }
+      }
+    }
+  }
+}
+
+/* ===========================================================================
+ * PROGRESS OVERVIEW
+ * Visual progress indicator for overall completion
+ * =========================================================================== */
+
+.progress-overview {
+  margin-top: $spacing-3;
+  padding-top: $spacing-3;
+  border-top: 1px solid rgba($gray-600, 0.3);
+  
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-2;
+    
+    .progress-text {
+      font-size: $font-size-sm;
+      color: $gray-400;
+      font-weight: $font-weight-medium;
+    }
+    
+    .progress-percentage {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $lime-400;
+    }
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba($gray-600, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, $lime-400, $emerald-400);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+      
+      &.progress-complete {
+        background: linear-gradient(90deg, $success, $lime-400);
+        box-shadow: 0 0 8px rgba($success, 0.4);
+      }
+    }
+  }
+}
+
+/* ===========================================================================
+ * SUMMARY ANIMATIONS
+ * Smooth state transitions and feedback
+ * =========================================================================== */
+
+.muscle-selection-summary {
+  &.updating {
+    .groups-pills-container {
+      .group-pill {
+        animation: pillPulse 0.6s ease-in-out;
+      }
+    }
+  }
+}
+
+@keyframes pillPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.group-pill {
+  &.entering {
+    animation: pillEnter 0.3s ease-out;
+  }
+  
+  &.exiting {
+    animation: pillExit 0.2s ease-in;
+  }
+}
+
+@keyframes pillEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pillExit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* ===========================================================================
+ * RESPONSIVE DESIGN
+ * =========================================================================== */
+
+@media (max-width: 768px) {
+  .muscle-selection-summary {
+    padding: $spacing-3;
+  }
+  
+  .summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-2;
+    
+    .summary-title {
+      font-size: $font-size-sm;
+    }
+    
+    .status-indicator {
+      align-self: flex-end;
+    }
+  }
+  
+  .group-pill {
+    padding: $spacing-1 $spacing-2;
+    font-size: $font-size-xs;
+    
+    .muscle-count {
+      min-width: 14px;
+      padding: 1px 4px;
+    }
+    
+    .completion-indicator {
+      width: 6px;
+      height: 6px;
+    }
+  }
+  
+  .validation-message {
+    padding: $spacing-2;
+    font-size: $font-size-xs;
+  }
+  
+  .tips-section .tip-item {
+    padding: $spacing-1;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .muscle-selection-summary {
+    padding: $spacing-2-5;
+  }
+  
+  .groups-pills-container {
+    gap: $spacing-1-5;
+  }
+  
+  .group-pill {
+    gap: $spacing-1;
+    
+    .group-name {
+      font-size: $font-size-xs;
+    }
+  }
+  
+  .progress-overview {
+    margin-top: $spacing-2;
+    padding-top: $spacing-2;
+    
+    .progress-bar {
+      height: 4px;
+    }
+  }
+}
+
+/* ===========================================================================
+ * ACCESSIBILITY ENHANCEMENTS
+ * =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .muscle-selection-summary,
+  .group-pill,
+  .progress-fill,
+  .completion-indicator {
+    transition: none;
+  }
+  
+  .muscle-selection-summary.updating .group-pill {
+    animation: none;
+  }
+  
+  .group-pill {
+    &.entering,
+    &.exiting {
+      animation: none;
+    }
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .muscle-selection-summary {
+    border-color: $lime-400;
+    
+    &.has-validation-errors {
+      border-color: $error;
+    }
+    
+    &.valid-selection {
+      border-color: $success;
+    }
+  }
+  
+  .group-pill {
+    border-width: 2px;
+    background: rgba($lime-400, 0.3);
+  }
+  
+  .validation-message {
+    border-width: 2px;
+    
+    &.success {
+      background: rgba($success, 0.3);
+    }
+    
+    &.warning {
+      background: rgba($warning, 0.3);
+    }
+    
+    &.error {
+      background: rgba($error, 0.3);
+    }
+  }
+}
+
+// Focus indicators
+.status-indicator:focus-visible,
+.group-pill:focus-visible {
+  outline: 2px solid rgba($lime-400, 0.6);
+  outline-offset: 2px;
+} 

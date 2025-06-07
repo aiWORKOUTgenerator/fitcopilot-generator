@@ -1,0 +1,638 @@
+/**
+ * Muscle Detail Grid Component Styling
+ * Expandable checkbox grids for specific muscle selection
+ * Integrates with glass morphism design system
+ */
+
+@use "sass:map";
+@use "sass:math";
+
+// Import existing system tokens
+@import '../../../../styles/_variables';
+@import '../../../../styles/_color-tokens';
+
+/* ===========================================================================
+ * MUSCLE DETAIL GRID CONTAINER
+ * Expandable container for each muscle group's detailed muscles
+ * =========================================================================== */
+
+.muscle-detail-grid {
+  background: rgba($gray-800, 0.6);
+  border: 1px solid rgba($lime-400, 0.15);
+  border-radius: $wg-border-radius;
+  overflow: hidden;
+  margin-bottom: $spacing-3;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  
+  // Glass morphism effect
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  
+  .dark-theme & {
+    background: rgba($gray-800, 0.8);
+    border-color: rgba($lime-400, 0.2);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+  
+  &.expanded {
+    border-color: rgba($lime-400, 0.25);
+    box-shadow: 
+      0 4px 16px rgba($lime-400, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    
+    .dark-theme & {
+      border-color: rgba($lime-400, 0.3);
+      box-shadow: 
+        0 6px 20px rgba($lime-400, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* ===========================================================================
+ * GRID HEADER
+ * Contains muscle group name, controls, and stats
+ * =========================================================================== */
+
+.grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-3 $spacing-4;
+  background: linear-gradient(135deg, 
+    rgba($lime-400, 0.1), 
+    rgba($emerald-400, 0.05)
+  );
+  border-bottom: 1px solid rgba($lime-400, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  .dark-theme & {
+    background: linear-gradient(135deg, 
+      rgba($lime-400, 0.12), 
+      rgba($emerald-400, 0.08)
+    );
+    border-bottom-color: rgba($lime-400, 0.15);
+  }
+  
+  &:hover {
+    background: linear-gradient(135deg, 
+      rgba($lime-400, 0.15), 
+      rgba($emerald-400, 0.1)
+    );
+    
+    .group-title {
+      color: $lime-400;
+    }
+    
+    .dark-theme & {
+      background: linear-gradient(135deg, 
+        rgba($lime-400, 0.18), 
+        rgba($emerald-400, 0.12)
+      );
+    }
+  }
+}
+
+.grid-header-content {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  flex: 1;
+  
+  .group-title {
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    color: $white;
+    transition: color 0.3s ease;
+    margin: 0;
+  }
+  
+  .group-icon {
+    font-size: $font-size-lg;
+    opacity: 0.8;
+  }
+  
+  .selection-stats {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    
+    .selected-count {
+      background: rgba($lime-400, 0.2);
+      border: 1px solid rgba($lime-400, 0.3);
+      color: $lime-400;
+      padding: $spacing-0-5 $spacing-1-5;
+      border-radius: 8px;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      
+      &.none-selected {
+        background: rgba($gray-600, 0.3);
+        border-color: rgba($gray-600, 0.4);
+        color: $gray-400;
+      }
+      
+      &.all-selected {
+        background: rgba($success, 0.2);
+        border-color: rgba($success, 0.3);
+        color: $success;
+      }
+    }
+    
+    .progress-indicator {
+      width: 40px;
+      height: 4px;
+      background: rgba($gray-600, 0.3);
+      border-radius: 2px;
+      overflow: hidden;
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, $lime-400, $emerald-400);
+        border-radius: 2px;
+        transition: width 0.4s ease;
+        
+        &.progress-0 { width: 0%; }
+        &.progress-25 { width: 25%; }
+        &.progress-50 { width: 50%; }
+        &.progress-75 { width: 75%; }
+        &.progress-100 { 
+          width: 100%; 
+          background: linear-gradient(90deg, $success, $lime-400);
+        }
+      }
+    }
+  }
+}
+
+.grid-header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  
+  .grid-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: $white;
+    padding: $spacing-1 $spacing-2;
+    border-radius: 6px;
+    font-size: $font-size-xs;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    
+    .dark-theme & {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    &:hover {
+      background: rgba($lime-400, 0.2);
+      border-color: rgba($lime-400, 0.3);
+      color: $lime-400;
+      transform: translateY(-1px);
+    }
+    
+    &:focus {
+      outline: none;
+      background: rgba($lime-400, 0.25);
+      border-color: rgba($lime-400, 0.4);
+      box-shadow: 0 0 0 2px rgba($lime-400, 0.3);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: $white;
+        transform: none;
+      }
+    }
+  }
+  
+  .expand-toggle {
+    color: $lime-400;
+    font-size: $font-size-lg;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    padding: $spacing-1;
+    border-radius: 4px;
+    
+    &:hover {
+      background: rgba($lime-400, 0.1);
+    }
+    
+    &.expanded {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+/* ===========================================================================
+ * MUSCLE GRID CONTENT
+ * The expandable grid of individual muscle checkboxes
+ * =========================================================================== */
+
+.grid-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+  
+  &.expanded {
+    max-height: 400px;
+    padding: $spacing-4;
+  }
+}
+
+.muscle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: $spacing-2;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: $spacing-1-5;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-1;
+  }
+}
+
+.muscle-option {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  background: rgba($gray-700, 0.4);
+  border: 1px solid rgba($gray-600, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  
+  // Glass morphism for individual options
+  box-shadow: 
+    0 1px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  
+  .dark-theme & {
+    background: rgba($gray-700, 0.6);
+    border-color: rgba($gray-600, 0.4);
+  }
+  
+  &:hover {
+    background: rgba($lime-400, 0.1);
+    border-color: rgba($lime-400, 0.3);
+    transform: translateY(-1px);
+    
+    .muscle-name {
+      color: $lime-400;
+    }
+    
+    .dark-theme & {
+      background: rgba($lime-400, 0.15);
+      border-color: rgba($lime-400, 0.35);
+    }
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: rgba($lime-400, 0.4);
+    box-shadow: 
+      0 0 0 2px rgba($lime-400, 0.3),
+      0 2px 8px rgba($lime-400, 0.2);
+  }
+  
+  &.selected {
+    background: rgba($lime-400, 0.2);
+    border-color: rgba($lime-400, 0.4);
+    
+    .muscle-name {
+      color: $lime-400;
+      font-weight: $font-weight-semibold;
+    }
+    
+    .muscle-checkbox {
+      background: $lime-400;
+      border-color: $lime-400;
+      
+      &::after {
+        opacity: 1;
+      }
+    }
+    
+    .dark-theme & {
+      background: rgba($lime-400, 0.25);
+      border-color: rgba($lime-400, 0.45);
+    }
+  }
+  
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    &:hover {
+      background: rgba($gray-700, 0.4);
+      border-color: rgba($gray-600, 0.3);
+      transform: none;
+      
+      .muscle-name {
+        color: $gray-400;
+      }
+    }
+  }
+}
+
+.muscle-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba($lime-400, 0.4);
+  border-radius: 3px;
+  background: transparent;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  
+  &::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: $gray-900;
+    font-size: 10px;
+    font-weight: $font-weight-bold;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+}
+
+.muscle-name {
+  font-size: $font-size-sm;
+  color: $white;
+  font-weight: $font-weight-medium;
+  transition: color 0.2s ease;
+  flex: 1;
+  line-height: 1.2;
+}
+
+/* ===========================================================================
+ * GRID FOOTER
+ * Summary and helpful messaging
+ * =========================================================================== */
+
+.grid-footer {
+  padding: $spacing-3 $spacing-4;
+  background: rgba($gray-700, 0.3);
+  border-top: 1px solid rgba($gray-600, 0.3);
+  
+  .dark-theme & {
+    background: rgba($gray-700, 0.4);
+    border-top-color: rgba($gray-600, 0.4);
+  }
+  
+  .footer-message {
+    font-size: $font-size-xs;
+    color: $gray-400;
+    line-height: 1.4;
+    text-align: center;
+    
+    &.has-selection {
+      color: $lime-400;
+    }
+    
+    &.complete {
+      color: $success;
+    }
+  }
+}
+
+/* ===========================================================================
+ * GRID ANIMATIONS
+ * Smooth expand/collapse and selection animations
+ * =========================================================================== */
+
+.muscle-detail-grid {
+  &.entering {
+    animation: gridEnter 0.4s ease-out;
+  }
+  
+  &.exiting {
+    animation: gridExit 0.3s ease-in;
+  }
+}
+
+@keyframes gridEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes gridExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.muscle-option {
+  &.selecting {
+    animation: optionSelect 0.3s ease-out;
+  }
+  
+  &.deselecting {
+    animation: optionDeselect 0.2s ease-in;
+  }
+}
+
+@keyframes optionSelect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes optionDeselect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===========================================================================
+ * RESPONSIVE DESIGN
+ * =========================================================================== */
+
+@media (max-width: 768px) {
+  .grid-header {
+    padding: $spacing-2-5 $spacing-3;
+    
+    .grid-header-content .group-title {
+      font-size: $font-size-sm;
+    }
+    
+    .selection-stats {
+      gap: $spacing-1-5;
+      
+      .progress-indicator {
+        width: 30px;
+        height: 3px;
+      }
+    }
+  }
+  
+  .grid-content.expanded {
+    padding: $spacing-3;
+  }
+  
+  .muscle-option {
+    padding: $spacing-1-5 $spacing-2;
+    gap: $spacing-1-5;
+    
+    .muscle-name {
+      font-size: $font-size-xs;
+    }
+    
+    .muscle-checkbox {
+      width: 14px;
+      height: 14px;
+      
+      &::after {
+        font-size: 8px;
+      }
+    }
+  }
+  
+  .grid-footer {
+    padding: $spacing-2 $spacing-3;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-header-content {
+    gap: $spacing-2;
+    
+    .group-icon {
+      font-size: $font-size-base;
+    }
+  }
+  
+  .grid-header-actions {
+    gap: $spacing-1;
+    
+    .grid-action-btn {
+      padding: $spacing-0-5 $spacing-1-5;
+      font-size: 10px;
+    }
+  }
+  
+  .muscle-option {
+    padding: $spacing-1 $spacing-1-5;
+  }
+}
+
+/* ===========================================================================
+ * ACCESSIBILITY ENHANCEMENTS
+ * =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .muscle-detail-grid,
+  .grid-content,
+  .muscle-option,
+  .muscle-checkbox,
+  .expand-toggle,
+  .progress-fill {
+    transition: none;
+  }
+  
+  .muscle-detail-grid {
+    &.entering,
+    &.exiting {
+      animation: none;
+    }
+  }
+  
+  .muscle-option {
+    &.selecting,
+    &.deselecting {
+      animation: none;
+    }
+    
+    &:hover {
+      transform: none;
+    }
+  }
+  
+  .grid-action-btn:hover {
+    transform: none;
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .muscle-detail-grid {
+    border-color: $lime-400;
+    
+    .grid-header {
+      background: rgba($lime-400, 0.3);
+      border-bottom-color: $lime-400;
+    }
+    
+    .muscle-option {
+      border-color: $gray-500;
+      
+      &.selected {
+        border-color: $lime-400;
+        background: rgba($lime-400, 0.4);
+      }
+    }
+  }
+}
+
+// Focus indicators for keyboard navigation
+.muscle-option {
+  &:focus-visible {
+    outline: 2px solid rgba($lime-400, 0.6);
+    outline-offset: 1px;
+  }
+}
+
+.grid-action-btn {
+  &:focus-visible {
+    outline: 2px solid rgba($lime-400, 0.6);
+    outline-offset: 1px;
+  }
+} 

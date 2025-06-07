@@ -1,0 +1,329 @@
+/**
+ * Muscle Group Card Component Styling
+ * Integrates with existing glass morphism design system
+ * Follows established card structure patterns and color token system
+ */
+
+@use "sass:map";
+@use "sass:math";
+
+// Import existing system tokens and patterns
+@import '../../../styles/_variables';
+@import '../../../styles/_color-tokens';
+@import '../../../styles/components/_component-tokens';
+@import '../../../../../styles/design-system/compatibility/_compatibility';
+@import '../../../../../styles/design-system/tokens/semantic/surfaces';
+
+// Import all component styles
+@import './components/index';
+
+/* ===========================================================================
+ * MUSCLE GROUP CARD STRUCTURE
+ * Extends existing glass morphism card patterns
+ * =========================================================================== */
+
+.muscle-card-structure {
+  // Inherit from existing card foundation
+  @include card-bg-color('card');
+  @include card-border-radius('card');
+  @include card-shadow('card');
+  @include card-hover-effect('card');
+  
+  background: $gray-900; // Dark background as per mockup
+  border: 1px solid rgba($lime-400, 0.1);
+  border-radius: $wg-border-radius;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  
+  .dark-theme & {
+    background: $gray-900;
+    border-color: rgba($lime-400, 0.15);
+  }
+  
+  &:hover {
+    border-color: rgba($lime-400, 0.2);
+    box-shadow: 0 8px 32px rgba($lime-400, 0.1);
+    
+    .dark-theme & {
+      border-color: rgba($lime-400, 0.25);
+      box-shadow: 0 8px 32px rgba($lime-400, 0.15);
+    }
+  }
+}
+
+/* ===========================================================================
+ * MUSCLE CARD HEADER
+ * Profile integration + selected muscle groups as chips
+ * =========================================================================== */
+
+.muscle-card-header {
+  padding: $spacing-4;
+  background: linear-gradient(135deg, 
+    rgba($header-dark-cyan, 0.8), 
+    rgba($header-dark-cyan-border, 0.6)
+  );
+  border-bottom: 1px solid rgba($lime-400, 0.1);
+  backdrop-filter: blur(8px);
+  
+  .dark-theme & {
+    background: linear-gradient(135deg, 
+      rgba($header-dark-cyan, 0.9), 
+      rgba($header-dark-cyan-border, 0.7)
+    );
+    border-bottom-color: rgba($lime-400, 0.15);
+  }
+  
+  .profile-muscle-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+    
+    .profile-preferences {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      flex-wrap: wrap;
+      
+      .profile-label {
+        font-size: $font-size-sm;
+        color: $gray-400;
+        font-weight: $font-weight-medium;
+        white-space: nowrap;
+      }
+      
+      .profile-muscle-badge {
+        background: rgba($lime-400, 0.15);
+        border: 1px solid rgba($lime-400, 0.3);
+        color: $lime-400;
+        padding: $spacing-1 $spacing-2;
+        border-radius: 12px;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(4px);
+        
+        &:hover {
+          background: rgba($lime-400, 0.25);
+          border-color: rgba($lime-400, 0.4);
+          transform: translateY(-1px);
+        }
+        
+        &.selected {
+          background: $lime-400;
+          color: $gray-900;
+          border-color: $lime-400;
+        }
+      }
+    }
+    
+    .selected-muscle-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-2;
+      min-height: 32px;
+      align-items: center;
+      
+      &.empty {
+        .empty-state-hint {
+          color: $gray-500;
+          font-size: $font-size-sm;
+          font-style: italic;
+        }
+      }
+    }
+  }
+}
+
+/* ===========================================================================
+ * MUSCLE CARD BODY
+ * Muscle group selector + expanded muscle grids
+ * =========================================================================== */
+
+.muscle-card-body {
+  padding: $spacing-4;
+  background: rgba($gray-900, 0.95);
+  backdrop-filter: blur(12px);
+  
+  .dark-theme & {
+    background: rgba($gray-900, 0.98);
+  }
+  
+  .muscle-group-selector {
+    margin-bottom: $spacing-4;
+    
+    .selector-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: $spacing-3;
+      
+      .label-text {
+        font-size: $font-size-md;
+        color: $white;
+        font-weight: $font-weight-medium;
+      }
+      
+      .selection-counter {
+        background: rgba($lime-400, 0.1);
+        border: 1px solid rgba($lime-400, 0.3);
+        color: $lime-400;
+        padding: $spacing-1 $spacing-2;
+        border-radius: 8px;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+        
+        &.at-limit {
+          background: rgba($error, 0.1);
+          border-color: rgba($error, 0.3);
+          color: $error;
+        }
+      }
+    }
+  }
+  
+  .muscle-detail-grids {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+  
+  .validation-messages {
+    margin-top: $spacing-3;
+    
+    .validation-message {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      padding: $spacing-2 $spacing-3;
+      border-radius: 8px;
+      font-size: $font-size-sm;
+      
+      .validation-icon {
+        font-size: $font-size-base;
+        flex-shrink: 0;
+      }
+      
+      &.success {
+        background: rgba($success, 0.1);
+        border: 1px solid rgba($success, 0.3);
+        color: $success;
+      }
+      
+      &.warning {
+        background: rgba($warning, 0.1);
+        border: 1px solid rgba($warning, 0.3);
+        color: $warning;
+      }
+      
+      &.error {
+        background: rgba($error, 0.1);
+        border: 1px solid rgba($error, 0.3);
+        color: $error;
+      }
+    }
+  }
+}
+
+/* ===========================================================================
+ * RESPONSIVE DESIGN
+ * =========================================================================== */
+
+@media (max-width: 768px) {
+  .muscle-card-header {
+    padding: $spacing-3;
+    
+    .profile-muscle-section .profile-preferences {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-2;
+    }
+  }
+  
+  .muscle-card-body {
+    padding: $spacing-3;
+    
+    .muscle-detail-grids {
+      gap: $spacing-3;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .muscle-card-header .selected-muscle-chips {
+    gap: $spacing-1-5;
+  }
+  
+  .muscle-card-body .muscle-group-selector .selector-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-2;
+  }
+}
+
+/* ===========================================================================
+ * ANIMATION PATTERNS
+ * Maintains existing staggered animation consistency
+ * =========================================================================== */
+
+.muscle-card-structure {
+  &.animating {
+    .muscle-card-header {
+      animation: slideInFromTop 0.4s ease-out;
+    }
+    
+    .muscle-card-body {
+      animation: slideInFromBottom 0.4s ease-out 0.2s both;
+    }
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================================================================
+ * FOCUS AND ACCESSIBILITY
+ * =========================================================================== */
+
+.muscle-card-structure {
+  &:focus-within {
+    border-color: rgba($lime-400, 0.4);
+    box-shadow: 0 0 0 3px rgba($lime-400, 0.2);
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .muscle-card-structure {
+    border-color: $lime-400;
+    
+    .muscle-card-header {
+      background: $header-dark-cyan;
+      border-bottom-color: $lime-400;
+    }
+    
+    .profile-muscle-badge {
+      border-color: $lime-400;
+      background: rgba($lime-400, 0.3);
+    }
+  }
+} 
