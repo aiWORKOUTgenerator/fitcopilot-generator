@@ -23,13 +23,13 @@ interface PreviewStepProps {
   isLoading?: boolean;
 }
 
-// Map goal keys to human-readable labels
+// Map goal keys to human-readable labels for daily focus
 const GOAL_LABELS: Record<string, string> = {
-  'lose-weight': 'Weight Loss',
-  'build-muscle': 'Muscle Gain',
-  'improve-endurance': 'Endurance',
-  'increase-strength': 'Strength',
-  'enhance-flexibility': 'Flexibility',
+  'lose-weight': 'Fat Burning & Cardio',
+  'build-muscle': 'Muscle Building',
+  'improve-endurance': 'Endurance & Stamina',
+  'increase-strength': 'Strength Training',
+  'enhance-flexibility': 'Flexibility & Mobility',
   'general-fitness': 'General Fitness',
   'sport-specific': 'Sport-Specific Training'
 };
@@ -86,8 +86,22 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
   const goalDisplay = formValues.goals ? GOAL_LABELS[formValues.goals] || formValues.goals : '';
   const difficultyDisplay = formValues.difficulty ? DIFFICULTY_LABELS[formValues.difficulty] : '';
   const durationDisplay = formValues.duration ? `${formValues.duration} minutes` : '';
+  const environmentDisplay = formValues.sessionInputs?.environment ? ENVIRONMENT_LABELS[formValues.sessionInputs.environment] : '';
+  const intensityDisplay = formValues.intensity ? getIntensityLabel(formValues.intensity) : '';
   const equipment = formValues.equipment || [];
   const sessionInputs = formValues.sessionInputs || {};
+  
+  // Helper function to get intensity label
+  function getIntensityLabel(intensity: number): string {
+    switch (intensity) {
+      case 1: return 'Very Low';
+      case 2: return 'Low';  
+      case 3: return 'Moderate';
+      case 4: return 'High';
+      case 5: return 'Very High';
+      default: return 'Moderate';
+    }
+  }
   
   // Format any restrictions or preferences
   const restrictionsPreferences = [
@@ -106,7 +120,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
         
         <div className="workout-preview__grid">
           <Card className="workout-preview__card workout-preview__card--goal">
-            <div className="workout-preview__card-label">GOAL</div>
+            <div className="workout-preview__card-label">FOCUS</div>
             <div className="workout-preview__card-value">
               {goalDisplay}
             </div>
@@ -125,6 +139,24 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
               {durationDisplay}
             </div>
           </Card>
+          
+          {environmentDisplay && (
+            <Card className="workout-preview__card workout-preview__card--environment">
+              <div className="workout-preview__card-label">ENVIRONMENT</div>
+              <div className="workout-preview__card-value">
+                {environmentDisplay}
+              </div>
+            </Card>
+          )}
+          
+          {intensityDisplay && (
+            <Card className="workout-preview__card workout-preview__card--intensity">
+              <div className="workout-preview__card-label">INTENSITY</div>
+              <div className="workout-preview__card-value">
+                {intensityDisplay}
+              </div>
+            </Card>
+          )}
         </div>
         
         {equipment.length > 0 && (
@@ -154,8 +186,10 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
           </div>
         )}
         
-        {/* Session-specific inputs */}
-        {Object.keys(sessionInputs).length > 0 && (
+        {/* Session-specific inputs - exclude environment since it's now in the main cards */}
+        {(sessionInputs.availableTime || sessionInputs.energyLevel || sessionInputs.moodLevel || 
+          sessionInputs.sleepQuality || (sessionInputs.focusArea && sessionInputs.focusArea.length > 0) || 
+          (sessionInputs.currentSoreness && sessionInputs.currentSoreness.length > 0)) && (
           <div className="workout-preview__section">
             <h4 className="workout-preview__section-title">
               Today's Workout Factors
@@ -189,12 +223,7 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
                 </div>
               )}
               
-              {sessionInputs.environment && (
-                <div className="workout-preview__session-item">
-                  <span className="workout-preview__session-label">Environment:</span> 
-                  <span className="workout-preview__session-value">{ENVIRONMENT_LABELS[sessionInputs.environment]}</span>
-                </div>
-              )}
+
               
               {sessionInputs.focusArea && sessionInputs.focusArea.length > 0 && (
                 <div className="workout-preview__session-item">

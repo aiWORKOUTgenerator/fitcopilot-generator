@@ -6,7 +6,7 @@
  */
 import React, { useState } from 'react';
 import { SessionSpecificInputs } from '../../types/workout';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 import './SessionInputsPanel.scss';
 
 /**
@@ -213,18 +213,32 @@ export const SessionInputsPanel: React.FC<SessionInputsPanelProps> = ({
             <label className="session-inputs__label">
               Focus area for today's workout
             </label>
-            <div className="session-inputs__checkbox-grid">
-              {FOCUS_AREA_OPTIONS.map(option => (
-                <label key={option.id} className="session-inputs__checkbox-label">
-                  <input
-                    type="checkbox"
-                    className="session-inputs__checkbox"
-                    checked={(sessionInputs.focusArea || []).includes(option.id)}
-                    onChange={(e) => handleFocusAreaChange(option.id, e.target.checked)}
-                  />
-                  <span className="session-inputs__checkbox-text">{option.label}</span>
-                </label>
-              ))}
+            <div className="session-inputs__form-grid">
+              <div className="session-inputs__checkbox-grid">
+                {FOCUS_AREA_OPTIONS.map(option => {
+                  const isSelected = (sessionInputs.focusArea || []).includes(option.id);
+                  return (
+                    <label 
+                      key={option.id} 
+                      className={`session-inputs__checkbox-label ${
+                        isSelected ? 'checkbox-label--selected' : ''
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="session-inputs__checkbox-input"
+                        value={option.id}
+                        checked={isSelected}
+                        onChange={(e) => handleFocusAreaChange(option.id, e.target.checked)}
+                      />
+                      <div className="session-inputs__checkbox-box">
+                        <Check size={14} className="session-inputs__checkbox-indicator" />
+                      </div>
+                      <span className="session-inputs__checkbox-text">{option.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -233,18 +247,32 @@ export const SessionInputsPanel: React.FC<SessionInputsPanelProps> = ({
             <label className="session-inputs__label">
               Current soreness or discomfort
             </label>
-            <div className="session-inputs__checkbox-grid">
-              {BODY_AREA_OPTIONS.map(option => (
-                <label key={option.id} className="session-inputs__checkbox-label">
-                  <input
-                    type="checkbox"
-                    className="session-inputs__checkbox"
-                    checked={(sessionInputs.currentSoreness || []).includes(option.id)}
-                    onChange={(e) => handleSorenessChange(option.id, e.target.checked)}
-                  />
-                  <span className="session-inputs__checkbox-text">{option.label}</span>
-                </label>
-              ))}
+            <div className="session-inputs__form-grid">
+              <div className="session-inputs__checkbox-grid">
+                {BODY_AREA_OPTIONS.map(option => {
+                  const isSelected = (sessionInputs.currentSoreness || []).includes(option.id);
+                  return (
+                    <label 
+                      key={option.id} 
+                      className={`session-inputs__checkbox-label ${
+                        isSelected ? 'checkbox-label--selected' : ''
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="session-inputs__checkbox-input"
+                        value={option.id}
+                        checked={isSelected}
+                        onChange={(e) => handleSorenessChange(option.id, e.target.checked)}
+                      />
+                      <div className="session-inputs__checkbox-box">
+                        <Check size={14} className="session-inputs__checkbox-indicator" />
+                      </div>
+                      <span className="session-inputs__checkbox-text">{option.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

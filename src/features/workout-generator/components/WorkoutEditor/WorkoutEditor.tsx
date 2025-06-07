@@ -12,7 +12,7 @@ import { AutoResizeTextarea } from '../../../../components/ui/AutoResizeTextarea
 import { ExpandableInput } from '../../../../components/ui/ExpandableInput';
 import { AutoResizeTextareaWithCounter } from '../../../../components/ui/AutoResizeTextareaWithCounter';
 import { FormFieldEnhanced } from '../../../profile/components/enhanced/FormFieldEnhanced';
-import { X, Save, Loader, Edit3, FileText, Clock, Target, Dumbbell, Settings } from 'lucide-react';
+import { X, Save, Loader, Edit3, FileText, Clock, Target, Dumbbell, Settings, Check, AlertCircle } from 'lucide-react';
 import { WorkoutDifficulty } from '../../types/workout';
 import { saveWorkout } from '../../services/workoutService';
 import ExerciseList from './ExerciseList';
@@ -48,15 +48,42 @@ const EQUIPMENT_OPTIONS = [
   { id: 'stability-ball', label: 'Stability Ball' }
 ];
 
-// Goal options for workout editor
+// Daily workout focus options for workout editor
 const GOAL_OPTIONS = [
-  { value: 'lose-weight', label: 'Lose Weight' },
-  { value: 'build-muscle', label: 'Build Muscle' },
-  { value: 'improve-endurance', label: 'Improve Endurance' },
-  { value: 'increase-strength', label: 'Increase Strength' },
-  { value: 'enhance-flexibility', label: 'Enhance Flexibility' },
+  { value: 'lose-weight', label: 'Fat Burning & Cardio' },
+  { value: 'build-muscle', label: 'Muscle Building' },
+  { value: 'improve-endurance', label: 'Endurance & Stamina' },
+  { value: 'increase-strength', label: 'Strength Training' },
+  { value: 'enhance-flexibility', label: 'Flexibility & Mobility' },
   { value: 'general-fitness', label: 'General Fitness' },
   { value: 'sport-specific', label: 'Sport-Specific Training' }
+];
+
+// Focus area options for session factors
+const FOCUS_AREA_OPTIONS = [
+  { id: 'upper-body', label: 'Upper Body' },
+  { id: 'lower-body', label: 'Lower Body' },
+  { id: 'core', label: 'Core' },
+  { id: 'back', label: 'Back' },
+  { id: 'shoulders', label: 'Shoulders' },
+  { id: 'chest', label: 'Chest' },
+  { id: 'arms', label: 'Arms' },
+  { id: 'mobility', label: 'Mobility/Flexibility' },
+  { id: 'cardio', label: 'Cardio' },
+  { id: 'recovery', label: 'Recovery/Stretching' }
+];
+
+// Body areas that might experience soreness
+const BODY_AREA_OPTIONS = [
+  { id: 'shoulders', label: 'Shoulders' },
+  { id: 'arms', label: 'Arms' },
+  { id: 'chest', label: 'Chest' },
+  { id: 'back', label: 'Back' },
+  { id: 'core', label: 'Core/Abs' },
+  { id: 'hips', label: 'Hips' },
+  { id: 'legs', label: 'Legs' },
+  { id: 'knees', label: 'Knees' },
+  { id: 'ankles', label: 'Ankles' }
 ];
 
 interface WorkoutEditorProps {
@@ -192,7 +219,10 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
         exercises: convertedExercises,
         version: workout.version || 1,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        
+        // Include session factors in save data
+        sessionFactors: workout.sessionFactors
       };
       
       console.log('[WorkoutEditor] SAVE PREPARATION:', {
@@ -403,6 +433,46 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
   // Handle notes change
   const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     dispatch({ type: 'UPDATE_NOTES', payload: e.target.value });
+  };
+
+  // Handle focus area toggle
+  const handleFocusAreaToggle = (areaId: string) => {
+    const currentAreas = workout.sessionFactors?.focusArea || [];
+    let newAreas: string[];
+    
+    if (currentAreas.includes(areaId)) {
+      newAreas = currentAreas.filter(id => id !== areaId);
+    } else {
+      newAreas = [...currentAreas, areaId];
+    }
+    
+    dispatch({ 
+      type: 'UPDATE_SESSION_FACTORS', 
+      payload: { 
+        ...workout.sessionFactors, 
+        focusArea: newAreas 
+      } 
+    });
+  };
+
+  // Handle soreness area toggle
+  const handleSorenessToggle = (areaId: string) => {
+    const currentAreas = workout.sessionFactors?.currentSoreness || [];
+    let newAreas: string[];
+    
+    if (currentAreas.includes(areaId)) {
+      newAreas = currentAreas.filter(id => id !== areaId);
+    } else {
+      newAreas = [...currentAreas, areaId];
+    }
+    
+    dispatch({ 
+      type: 'UPDATE_SESSION_FACTORS', 
+      payload: { 
+        ...workout.sessionFactors, 
+        currentSoreness: newAreas 
+      } 
+    });
   };
   
   // Handle keyboard shortcuts
@@ -671,6 +741,78 @@ const WorkoutEditor: React.FC<WorkoutEditorProps> = ({
                             <Target size={14} className="workout-editor__checkbox-indicator" />
                           </div>
                           <span className="workout-editor__checkbox-text">{goal.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </FormFieldEnhanced>
+              </div>
+
+              {/* Focus Areas Selection */}
+              <div className="workout-editor__form-field workout-editor__form-field--full-width">
+                <FormFieldEnhanced
+                  label="Focus Areas for This Session"
+                  disabled={isLoading || isSaving}
+                  hint="Select the body areas you want to focus on today"
+                >
+                  <div className="workout-editor__checkbox-grid">
+                    {FOCUS_AREA_OPTIONS.map(area => {
+                      const isSelected = (workout.sessionFactors?.focusArea || []).includes(area.id);
+                      const isDisabled = isLoading || isSaving;
+                      
+                      return (
+                        <label 
+                          key={area.id} 
+                          className={`workout-editor__checkbox-label ${isSelected ? 'checkbox-label--selected' : ''}`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="workout-editor__checkbox-input"
+                            value={area.id}
+                            checked={isSelected}
+                            onChange={() => handleFocusAreaToggle(area.id)}
+                            disabled={isDisabled}
+                          />
+                          <div className="workout-editor__checkbox-box">
+                            <Target size={14} className="workout-editor__checkbox-indicator" />
+                          </div>
+                          <span className="workout-editor__checkbox-text">{area.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </FormFieldEnhanced>
+              </div>
+
+              {/* Current Soreness Selection */}
+              <div className="workout-editor__form-field workout-editor__form-field--full-width">
+                <FormFieldEnhanced
+                  label="Current Soreness or Discomfort"
+                  disabled={isLoading || isSaving}
+                  hint="Areas experiencing soreness that should be avoided or worked lightly"
+                >
+                  <div className="workout-editor__checkbox-grid">
+                    {BODY_AREA_OPTIONS.map(area => {
+                      const isSelected = (workout.sessionFactors?.currentSoreness || []).includes(area.id);
+                      const isDisabled = isLoading || isSaving;
+                      
+                      return (
+                        <label 
+                          key={area.id} 
+                          className={`workout-editor__checkbox-label ${isSelected ? 'checkbox-label--selected' : ''}`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="workout-editor__checkbox-input"
+                            value={area.id}
+                            checked={isSelected}
+                            onChange={() => handleSorenessToggle(area.id)}
+                            disabled={isDisabled}
+                          />
+                          <div className="workout-editor__checkbox-box">
+                            <AlertCircle size={14} className="workout-editor__checkbox-indicator" />
+                          </div>
+                          <span className="workout-editor__checkbox-text">{area.label}</span>
                         </label>
                       );
                     })}

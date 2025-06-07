@@ -147,6 +147,20 @@ class WorkoutUpdateEndpoint extends AbstractEndpoint {
                 }
             }
             
+            // Update session inputs if provided
+            if (isset($params['sessionFactors'])) {
+                // Map sessionFactors back to sessionInputs format for storage
+                $session_inputs = [
+                    'focusArea' => $params['sessionFactors']['focusArea'] ?? [],
+                    'currentSoreness' => $params['sessionFactors']['currentSoreness'] ?? [],
+                    'intensity' => $params['sessionFactors']['intensity'] ?? null,
+                    'energyLevel' => $params['sessionFactors']['energyLevel'] ?? null,
+                    'environment' => $params['sessionFactors']['environment'] ?? null,
+                ];
+                update_post_meta($post_id, '_workout_session_inputs', wp_json_encode($session_inputs));
+                error_log("FitCopilot: Updated session inputs for workout {$post_id}");
+            }
+            
             // Get the workout state after changes
             $after_state = VersioningUtils::get_workout_state($post_id, $user_id, $versioning_service);
             

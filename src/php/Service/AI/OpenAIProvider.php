@@ -73,12 +73,31 @@ class OpenAIProvider {
         $duration = $params['duration'] ?? 30;
         $difficulty = $params['difficulty'] ?? 'intermediate';
         $equipment = isset($params['equipment']) ? implode(', ', $params['equipment']) : 'no equipment';
-        $goals = $params['goals'] ?? 'general fitness';
+        $daily_focus = $params['daily_focus'] ?? $params['goals'] ?? 'general fitness';
+        $profile_goals = isset($params['profile_goals']) && is_array($params['profile_goals']) ? $params['profile_goals'] : [];
         $restrictions = $params['restrictions'] ?? 'none';
+        $intensity = $params['intensity'] ?? 3;
 
-        $prompt = "Create a detailed {$difficulty} level workout for {$duration} minutes. ";
+        // Map intensity level to descriptive text
+        $intensity_labels = [
+            1 => 'very low intensity (gentle, recovery-focused)',
+            2 => 'low intensity (light activity, easy pace)',
+            3 => 'moderate intensity (comfortable challenge)',
+            4 => 'high intensity (vigorous, challenging)',
+            5 => 'very high intensity (maximum effort, elite level)'
+        ];
+        $intensity_description = $intensity_labels[$intensity] ?? 'moderate intensity';
+
+        $prompt = "Create a detailed {$difficulty} level workout for {$duration} minutes at {$intensity_description}. ";
         $prompt .= "Equipment available: {$equipment}. ";
-        $prompt .= "Fitness goals: {$goals}. ";
+        $prompt .= "Today's workout focus: {$daily_focus}. ";
+        
+        // Add profile context if available
+        if (!empty($profile_goals)) {
+            $profile_goals_text = implode(', ', $profile_goals);
+            $prompt .= "User's long-term fitness goals: {$profile_goals_text}. ";
+            $prompt .= "Prioritize today's focus while supporting overall fitness goals. ";
+        }
         
         if ($restrictions !== 'none') {
             $prompt .= "Health restrictions/considerations: {$restrictions}. ";

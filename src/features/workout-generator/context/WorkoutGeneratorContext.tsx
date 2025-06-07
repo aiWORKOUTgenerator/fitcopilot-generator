@@ -9,6 +9,8 @@ import { GeneratedWorkout, WorkoutFormParams } from '../types/workout';
 import { ValidationErrors } from '../domain/validators';
 import { apiFetch, ApiResponse } from '../api/client';
 import { API_ENDPOINTS } from '../api/endpoints';
+import { useProfile } from '../../profile/context';
+import { mapProfileToWorkoutContext } from '../utils/profileMapping';
 import { 
   WorkoutGeneratorAction, 
   WorkoutActionType,
@@ -243,6 +245,10 @@ interface WorkoutGeneratorProviderProps {
 export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderProps) {
   const [state, dispatch] = useReducer(workoutGeneratorReducer, initialState);
   
+  // Get profile context for enhanced prompt building
+  const { state: profileState } = useProfile();
+  const { profile } = profileState;
+  
   /**
    * Log error with context information
    */
@@ -309,15 +315,36 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
         dispatch(setGenerationProcessing());
       }, 500);
       
-      // Prepare request payload
+      // Enhanced prompt building with profile integration
+      const profileMapping = profile ? mapProfileToWorkoutContext(profile) : null;
+      
+      // Build enhanced specific request that includes both daily focus and profile context
+      let specificRequest = `A ${formData.difficulty} level ${formData.duration}-minute workout with today's focus on ${formData.goals}.`;
+      
+      // Add profile goals context if available
+      if (profileMapping && profileMapping.displayData.goals.length > 0) {
+        const profileGoalsText = profileMapping.displayData.goals.map(g => g.display).join(', ');
+        specificRequest += ` User's long-term fitness goals include: ${profileGoalsText}. Prioritize today's focus while supporting overall fitness goals.`;
+      }
+      
+      // Add restrictions if any
+      if (formData.restrictions) {
+        specificRequest += ` Important restrictions: ${formData.restrictions}`;
+      }
+      
+      // Prepare request payload with enhanced prompt
       const requestBody = {
-        specific_request: `A ${formData.difficulty} level ${formData.duration}-minute workout focusing on ${formData.goals}${formData.restrictions ? ` with restrictions: ${formData.restrictions}` : ''}`,
+        specific_request: specificRequest,
         duration: formData.duration,
         difficulty: formData.difficulty,
         goals: formData.goals,
         equipment: formData.equipment || [],
         restrictions: formData.restrictions || '',
-        session_inputs: formData.sessionInputs || {}
+        intensity: formData.intensity || 3,
+        session_inputs: formData.sessionInputs || {},
+        // Include profile context for backend processing
+        profile_goals: profileMapping?.goals || [],
+        daily_focus: formData.goals
       };
       
       // Make API request to generate workout
@@ -380,7 +407,7 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
       dispatch(setGenerationError(errorMessage));
       throw error;
     }
-  }, []);
+  }, [profile]);
   
   // Helper functions for common actions
   const updateFormValues = useCallback((values: Partial<WorkoutFormParams>) => {

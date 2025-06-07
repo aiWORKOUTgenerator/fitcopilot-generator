@@ -51,8 +51,6 @@ import PreviewStep from './steps/PreviewStep';
 import GeneratingStep from './steps/GeneratingStep';
 import { ResultStep } from './steps/ResultStep';
 import ErrorBoundary from '../common/ErrorBoundary';
-import { Button } from '../../../../components/ui';
-import { ThemeToggle } from '../../../../components/ui';
 import './form.scss';
 
 /**
@@ -75,14 +73,14 @@ const EQUIPMENT_OPTIONS = [
 ];
 
 /**
- * Workout goal options that determine the focus of the generated workout
+ * Daily workout focus options that determine the emphasis of today's generated workout
  */
 const GOAL_OPTIONS = [
-  { value: 'lose-weight', label: 'Lose Weight' },
-  { value: 'build-muscle', label: 'Build Muscle' },
-  { value: 'improve-endurance', label: 'Improve Endurance' },
-  { value: 'increase-strength', label: 'Increase Strength' },
-  { value: 'enhance-flexibility', label: 'Enhance Flexibility' },
+  { value: 'lose-weight', label: 'Fat Burning & Cardio' },
+  { value: 'build-muscle', label: 'Muscle Building' },
+  { value: 'improve-endurance', label: 'Endurance & Stamina' },
+  { value: 'increase-strength', label: 'Strength Training' },
+  { value: 'enhance-flexibility', label: 'Flexibility & Mobility' },
   { value: 'general-fitness', label: 'General Fitness' },
   { value: 'sport-specific', label: 'Sport-Specific Training' }
 ];
@@ -111,7 +109,7 @@ const DURATION_OPTIONS = [
  * WorkoutRequestForm Component Props
  */
 interface WorkoutRequestFormProps {
-  className?: string;
+  // No props needed currently
 }
 
 /**
@@ -120,13 +118,12 @@ interface WorkoutRequestFormProps {
  * This component is the main entry point for the workout generator form flow.
  * It wraps the actual form in a FormFlowProvider for centralized state management.
  * 
- * @param props - Component props
  * @returns React component
  */
-export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) {
+export function WorkoutRequestForm() {
   return (
     <FormFlowProvider>
-      <WorkoutRequestFormInner className={className} />
+      <WorkoutRequestFormInner />
     </FormFlowProvider>
   );
 }
@@ -137,10 +134,9 @@ export function WorkoutRequestForm({ className = '' }: WorkoutRequestFormProps) 
  * This component implements the actual form UI and logic, using the
  * form flow state from FormFlowContext.
  * 
- * @param props - Component props
  * @returns React component
  */
-function WorkoutRequestFormInner({ className = '' }: WorkoutRequestFormProps) {
+function WorkoutRequestFormInner() {
   // Get the form management and workout generation hooks
   const workoutForm = useWorkoutForm();
   const { 
@@ -355,70 +351,64 @@ function WorkoutRequestFormInner({ className = '' }: WorkoutRequestFormProps) {
 
   return (
     <ErrorBoundary>
-      <div className={`workout-form-container ${className}`}>
-        <div className="theme-toggle-container">
-          <ThemeToggle className="workout-form__theme-toggle" />
-        </div>
-        
-        <div className="workout-generator-form">
-          {/* Use derivedStep to determine which component to render */}
-          {derivedStep === 'input' && (
-            <InputStep 
-              formValues={workoutForm.formValues}
-              formErrors={workoutForm.formErrors || {}}
-              isValid={workoutForm.isValid}
-              hasFieldError={(field) => Boolean(workoutForm.formErrors?.[field])}
-              getFieldError={(field) => workoutForm.formErrors?.[field]}
-              setGoals={(goals) => workoutForm.updateField('goals', goals)}
-              setDifficulty={(difficulty) => workoutForm.updateField('difficulty', difficulty)}
-              setDuration={(duration) => workoutForm.updateField('duration', duration)}
-              setEquipment={(equipment) => workoutForm.updateField('equipment', equipment)}
-              setRestrictions={(restrictions) => workoutForm.updateField('restrictions', restrictions)}
-              setPreferences={(preferences) => workoutForm.updateField('preferences', preferences)}
-              setSessionInputs={workoutForm.setSessionInputs}
-              validateForm={workoutForm.validateForm}
-              onContinue={handlePreviewStep}
-            />
-          )}
-          
-          {derivedStep === 'preview' && (
-            <PreviewStep 
-              formValues={{
-                duration: Number(workoutForm.formValues.duration || 0),
-                difficulty: workoutForm.formValues.difficulty || 'beginner',
-                equipment: workoutForm.formValues.equipment || [],
-                goals: workoutForm.formValues.goals || '',
-                restrictions: workoutForm.formValues.restrictions,
-                preferences: workoutForm.formValues.preferences,
-                sessionInputs: workoutForm.formValues.sessionInputs
-              }} 
-              onEditRequest={handleEditForm}
-              onGenerateWorkout={handleSubmitForm}
-              isLoading={isGeneratorRunning}
-            />
-          )}
-          
-          {derivedStep === 'generating' && (
-            <GeneratingStep
-              onCancel={handleCancelGeneration}
-              onComplete={handleGenerationComplete}
-              progress={progress} 
-              error={flowErrorMessage || generatorErrorMessage ? {
-                message: flowErrorMessage || generatorErrorMessage || 'An error occurred during generation'
-              } : null}
-            />
-          )}
-          
-          {derivedStep === 'completed' && generatedWorkout && (
-            <ResultStep 
-              workout={generatedWorkout} 
-              postId={generatedWorkout.id ? Number(generatedWorkout.id) : undefined}
-              error={flowErrorMessage}
-              onGenerateNew={handleRestart}
-            />
-          )}
-        </div>
-      </div>
+      {/* Use derivedStep to determine which component to render */}
+      {derivedStep === 'input' && (
+        <InputStep 
+          formValues={workoutForm.formValues}
+          formErrors={workoutForm.formErrors || {}}
+          isValid={workoutForm.isValid}
+          hasFieldError={(field) => Boolean(workoutForm.formErrors?.[field])}
+          getFieldError={(field) => workoutForm.formErrors?.[field]}
+          setGoals={(goals) => workoutForm.updateField('goals', goals)}
+          setDifficulty={(difficulty) => workoutForm.updateField('difficulty', difficulty)}
+          setDuration={(duration) => workoutForm.updateField('duration', duration)}
+          setEquipment={(equipment) => workoutForm.updateField('equipment', equipment)}
+          setRestrictions={(restrictions) => workoutForm.updateField('restrictions', restrictions)}
+          setPreferences={(preferences) => workoutForm.updateField('preferences', preferences)}
+          setSessionInputs={workoutForm.setSessionInputs}
+          setIntensity={workoutForm.setIntensity}
+          validateForm={workoutForm.validateForm}
+          onContinue={handlePreviewStep}
+        />
+      )}
+      
+      {derivedStep === 'preview' && (
+        <PreviewStep 
+          formValues={{
+            duration: Number(workoutForm.formValues.duration || 0),
+            difficulty: workoutForm.formValues.difficulty || 'beginner',
+            equipment: workoutForm.formValues.equipment || [],
+            goals: workoutForm.formValues.goals || '',
+            restrictions: workoutForm.formValues.restrictions,
+            preferences: workoutForm.formValues.preferences,
+            intensity: workoutForm.formValues.intensity,
+            sessionInputs: workoutForm.formValues.sessionInputs
+          }} 
+          onEditRequest={handleEditForm}
+          onGenerateWorkout={handleSubmitForm}
+          isLoading={isGeneratorRunning}
+        />
+      )}
+      
+      {derivedStep === 'generating' && (
+        <GeneratingStep
+          onCancel={handleCancelGeneration}
+          onComplete={handleGenerationComplete}
+          progress={progress} 
+          error={flowErrorMessage || generatorErrorMessage ? {
+            message: flowErrorMessage || generatorErrorMessage || 'An error occurred during generation'
+          } : null}
+        />
+      )}
+      
+      {derivedStep === 'completed' && generatedWorkout && (
+        <ResultStep 
+          workout={generatedWorkout} 
+          postId={generatedWorkout.id ? Number(generatedWorkout.id) : undefined}
+          error={flowErrorMessage}
+          onGenerateNew={handleRestart}
+        />
+      )}
     </ErrorBoundary>
   );
 }

@@ -104,14 +104,22 @@ class GenerateEndpoint extends AbstractEndpoint {
             // Use the OpenAI provider to generate the workout
             $provider = new OpenAIProvider($api_key);
             
+            // Extract session inputs from the request
+            $session_inputs = $params['sessionInputs'] ?? [];
+            
             // Prepare parameters for workout generation
             $generation_params = [
                 'duration'        => $params['duration'] ?? 30,
                 'difficulty'      => $params['difficulty'] ?? 'intermediate',
                 'equipment'       => $params['equipment'] ?? [],
                 'goals'           => $params['goals'] ?? 'general fitness',
+                'daily_focus'     => $params['daily_focus'] ?? $params['goals'] ?? 'general fitness',
+                'profile_goals'   => $params['profile_goals'] ?? [],
                 'restrictions'    => $params['restrictions'] ?? '',
+                'intensity'       => $params['intensity'] ?? 3,
                 'specific_request' => $params['specific_request'],
+                // Add session inputs to generation parameters
+                'session_inputs'  => $session_inputs,
             ];
             
             // Debug log - parameters sent to generator
@@ -137,6 +145,8 @@ class GenerateEndpoint extends AbstractEndpoint {
                 'equipment' => $workout['equipment'] ?? $generation_params['equipment'],
                 'goals' => $workout['goals'] ?? $generation_params['goals'],
                 'restrictions' => $workout['restrictions'] ?? $generation_params['restrictions'],
+                // Include session inputs in the response
+                'sessionInputs' => $session_inputs,
             ];
             
             // Add post_id and version metadata to response
@@ -253,6 +263,11 @@ class GenerateEndpoint extends AbstractEndpoint {
         update_post_meta($post_id, '_workout_goals', $params['goals']);
         update_post_meta($post_id, '_workout_restrictions', $params['restrictions']);
         update_post_meta($post_id, '_workout_specific_request', $params['specific_request']);
+        
+        // Save session inputs if provided
+        if (!empty($params['session_inputs'])) {
+            update_post_meta($post_id, '_workout_session_inputs', wp_json_encode($params['session_inputs']));
+        }
         
         // Initialize version information
         update_post_meta($post_id, '_workout_version', 1);

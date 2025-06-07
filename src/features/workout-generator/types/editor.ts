@@ -32,6 +32,20 @@ export interface WorkoutEditorData {
   lastModified?: string;
   /** WordPress post ID if the workout is saved */
   postId?: number;
+  
+  /** Session-specific factors that influence this workout */
+  sessionFactors?: {
+    /** Areas to focus on during this session */
+    focusArea?: string[];
+    /** Areas experiencing soreness or discomfort */
+    currentSoreness?: string[];
+    /** Workout intensity level (1-5 scale) */
+    intensity?: number;
+    /** Current energy/motivation level (1-5 scale) */
+    energyLevel?: number;
+    /** Workout environment */
+    environment?: string;
+  };
 }
 
 /**
@@ -47,6 +61,8 @@ export interface EditorExercise {
   sets: number;
   /** Number of reps or rep range (e.g. "8-12") */
   reps: number | string;
+  /** Weight for the exercise (e.g. "50 lbs", "20 kg") */
+  weight?: string;
   /** Rest period between sets in seconds */
   restPeriod?: number;
   /** Additional notes or form cues for this exercise */
@@ -198,6 +214,15 @@ export function convertToEditorFormat(workout: GeneratedWorkout, postId?: number
     exercises,
     notes: workout.notes || workout.description || '',
     lastModified: workout.lastModified || new Date().toISOString(),
-    version: workout.version
+    version: workout.version,
+    
+    // Map session inputs to session factors
+    sessionFactors: {
+      focusArea: (workout as any).sessionInputs?.focusArea || [],
+      currentSoreness: (workout as any).sessionInputs?.currentSoreness || [],
+      intensity: (workout as any).sessionInputs?.intensity || (workout as any).intensity,
+      energyLevel: (workout as any).sessionInputs?.energyLevel,
+      environment: (workout as any).sessionInputs?.environment
+    }
   };
 } 

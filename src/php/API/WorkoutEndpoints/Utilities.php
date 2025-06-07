@@ -97,6 +97,16 @@ class Utilities {
         $restrictions = get_post_meta($post_id, '_workout_restrictions', true);
         $specific_request = get_post_meta($post_id, '_workout_specific_request', true);
         
+        // Get session inputs
+        $session_inputs_raw = get_post_meta($post_id, '_workout_session_inputs', true);
+        $session_inputs = [];
+        if ($session_inputs_raw) {
+            $decoded = json_decode($session_inputs_raw, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $session_inputs = $decoded;
+            }
+        }
+        
         // Get versioning metadata
         $version = (int) get_post_meta($post_id, '_workout_version', true) ?: 1;
         $last_modified = get_post_meta($post_id, '_workout_last_modified', true) ?: $post->post_modified;
@@ -115,6 +125,7 @@ class Utilities {
             'restrictions' => $restrictions,
             'specific_request' => $specific_request,
             'workout_data' => $workout_data,
+            'sessionInputs' => $session_inputs,
             'version' => $version,
             'last_modified' => $last_modified,
             'modified_by' => $modified_by

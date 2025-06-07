@@ -22,6 +22,7 @@ type WorkoutEditorAction =
   | { type: 'UPDATE_DURATION'; payload: number }
   | { type: 'UPDATE_EQUIPMENT'; payload: string[] }
   | { type: 'UPDATE_GOALS'; payload: string[] }
+  | { type: 'UPDATE_SESSION_FACTORS'; payload: { focusArea?: string[]; currentSoreness?: string[]; intensity?: number; energyLevel?: number; environment?: string; } }
   | { type: 'ADD_EXERCISE'; payload: { name: string; sets: number; reps: string } }
   | { type: 'UPDATE_EXERCISE'; payload: { id: string; field: string; value: any } }
   | { type: 'REMOVE_EXERCISE'; payload: string }
@@ -149,12 +150,23 @@ function editorReducer(state: WorkoutEditorState, action: WorkoutEditorAction): 
         isDirty: true
       };
 
+    case 'UPDATE_SESSION_FACTORS':
+      return {
+        ...state,
+        workout: {
+          ...state.workout,
+          sessionFactors: action.payload
+        },
+        isDirty: true
+      };
+
     case 'ADD_EXERCISE': {
       const newExercise = {
         id: `exercise-${Date.now()}`,
         name: action.payload.name || 'New Exercise',
         sets: action.payload.sets || 3,
         reps: action.payload.reps || '10-12',
+        weight: '',
         notes: ''
       };
 

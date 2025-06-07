@@ -186,6 +186,11 @@ export interface WorkoutFormParams {
   preferences?: string;
   
   /**
+   * Workout intensity level (1-5 scale: Low to High)
+   */
+  intensity?: number;
+  
+  /**
    * Dynamic inputs specific to the current workout session
    */
   sessionInputs?: SessionSpecificInputs;

@@ -39,14 +39,14 @@ const EQUIPMENT_OPTIONS = [
 ];
 
 /**
- * Workout goal options
+ * Daily workout focus options
  */
 const GOAL_OPTIONS = [
-  { value: 'lose-weight', label: 'Lose Weight' },
-  { value: 'build-muscle', label: 'Build Muscle' },
-  { value: 'improve-endurance', label: 'Improve Endurance' },
-  { value: 'increase-strength', label: 'Increase Strength' },
-  { value: 'enhance-flexibility', label: 'Enhance Flexibility' },
+  { value: 'lose-weight', label: 'Fat Burning & Cardio' },
+  { value: 'build-muscle', label: 'Muscle Building' },
+  { value: 'improve-endurance', label: 'Endurance & Stamina' },
+  { value: 'increase-strength', label: 'Strength Training' },
+  { value: 'enhance-flexibility', label: 'Flexibility & Mobility' },
   { value: 'general-fitness', label: 'General Fitness' },
   { value: 'sport-specific', label: 'Sport-Specific Training' }
 ];
@@ -96,6 +96,8 @@ interface InputStepProps {
   setPreferences: (preferences: string) => void;
   /** Update session inputs */
   setSessionInputs?: (sessionInputs: SessionSpecificInputs) => void;
+  /** Update intensity field */
+  setIntensity: (intensity: number) => void;
   /** Validate the form */
   validateForm: () => boolean;
   /** Continue to next step */
@@ -118,11 +120,11 @@ export const InputStep: React.FC<InputStepProps> = ({
   setRestrictions,
   setPreferences,
   setSessionInputs,
+  setIntensity,
   validateForm,
   onContinue,
 }) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [intensity, setIntensity] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSessionInputsExpanded, setIsSessionInputsExpanded] = useState(true);
 
@@ -253,211 +255,224 @@ export const InputStep: React.FC<InputStepProps> = ({
       <Card padding="large" primary elevated>
         <h2 className="input-step__title gradient-text">Create Your Custom Workout</h2>
         <form onSubmit={handleSubmit} className="input-step__form">
-          {/* Goals Selection */}
-          <div className="input-step__form-group">
-            <label htmlFor="goals" className="input-step__label">
-              What is your fitness goal?
-              {hasFieldError('goals') && (
-                <span className="input-step__error">{getFieldError('goals')}</span>
-              )}
-            </label>
-            
-            {/* Profile Fitness Goals Badge - Show user's current goals if available */}
-            {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.goals.length > 0 && (
-              <div className="input-step__profile-context">
-                <div className="input-step__profile-label">Your Profile Goals:</div>
-                <div className="meta-badges">
-                  {profileMapping.displayData.goals.slice(0, 2).map((goal, index) => (
-                    <span 
-                      key={goal.value}
-                      className="workout-type-badge"
-                      style={{ 
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => handleAutoFillFromProfile('goals')}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('goals')}
-                      title="Click to use your profile fitness goals"
-                    >
-                      <span className="workout-type-icon">{goal.icon}</span>
-                      {goal.display}
-                    </span>
-                  ))}
-                  {profileMapping.displayData.goals.length > 2 && (
-                    <span className="goals-more-indicator">
-                      +{profileMapping.displayData.goals.length - 2} more
-                    </span>
+          {/* Basic Workout Preferences - Two Column Grid */}
+          <div className="input-step__form-grid">
+            {/* Column 1: Goals and Duration */}
+            <div className="input-step__form-column">
+              {/* Goals Selection */}
+              <div className="input-step__form-group">
+                <label htmlFor="goals" className="input-step__label">
+                  What is the focus of today's workout?
+                  {hasFieldError('goals') && (
+                    <span className="input-step__error">{getFieldError('goals')}</span>
                   )}
-                </div>
-              </div>
-            )}
-            
-            <div className="input-step__select-container">
-              <select
-                id="goals"
-                className={`input-step__select ${activeDropdown === 'goals' ? 'input-step__select--focused' : ''}`}
-                value={formValues.goals || ''}
-                onChange={e => setGoals(e.target.value)}
-                onFocus={() => handleDropdownFocus('goals')}
-                onBlur={handleDropdownBlur}
-              >
-                <option value="">Select your goal</option>
-                {GOAL_OPTIONS.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="input-step__select-icon" />
-            </div>
-          </div>
-
-          {/* Difficulty Selection */}
-          <div className="input-step__form-group">
-            <label className="input-step__label">
-              What is your fitness experience level?
-              {hasFieldError('difficulty') && (
-                <span className="input-step__error">{getFieldError('difficulty')}</span>
-              )}
-            </label>
-            
-            {/* Profile Fitness Level Badge - Show user's current level if available */}
-            {!profileLoading && !profileError && isProfileSufficient && profileMapping && (
-              <div className="input-step__profile-context">
-                <div className="input-step__profile-label">Your Profile Level:</div>
-                <div className="meta-badges">
-                  <span 
-                    className="difficulty-badge"
-                    style={{ 
-                      backgroundColor: profileMapping.displayData.fitnessLevel.bgColor,
-                      color: profileMapping.displayData.fitnessLevel.color,
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => handleAutoFillFromProfile('difficulty')}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('difficulty')}
-                    title="Click to use your profile fitness level"
-                  >
-                    <span className="difficulty-icon">{profileMapping.displayData.fitnessLevel.icon}</span>
-                    {profileMapping.displayData.fitnessLevel.display}
-                  </span>
-                </div>
-              </div>
-            )}
-            
-            <div className="input-step__radio-group">
-              {DIFFICULTY_OPTIONS.map(option => (
-                <label key={option.value} className="input-step__radio-label">
-                  <input
-                    type="radio"
-                    className="input-step__radio-input"
-                    name="difficulty"
-                    value={option.value}
-                    checked={formValues.difficulty === option.value}
-                    onChange={e => setDifficulty(e.target.value as WorkoutDifficulty)}
-                  />
-                  <div className="input-step__radio-button">
-                    <div className="input-step__radio-dot"></div>
-                  </div>
-                  <span className="input-step__radio-text">{option.label}</span>
                 </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Duration Selection */}
-          <div className="input-step__form-group">
-            <label htmlFor="duration" className="input-step__label">
-              How long do you want to workout?
-              {hasFieldError('duration') && (
-                <span className="input-step__error">{getFieldError('duration')}</span>
-              )}
-            </label>
-            <div className="input-step__select-container">
-              <select
-                id="duration"
-                className={`input-step__select ${activeDropdown === 'duration' ? 'input-step__select--focused' : ''}`}
-                value={formValues.duration || ''}
-                onChange={e => setDuration(Number(e.target.value))}
-                onFocus={() => handleDropdownFocus('duration')}
-                onBlur={handleDropdownBlur}
-              >
-                <option value="">Select duration</option>
-                {DURATION_OPTIONS.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="input-step__select-icon" />
-            </div>
-          </div>
-
-          {/* Environment Selection */}
-          <div className="input-step__form-group">
-            <label htmlFor="environment" className="input-step__label">
-              Where will you be working out?
-            </label>
-            
-            {/* Profile Preferred Location Badge - Show user's current location preference if available */}
-            {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.location && (
-              <div className="input-step__profile-context">
-                <div className="input-step__profile-label">Your Profile Location:</div>
-                <div className="meta-badges">
-                  <span 
-                    className="workout-type-badge"
-                    style={{ 
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => handleAutoFillFromProfile('environment')}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('environment')}
-                    title="Click to use your profile location preference"
+                
+                {/* Profile Fitness Goals Badge - Show user's current goals if available */}
+                {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.goals.length > 0 && (
+                  <div className="input-step__profile-context">
+                    <div className="input-step__profile-label">Your Long-term Fitness Goals:</div>
+                    <div className="meta-badges">
+                      {profileMapping.displayData.goals.slice(0, 2).map((goal, index) => (
+                        <span 
+                          key={goal.value}
+                          className="workout-type-badge"
+                          style={{ 
+                            cursor: 'pointer',
+                            opacity: 0.8
+                          }}
+                          onClick={() => handleAutoFillFromProfile('goals')}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('goals')}
+                          title="Click to align today's workout with your long-term goals"
+                        >
+                          <span className="workout-type-icon">{goal.icon}</span>
+                          {goal.display}
+                        </span>
+                      ))}
+                      {profileMapping.displayData.goals.length > 2 && (
+                        <span className="goals-more-indicator">
+                          +{profileMapping.displayData.goals.length - 2} more
+                        </span>
+                      )}
+                    </div>
+                    <div className="input-step__profile-note" style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>
+                      Your workout will be personalized to support these goals
+                    </div>
+                  </div>
+                )}
+                
+                <div className="input-step__select-container">
+                  <select
+                    id="goals"
+                    className={`input-step__select ${activeDropdown === 'goals' ? 'input-step__select--focused' : ''}`}
+                    value={formValues.goals || ''}
+                    onChange={e => setGoals(e.target.value)}
+                    onFocus={() => handleDropdownFocus('goals')}
+                    onBlur={handleDropdownBlur}
                   >
-                    <span className="workout-type-icon">
-                      {profileMapping.displayData.location.value === 'home' && '🏠'}
-                      {profileMapping.displayData.location.value === 'gym' && '🏋️'}
-                      {profileMapping.displayData.location.value === 'outdoors' && '🌳'}
-                      {profileMapping.displayData.location.value === 'anywhere' && '📍'}
-                    </span>
-                    {profileMapping.displayData.location.display}
-                  </span>
-                </div>
-                <div className="input-step__profile-context-hint">
-                  {profileMapping.displayData.location.context}
+                    <option value="">Select today's focus</option>
+                    {GOAL_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="input-step__select-icon" />
                 </div>
               </div>
-            )}
-            
-            <div className="input-step__select-container">
-              <select
-                id="environment"
-                className={`input-step__select ${activeDropdown === 'environment' ? 'input-step__select--focused' : ''}`}
-                value={formValues.sessionInputs?.environment || ''}
-                onChange={e => {
-                  const currentSessionInputs = formValues.sessionInputs || {};
-                  const newSessionInputs = {
-                    ...currentSessionInputs,
-                    environment: e.target.value as 'gym' | 'home' | 'outdoors' | 'travel' | 'limited-space'
-                  };
-                  if (setSessionInputs) {
-                    setSessionInputs(newSessionInputs);
-                  }
-                }}
-                onFocus={() => handleDropdownFocus('environment')}
-                onBlur={handleDropdownBlur}
-              >
-                <option value="">Select environment</option>
-                <option value="home">Home</option>
-                <option value="gym">Gym</option>
-                <option value="outdoors">Outdoors</option>
-                <option value="travel">Travel/Hotel</option>
-                <option value="limited-space">Limited Space</option>
-              </select>
-              <ChevronDown className="input-step__select-icon" />
+
+              {/* Duration Selection */}
+              <div className="input-step__form-group">
+                <label htmlFor="duration" className="input-step__label">
+                  How long do you want to workout?
+                  {hasFieldError('duration') && (
+                    <span className="input-step__error">{getFieldError('duration')}</span>
+                  )}
+                </label>
+                <div className="input-step__select-container">
+                  <select
+                    id="duration"
+                    className={`input-step__select ${activeDropdown === 'duration' ? 'input-step__select--focused' : ''}`}
+                    value={formValues.duration || ''}
+                    onChange={e => setDuration(Number(e.target.value))}
+                    onFocus={() => handleDropdownFocus('duration')}
+                    onBlur={handleDropdownBlur}
+                  >
+                    <option value="">Select duration</option>
+                    {DURATION_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="input-step__select-icon" />
+                </div>
+              </div>
+            </div>
+
+            {/* Column 2: Experience and Environment */}
+            <div className="input-step__form-column">
+              {/* Difficulty Selection */}
+              <div className="input-step__form-group">
+                <label className="input-step__label">
+                  What is your fitness experience level?
+                  {hasFieldError('difficulty') && (
+                    <span className="input-step__error">{getFieldError('difficulty')}</span>
+                  )}
+                </label>
+                
+                {/* Profile Fitness Level Badge - Show user's current level if available */}
+                {!profileLoading && !profileError && isProfileSufficient && profileMapping && (
+                  <div className="input-step__profile-context">
+                    <div className="input-step__profile-label">Your Profile Level:</div>
+                    <div className="meta-badges">
+                      <span 
+                        className="difficulty-badge"
+                        style={{ 
+                          backgroundColor: profileMapping.displayData.fitnessLevel.bgColor,
+                          color: profileMapping.displayData.fitnessLevel.color,
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => handleAutoFillFromProfile('difficulty')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('difficulty')}
+                        title="Click to use your profile fitness level"
+                      >
+                        <span className="difficulty-icon">{profileMapping.displayData.fitnessLevel.icon}</span>
+                        {profileMapping.displayData.fitnessLevel.display}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="input-step__radio-group">
+                  {DIFFICULTY_OPTIONS.map(option => (
+                    <label key={option.value} className="input-step__radio-label">
+                      <input
+                        type="radio"
+                        className="input-step__radio-input"
+                        name="difficulty"
+                        value={option.value}
+                        checked={formValues.difficulty === option.value}
+                        onChange={e => setDifficulty(e.target.value as WorkoutDifficulty)}
+                      />
+                      <div className="input-step__radio-button">
+                        <div className="input-step__radio-dot"></div>
+                      </div>
+                      <span className="input-step__radio-text">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Environment Selection */}
+              <div className="input-step__form-group">
+                <label htmlFor="environment" className="input-step__label">
+                  Where will you be working out?
+                </label>
+                
+                {/* Profile Preferred Location Badge - Show user's current location preference if available */}
+                {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.location && (
+                  <div className="input-step__profile-context">
+                    <div className="input-step__profile-label">Your Profile Location:</div>
+                    <div className="meta-badges">
+                      <span 
+                        className="workout-type-badge"
+                        style={{ 
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => handleAutoFillFromProfile('environment')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('environment')}
+                        title="Click to use your profile location preference"
+                      >
+                        <span className="workout-type-icon">
+                          {profileMapping.displayData.location.value === 'home' && '🏠'}
+                          {profileMapping.displayData.location.value === 'gym' && '🏋️'}
+                          {profileMapping.displayData.location.value === 'outdoors' && '🌳'}
+                          {profileMapping.displayData.location.value === 'anywhere' && '📍'}
+                        </span>
+                        {profileMapping.displayData.location.display}
+                      </span>
+                    </div>
+                    <div className="input-step__profile-context-hint">
+                      {profileMapping.displayData.location.context}
+                    </div>
+                  </div>
+                )}
+                
+                <div className="input-step__select-container">
+                  <select
+                    id="environment"
+                    className={`input-step__select ${activeDropdown === 'environment' ? 'input-step__select--focused' : ''}`}
+                    value={formValues.sessionInputs?.environment || ''}
+                    onChange={e => {
+                      const currentSessionInputs = formValues.sessionInputs || {};
+                      const newSessionInputs = {
+                        ...currentSessionInputs,
+                        environment: e.target.value as 'gym' | 'home' | 'outdoors' | 'travel' | 'limited-space'
+                      };
+                      if (setSessionInputs) {
+                        setSessionInputs(newSessionInputs);
+                      }
+                    }}
+                    onFocus={() => handleDropdownFocus('environment')}
+                    onBlur={handleDropdownBlur}
+                  >
+                    <option value="">Select environment</option>
+                    <option value="home">Home</option>
+                    <option value="gym">Gym</option>
+                    <option value="outdoors">Outdoors</option>
+                    <option value="travel">Travel/Hotel</option>
+                    <option value="limited-space">Limited Space</option>
+                  </select>
+                  <ChevronDown className="input-step__select-icon" />
+                </div>
+              </div>
             </div>
           </div>
           
@@ -478,7 +493,7 @@ export const InputStep: React.FC<InputStepProps> = ({
             equipmentOptions={EQUIPMENT_OPTIONS}
             selectedEquipment={formValues.equipment || []}
             onEquipmentChange={setEquipment}
-            intensity={intensity}
+            intensity={formValues.intensity || 3}
             onIntensityChange={setIntensity}
             preferences={formValues.preferences || ''}
             onPreferencesChange={setPreferences}

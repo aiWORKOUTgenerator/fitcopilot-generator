@@ -88,6 +88,11 @@ export function useWorkoutForm() {
     updateField('sessionInputs', sessionInputs);
   }, [updateField]);
   
+  // Set intensity
+  const setIntensity = useCallback((intensity: number) => {
+    updateField('intensity', intensity);
+  }, [updateField]);
+  
   // Validate the form
   const validateForm = useCallback(() => {
     const isValid = validation.validateForm(formValues);
@@ -131,6 +136,7 @@ export function useWorkoutForm() {
     setEquipment,
     setRestrictions,
     setSessionInputs,
+    setIntensity,
     
     // Storage
     clearFormStorage,

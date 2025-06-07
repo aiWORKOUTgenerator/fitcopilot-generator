@@ -123,57 +123,207 @@
     height: 18px;
   }
 
-  &__checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 0.75rem;
-  }
-
-  &__checkbox-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  &__checkbox {
-    position: relative;
-    width: 18px;
-    height: 18px;
-    margin-right: 0.5rem;
-    border: 2px solid var(--border-color);
-    border-radius: 4px;
-    -webkit-appearance: none;
-    appearance: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-
-    &:checked {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-
-      &:after {
-        content: '';
-        position: absolute;
-        left: 5px;
-        top: 2px;
-        width: 5px;
-        height: 10px;
-        border: solid white;
-        border-width: 0 2px 2px 0;
-        transform: rotate(45deg);
+  // Container override for grid layout (matching WorkoutEditor pattern)
+  &__form-grid {
+    .form-field-enhanced {
+      display: block !important;
+      
+      .form-field-enhanced__input-wrapper {
+        display: block !important;
       }
     }
-
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+    
+    .session-inputs__checkbox-grid {
+      display: grid !important;
     }
   }
 
+  // Selectable Grid System Implementation (matching WorkoutEditor)
+  &__checkbox-grid {
+    display: grid !important; // Force grid display to override flex parent
+    gap: 0.5rem; // 8px - exact specification
+    margin-top: var(--wg-spacing-sm, 8px);
+    width: 100%;
+    
+    // Responsive grid layout - 5 columns at desktop
+    grid-template-columns: 1fr;
+    
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    
+    @media (min-width: 1280px) {
+      grid-template-columns: repeat(5, minmax(0, 1fr)); // 5 columns target
+    }
+  }
+
+  // Enhanced checkbox label with exact theme registration styling
+  &__checkbox-label {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    
+    // Exact measurements from specifications
+    padding: 0.625rem 1rem; // 10px 16px
+    border-radius: 0.375rem; // 6px
+    margin-bottom: 0.5rem; // 8px
+    min-height: auto; // Content-driven
+    
+    // Default state - exact colors
+    background-color: rgba(51, 65, 85, 0.4); // #334155 at 40% opacity
+    border: none; // No border in default
+    color: #e5e7eb !important; // Light gray text - force override
+    
+    cursor: pointer;
+    transition: all 0.2s ease; // 200ms smooth transitions
+    transition-property: background-color, border-color, transform, opacity;
+    width: 100%;
+    box-sizing: border-box;
+    
+    // Ensure all text inside is light colored
+    * {
+      color: inherit !important; // Force all child elements to inherit light color
+    }
+    
+    // Hover state - exact specification
+    &:hover {
+      background-color: rgba(51, 65, 85, 0.6); // #334155 at 60% opacity
+      color: #f3f4f6 !important; // Even lighter on hover
+      
+      .session-inputs__checkbox-text {
+        color: #f3f4f6 !important; // Ensure text gets lighter on hover
+      }
+    }
+    
+    // Focus state - exact specification
+    &:focus-within {
+      outline: 2px solid rgba(139, 92, 246, 0.5); // Purple outline at 50% opacity
+      outline-offset: 2px; // 2px offset from element
+      color: #f3f4f6 !important;
+      
+      .session-inputs__checkbox-text {
+        color: #f3f4f6 !important;
+      }
+    }
+    
+    // Selected state with exact styling
+    &.checkbox-label--selected {
+      background-color: rgba(139, 92, 246, 0.2); // Purple #8b5cf6 at 20% opacity
+      border: 1px solid rgba(139, 92, 246, 0.4); // Purple border at 40% opacity
+      color: #c4b5fd !important; // Light purple text - force override
+      
+      // Ensure selected text is visible
+      .session-inputs__checkbox-text {
+        color: #c4b5fd !important; // Light purple text when selected
+        font-weight: 600; // Semi-bold when selected
+      }
+      
+      .session-inputs__checkbox-box {
+        background-color: #8b5cf6; // Solid purple
+        border: none; // Remove border when selected
+        
+        .session-inputs__checkbox-indicator {
+          opacity: 1;
+          transform: scale(1);
+          color: white !important; // White checkmark
+        }
+      }
+    }
+    
+    // Disabled state
+    &:has(input:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
+      
+      &:hover {
+        background-color: rgba(51, 65, 85, 0.4); // Keep default background
+        color: #e5e7eb !important; // Keep default text color
+        transform: none;
+        box-shadow: none;
+        
+        .session-inputs__checkbox-text {
+          color: #e5e7eb !important;
+        }
+      }
+    }
+    
+    // Reduced motion accessibility
+    @media (prefers-reduced-motion: reduce) {
+      transition-duration: 0.01ms !important; // Nearly instant for accessibility
+    }
+  }
+
+  // Enhanced checkbox indicator - exact specifications
+  &__checkbox-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    // Exact measurements
+    width: 1.25rem; // 20px
+    height: 1.25rem; // 20px
+    border-radius: 0.25rem; // 4px
+    margin-right: 0.75rem; // 12px
+    
+    // Default state
+    background-color: rgba(255, 255, 255, 0.1); // White at 10% opacity
+    border: none; // No border in default
+    
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    
+    .session-inputs__checkbox-label:hover & {
+      background-color: rgba(255, 255, 255, 0.15); // Slightly more opaque on hover
+    }
+  }
+
+  &__checkbox-indicator {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: bold;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Enhanced text styling - exact specifications with light colors
   &__checkbox-text {
-    font-size: 0.95rem;
-    color: var(--text-color);
+    // Typography specifications
+    font-size: 0.875rem; // 14px
+    line-height: 1.25rem; // 20px
+    font-weight: normal; // 400
+    
+    color: #e5e7eb !important; // Light gray for better readability - force override
+    transition: all 0.2s ease;
+    word-break: break-word;
+    flex: 1;
+    
+    // Ensure text is never transparent or dark
+    opacity: 1 !important;
+    
+    // Override any design system conflicts
+    &:not([class*="--selected"]) {
+      color: #e5e7eb !important; // Default light grey
+    }
+  }
+
+  // Input element (hidden)
+  &__checkbox-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
   }
 
   &__rating {
