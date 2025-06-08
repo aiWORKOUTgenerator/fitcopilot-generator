@@ -14,6 +14,9 @@ export { default as useErrorHandler } from './useErrorHandler';
 export { default as useFormPersistence } from './useFormPersistence';
 export { default as useFormValidation } from './useFormValidation';
 export { default as useWorkoutForm } from './useWorkoutForm';
+export { useMuscleSelection } from './useMuscleSelection';
+export { useWorkoutFormMuscleIntegration } from './useWorkoutFormMuscleIntegration';
+export { useWorkoutFormMuscleSync } from './useWorkoutFormMuscleSync';
 
 // Performance optimization
 export { default as usePerformanceCache } from './usePerformanceCache';

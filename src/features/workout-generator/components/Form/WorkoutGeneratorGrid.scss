@@ -73,7 +73,7 @@ $workout-generator-card-height: 180px;
     }
   }
 
-  // Generator Grid
+  // Generator Grid (First Row)
   .generator-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -88,6 +88,70 @@ $workout-generator-card-height: 180px;
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: var(--spacing-md, 1rem);
+    }
+  }
+
+  // Generator Row (Second Row and beyond) - 3-column layout
+  .generator-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg, 1.5rem);
+    margin-bottom: var(--spacing-lg, 1.5rem);
+
+    @media (max-width: 1024px) {
+      gap: var(--spacing-md, 1rem);
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md, 1rem);
+    }
+
+    // Second row specific styling
+    &--second {
+      // Inherits all grid styles from parent .generator-row
+    }
+
+    // Third row specific styling - 2-column layout
+    &--third {
+      grid-template-columns: repeat(2, 1fr);
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr; // Stack on mobile
+      }
+    }
+  }
+
+  // Workout Type Badge Styling (from InputStep.scss)
+  .workout-type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary, #b3b3b3);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: var(--color-text-primary, #ffffff);
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    .workout-type-icon {
+      margin-right: 0.375rem;
+      font-size: 0.875rem;
     }
   }
 
@@ -593,7 +657,7 @@ $workout-generator-card-height: 180px;
                 }
               }
 
-              // Responsive adjustments
+                            // Responsive adjustments
               @media (max-width: 1024px) {
                 .intensity-option {
                   min-height: 40px;
@@ -620,9 +684,969 @@ $workout-generator-card-height: 180px;
                   }
                 }
               }
-             }
-           }
-         }
+            }
+          }
+        }
+      }
+
+      // Energy card structure - Similar to intensity card but for energy/motivation level
+      .energy-card-structure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm, 0.5rem);
+
+        // Header: Profile Energy Section
+        .energy-card-header {
+          flex: 0 0 auto;
+          min-height: 50px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .profile-energy-section {
+            .profile-energy-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+            }
+
+            .profile-energy-badges {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              .profile-energy-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.2rem 0.4rem;
+                border-radius: 4px;
+                font-size: var(--font-size-xs, 0.75rem);
+                font-weight: var(--font-weight-medium, 500);
+                transition: all 0.2s ease;
+                backdrop-filter: blur(8px);
+
+                &:hover {
+                  transform: translateY(-1px);
+                  opacity: 1 !important;
+                }
+
+                .workout-type-icon {
+                  margin-right: 0.3rem;
+                  font-size: 0.8rem;
+                }
+              }
+            }
+          }
+
+          .header-fallback {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+            .header-fallback-text {
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-xs, 0.25rem);
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-primary, #ffffff);
+              font-weight: 500;
+
+              .header-icon {
+                font-size: 1em;
+              }
+            }
+
+            .header-subtitle {
+              font-size: 0.7rem;
+              color: var(--color-text-secondary, #b3b3b3);
+              margin-top: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // Body: Energy Selector
+        .energy-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 120px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .energy-selector-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            .energy-selector-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              flex: 0 0 auto;
+            }
+
+            .energy-options-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: var(--spacing-xs, 0.25rem);
+              flex: 1;
+              align-content: center;
+
+              .energy-option {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: var(--spacing-xs, 0.25rem);
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: var(--border-radius-sm, 6px);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                aspect-ratio: 1;
+                min-height: 45px;
+
+                &:hover {
+                  background: rgba(34, 197, 94, 0.1);
+                  border-color: rgba(34, 197, 94, 0.3);
+                  transform: translateY(-1px);
+
+                  .energy-icon {
+                    transform: scale(1.1);
+                  }
+
+                  .energy-label {
+                    color: var(--color-text-primary, #ffffff);
+                  }
+                }
+
+                &.selected {
+                  background: rgba(34, 197, 94, 0.2);
+                  border-color: rgba(34, 197, 94, 0.5);
+
+                  .energy-label {
+                    color: rgba(34, 197, 94, 1);
+                    font-weight: var(--font-weight-semibold, 600);
+                  }
+                }
+
+                .energy-icon {
+                  font-size: 1rem;
+                  margin-bottom: var(--spacing-xs, 0.25rem);
+                  transition: transform 0.2s ease;
+                  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+                }
+
+                .energy-label {
+                  font-size: var(--font-size-xs, 0.75rem);
+                  color: var(--color-text-secondary, #b3b3b3);
+                  font-weight: var(--font-weight-medium, 500);
+                  text-align: center;
+                  line-height: 1.1;
+                  transition: all 0.2s ease;
+                }
+              }
+
+              // Responsive adjustments
+              @media (max-width: 1024px) {
+                .energy-option {
+                  min-height: 40px;
+                  padding: 0.2rem;
+
+                  .energy-icon {
+                    font-size: 0.9rem;
+                  }
+
+                  .energy-label {
+                    font-size: 0.7rem;
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                
+                .energy-option {
+                  min-height: 35px;
+                  
+                  .energy-label {
+                    font-size: 0.65rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Motivation card structure - Similar to intensity card but for energy/motivation level
+      .motivation-card-structure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm, 0.5rem);
+
+        // Header: Profile Motivation Section
+        .motivation-card-header {
+          flex: 0 0 auto;
+          min-height: 50px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .profile-motivation-section {
+            .profile-motivation-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+            }
+
+            .profile-motivation-badges {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              .profile-motivation-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.2rem 0.4rem;
+                border-radius: 4px;
+                font-size: var(--font-size-xs, 0.75rem);
+                font-weight: var(--font-weight-medium, 500);
+                transition: all 0.2s ease;
+                backdrop-filter: blur(8px);
+
+                &:hover {
+                  transform: translateY(-1px);
+                  opacity: 1 !important;
+                }
+
+                .workout-type-icon {
+                  margin-right: 0.3rem;
+                  font-size: 0.8rem;
+                }
+              }
+            }
+          }
+
+          .header-fallback {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+            .header-fallback-text {
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-xs, 0.25rem);
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-primary, #ffffff);
+              font-weight: 500;
+
+              .header-icon {
+                font-size: 1em;
+              }
+            }
+
+            .header-subtitle {
+              font-size: 0.7rem;
+              color: var(--color-text-secondary, #b3b3b3);
+              margin-top: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // Body: Motivation Selector
+        .motivation-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 120px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .motivation-selector-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            .motivation-selector-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              flex: 0 0 auto;
+            }
+
+            .motivation-options-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: var(--spacing-xs, 0.25rem);
+              flex: 1;
+              align-content: center;
+
+              .motivation-option {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: var(--spacing-xs, 0.25rem);
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: var(--border-radius-sm, 6px);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                aspect-ratio: 1;
+                min-height: 45px;
+
+                &:hover {
+                  background: rgba(34, 197, 94, 0.1);
+                  border-color: rgba(34, 197, 94, 0.3);
+                  transform: translateY(-1px);
+
+                  .motivation-icon {
+                    transform: scale(1.1);
+                  }
+
+                  .motivation-label {
+                    color: var(--color-text-primary, #ffffff);
+                  }
+                }
+
+                &.selected {
+                  background: rgba(34, 197, 94, 0.2);
+                  border-color: rgba(34, 197, 94, 0.5);
+
+                  .motivation-label {
+                    color: rgba(34, 197, 94, 1);
+                    font-weight: var(--font-weight-semibold, 600);
+                  }
+                }
+
+                .motivation-icon {
+                  font-size: 1rem;
+                  margin-bottom: var(--spacing-xs, 0.25rem);
+                  transition: transform 0.2s ease;
+                  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+                }
+
+                .motivation-label {
+                  font-size: var(--font-size-xs, 0.75rem);
+                  color: var(--color-text-secondary, #b3b3b3);
+                  font-weight: var(--font-weight-medium, 500);
+                  text-align: center;
+                  line-height: 1.1;
+                  transition: all 0.2s ease;
+                }
+              }
+
+              // Responsive adjustments
+              @media (max-width: 1024px) {
+                .motivation-option {
+                  min-height: 40px;
+                  padding: 0.2rem;
+
+                  .motivation-icon {
+                    font-size: 0.9rem;
+                  }
+
+                  .motivation-label {
+                    font-size: 0.7rem;
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                
+                .motivation-option {
+                  min-height: 35px;
+                  
+                  .motivation-label {
+                    font-size: 0.65rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Stress card structure - Similar to motivation card but for stress level
+      .stress-card-structure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm, 0.5rem);
+
+        // Header: Profile Stress Section
+        .stress-card-header {
+          flex: 0 0 auto;
+          min-height: 50px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .profile-stress-section {
+            .profile-stress-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+            }
+
+            .profile-stress-badges {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              .profile-stress-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.2rem 0.4rem;
+                border-radius: 4px;
+                font-size: var(--font-size-xs, 0.75rem);
+                font-weight: var(--font-weight-medium, 500);
+                transition: all 0.2s ease;
+                backdrop-filter: blur(8px);
+
+                &:hover {
+                  transform: translateY(-1px);
+                  opacity: 1 !important;
+                }
+
+                .workout-type-icon {
+                  margin-right: 0.3rem;
+                  font-size: 0.8rem;
+                }
+              }
+            }
+          }
+
+          .header-fallback {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+            .header-fallback-text {
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-xs, 0.25rem);
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-primary, #ffffff);
+              font-weight: 500;
+
+              .header-icon {
+                font-size: 1em;
+              }
+            }
+
+            .header-subtitle {
+              font-size: 0.7rem;
+              color: var(--color-text-secondary, #b3b3b3);
+              margin-top: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // Body: Stress Selector
+        .stress-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 120px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .stress-selector-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            .stress-selector-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              flex: 0 0 auto;
+            }
+
+            .stress-options-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: var(--spacing-xs, 0.25rem);
+              flex: 1;
+              align-content: center;
+
+              .stress-option {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: var(--spacing-xs, 0.25rem);
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: var(--border-radius-sm, 6px);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                aspect-ratio: 1;
+                min-height: 45px;
+
+                &:hover {
+                  background: rgba(59, 130, 246, 0.1);
+                  border-color: rgba(59, 130, 246, 0.3);
+                  transform: translateY(-1px);
+
+                  .stress-icon {
+                    transform: scale(1.1);
+                  }
+
+                  .stress-label {
+                    color: var(--color-text-primary, #ffffff);
+                  }
+                }
+
+                &.selected {
+                  background: rgba(59, 130, 246, 0.2);
+                  border-color: rgba(59, 130, 246, 0.5);
+
+                  .stress-label {
+                    color: rgba(59, 130, 246, 1);
+                    font-weight: var(--font-weight-semibold, 600);
+                  }
+                }
+
+                .stress-icon {
+                  font-size: 1rem;
+                  margin-bottom: var(--spacing-xs, 0.25rem);
+                  transition: transform 0.2s ease;
+                  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+                }
+
+                .stress-label {
+                  font-size: var(--font-size-xs, 0.75rem);
+                  color: var(--color-text-secondary, #b3b3b3);
+                  font-weight: var(--font-weight-medium, 500);
+                  text-align: center;
+                  line-height: 1.1;
+                  transition: all 0.2s ease;
+                }
+              }
+
+              // Responsive adjustments
+              @media (max-width: 1024px) {
+                .stress-option {
+                  min-height: 40px;
+                  padding: 0.2rem;
+
+                  .stress-icon {
+                    font-size: 0.9rem;
+                  }
+
+                  .stress-label {
+                    font-size: 0.7rem;
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                
+                .stress-option {
+                  min-height: 35px;
+                  
+                  .stress-label {
+                    font-size: 0.65rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Soreness card structure - Similar to restrictions card but for current soreness
+      .soreness-card-structure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm, 0.5rem);
+
+        // Header: Profile Soreness Section
+        .soreness-card-header {
+          flex: 0 0 auto;
+          min-height: 50px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .profile-soreness-section {
+            .profile-soreness-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+            }
+
+            .profile-soreness-badges {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              .profile-no-soreness {
+                font-size: var(--font-size-xs, 0.75rem);
+                color: var(--color-text-secondary, #b3b3b3);
+                font-weight: var(--font-weight-medium, 500);
+                text-align: center;
+                opacity: 0.8;
+              }
+            }
+          }
+
+          .header-fallback {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+            .header-fallback-text {
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-xs, 0.25rem);
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-primary, #ffffff);
+              font-weight: 500;
+            }
+
+            .header-subtitle {
+              font-size: 0.7rem;
+              color: var(--color-text-secondary, #b3b3b3);
+              margin-top: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // Body: Soreness Selector
+        .soreness-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 120px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .soreness-selector-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            .soreness-selector-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              flex: 0 0 auto;
+            }
+
+            .soreness-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: var(--spacing-xs, 0.25rem);
+              flex: 1;
+              align-content: center;
+
+              .soreness-option {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--spacing-xs, 0.25rem);
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: var(--border-radius-sm, 6px);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                min-height: 45px;
+
+                &:hover {
+                  background: rgba(220, 38, 38, 0.1);
+                  border-color: rgba(220, 38, 38, 0.3);
+                  transform: translateY(-1px);
+
+                  .soreness-label {
+                    color: var(--color-text-primary, #ffffff);
+                  }
+                }
+
+                &.selected {
+                  background: rgba(220, 38, 38, 0.2);
+                  border-color: rgba(220, 38, 38, 0.5);
+
+                  .soreness-label {
+                    color: rgba(220, 38, 38, 1);
+                    font-weight: var(--font-weight-semibold, 600);
+                  }
+                }
+
+                .soreness-label {
+                  font-size: var(--font-size-xs, 0.75rem);
+                  color: var(--color-text-secondary, #b3b3b3);
+                  font-weight: var(--font-weight-medium, 500);
+                  text-align: center;
+                  line-height: 1.1;
+                  transition: all 0.2s ease;
+                }
+              }
+
+              // Responsive adjustments
+              @media (max-width: 1024px) {
+                .soreness-option {
+                  min-height: 40px;
+                  padding: 0.2rem;
+
+                  .soreness-label {
+                    font-size: 0.7rem;
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                
+                .soreness-option {
+                  min-height: 35px;
+                  
+                  .soreness-label {
+                    font-size: 0.65rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Sleep card structure - Similar to soreness card but for sleep quality
+      .sleep-card-structure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm, 0.5rem);
+
+        // Header: Profile Sleep Section
+        .sleep-card-header {
+          flex: 0 0 auto;
+          min-height: 50px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .profile-sleep-section {
+            .profile-sleep-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+            }
+
+            .profile-sleep-badges {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              .profile-sleep-info {
+                font-size: var(--font-size-xs, 0.75rem);
+                color: var(--color-text-secondary, #b3b3b3);
+                font-weight: var(--font-weight-medium, 500);
+                text-align: center;
+                opacity: 0.8;
+              }
+            }
+          }
+
+          .header-fallback {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+            .header-fallback-text {
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-xs, 0.25rem);
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-primary, #ffffff);
+              font-weight: 500;
+            }
+
+            .header-subtitle {
+              font-size: 0.7rem;
+              color: var(--color-text-secondary, #b3b3b3);
+              margin-top: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // Body: Sleep Quality Selector
+        .sleep-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 120px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .sleep-selector-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            .sleep-selector-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              flex: 0 0 auto;
+            }
+
+            .sleep-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: var(--spacing-xs, 0.25rem);
+              flex: 1;
+              align-content: center;
+
+              .sleep-option {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: var(--spacing-xs, 0.25rem);
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: var(--border-radius-sm, 6px);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                min-height: 45px;
+
+                &:hover {
+                  background: rgba(139, 92, 246, 0.1);
+                  border-color: rgba(139, 92, 246, 0.3);
+                  transform: translateY(-1px);
+
+                  .sleep-label {
+                    color: var(--color-text-primary, #ffffff);
+                  }
+                }
+
+                &.selected {
+                  background: rgba(139, 92, 246, 0.2);
+                  border-color: rgba(139, 92, 246, 0.5);
+
+                  .sleep-label {
+                    color: rgba(139, 92, 246, 1);
+                    font-weight: var(--font-weight-semibold, 600);
+                  }
+                }
+
+                .sleep-label {
+                  font-size: var(--font-size-xs, 0.75rem);
+                  color: var(--color-text-secondary, #b3b3b3);
+                  font-weight: var(--font-weight-medium, 500);
+                  text-align: center;
+                  line-height: 1.1;
+                  transition: all 0.2s ease;
+                }
+              }
+
+              // Responsive adjustments
+              @media (max-width: 1024px) {
+                .sleep-option {
+                  min-height: 40px;
+                  padding: 0.2rem;
+
+                  .sleep-label {
+                    font-size: 0.7rem;
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                
+                .sleep-option {
+                  min-height: 35px;
+                  
+                  .sleep-label {
+                    font-size: 0.65rem;
+                  }
+                }
+              }
+            }
+          }
+        }
       }
 
       // Duration card structure - Similar to other complex cards but for workout duration
@@ -1053,6 +2077,415 @@ $workout-generator-card-height: 180px;
                   
                   .equipment-label {
                     font-size: 0.65rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Restrictions card structure - Similar to Equipment card but for restrictions selection
+      .restrictions-card-structure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm, 0.5rem);
+
+        // Header: Profile Restrictions Section
+        .restrictions-card-header {
+          flex: 0 0 auto;
+          min-height: 50px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .profile-restrictions-section {
+            .profile-restrictions-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+            }
+
+            .profile-restrictions-badges {
+              display: flex;
+              flex-wrap: wrap;
+              gap: var(--spacing-xs, 0.25rem);
+              justify-content: center;
+              align-items: center;
+
+              .profile-restriction-badge {
+                background: rgba(220, 38, 38, 0.1);
+                border-color: rgba(220, 38, 38, 0.3);
+                color: rgba(220, 38, 38, 0.9);
+              }
+
+              .profile-no-restrictions {
+                font-size: var(--font-size-xs, 0.75rem);
+                color: var(--color-text-secondary, #b3b3b3);
+                opacity: 0.8;
+              }
+
+              .restrictions-more-indicator {
+                font-size: var(--font-size-xs, 0.75rem);
+                color: var(--color-text-secondary, #b3b3b3);
+                opacity: 0.7;
+              }
+            }
+          }
+
+          .header-fallback {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+            .header-fallback-text {
+              display: flex;
+              align-items: center;
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-primary, #ffffff);
+              font-weight: 500;
+            }
+
+            .header-subtitle {
+              font-size: 0.7rem;
+              color: var(--color-text-secondary, #b3b3b3);
+              margin-top: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // Body: Restrictions Selector Grid
+        .restrictions-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 120px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .restrictions-selector-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            .restrictions-selector-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              flex: 0 0 auto;
+            }
+
+            .restrictions-grid {
+              flex: 1;
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: var(--spacing-xs, 0.25rem);
+              align-content: center;
+
+              .restriction-option {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 40px;
+                padding: 0.2rem;
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: var(--border-radius-sm, 6px);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                backdrop-filter: blur(8px);
+
+                &:hover {
+                  background: rgba(220, 38, 38, 0.1);
+                  border-color: rgba(220, 38, 38, 0.3);
+                  transform: translateY(-1px);
+
+                  .restriction-label {
+                    color: var(--color-text-primary, #ffffff);
+                  }
+                }
+
+                &.restriction-option--selected {
+                  background: rgba(220, 38, 38, 0.2);
+                  border-color: rgba(220, 38, 38, 0.5);
+
+                  .restriction-label {
+                    color: rgba(220, 38, 38, 1);
+                    font-weight: var(--font-weight-semibold, 600);
+                  }
+                }
+
+                .restriction-label {
+                  font-size: var(--font-size-xs, 0.75rem);
+                  color: var(--color-text-secondary, #b3b3b3);
+                  font-weight: var(--font-weight-medium, 500);
+                  text-align: center;
+                  line-height: 1.1;
+                  transition: all 0.2s ease;
+                  word-wrap: break-word;
+                  overflow: hidden;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 2;
+                  -webkit-box-orient: vertical;
+                }
+              }
+
+              // Responsive adjustments
+              @media (max-width: 1024px) {
+                grid-template-columns: repeat(3, 1fr);
+                
+                .restriction-option {
+                  min-height: 36px;
+                  padding: 0.15rem;
+
+                  .restriction-label {
+                    font-size: 0.7rem;
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                
+                .restriction-option {
+                  min-height: 40px;
+                  
+                  .restriction-label {
+                    font-size: 0.65rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Location card structure - Similar to Equipment card but for location selection
+      .location-card-structure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm, 0.5rem);
+
+        // Header: Profile Location Section
+        .location-card-header {
+          flex: 0 0 auto;
+          min-height: 50px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .profile-location-section {
+            .profile-location-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+            }
+
+            .profile-location-badges {
+              display: flex;
+              flex-wrap: wrap;
+              gap: var(--spacing-xs, 0.25rem);
+              justify-content: center;
+              align-items: center;
+
+              .profile-location-badge {
+                font-weight: var(--font-weight-semibold, 600);
+              }
+            }
+          }
+
+          .header-fallback {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+
+            .header-fallback-text {
+              display: flex;
+              align-items: center;
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-primary, #ffffff);
+              font-weight: 500;
+            }
+
+            .header-subtitle {
+              font-size: 0.7rem;
+              color: var(--color-text-secondary, #b3b3b3);
+              margin-top: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              opacity: 0.8;
+            }
+          }
+        }
+
+        // Body: Location Selector Grid
+        .location-card-body {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-height: 120px;
+          padding: var(--spacing-xs, 0.25rem);
+          background: rgba(255, 255, 255, 0.01);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: var(--border-radius-sm, 6px);
+
+          .location-selector-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            .location-selector-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              margin-bottom: var(--spacing-xs, 0.25rem);
+              text-align: center;
+              flex: 0 0 auto;
+            }
+
+            .location-grid {
+              flex: 1;
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: var(--spacing-xs, 0.25rem);
+              align-content: center;
+
+              .location-option {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 50px;
+                padding: 0.3rem;
+                background: rgba(255, 255, 255, 0.02);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: var(--border-radius-sm, 6px);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                backdrop-filter: blur(8px);
+
+                &:hover {
+                  background: rgba(132, 204, 22, 0.1);
+                  border-color: rgba(132, 204, 22, 0.3);
+                  transform: translateY(-1px);
+
+                  .location-label {
+                    color: var(--color-text-primary, #ffffff);
+                  }
+                }
+
+                &.location-option--selected {
+                  background: rgba(132, 204, 22, 0.2);
+                  border-color: rgba(132, 204, 22, 0.5);
+
+                  .location-label {
+                    color: rgba(132, 204, 22, 1);
+                    font-weight: var(--font-weight-semibold, 600);
+                  }
+                }
+
+                // Color variants based on location type
+                &[data-location="home"]:hover {
+                  background: rgba(16, 185, 129, 0.1);
+                  border-color: rgba(16, 185, 129, 0.3);
+                }
+                &[data-location="home"].location-option--selected {
+                  background: rgba(16, 185, 129, 0.2);
+                  border-color: rgba(16, 185, 129, 0.5);
+                  .location-label { color: rgba(16, 185, 129, 1); }
+                }
+
+                &[data-location="gym"]:hover {
+                  background: rgba(59, 130, 246, 0.1);
+                  border-color: rgba(59, 130, 246, 0.3);
+                }
+                &[data-location="gym"].location-option--selected {
+                  background: rgba(59, 130, 246, 0.2);
+                  border-color: rgba(59, 130, 246, 0.5);
+                  .location-label { color: rgba(59, 130, 246, 1); }
+                }
+
+                &[data-location="outdoors"]:hover {
+                  background: rgba(245, 158, 11, 0.1);
+                  border-color: rgba(245, 158, 11, 0.3);
+                }
+                &[data-location="outdoors"].location-option--selected {
+                  background: rgba(245, 158, 11, 0.2);
+                  border-color: rgba(245, 158, 11, 0.5);
+                  .location-label { color: rgba(245, 158, 11, 1); }
+                }
+
+                &[data-location="travel"]:hover {
+                  background: rgba(139, 92, 246, 0.1);
+                  border-color: rgba(139, 92, 246, 0.3);
+                }
+                &[data-location="travel"].location-option--selected {
+                  background: rgba(139, 92, 246, 0.2);
+                  border-color: rgba(139, 92, 246, 0.5);
+                  .location-label { color: rgba(139, 92, 246, 1); }
+                }
+
+                .location-icon {
+                  font-size: 1.2rem;
+                  margin-bottom: 0.2rem;
+                  opacity: 0.8;
+                  transition: all 0.2s ease;
+                }
+
+                .location-label {
+                  font-size: var(--font-size-sm, 0.875rem);
+                  color: var(--color-text-secondary, #b3b3b3);
+                  font-weight: var(--font-weight-medium, 500);
+                  text-align: center;
+                  line-height: 1.2;
+                  transition: all 0.2s ease;
+                }
+              }
+
+              // Responsive adjustments
+              @media (max-width: 1024px) {
+                .location-option {
+                  min-height: 45px;
+                  padding: 0.25rem;
+
+                  .location-label {
+                    font-size: var(--font-size-sm, 0.875rem);
+                  }
+                }
+              }
+
+              @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                
+                .location-option {
+                  min-height: 40px;
+                  
+                  .location-label {
+                    font-size: var(--font-size-xs, 0.75rem);
                   }
                 }
               }

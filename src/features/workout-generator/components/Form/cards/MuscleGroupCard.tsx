@@ -1,135 +1,94 @@
 /**
- * Muscle Group Card Component
+ * MuscleGroupCard Component
  * 
- * Advanced muscle group selector that replaces the Focus Area card.
- * Supports multi-selection with visual chips and expandable muscle grids.
+ * Enhanced muscle group selector that replaces the Focus Area card.
+ * Maintains the same header/body structure while providing sophisticated
+ * muscle targeting with up to 3 muscle groups and specific muscle selection.
  */
-import React, { useState, useEffect } from 'react';
-import { useProfile } from '../../../../profile/context';
-import { 
-  MuscleGroup, 
-  MuscleSelectionData,
-  MuscleSelectionValidation 
-} from '../../../types/muscle-types';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { useMuscleSelection } from '../../../hooks/useMuscleSelection';
+import { MuscleGroup } from '../../../types/muscle-types';
 import { 
   muscleGroupData, 
-  MUSCLE_SELECTION_LIMITS 
+  MUSCLE_GROUP_DISPLAY_ORDER,
+  getMusclesInGroup 
 } from '../../../constants/muscle-data';
-import { 
-  validateMuscleSelectionData,
-  createMuscleSelectionSummary,
-  canAddMoreGroups 
-} from '../../../utils/muscle-helpers';
-import { MuscleGroupDropdown } from './components/MuscleGroupDropdown';
-import { MuscleGroupChip } from './components/MuscleGroupChip';
-import { MuscleDetailGrid } from './components/MuscleDetailGrid';
-import { MuscleSelectionSummary } from './components/MuscleSelectionSummary';
+import { ChevronDown, X, Plus } from 'lucide-react';
 import './MuscleGroupCard.scss';
 
 interface MuscleGroupCardProps {
-  className?: string;
-  onSelectionChange?: (selectionData: MuscleSelectionData) => void;
-  initialSelection?: MuscleSelectionData;
+  profileLoading?: boolean;
+  profileError?: any;
+  isProfileSufficient?: boolean;
+  profileMapping?: any;
 }
 
-/**
- * Main Muscle Group Card Component
- */
 export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
-  className = '',
-  onSelectionChange,
-  initialSelection
+  profileLoading = false,
+  profileError = null,
+  isProfileSufficient = false,
+  profileMapping = null
 }) => {
-  // Profile context integration
-  const { state: profileState } = useProfile();
-  const { profile, loading: profileLoading, error: profileError } = profileState;
-
-  // Muscle selection state
-  const [selectionData, setSelectionData] = useState<MuscleSelectionData>(
-    initialSelection || {
-      selectedGroups: [],
-      selectedMuscles: {}
-    }
-  );
-
-  // Expanded groups state (for muscle detail grids)
+  
+  // Use muscle selection directly WITHOUT the sync wrapper to avoid conflicts
+  const muscleSelection = useMuscleSelection(3, false); // Disable auto-persistence
   const [expandedGroups, setExpandedGroups] = useState<Set<MuscleGroup>>(new Set());
-
-  // Selection validation
-  const [validation, setValidation] = useState<MuscleSelectionValidation | null>(null);
-
-  // Update validation when selection changes
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isOperationInProgress, setIsOperationInProgress] = useState(false);
+  
+  // Debounced state updates to prevent flickering
+  const [stableSelectionData, setStableSelectionData] = useState(muscleSelection.selectionData);
+  
+  // Update stable selection data with debouncing
   useEffect(() => {
-    const newValidation = validateMuscleSelectionData(selectionData);
-    setValidation(newValidation);
+    const timeout = setTimeout(() => {
+      setStableSelectionData(muscleSelection.selectionData);
+    }, 10);
     
-    // Notify parent component of changes
-    if (onSelectionChange) {
-      onSelectionChange(selectionData);
+    return () => clearTimeout(timeout);
+  }, [muscleSelection.selectionData]);
+  
+  // Handle muscle group selection from dropdown
+  const handleGroupSelect = useCallback((group: MuscleGroup) => {
+    if (isOperationInProgress) return;
+    
+    setIsOperationInProgress(true);
+    
+    if (!muscleSelection.isGroupSelected(group) && muscleSelection.canAddMore) {
+      muscleSelection.addMuscleGroup(group);
+      setExpandedGroups(prev => new Set([...prev, group]));
     }
-  }, [selectionData, onSelectionChange]);
-
-  // Add muscle group
-  const addMuscleGroup = (group: MuscleGroup) => {
-    if (!canAddMoreGroups(selectionData) || selectionData.selectedGroups.includes(group)) {
-      return;
-    }
-
-    setSelectionData(prev => ({
-      ...prev,
-      selectedGroups: [...prev.selectedGroups, group],
-      selectedMuscles: {
-        ...prev.selectedMuscles,
-        [group]: [] // Initialize with empty muscle array
-      }
-    }));
-
-    // Auto-expand the newly added group
-    setExpandedGroups(prev => new Set([...prev, group]));
-  };
-
-  // Remove muscle group
-  const removeMuscleGroup = (group: MuscleGroup) => {
-    setSelectionData(prev => {
-      const newSelectedMuscles = { ...prev.selectedMuscles };
-      delete newSelectedMuscles[group];
-      
-      return {
-        selectedGroups: prev.selectedGroups.filter(g => g !== group),
-        selectedMuscles: newSelectedMuscles
-      };
-    });
-
-    // Collapse the removed group
+    setShowDropdown(false);
+    
+    // Clear operation lock quickly
+    setTimeout(() => setIsOperationInProgress(false), 100);
+  }, [muscleSelection, isOperationInProgress]);
+  
+  // Handle muscle group removal with immediate state updates
+  const handleGroupRemove = useCallback((group: MuscleGroup) => {
+    if (isOperationInProgress) return;
+    
+    setIsOperationInProgress(true);
+    
+    // Remove from expanded groups immediately
     setExpandedGroups(prev => {
       const newSet = new Set(prev);
       newSet.delete(group);
       return newSet;
     });
-  };
-
-  // Toggle muscle in group
-  const toggleMuscle = (group: MuscleGroup, muscle: string) => {
-    setSelectionData(prev => {
-      const currentMuscles = prev.selectedMuscles?.[group] || [];
-      const isSelected = currentMuscles.includes(muscle);
-      
-      const newMuscles = isSelected
-        ? currentMuscles.filter(m => m !== muscle)
-        : [...currentMuscles, muscle];
-
-      return {
-        ...prev,
-        selectedMuscles: {
-          ...prev.selectedMuscles,
-          [group]: newMuscles
-        }
-      };
-    });
-  };
-
-  // Toggle expanded state for muscle detail grid
-  const toggleExpanded = (group: MuscleGroup) => {
+    
+    // Remove from muscle selection
+    muscleSelection.removeMuscleGroup(group);
+    
+    // Clear operation lock
+    setTimeout(() => setIsOperationInProgress(false), 100);
+  }, [muscleSelection, isOperationInProgress]);
+  
+  // Toggle expanded state for muscle detail grids
+  const toggleGroupExpanded = useCallback((group: MuscleGroup) => {
+    if (isOperationInProgress) return;
+    
     setExpandedGroups(prev => {
       const newSet = new Set(prev);
       if (newSet.has(group)) {
@@ -139,175 +98,265 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
       }
       return newSet;
     });
-  };
-
-  // Get profile muscle preferences for header display
-  const getProfileMusclePreferences = () => {
-    if (!profile || profileLoading || profileError) return null;
+  }, [isOperationInProgress]);
+  
+  // Get available groups for dropdown (use stable data to prevent flickering)
+  const availableGroups = MUSCLE_GROUP_DISPLAY_ORDER.filter(
+    group => !stableSelectionData.selectedGroups.includes(group)
+  );
+  
+  // Generate profile-based muscle preferences display
+  const getProfileMuscleDisplay = useCallback(() => {
+    if (!profileMapping?.displayData?.goals) return null;
     
-    // Extract muscle-related data from profile
-    // This would be integrated with the existing profile mapping system
-    return {
-      favoriteGroups: [], // Would come from profile.goals or similar
-      lastTargeted: {} // Would come from workout history
+    // Map profile goals to suggested muscle groups
+    const goalToMuscleMap: { [key: string]: MuscleGroup[] } = {
+      'strength': [MuscleGroup.Chest, MuscleGroup.Back, MuscleGroup.Legs],
+      'muscle': [MuscleGroup.Chest, MuscleGroup.Back, MuscleGroup.Arms],
+      'cardio': [MuscleGroup.Legs, MuscleGroup.Core],
+      'flexibility': [MuscleGroup.Core, MuscleGroup.Back],
+      'endurance': [MuscleGroup.Legs, MuscleGroup.Core, MuscleGroup.Back]
     };
-  };
-
-  const profilePreferences = getProfileMusclePreferences();
-  const selectionSummary = createMuscleSelectionSummary(selectionData);
-
+    
+    const suggestedGroups = new Set<MuscleGroup>();
+    profileMapping.displayData.goals.forEach((goal: any) => {
+      const goalKey = goal.value.toLowerCase();
+      if (goalToMuscleMap[goalKey]) {
+        goalToMuscleMap[goalKey].forEach(group => suggestedGroups.add(group));
+      }
+    });
+    
+    return Array.from(suggestedGroups).slice(0, 3);
+  }, [profileMapping]);
+  
+  const profileSuggestedGroups = getProfileMuscleDisplay();
+  
   return (
-    <div className={`muscle-group-card ${className}`}>
-      <div className="muscle-card-structure">
-        {/* HEADER: Profile Muscle Preferences Section */}
-        <div className="muscle-card-header">
-          {!profileLoading && !profileError && profilePreferences ? (
-            <div className="profile-muscle-section">
-              <div className="profile-muscle-label">Your Muscle Preferences:</div>
-              <div className="profile-muscle-content">
-                {profilePreferences.favoriteGroups.length > 0 ? (
-                  <div className="profile-muscle-badges">
-                    {profilePreferences.favoriteGroups.slice(0, 2).map((group) => (
-                      <span 
-                        key={group}
-                        className="workout-type-badge profile-muscle-badge"
-                        style={{ 
-                          cursor: 'pointer',
-                          opacity: 0.8
-                        }}
-                        title={`Click to select: ${muscleGroupData[group].display}`}
-                        onClick={() => addMuscleGroup(group)}
-                      >
-                        <span className="workout-type-icon">{muscleGroupData[group].icon}</span>
-                        {muscleGroupData[group].display}
-                      </span>
-                    ))}
-                    {profilePreferences.favoriteGroups.length > 2 && (
-                      <span className="muscle-more-indicator">
-                        +{profilePreferences.favoriteGroups.length - 2} more
-                      </span>
+    <div className="muscle-card-structure">
+      {/* HEADER: Profile Muscle Recommendations + Selected Groups */}
+      <div className="muscle-card-header">
+        {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileSuggestedGroups?.length ? (
+          <div className="profile-muscle-section">
+            <div className="profile-muscle-label">Suggested for Your Goals:</div>
+            <div className="profile-muscle-suggestions">
+              {profileSuggestedGroups.map((group: MuscleGroup) => (
+                <button
+                  key={group}
+                  className={`muscle-suggestion-badge ${
+                    stableSelectionData.selectedGroups.includes(group) ? 'suggestion-badge--selected' : ''
+                  }`}
+                  onClick={() => !stableSelectionData.selectedGroups.includes(group) && !isOperationInProgress && handleGroupSelect(group)}
+                  disabled={stableSelectionData.selectedGroups.includes(group) || isOperationInProgress}
+                  title={`${muscleGroupData[group].description}`}
+                  id={`muscle-suggestion-${group.toLowerCase()}`}
+                  name={`muscle-suggestion`}
+                  value={group}
+                >
+                  {muscleGroupData[group].display}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="header-fallback">
+            <div className="header-fallback-text">
+              <span>Target Muscles</span>
+            </div>
+            <div className="header-subtitle">Select up to 3 muscle groups to focus on</div>
+          </div>
+        )}
+        
+        {/* Selected Muscle Groups as Chips */}
+        {stableSelectionData.selectedGroups.length > 0 && (
+          <div className="selected-muscle-chips">
+            {stableSelectionData.selectedGroups.map((group, index) => {
+              const selectedMuscles = muscleSelection.getMusclesInGroup(group);
+              const totalMuscles = getMusclesInGroup(group).length;
+              return (
+                <div 
+                  key={`chip-${group}-${index}`} 
+                  className="muscle-group-chip"
+                >
+                  <div className="chip-content">
+                    <span className="chip-label">{muscleGroupData[group].display}</span>
+                    {selectedMuscles.length > 0 && (
+                      <span className="chip-count">({selectedMuscles.length}/{totalMuscles})</span>
                     )}
                   </div>
-                ) : (
-                  <div className="profile-muscle-empty">
-                    <span className="muscle-empty-text">Set up your profile to see muscle preferences</span>
-                  </div>
-                )}
-              </div>
+                  <button
+                    className="chip-remove"
+                    onClick={() => handleGroupRemove(group)}
+                    title={`Remove ${muscleGroupData[group].display}`}
+                    id={`remove-muscle-${group.toLowerCase()}`}
+                    name={`remove-muscle-chip`}
+                    value={group}
+                    aria-label={`Remove ${muscleGroupData[group].display} muscle group`}
+                    disabled={isOperationInProgress}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      
+      {/* BODY: Muscle Group Selector + Detail Grids */}
+      <div className="muscle-card-body">
+        {/* Muscle Group Dropdown Selector */}
+        <div className="muscle-group-selector">
+          <div className="selector-label">
+            Select Muscle Groups ({stableSelectionData.selectedGroups.length}/3):
+          </div>
+          
+          {stableSelectionData.selectedGroups.length < 3 && (
+            <div className="dropdown-container">
+              <button
+                className="muscle-dropdown-trigger"
+                onClick={() => setShowDropdown(!showDropdown)}
+                disabled={stableSelectionData.selectedGroups.length >= 3 || isOperationInProgress}
+                aria-expanded={showDropdown}
+                aria-haspopup="listbox"
+                id="muscle-group-dropdown-trigger"
+                name="muscle-group-selector"
+              >
+                <Plus size={14} />
+                <span>Add Muscle Group</span>
+                <ChevronDown size={14} className={`dropdown-chevron ${showDropdown ? 'chevron--open' : ''}`} />
+              </button>
+              
+              {showDropdown && availableGroups.length > 0 && (
+                <div 
+                  className="muscle-dropdown-menu"
+                  role="listbox"
+                  aria-labelledby="muscle-group-dropdown-trigger"
+                >
+                  {availableGroups.map((group) => (
+                    <button
+                      key={group}
+                      className="dropdown-option"
+                      onClick={() => handleGroupSelect(group)}
+                      title={muscleGroupData[group].description}
+                      role="option"
+                      id={`muscle-group-option-${group.toLowerCase()}`}
+                      name={`muscle-group-option`}
+                      value={group}
+                      disabled={isOperationInProgress}
+                    >
+                      <div className="option-content">
+                        <span className="option-label">{muscleGroupData[group].display}</span>
+                        <span className="option-muscle-count">
+                          {getMusclesInGroup(group).length} muscles
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="header-fallback">
-              <div className="header-fallback-text">
-                <span className="header-icon">🎯</span>
-                <span>Target Muscles</span>
-              </div>
-              <div className="header-subtitle">Set up your profile to see muscle preferences</div>
+          )}
+          
+          {stableSelectionData.selectedGroups.length >= 3 && (
+            <div className="selector-limit-message">
+              Maximum 3 muscle groups selected. Remove one to add another.
             </div>
           )}
         </div>
-
-        {/* BODY: Muscle Group Selector */}
-        <div className="muscle-card-body">
-          <div className="muscle-selector-container">
-            
-            {/* Selection Summary & Dropdown */}
-            <div className="muscle-selection-header">
-              <div className="muscle-selector-label">
-                Select up to {MUSCLE_SELECTION_LIMITS.MAX_GROUPS} muscle groups:
-              </div>
+        
+        {/* Muscle Detail Grids for Selected Groups */}
+        {stableSelectionData.selectedGroups.length > 0 && (
+          <div className="muscle-detail-grids">
+            {stableSelectionData.selectedGroups.map((group, index) => {
+              const groupMuscles = getMusclesInGroup(group);
+              const isExpanded = expandedGroups.has(group);
+              const selectedMuscles = muscleSelection.getMusclesInGroup(group);
               
-              {/* Selection Summary */}
-              {selectionData.selectedGroups.length > 0 && (
-                <MuscleSelectionSummary 
-                  summary={selectionSummary}
-                  validation={validation}
-                />
-              )}
-              
-              {/* Muscle Group Dropdown */}
-              <MuscleGroupDropdown
-                selectedGroups={selectionData.selectedGroups}
-                onGroupSelect={addMuscleGroup}
-                disabled={!canAddMoreGroups(selectionData)}
-                maxGroups={MUSCLE_SELECTION_LIMITS.MAX_GROUPS}
-                placeholder={
-                  selectionData.selectedGroups.length === 0 
-                    ? "Choose your first muscle group"
-                    : canAddMoreGroups(selectionData)
-                    ? `Add another muscle group (${selectionData.selectedGroups.length}/${MUSCLE_SELECTION_LIMITS.MAX_GROUPS})`
-                    : `Maximum ${MUSCLE_SELECTION_LIMITS.MAX_GROUPS} groups selected`
-                }
-              />
+              return (
+                <div key={`grid-${group}-${index}`} className="muscle-detail-grid">
+                  <button
+                    className="grid-header"
+                    onClick={() => toggleGroupExpanded(group)}
+                    title={`${isExpanded ? 'Collapse' : 'Expand'} ${muscleGroupData[group].display} details`}
+                    id={`muscle-grid-toggle-${group.toLowerCase()}`}
+                    name={`muscle-grid-toggle`}
+                    value={group}
+                    aria-expanded={isExpanded}
+                    aria-controls={`muscle-grid-content-${group.toLowerCase()}`}
+                    disabled={isOperationInProgress}
+                  >
+                    <div className="grid-header-content">
+                      <span className="grid-title">{muscleGroupData[group].display}</span>
+                      <span className="grid-progress">
+                        {selectedMuscles.length > 0 ? `${selectedMuscles.length}/${groupMuscles.length}` : 'All'}
+                      </span>
+                    </div>
+                    <ChevronDown size={16} className={`grid-chevron ${isExpanded ? 'chevron--open' : ''}`} />
+                  </button>
+                  
+                  {isExpanded && (
+                    <div 
+                      className="muscle-options-grid"
+                      id={`muscle-grid-content-${group.toLowerCase()}`}
+                      role="group"
+                      aria-labelledby={`muscle-grid-toggle-${group.toLowerCase()}`}
+                    >
+                      {groupMuscles.map((muscle) => {
+                        const isSelected = muscleSelection.isMuscleSelected(group, muscle);
+                        return (
+                          <label
+                            key={muscle}
+                            className={`muscle-option ${isSelected ? 'muscle-option--selected' : ''}`}
+                            htmlFor={`muscle-${group}-${muscle.replace(/\s+/g, '-').toLowerCase()}`}
+                          >
+                            <input
+                              type="checkbox"
+                              id={`muscle-${group}-${muscle.replace(/\s+/g, '-').toLowerCase()}`}
+                              name={`muscle-selection-${group}`}
+                              value={muscle}
+                              checked={isSelected}
+                              onChange={() => !isOperationInProgress && muscleSelection.toggleMuscle(group, muscle)}
+                              className="muscle-checkbox"
+                              aria-label={`Select ${muscle} in ${muscleGroupData[group].display} group`}
+                              disabled={isOperationInProgress}
+                            />
+                            <span className="muscle-label">{muscle}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        
+        {/* Selection Summary */}
+        {stableSelectionData.selectedGroups.length === 0 && (
+          <div className="selection-empty-state">
+            <div className="empty-state-title">No muscle groups selected</div>
+            <div className="empty-state-subtitle">
+              Choose up to 3 muscle groups to create a focused workout
             </div>
-
-            {/* Selected Groups as Chips */}
-            {selectionData.selectedGroups.length > 0 && (
-              <div className="selected-muscle-groups">
-                <div className="muscle-chips-container">
-                  {selectionData.selectedGroups.map((group) => (
-                    <MuscleGroupChip
-                      key={group}
-                      group={group}
-                      onRemove={removeMuscleGroup}
-                      selectedMuscleCount={selectionData.selectedMuscles?.[group]?.length || 0}
-                      totalMuscleCount={muscleGroupData[group].muscles.length}
-                      isExpanded={expandedGroups.has(group)}
-                      onToggleExpanded={() => toggleExpanded(group)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Muscle Detail Grids */}
-            {selectionData.selectedGroups.length > 0 && (
-              <div className="muscle-detail-grids">
-                {selectionData.selectedGroups.map((group) => (
-                  <MuscleDetailGrid
-                    key={group}
-                    group={group}
-                    selectedMuscles={selectionData.selectedMuscles?.[group] || []}
-                    onMuscleToggle={(muscle) => toggleMuscle(group, muscle)}
-                    isExpanded={expandedGroups.has(group)}
-                    onToggleExpanded={() => toggleExpanded(group)}
-                  />
+          </div>
+        )}
+        
+        {stableSelectionData.selectedGroups.length > 0 && (
+          <div className="selection-summary">
+            <div className="summary-text">
+              {muscleSelection.getSelectionSummary().displayText}
+            </div>
+            {muscleSelection.validation.warnings.length > 0 && (
+              <div className="summary-warnings">
+                {muscleSelection.validation.warnings.map((warning, index) => (
+                  <div key={index} className="warning-item">⚠️ {warning}</div>
                 ))}
-              </div>
-            )}
-
-            {/* Validation Messages */}
-            {validation && (validation.errors.length > 0 || validation.warnings.length > 0) && (
-              <div className="muscle-validation-messages">
-                {validation.errors.map((error, index) => (
-                  <div key={`error-${index}`} className="validation-error">
-                    ⚠️ {error}
-                  </div>
-                ))}
-                {validation.warnings.map((warning, index) => (
-                  <div key={`warning-${index}`} className="validation-warning">
-                    💡 {warning}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Empty State */}
-            {selectionData.selectedGroups.length === 0 && (
-              <div className="muscle-empty-state">
-                <div className="empty-state-icon">🎯</div>
-                <div className="empty-state-text">
-                  <div className="empty-state-title">Choose Your Target Muscles</div>
-                  <div className="empty-state-subtitle">
-                    Select muscle groups to create a focused workout plan
-                  </div>
-                </div>
               </div>
             )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default MuscleGroupCard; 
+}; 

@@ -266,4 +266,7 @@ export class WorkoutFormatters {
            (hasHalfStar ? '☆' : '') + 
            '☆'.repeat(emptyStars);
   }
-} 
+}
+
+// Also export as default for flexible importing
+export default WorkoutFormatters; 

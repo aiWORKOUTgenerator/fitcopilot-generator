@@ -10,6 +10,7 @@ import {
   mapProfileToWorkoutContext, 
   isProfileSufficientForWorkout 
 } from '../../utils/profileMapping';
+import { MuscleGroupCard } from './cards/MuscleGroupCard';
 import './WorkoutGeneratorGrid.scss';
 
 interface WorkoutGeneratorGridProps {
@@ -323,92 +324,19 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
           </div>
         </FormFieldCard>
 
-        {/* Focus Area Card */}
+        {/* Target Muscles Card - Enhanced Muscle Group Selector */}
         <FormFieldCard
-          title="Focus Area"
-          description="Target specific muscle groups"
+          title="Target Muscles"
+          description="Select up to 3 muscle groups to focus on"
           delay={300}
           variant="complex"
         >
-          <div className="focusarea-card-structure">
-            {/* HEADER: Profile Focus Areas Section */}
-            <div className="focusarea-card-header">
-              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
-                <div className="profile-focusarea-section">
-                  <div className="profile-focusarea-label">Your Profile Goals:</div>
-                  <div className="profile-focusarea-badges">
-                    {profileMapping.displayData.goals.slice(0, 2).map((goal, index) => (
-                      <span 
-                        key={goal.value}
-                        className="workout-type-badge profile-focusarea-badge"
-                        style={{ 
-                          cursor: 'pointer',
-                          opacity: 0.8
-                        }}
-                        title={`Focus areas aligned with: ${goal.display}`}
-                      >
-                        <span className="workout-type-icon">{goal.icon}</span>
-                        {goal.display}
-                      </span>
-                    ))}
-                    {profileMapping.displayData.goals.length > 2 && (
-                      <span className="focusarea-more-indicator">
-                        +{profileMapping.displayData.goals.length - 2} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="header-fallback">
-                  <div className="header-fallback-text">
-                    <span className="header-icon">🎯</span>
-                    <span>Focus Areas</span>
-                  </div>
-                  <div className="header-subtitle">Set up your profile to see goal-aligned areas</div>
-                </div>
-              )}
-            </div>
-
-            {/* BODY: Today's Focus Area Selector */}
-            <div className="focusarea-card-body">
-              <div className="focusarea-selector-container">
-                <div className="focusarea-selector-label">Focus Areas for Today:</div>
-                {/* All 10 focus area options from FOCUS_AREA_OPTIONS - no icons, compact */}
-                <div className="focusarea-options-grid">
-                  <div className="focusarea-option" title="Upper Body" data-focusarea="upper-body">
-                    <span className="focusarea-label">Upper Body</span>
-                  </div>
-                  <div className="focusarea-option" title="Lower Body" data-focusarea="lower-body">
-                    <span className="focusarea-label">Lower Body</span>
-                  </div>
-                  <div className="focusarea-option" title="Core" data-focusarea="core">
-                    <span className="focusarea-label">Core</span>
-                  </div>
-                  <div className="focusarea-option" title="Back" data-focusarea="back">
-                    <span className="focusarea-label">Back</span>
-                  </div>
-                  <div className="focusarea-option" title="Shoulders" data-focusarea="shoulders">
-                    <span className="focusarea-label">Shoulders</span>
-                  </div>
-                  <div className="focusarea-option" title="Chest" data-focusarea="chest">
-                    <span className="focusarea-label">Chest</span>
-                  </div>
-                  <div className="focusarea-option" title="Arms" data-focusarea="arms">
-                    <span className="focusarea-label">Arms</span>
-                  </div>
-                  <div className="focusarea-option" title="Mobility/Flexibility" data-focusarea="mobility">
-                    <span className="focusarea-label">Mobility</span>
-                  </div>
-                  <div className="focusarea-option" title="Cardio" data-focusarea="cardio">
-                    <span className="focusarea-label">Cardio</span>
-                  </div>
-                  <div className="focusarea-option" title="Recovery/Stretching" data-focusarea="recovery">
-                    <span className="focusarea-label">Recovery</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MuscleGroupCard
+            profileLoading={profileLoading}
+            profileError={profileError}
+            isProfileSufficient={isProfileSufficient}
+            profileMapping={profileMapping}
+          />
         </FormFieldCard>
 
         {/* Equipment Card */}
@@ -510,9 +438,424 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
           title="Restrictions"
           description="Any limitations or injuries?"
           delay={500}
+          variant="complex"
         >
-          <div className="placeholder-content">
-            <p>Restrictions input will go here</p>
+          <div className="restrictions-card-structure">
+            {/* HEADER: Profile Limitations Section */}
+            <div className="restrictions-card-header">
+              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+                <div className="profile-restrictions-section">
+                  <div className="profile-restrictions-label">Health & Safety Focus:</div>
+                  <div className="profile-restrictions-badges">
+                    <span className="profile-no-restrictions">Select areas to avoid today</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="header-fallback">
+                  <div className="header-fallback-text">
+                    <span>Current Restrictions</span>
+                  </div>
+                  <div className="header-subtitle">Select any areas with soreness or discomfort</div>
+                </div>
+              )}
+            </div>
+
+            {/* BODY: Today's Restrictions Selector */}
+            <div className="restrictions-card-body">
+              <div className="restrictions-selector-container">
+                <div className="restrictions-selector-label">
+                  Current soreness or discomfort:
+                </div>
+                
+                <div className="restrictions-grid">
+                  <div className="restriction-option" title="Shoulders soreness or discomfort" data-restriction="shoulders">
+                    <span className="restriction-label">Shoulders</span>
+                  </div>
+                  <div className="restriction-option" title="Arms soreness or discomfort" data-restriction="arms">
+                    <span className="restriction-label">Arms</span>
+                  </div>
+                  <div className="restriction-option" title="Chest soreness or discomfort" data-restriction="chest">
+                    <span className="restriction-label">Chest</span>
+                  </div>
+                  <div className="restriction-option" title="Back soreness or discomfort" data-restriction="back">
+                    <span className="restriction-label">Back</span>
+                  </div>
+                  <div className="restriction-option" title="Core/Abs soreness or discomfort" data-restriction="core">
+                    <span className="restriction-label">Core/Abs</span>
+                  </div>
+                  <div className="restriction-option" title="Hips soreness or discomfort" data-restriction="hips">
+                    <span className="restriction-label">Hips</span>
+                  </div>
+                  <div className="restriction-option" title="Legs soreness or discomfort" data-restriction="legs">
+                    <span className="restriction-label">Legs</span>
+                  </div>
+                  <div className="restriction-option" title="Knees soreness or discomfort" data-restriction="knees">
+                    <span className="restriction-label">Knees</span>
+                  </div>
+                  <div className="restriction-option" title="Ankles soreness or discomfort" data-restriction="ankles">
+                    <span className="restriction-label">Ankles</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormFieldCard>
+      </div>
+
+      {/* Second Row: Location + Additional Cards */}
+      <div className="generator-row generator-row--second">
+        {/* Location Card */}
+        <FormFieldCard
+          title="Location"
+          description="Where will you work out today?"
+          delay={600}
+          variant="complex"
+        >
+          <div className="location-card-structure">
+            {/* HEADER: Profile Location Section */}
+            <div className="location-card-header">
+              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+                <div className="profile-location-section">
+                  <div className="profile-location-label">Your Preferred Location:</div>
+                  <div className="profile-location-badges">
+                    <span 
+                      className="workout-type-badge profile-location-badge"
+                      style={{ 
+                        color: profileMapping.displayData.location.color,
+                        cursor: 'pointer',
+                        opacity: 0.8
+                      }}
+                      title={`Profile location: ${profileMapping.displayData.location.context}`}
+                    >
+                      <span className="workout-type-icon">
+                        {profileMapping.displayData.location.value === 'home' && '🏠'}
+                        {profileMapping.displayData.location.value === 'gym' && '🏋️'}
+                        {profileMapping.displayData.location.value === 'outdoors' && '🌳'}
+                        {(profileMapping.displayData.location.value === 'anywhere' || profileMapping.displayData.location.value === 'travel') && '✈️'}
+                      </span>
+                      {profileMapping.displayData.location.display}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="header-fallback">
+                  <div className="header-fallback-text">
+                    <span>Workout Location</span>
+                  </div>
+                  <div className="header-subtitle">Choose where you'll exercise today</div>
+                </div>
+              )}
+            </div>
+
+            {/* BODY: Today's Location Selector */}
+            <div className="location-card-body">
+              <div className="location-selector-container">
+                <div className="location-selector-label">
+                  Today's workout location:
+                </div>
+                
+                <div className="location-grid">
+                  <div className="location-option" title="Home workouts - Space-efficient exercises" data-location="home">
+                    <span className="location-icon">🏠</span>
+                    <span className="location-label">Home</span>
+                  </div>
+                  <div className="location-option" title="Gym training - Full equipment access" data-location="gym">
+                    <span className="location-icon">🏋️</span>
+                    <span className="location-label">Gym</span>
+                  </div>
+                  <div className="location-option" title="Outdoor activities - Fresh air workouts" data-location="outdoors">
+                    <span className="location-icon">🌳</span>
+                    <span className="location-label">Outdoors</span>
+                  </div>
+                  <div className="location-option" title="Travel workouts - Portable exercises" data-location="travel">
+                    <span className="location-icon">✈️</span>
+                    <span className="location-label">Travel</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormFieldCard>
+
+        {/* Current Stress Level Card */}
+        <FormFieldCard
+          title="Stress Level"
+          description="How stressed are you feeling today?"
+          delay={700}
+          variant="complex"
+        >
+          <div className="stress-card-structure">
+            {/* HEADER: Profile Stress Section */}
+            <div className="stress-card-header">
+              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+                <div className="profile-stress-section">
+                  <div className="profile-stress-label">Your Typical Stress:</div>
+                  <div className="profile-stress-badges">
+                    <span 
+                      className="workout-type-badge profile-stress-badge"
+                      style={{ 
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        color: '#3b82f6',
+                        cursor: 'pointer',
+                        opacity: 0.8
+                      }}
+                      title="Click to use your typical stress level"
+                    >
+                      <span className="workout-type-icon">🧘</span>
+                      Balanced
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="header-fallback">
+                  <div className="header-fallback-text">
+                    <span className="header-icon">🧘</span>
+                    <span>Stress Level</span>
+                  </div>
+                  <div className="header-subtitle">Set up your profile to see your stress patterns</div>
+                </div>
+              )}
+            </div>
+
+            {/* BODY: Today's Stress Selector */}
+            <div className="stress-card-body">
+              <div className="stress-selector-container">
+                <div className="stress-selector-label">Today's Stress:</div>
+                {/* 6-level stress system in 3x2 grid matching intensity colors */}
+                <div className="stress-options-grid">
+                  <div className="stress-option" title="Very Low - Completely relaxed">
+                    <span className="stress-icon">🟢</span>
+                    <span className="stress-label">Very Low</span>
+                  </div>
+                  <div className="stress-option" title="Low - Mostly calm and relaxed">
+                    <span className="stress-icon">🔵</span>
+                    <span className="stress-label">Low</span>
+                  </div>
+                  <div className="stress-option" title="Moderate - Some tension, manageable">
+                    <span className="stress-icon">🟡</span>
+                    <span className="stress-label">Moderate</span>
+                  </div>
+                  <div className="stress-option" title="High - Feeling stressed and tense">
+                    <span className="stress-icon">🟠</span>
+                    <span className="stress-label">High</span>
+                  </div>
+                  <div className="stress-option" title="Very High - Significant stress and anxiety">
+                    <span className="stress-icon">🔴</span>
+                    <span className="stress-label">Very High</span>
+                  </div>
+                  <div className="stress-option" title="Extreme - Overwhelmed and very anxious">
+                    <span className="stress-icon">🟣</span>
+                    <span className="stress-label">Extreme</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormFieldCard>
+
+        {/* Energy/Motivation Level Card */}
+        <FormFieldCard
+          title="Energy Level"
+          description="How motivated are you feeling today?"
+          delay={800}
+          variant="complex"
+        >
+          <div className="motivation-card-structure">
+            {/* HEADER: Profile Energy Section */}
+            <div className="motivation-card-header">
+              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+                <div className="profile-motivation-section">
+                  <div className="profile-motivation-label">Your Typical Energy:</div>
+                  <div className="profile-motivation-badges">
+                    <span 
+                      className="workout-type-badge profile-motivation-badge"
+                      style={{ 
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        color: '#22c55e',
+                        cursor: 'pointer',
+                        opacity: 0.8
+                      }}
+                      title="Click to use your typical energy level"
+                    >
+                      <span className="workout-type-icon">⚡</span>
+                      Balanced
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="header-fallback">
+                  <div className="header-fallback-text">
+                    <span className="header-icon">⚡</span>
+                    <span>Energy Level</span>
+                  </div>
+                  <div className="header-subtitle">Set up your profile to see your energy patterns</div>
+                </div>
+              )}
+            </div>
+
+            {/* BODY: Today's Energy/Motivation Selector */}
+            <div className="motivation-card-body">
+              <div className="motivation-selector-container">
+                <div className="motivation-selector-label">Today's Energy:</div>
+                {/* 6-level motivation system in 3x2 grid matching intensity colors */}
+                <div className="motivation-options-grid">
+                  <div className="motivation-option" title="Very Low - Need gentle movement">
+                    <span className="motivation-icon">🟢</span>
+                    <span className="motivation-label">Very Low</span>
+                  </div>
+                  <div className="motivation-option" title="Low - Prefer lighter activities">
+                    <span className="motivation-icon">🔵</span>
+                    <span className="motivation-label">Low</span>
+                  </div>
+                  <div className="motivation-option" title="Moderate - Ready for balanced workout">
+                    <span className="motivation-icon">🟡</span>
+                    <span className="motivation-label">Moderate</span>
+                  </div>
+                  <div className="motivation-option" title="High - Feeling strong and motivated">
+                    <span className="motivation-icon">🟠</span>
+                    <span className="motivation-label">High</span>
+                  </div>
+                  <div className="motivation-option" title="Very High - Maximum motivation and energy">
+                    <span className="motivation-icon">🔴</span>
+                    <span className="motivation-label">Very High</span>
+                  </div>
+                  <div className="motivation-option" title="Extreme - Peak energy and drive">
+                    <span className="motivation-icon">🟣</span>
+                    <span className="motivation-label">Extreme</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormFieldCard>
+      </div>
+
+      {/* Third Row: 2-Column Layout */}
+      <div className="generator-row generator-row--third">
+        {/* Current Soreness Card */}
+        <FormFieldCard
+          title="Current Soreness"
+          description="Any areas feeling sore or tight today?"
+          delay={900}
+          variant="complex"
+        >
+          <div className="soreness-card-structure">
+            {/* HEADER: Profile Soreness Section */}
+            <div className="soreness-card-header">
+              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+                <div className="profile-soreness-section">
+                  <div className="profile-soreness-label">Recovery Focus:</div>
+                  <div className="profile-soreness-badges">
+                    <span className="profile-no-soreness">Select any sore areas today</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="header-fallback">
+                  <div className="header-fallback-text">
+                    <span>Current Soreness</span>
+                  </div>
+                  <div className="header-subtitle">Select areas that need extra attention</div>
+                </div>
+              )}
+            </div>
+
+            {/* BODY: Today's Soreness Selector */}
+            <div className="soreness-card-body">
+              <div className="soreness-selector-container">
+                <div className="soreness-selector-label">
+                  Areas feeling sore or tight:
+                </div>
+                
+                <div className="soreness-grid">
+                  <div className="soreness-option" title="Shoulders feeling sore or tight" data-soreness="shoulders">
+                    <span className="soreness-label">Shoulders</span>
+                  </div>
+                  <div className="soreness-option" title="Arms feeling sore or tight" data-soreness="arms">
+                    <span className="soreness-label">Arms</span>
+                  </div>
+                  <div className="soreness-option" title="Chest feeling sore or tight" data-soreness="chest">
+                    <span className="soreness-label">Chest</span>
+                  </div>
+                  <div className="soreness-option" title="Back feeling sore or tight" data-soreness="back">
+                    <span className="soreness-label">Back</span>
+                  </div>
+                  <div className="soreness-option" title="Core/Abs feeling sore or tight" data-soreness="core">
+                    <span className="soreness-label">Core/Abs</span>
+                  </div>
+                  <div className="soreness-option" title="Hips feeling sore or tight" data-soreness="hips">
+                    <span className="soreness-label">Hips</span>
+                  </div>
+                  <div className="soreness-option" title="Legs feeling sore or tight" data-soreness="legs">
+                    <span className="soreness-label">Legs</span>
+                  </div>
+                  <div className="soreness-option" title="Knees feeling sore or tight" data-soreness="knees">
+                    <span className="soreness-label">Knees</span>
+                  </div>
+                  <div className="soreness-option" title="Ankles feeling sore or tight" data-soreness="ankles">
+                    <span className="soreness-label">Ankles</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormFieldCard>
+
+        {/* Sleep Quality Card */}
+        <FormFieldCard
+          title="Sleep Quality"
+          description="How well did you sleep last night?"
+          delay={1000}
+          variant="complex"
+        >
+          <div className="sleep-card-structure">
+            {/* HEADER: Profile Sleep Section */}
+            <div className="sleep-card-header">
+              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+                <div className="profile-sleep-section">
+                  <div className="profile-sleep-label">Your Typical Sleep:</div>
+                  <div className="profile-sleep-badges">
+                    <span className="profile-sleep-info">Rate last night's rest quality</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="header-fallback">
+                  <div className="header-fallback-text">
+                    <span>Sleep Quality</span>
+                  </div>
+                  <div className="header-subtitle">Rate how well you slept last night</div>
+                </div>
+              )}
+            </div>
+
+            {/* BODY: Sleep Quality Selector */}
+            <div className="sleep-card-body">
+              <div className="sleep-selector-container">
+                <div className="sleep-selector-label">
+                  Last night's sleep quality:
+                </div>
+                
+                <div className="sleep-grid">
+                  <div className="sleep-option" title="Excellent - Deep, restful sleep all night" data-sleep="excellent">
+                    <span className="sleep-label">Excellent</span>
+                  </div>
+                  <div className="sleep-option" title="Good - Solid sleep with minimal interruptions" data-sleep="good">
+                    <span className="sleep-label">Good</span>
+                  </div>
+                  <div className="sleep-option" title="Fair - Decent sleep but some restlessness" data-sleep="fair">
+                    <span className="sleep-label">Fair</span>
+                  </div>
+                  <div className="sleep-option" title="Poor - Restless night with frequent waking" data-sleep="poor">
+                    <span className="sleep-label">Poor</span>
+                  </div>
+                  <div className="sleep-option" title="Very Poor - Little sleep, very restless" data-sleep="very-poor">
+                    <span className="sleep-label">Very Poor</span>
+                  </div>
+                  <div className="sleep-option" title="Terrible - Almost no sleep, exhausted" data-sleep="terrible">
+                    <span className="sleep-label">Terrible</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </FormFieldCard>
       </div>
@@ -522,7 +865,7 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
           <div className="generate-button-card">
             <button className="generate-workout-btn" disabled>
               <span className="btn-icon">✨</span>
-              <span className="btn-text">Generate Workout</span>
+              <span className="btn-text">Review Workout</span>
               <span className="btn-subtitle">(Coming Soon)</span>
             </button>
           </div>
@@ -532,4 +875,4 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
   );
 };
 
-export default WorkoutGeneratorGrid; 
+export default WorkoutGeneratorGrid;

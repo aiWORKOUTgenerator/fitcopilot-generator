@@ -62,9 +62,34 @@ export const AdvancedOptionsPanel: React.FC<AdvancedOptionsPanelProps> = ({
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   
-  // Get profile data for equipment badges
-  const { profile, isLoading: profileLoading } = useProfile();
-  const profileMapping = profile ? mapProfileToWorkoutContext(profile) : null;
+  // Get profile data for equipment badges with error handling
+  let state, profile, profileLoading, profileMapping;
+  try {
+    const profileResult = useProfile();
+    state = profileResult.state;
+    profile = state.profile;
+    profileLoading = state.loading;
+    profileMapping = profile ? mapProfileToWorkoutContext(profile) : null;
+  } catch (error) {
+    console.error('[AdvancedOptionsPanel] Error calling useProfile hook:', error);
+    // Fallback values
+    state = { profile: null, loading: false, error: null };
+    profile = null;
+    profileLoading = false;
+    profileMapping = null;
+  }
+
+  // Debug logging to understand what's happening
+  React.useEffect(() => {
+    console.log('[AdvancedOptionsPanel] Debug Info:', {
+      profileState: state,
+      profile: profile,
+      profileLoading: profileLoading,
+      profileMappingExists: !!profileMapping,
+      useProfileType: typeof useProfile,
+      profileContextAvailable: !!useProfile,
+    });
+  }, [state, profile, profileLoading, profileMapping]);
 
   /**
    * Toggle advanced options visibility

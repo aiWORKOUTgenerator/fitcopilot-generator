@@ -23,273 +23,557 @@
  * =========================================================================== */
 
 .muscle-card-structure {
-  // Inherit from existing card foundation
-  @include card-bg-color('card');
-  @include card-border-radius('card');
-  @include card-shadow('card');
-  @include card-hover-effect('card');
-  
-  background: $gray-900; // Dark background as per mockup
-  border: 1px solid rgba($lime-400, 0.1);
-  border-radius: $wg-border-radius;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  
-  .dark-theme & {
-    background: $gray-900;
-    border-color: rgba($lime-400, 0.15);
-  }
-  
-  &:hover {
-    border-color: rgba($lime-400, 0.2);
-    box-shadow: 0 8px 32px rgba($lime-400, 0.1);
-    
-    .dark-theme & {
-      border-color: rgba($lime-400, 0.25);
-      box-shadow: 0 8px 32px rgba($lime-400, 0.15);
-    }
-  }
-}
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 0.5rem);
 
-/* ===========================================================================
- * MUSCLE CARD HEADER
- * Profile integration + selected muscle groups as chips
- * =========================================================================== */
-
-.muscle-card-header {
-  padding: $spacing-4;
-  background: linear-gradient(135deg, 
-    rgba($header-dark-cyan, 0.8), 
-    rgba($header-dark-cyan-border, 0.6)
-  );
-  border-bottom: 1px solid rgba($lime-400, 0.1);
-  backdrop-filter: blur(8px);
-  
-  .dark-theme & {
-    background: linear-gradient(135deg, 
-      rgba($header-dark-cyan, 0.9), 
-      rgba($header-dark-cyan-border, 0.7)
-    );
-    border-bottom-color: rgba($lime-400, 0.15);
-  }
-  
-  .profile-muscle-section {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-3;
-    
-    .profile-preferences {
-      display: flex;
-      align-items: center;
-      gap: $spacing-2;
-      flex-wrap: wrap;
-      
-      .profile-label {
-        font-size: $font-size-sm;
-        color: $gray-400;
-        font-weight: $font-weight-medium;
-        white-space: nowrap;
-      }
-      
-      .profile-muscle-badge {
-        background: rgba($lime-400, 0.15);
-        border: 1px solid rgba($lime-400, 0.3);
-        color: $lime-400;
-        padding: $spacing-1 $spacing-2;
-        border-radius: 12px;
-        font-size: $font-size-xs;
-        font-weight: $font-weight-medium;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        backdrop-filter: blur(4px);
-        
-        &:hover {
-          background: rgba($lime-400, 0.25);
-          border-color: rgba($lime-400, 0.4);
-          transform: translateY(-1px);
-        }
-        
-        &.selected {
-          background: $lime-400;
-          color: $gray-900;
-          border-color: $lime-400;
-        }
-      }
-    }
-    
-    .selected-muscle-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: $spacing-2;
-      min-height: 32px;
-      align-items: center;
-      
-      &.empty {
-        .empty-state-hint {
-          color: $gray-500;
-          font-size: $font-size-sm;
-          font-style: italic;
-        }
-      }
-    }
-  }
-}
-
-/* ===========================================================================
- * MUSCLE CARD BODY
- * Muscle group selector + expanded muscle grids
- * =========================================================================== */
-
-.muscle-card-body {
-  padding: $spacing-4;
-  background: rgba($gray-900, 0.95);
-  backdrop-filter: blur(12px);
-  
-  .dark-theme & {
-    background: rgba($gray-900, 0.98);
-  }
-  
-  .muscle-group-selector {
-    margin-bottom: $spacing-4;
-    
-    .selector-label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: $spacing-3;
-      
-      .label-text {
-        font-size: $font-size-md;
-        color: $white;
-        font-weight: $font-weight-medium;
-      }
-      
-      .selection-counter {
-        background: rgba($lime-400, 0.1);
-        border: 1px solid rgba($lime-400, 0.3);
-        color: $lime-400;
-        padding: $spacing-1 $spacing-2;
-        border-radius: 8px;
-        font-size: $font-size-xs;
-        font-weight: $font-weight-semibold;
-        
-        &.at-limit {
-          background: rgba($error, 0.1);
-          border-color: rgba($error, 0.3);
-          color: $error;
-        }
-      }
-    }
-  }
-  
-  .muscle-detail-grids {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-4;
-  }
-  
-  .validation-messages {
-    margin-top: $spacing-3;
-    
-    .validation-message {
-      display: flex;
-      align-items: center;
-      gap: $spacing-2;
-      padding: $spacing-2 $spacing-3;
-      border-radius: 8px;
-      font-size: $font-size-sm;
-      
-      .validation-icon {
-        font-size: $font-size-base;
-        flex-shrink: 0;
-      }
-      
-      &.success {
-        background: rgba($success, 0.1);
-        border: 1px solid rgba($success, 0.3);
-        color: $success;
-      }
-      
-      &.warning {
-        background: rgba($warning, 0.1);
-        border: 1px solid rgba($warning, 0.3);
-        color: $warning;
-      }
-      
-      &.error {
-        background: rgba($error, 0.1);
-        border: 1px solid rgba($error, 0.3);
-        color: $error;
-      }
-    }
-  }
-}
-
-/* ===========================================================================
- * RESPONSIVE DESIGN
- * =========================================================================== */
-
-@media (max-width: 768px) {
+  // HEADER: Profile Muscle Recommendations + Selected Groups
   .muscle-card-header {
-    padding: $spacing-3;
+    flex: 0 0 auto;
+    min-height: 60px;
+    padding: var(--spacing-xs, 0.25rem);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm, 6px);
+    backdrop-filter: blur(8px);
     
-    .profile-muscle-section .profile-preferences {
+    // Allow height expansion for multiple chips
+    height: auto;
+    max-height: none;
+
+    .profile-muscle-section {
+      width: 100%;
+      display: flex;
       flex-direction: column;
+      
+      .profile-muscle-label {
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-secondary, #b3b3b3);
+        font-weight: var(--font-weight-medium, 500);
+        margin-bottom: var(--spacing-xs, 0.25rem);
+        text-align: center;
+      }
+
+      .profile-muscle-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-xs, 0.25rem);
+        justify-content: center;
+        align-items: center;
+
+        .muscle-suggestion-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.2rem 0.4rem;
+          background: rgba(132, 204, 22, 0.1);
+          border: 1px solid rgba(132, 204, 22, 0.3);
+          border-radius: 4px;
+          font-size: var(--font-size-xs, 0.75rem);
+          color: var(--color-text-secondary, #b3b3b3);
+          font-weight: var(--font-weight-medium, 500);
+          transition: all 0.2s ease;
+          backdrop-filter: blur(8px);
+          cursor: pointer;
+
+          &:hover:not(:disabled) {
+            background: rgba(132, 204, 22, 0.2);
+            border-color: rgba(132, 204, 22, 0.5);
+            color: var(--color-text-primary, #ffffff);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+          }
+
+          &.suggestion-badge--selected {
+            background: rgba(132, 204, 22, 0.3);
+            border-color: rgba(132, 204, 22, 0.6);
+            color: rgba(132, 204, 22, 1);
+            font-weight: var(--font-weight-semibold, 600);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+
+
+        }
+      }
+    }
+
+    .header-fallback {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+
+      .header-fallback-text {
+        display: flex;
+        align-items: center;
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-primary, #ffffff);
+        font-weight: 500;
+
+
+      }
+
+      .header-subtitle {
+        font-size: 0.7rem;
+        color: var(--color-text-secondary, #b3b3b3);
+        margin-top: var(--spacing-xs, 0.25rem);
+        text-align: center;
+        opacity: 0.8;
+      }
+    }
+
+    // Selected Muscle Groups as Chips
+    .selected-muscle-chips {
+      margin-top: var(--spacing-sm, 0.5rem);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs, 0.25rem);
+      justify-content: center;
+      width: 100%;
+      min-height: auto;
+      
+      // Ensure container expands with content
       align-items: flex-start;
-      gap: $spacing-2;
+      align-content: flex-start;
+
+      .muscle-group-chip {
+        display: flex;
+        align-items: center;
+        background: rgba(132, 204, 22, 0.15);
+        border: 1px solid rgba(132, 204, 22, 0.4);
+        border-radius: 6px;
+        padding: 0.25rem 0.5rem;
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+        
+        // Ensure chips can size naturally
+        flex: 0 0 auto;
+        max-width: none;
+        white-space: nowrap;
+
+        &:hover {
+          background: rgba(132, 204, 22, 0.25);
+          transform: translateY(-1px);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .chip-content {
+          display: flex;
+          align-items: center;
+          margin-right: var(--spacing-xs, 0.25rem);
+
+
+
+          .chip-label {
+            font-size: var(--font-size-xs, 0.75rem);
+            color: rgba(132, 204, 22, 1);
+            font-weight: var(--font-weight-semibold, 600);
+          }
+
+          .chip-count {
+            margin-left: 0.3rem;
+            font-size: 0.7rem;
+            color: var(--color-text-secondary, #b3b3b3);
+            opacity: 0.8;
+          }
+        }
+
+        .chip-remove {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          background: rgba(255, 255, 255, 0.1);
+          border: none;
+          border-radius: 50%;
+          color: var(--color-text-secondary, #b3b3b3);
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba(220, 38, 38, 0.2);
+            color: #ef4444;
+            transform: scale(1.1);
+          }
+          
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+        
+        // Removing state with less restrictive interaction blocking
+        &.chip--removing {
+          opacity: 0.6;
+          transform: scale(0.95);
+          transition: all 0.15s ease-out;
+          
+          // Only disable the chip content, not the remove button
+          .chip-content {
+            pointer-events: none;
+          }
+        }
+      }
     }
   }
-  
+
+  // BODY: Muscle Group Selector + Detail Grids
   .muscle-card-body {
-    padding: $spacing-3;
-    
-    .muscle-detail-grids {
-      gap: $spacing-3;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .muscle-card-header .selected-muscle-chips {
-    gap: $spacing-1-5;
-  }
-  
-  .muscle-card-body .muscle-group-selector .selector-label {
+    flex: 1;
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-2;
-  }
-}
+    gap: var(--spacing-sm, 0.5rem);
+    padding: var(--spacing-xs, 0.25rem);
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-sm, 6px);
+    backdrop-filter: blur(8px);
 
-/* ===========================================================================
- * ANIMATION PATTERNS
- * Maintains existing staggered animation consistency
- * =========================================================================== */
+    // Muscle Group Dropdown Selector
+    .muscle-group-selector {
+      .selector-label {
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-secondary, #b3b3b3);
+        font-weight: var(--font-weight-medium, 500);
+        margin-bottom: var(--spacing-xs, 0.25rem);
+        text-align: center;
+      }
 
-.muscle-card-structure {
-  &.animating {
-    .muscle-card-header {
-      animation: slideInFromTop 0.4s ease-out;
+      .dropdown-container {
+        position: relative;
+
+        .muscle-dropdown-trigger {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--spacing-xs, 0.25rem);
+          padding: 0.5rem;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-sm, 6px);
+          color: var(--color-text-secondary, #b3b3b3);
+          font-size: var(--font-size-xs, 0.75rem);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          backdrop-filter: blur(8px);
+
+          &:hover:not(:disabled) {
+            background: rgba(132, 204, 22, 0.1);
+            border-color: rgba(132, 204, 22, 0.3);
+            color: var(--color-text-primary, #ffffff);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+
+          .dropdown-chevron {
+            transition: transform 0.2s ease;
+
+            &.chevron--open {
+              transform: rotate(180deg);
+            }
+          }
+        }
+
+        .muscle-dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          z-index: 10;
+          background: rgba(0, 0, 0, 0.9);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: var(--border-radius-sm, 6px);
+          margin-top: 0.25rem;
+          backdrop-filter: blur(12px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+          max-height: 200px;
+          overflow-y: auto;
+
+          .dropdown-option {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--color-text-secondary, #b3b3b3);
+            font-size: var(--font-size-xs, 0.75rem);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+
+            &:hover {
+              background: rgba(132, 204, 22, 0.1);
+              color: var(--color-text-primary, #ffffff);
+            }
+
+
+
+            .option-content {
+              display: flex;
+              flex-direction: column;
+
+              .option-label {
+                font-weight: var(--font-weight-medium, 500);
+              }
+
+              .option-muscle-count {
+                font-size: 0.65rem;
+                opacity: 0.7;
+              }
+            }
+          }
+        }
+      }
+
+      .selector-limit-message {
+        text-align: center;
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-secondary, #b3b3b3);
+        opacity: 0.8;
+        padding: 0.5rem;
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: var(--border-radius-sm, 6px);
+      }
     }
-    
-    .muscle-card-body {
-      animation: slideInFromBottom 0.4s ease-out 0.2s both;
+
+    // Muscle Detail Grids for Selected Groups
+    .muscle-detail-grids {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm, 0.5rem);
+
+      .muscle-detail-grid {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--border-radius-sm, 6px);
+        overflow: hidden;
+
+        .grid-header {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem;
+          background: rgba(255, 255, 255, 0.03);
+          border: none;
+          color: var(--color-text-primary, #ffffff);
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba(132, 204, 22, 0.1);
+          }
+
+          .grid-header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+
+
+            .grid-title {
+              font-size: var(--font-size-sm, 0.875rem);
+              font-weight: var(--font-weight-medium, 500);
+            }
+
+            .grid-progress {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              padding: 0.1rem 0.3rem;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 3px;
+            }
+          }
+
+          .grid-chevron {
+            transition: transform 0.2s ease;
+
+            &.chevron--open {
+              transform: rotate(180deg);
+            }
+          }
+        }
+
+        .muscle-options-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.25rem;
+          padding: 0.5rem;
+
+          .muscle-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius-sm, 6px);
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(132, 204, 22, 0.1);
+              border-color: rgba(132, 204, 22, 0.3);
+
+              .muscle-label {
+                color: var(--color-text-primary, #ffffff);
+              }
+            }
+
+            &.muscle-option--selected {
+              background: rgba(132, 204, 22, 0.2);
+              border-color: rgba(132, 204, 22, 0.5);
+
+              .muscle-label {
+                color: rgba(132, 204, 22, 1);
+                font-weight: var(--font-weight-semibold, 600);
+              }
+            }
+
+            .muscle-checkbox {
+              width: 14px;
+              height: 14px;
+              margin: 0;
+              accent-color: rgba(132, 204, 22, 1);
+            }
+
+            .muscle-label {
+              font-size: var(--font-size-xs, 0.75rem);
+              color: var(--color-text-secondary, #b3b3b3);
+              font-weight: var(--font-weight-medium, 500);
+              transition: all 0.2s ease;
+              user-select: none;
+            }
+          }
+
+          // Responsive adjustments
+          @media (max-width: 1024px) {
+            .muscle-option {
+              padding: 0.25rem;
+
+              .muscle-label {
+                font-size: 0.7rem;
+              }
+            }
+          }
+
+          @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+
+            .muscle-option {
+              .muscle-label {
+                font-size: 0.65rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Selection Summary and Empty State
+    .selection-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      text-align: center;
+
+
+
+      .empty-state-title {
+        font-size: var(--font-size-sm, 0.875rem);
+        color: var(--color-text-primary, #ffffff);
+        font-weight: var(--font-weight-medium, 500);
+        margin-bottom: var(--spacing-xs, 0.25rem);
+      }
+
+      .empty-state-subtitle {
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-secondary, #b3b3b3);
+        opacity: 0.8;
+      }
+    }
+
+    .selection-summary {
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--border-radius-sm, 6px);
+
+      .summary-text {
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-primary, #ffffff);
+        font-weight: var(--font-weight-medium, 500);
+        margin-bottom: var(--spacing-xs, 0.25rem);
+      }
+
+      .summary-warnings {
+        .warning-item {
+          font-size: 0.7rem;
+          color: #fbbf24;
+          margin-bottom: 0.2rem;
+        }
+      }
     }
   }
-}
 
-@keyframes slideInFromTop {
-  from {
+  // Animation entrance effects
+  &[data-animation-delay] {
     opacity: 0;
-    transform: translateY(-20px);
+    animation: fadeInUp 0.6s ease-out forwards;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  // Responsive adjustments
+  @media (max-width: 1024px) {
+    .muscle-card-header {
+      min-height: 50px;
+      padding: 0.2rem;
+    }
+
+    .muscle-card-body {
+      padding: 0.2rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    gap: 0.3rem;
+
+    .muscle-card-header {
+      .selected-muscle-chips {
+        .muscle-group-chip {
+          padding: 0.2rem 0.4rem;
+
+          .chip-content {
+            .chip-label {
+              font-size: 0.65rem;
+            }
+          }
+        }
+      }
+    }
   }
 }
 
-@keyframes slideInFromBottom {
+// Animation keyframes
+@keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(20px);

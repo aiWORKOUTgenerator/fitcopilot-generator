@@ -102,7 +102,11 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
       </div>
       
       <div className="workout-card__content">
-        {workout.sections.map(section => renderSection(section))}
+        {workout.sections?.map(section => renderSection(section)) || (
+          <div className="workout-card__no-sections">
+            No workout sections available
+          </div>
+        )}
       </div>
       
       <div className="workout-card__actions">

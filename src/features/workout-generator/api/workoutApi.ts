@@ -81,6 +81,13 @@ export interface WorkoutFormParams {
   equipment?: string[];
   restrictions?: string;
   specific_request?: string;
+  
+  // Enhanced muscle targeting support
+  muscleSelection?: any;
+  targetMuscleGroups?: string[];
+  specificMuscles?: { [key: string]: string[] };
+  primaryFocus?: string;
+  
   [key: string]: unknown;
 }
 

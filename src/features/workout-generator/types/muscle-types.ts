@@ -71,6 +71,17 @@ export interface UseMuscleSelectionReturn {
   clearSelection: () => void;
   canAddMore: boolean;
   validation: MuscleSelectionValidation;
+  
+  // Additional helper methods
+  getSelectionSummary: () => MuscleSelectionSummary;
+  getMusclesInGroup: (group: MuscleGroup) => string[];
+  isMuscleSelected: (group: MuscleGroup, muscle: string) => boolean;
+  isGroupSelected: (group: MuscleGroup) => boolean;
+  getAvailableGroups: () => MuscleGroup[];
+  
+  // Persistence helpers
+  hasStoredData: boolean;
+  clearStoredData: () => void;
 }
 
 /**

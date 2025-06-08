@@ -17,7 +17,10 @@ import {
   muscleGroupData, 
   MUSCLE_SELECTION_LIMITS, 
   MUSCLE_GROUP_DISPLAY_ORDER,
-  validateMuscleSelection 
+  validateMuscleSelection,
+  MUSCLE_GROUP_COMBINATIONS,
+  getMusclesInGroup,
+  getMuscleGroupInfo
 } from '../constants/muscle-data';
 
 /**
@@ -48,12 +51,7 @@ export const getMuscleGroupDescription = (group: MuscleGroup): string => {
   return muscleGroupData[group]?.description || '';
 };
 
-/**
- * Get all muscles in a specific group
- */
-export const getMusclesInGroup = (group: MuscleGroup): string[] => {
-  return muscleGroupData[group]?.muscles || [];
-};
+
 
 /**
  * Get muscle group for a specific muscle name
@@ -307,4 +305,343 @@ export const isMuscleSelectionEmpty = (selectionData: MuscleSelectionData): bool
  */
 export const hasSpecificMuscles = (selectionData: MuscleSelectionData): boolean => {
   return Object.values(selectionData.selectedMuscles || {}).some(muscles => muscles && muscles.length > 0);
+};
+
+/**
+ * Muscle Selection Utility Functions
+ * 
+ * Helper functions for muscle group selection, formatting, validation,
+ * and integration with the workout generation system.
+ */
+
+/**
+ * Format muscle selection data for API calls
+ */
+export const formatMuscleSelectionForAPI = (
+  selectionData: MuscleSelectionData,
+  primaryFocus?: MuscleGroup
+): WorkoutGenerationMusclePayload => {
+  return {
+    targetMuscleGroups: selectionData.selectedGroups,
+    specificMuscles: selectionData.selectedMuscles,
+    primaryFocus: primaryFocus || (selectionData.selectedGroups.length > 0 ? selectionData.selectedGroups[0] : undefined)
+  };
+};
+
+/**
+ * Format muscle selection for display text
+ */
+export const formatMuscleSelectionDisplay = (selectionData: MuscleSelectionData): string => {
+  if (selectionData.selectedGroups.length === 0) {
+    return 'All muscle groups';
+  }
+  
+  if (selectionData.selectedGroups.length === 1) {
+    return muscleGroupData[selectionData.selectedGroups[0]].display;
+  }
+  
+  if (selectionData.selectedGroups.length === 2) {
+    return `${muscleGroupData[selectionData.selectedGroups[0]].display} & ${muscleGroupData[selectionData.selectedGroups[1]].display}`;
+  }
+  
+  // For 3+ groups, show first two and "& X more"
+  const firstTwo = selectionData.selectedGroups.slice(0, 2)
+    .map(group => muscleGroupData[group].display)
+    .join(', ');
+  const remaining = selectionData.selectedGroups.length - 2;
+  
+  return `${firstTwo} & ${remaining} more`;
+};
+
+/**
+ * Get suggested muscle group combinations based on current selection
+ */
+export const getSuggestedCombinations = (currentSelection: MuscleGroup[]): Array<{
+  name: string;
+  groups: MuscleGroup[];
+  description: string;
+}> => {
+  const suggestions: Array<{ name: string; groups: MuscleGroup[]; description: string; }> = [];
+  
+  // If no current selection, show popular combinations
+  if (currentSelection.length === 0) {
+    return Object.entries(MUSCLE_GROUP_COMBINATIONS).map(([name, groups]) => ({
+      name,
+      groups: groups as MuscleGroup[],
+      description: `Target ${groups.length} muscle groups: ${groups.join(', ')}`
+    }));
+  }
+  
+  // If one group selected, suggest complementary groups
+  if (currentSelection.length === 1) {
+    const selected = currentSelection[0];
+    
+    switch (selected) {
+      case MuscleGroup.Chest:
+        suggestions.push(
+          {
+            name: 'Push Focus',
+            groups: [MuscleGroup.Chest, MuscleGroup.Shoulders, MuscleGroup.Arms],
+            description: 'Complete upper body pushing muscles'
+          },
+          {
+            name: 'Upper Body',
+            groups: [MuscleGroup.Chest, MuscleGroup.Back],
+            description: 'Balanced upper body development'
+          }
+        );
+        break;
+      case MuscleGroup.Back:
+        suggestions.push(
+          {
+            name: 'Pull Focus',
+            groups: [MuscleGroup.Back, MuscleGroup.Arms],
+            description: 'Complete upper body pulling muscles'
+          },
+          {
+            name: 'Posture & Core',
+            groups: [MuscleGroup.Back, MuscleGroup.Core],
+            description: 'Strengthen posture and stability'
+          }
+        );
+        break;
+      case MuscleGroup.Legs:
+        suggestions.push(
+          {
+            name: 'Lower Body',
+            groups: [MuscleGroup.Legs, MuscleGroup.Core],
+            description: 'Complete lower body and core strength'
+          }
+        );
+        break;
+    }
+  }
+  
+  return suggestions.filter(suggestion => 
+    suggestion.groups.length <= MUSCLE_SELECTION_LIMITS.MAX_GROUPS &&
+    !suggestion.groups.every(group => currentSelection.includes(group))
+  );
+};
+
+/**
+ * Validate muscle selection against user profile and preferences
+ */
+export const validateMuscleSelectionWithProfile = (
+  selectionData: MuscleSelectionData,
+  profilePreferences?: ProfileMusclePreferences
+): {
+  isValid: boolean;
+  warnings: string[];
+  suggestions: string[];
+} => {
+  const warnings: string[] = [];
+  const suggestions: string[] = [];
+  
+  if (!profilePreferences) {
+    return { isValid: true, warnings, suggestions };
+  }
+  
+  // Check for avoided muscles
+  if (profilePreferences.avoidedMuscles.length > 0) {
+    Object.entries(selectionData.selectedMuscles).forEach(([group, muscles]) => {
+      const conflictingMuscles = muscles?.filter(muscle => 
+        profilePreferences.avoidedMuscles.includes(muscle)
+      ) || [];
+      
+      if (conflictingMuscles.length > 0) {
+        warnings.push(`Avoid ${conflictingMuscles.join(', ')} based on your profile`);
+      }
+    });
+  }
+  
+  // Check for recently targeted muscles (recovery time)
+  if (profilePreferences.lastTargeted) {
+    const recentlyTargeted = selectionData.selectedGroups.filter(group => {
+      const lastWorkout = profilePreferences.lastTargeted[group];
+      if (!lastWorkout) return false;
+      
+      const daysSince = Math.floor((Date.now() - lastWorkout.getTime()) / (1000 * 60 * 60 * 24));
+      return daysSince < 2; // Less than 2 days recovery
+    });
+    
+    if (recentlyTargeted.length > 0) {
+      warnings.push(`Recently targeted: ${recentlyTargeted.join(', ')} - consider rest time`);
+    }
+  }
+  
+  // Suggest favorite groups if not selected
+  if (profilePreferences.favoriteGroups.length > 0) {
+    const unselectedFavorites = profilePreferences.favoriteGroups.filter(group => 
+      !selectionData.selectedGroups.includes(group)
+    );
+    
+    if (unselectedFavorites.length > 0 && selectionData.selectedGroups.length < MUSCLE_SELECTION_LIMITS.MAX_GROUPS) {
+      suggestions.push(`Consider adding: ${unselectedFavorites.slice(0, 2).join(', ')}`);
+    }
+  }
+  
+  return {
+    isValid: warnings.length === 0,
+    warnings,
+    suggestions
+  };
+};
+
+/**
+ * Calculate workout balance score based on muscle selection
+ */
+export const calculateWorkoutBalance = (selectionData: MuscleSelectionData): {
+  score: number;
+  analysis: string;
+  recommendations: string[];
+} => {
+  const recommendations: string[] = [];
+  let score = 0;
+  
+  const selectedGroups = selectionData.selectedGroups;
+  const hasUpper = selectedGroups.some(group => 
+    [MuscleGroup.Chest, MuscleGroup.Back, MuscleGroup.Arms, MuscleGroup.Shoulders].includes(group)
+  );
+  const hasLower = selectedGroups.includes(MuscleGroup.Legs);
+  const hasCore = selectedGroups.includes(MuscleGroup.Core);
+  const hasPush = selectedGroups.some(group => 
+    [MuscleGroup.Chest, MuscleGroup.Shoulders].includes(group)
+  );
+  const hasPull = selectedGroups.includes(MuscleGroup.Back);
+  
+  // Balance scoring
+  if (hasUpper && hasLower) score += 30;
+  if (hasCore) score += 20;
+  if (hasPush && hasPull) score += 25;
+  if (selectedGroups.length >= 2) score += 15;
+  if (selectedGroups.length === 3) score += 10;
+  
+  // Generate analysis and recommendations
+  let analysis = '';
+  if (score >= 80) {
+    analysis = 'Excellent balance - targets multiple muscle groups effectively';
+  } else if (score >= 60) {
+    analysis = 'Good balance - solid muscle group selection';
+  } else if (score >= 40) {
+    analysis = 'Moderate balance - consider adding complementary groups';
+  } else {
+    analysis = 'Limited balance - focused on specific areas';
+  }
+  
+  // Specific recommendations
+  if (!hasCore && selectedGroups.length < MUSCLE_SELECTION_LIMITS.MAX_GROUPS) {
+    recommendations.push('Add Core for better stability and functional strength');
+  }
+  if (hasPush && !hasPull && selectedGroups.length < MUSCLE_SELECTION_LIMITS.MAX_GROUPS) {
+    recommendations.push('Add Back exercises to balance pushing movements');
+  }
+  if (hasPull && !hasPush && selectedGroups.length < MUSCLE_SELECTION_LIMITS.MAX_GROUPS) {
+    recommendations.push('Add Chest or Shoulders to balance pulling movements');
+  }
+  if (hasUpper && !hasLower && selectedGroups.length < MUSCLE_SELECTION_LIMITS.MAX_GROUPS) {
+    recommendations.push('Add Legs for a more complete workout');
+  }
+  
+  return { score, analysis, recommendations };
+};
+
+/**
+ * Generate muscle selection summary with rich information
+ */
+export const generateMuscleSelectionSummary = (selectionData: MuscleSelectionData): MuscleSelectionSummary & {
+  balance: ReturnType<typeof calculateWorkoutBalance>;
+  estimatedDuration: number;
+  difficulty: 'Low' | 'Medium' | 'High';
+} => {
+  const totalGroups = selectionData.selectedGroups.length;
+  let totalMuscles = 0;
+  
+  const groupSummary = selectionData.selectedGroups.map(group => {
+    const selectedMuscles = selectionData.selectedMuscles[group] || [];
+    const totalMusclesInGroup = getMusclesInGroup(group).length;
+    totalMuscles += selectedMuscles.length;
+    
+    return {
+      group,
+      muscleCount: selectedMuscles.length,
+      isComplete: selectedMuscles.length === totalMusclesInGroup
+    };
+  });
+  
+  // Generate display text
+  let displayText = formatMuscleSelectionDisplay(selectionData);
+  
+  // Calculate estimated duration (base 20min + 10min per additional group)
+  const estimatedDuration = Math.max(20, 20 + (totalGroups - 1) * 10);
+  
+  // Determine difficulty based on selection complexity
+  let difficulty: 'Low' | 'Medium' | 'High' = 'Low';
+  if (totalGroups >= 3 || totalMuscles > 8) {
+    difficulty = 'High';
+  } else if (totalGroups === 2 || totalMuscles > 4) {
+    difficulty = 'Medium';
+  }
+  
+  return {
+    totalGroups,
+    totalMuscles,
+    groupSummary,
+    displayText,
+    balance: calculateWorkoutBalance(selectionData),
+    estimatedDuration,
+    difficulty
+  };
+};
+
+/**
+ * Create muscle selection from user preferences
+ */
+export const createMuscleSelectionFromPreferences = (
+  preferences: ProfileMusclePreferences,
+  maxGroups: number = MUSCLE_SELECTION_LIMITS.MAX_GROUPS
+): MuscleSelectionData => {
+  const selectedGroups = preferences.favoriteGroups.slice(0, maxGroups);
+  const selectedMuscles: { [key in MuscleGroup]?: string[] } = {};
+  
+  // Initialize with focus areas if available
+  selectedGroups.forEach(group => {
+    const groupMuscles = getMusclesInGroup(group);
+    const focusedMuscles = preferences.focusAreas.filter(muscle => 
+      groupMuscles.includes(muscle)
+    );
+    
+    selectedMuscles[group] = focusedMuscles;
+  });
+  
+  return {
+    selectedGroups,
+    selectedMuscles
+  };
+};
+
+/**
+ * Export muscle selection to various formats
+ */
+export const exportMuscleSelection = {
+  // Export to simple array format
+  toArray: (selectionData: MuscleSelectionData): string[] => {
+    return selectionData.selectedGroups.map(group => muscleGroupData[group].display);
+  },
+  
+  // Export to detailed object format
+  toDetailedObject: (selectionData: MuscleSelectionData) => {
+    return selectionData.selectedGroups.map(group => ({
+      group,
+      display: muscleGroupData[group].display,
+      icon: muscleGroupData[group].icon,
+      muscles: selectionData.selectedMuscles[group] || [],
+      allMuscles: getMusclesInGroup(group)
+    }));
+  },
+  
+  // Export to workout generation format
+  toWorkoutFormat: formatMuscleSelectionForAPI,
+  
+  // Export to display text
+  toDisplayText: formatMuscleSelectionDisplay
 }; 

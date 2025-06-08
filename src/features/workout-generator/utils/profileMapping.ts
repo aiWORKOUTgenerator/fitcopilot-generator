@@ -230,6 +230,11 @@ export const getProfileDisplayData = (profile: Profile): ProfileToWorkoutMapping
       display: 'Flexible Location',
       context: 'Adaptable exercises',
       color: '#8b5cf6'
+    },
+    'travel': {
+      display: 'Travel Workouts',
+      context: 'Portable exercises',
+      color: '#8b5cf6'
     }
   };
   
