@@ -3,8 +3,9 @@
  * 
  * Main entry point for the user profile feature
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ProfileProvider, useProfile } from './context/ProfileContext';
+import { getTimeBasedPersonalization, getMotivationalMessage } from './utils/timePersonalization';
 
 // Import the enhanced styles
 import './styles/ProfileFeature.scss';
@@ -80,15 +81,29 @@ function ProfileContent() {
   // Success! Show profile data with enhanced styling
   const { profile } = state;
   
+  // Get time-based personalization
+  const timePersonalization = useMemo(() => {
+    const userName = profile.firstName || profile.displayName || profile.username;
+    return getTimeBasedPersonalization(userName);
+  }, [profile.firstName, profile.displayName, profile.username]);
+
+  // Get motivational message based on goals and time
+  const motivationalMessage = useMemo(() => {
+    return getMotivationalMessage(profile.goals || [], timePersonalization.timeOfDay);
+  }, [profile.goals, timePersonalization.timeOfDay]);
+  
   return (
     <div className="profile-feature profile-feature--enhanced">
       <div className="profile-success">
         <div className="profile-success__header">
-          <div className="profile-success__icon">✅</div>
-          <h2 className="profile-success__title">Profile Loaded Successfully!</h2>
+          <div className="profile-success__icon">{timePersonalization.emoji}</div>
+          <h2 className="profile-success__title">{timePersonalization.greeting}</h2>
         </div>
         <p className="profile-success__message">
-          Your fitness profile has been loaded and is ready for personalized workouts.
+          {timePersonalization.message}
+        </p>
+        <p className="profile-success__description">
+          {motivationalMessage}
         </p>
       </div>
 
@@ -262,6 +277,7 @@ Email: ${profile.email}`}
           </pre>
         </div>
       </div>
+
     </div>
   );
 }

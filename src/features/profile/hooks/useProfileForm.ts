@@ -15,7 +15,8 @@ import { useProfile } from '../context';
  * @returns Profile form state and handlers
  */
 export const useProfileForm = (initialStep = 1) => {
-  const { profile, updateUserProfile, saveDraftUserProfile, isUpdating, isSavingDraft, error, completedSteps } = useProfile();
+  const { state, updateProfile, clearError } = useProfile();
+  const { profile, loading, error } = state;
   const { validateProfile, isProfileComplete } = useProfileValidation();
   
   // Define total steps in the profile form
@@ -30,6 +31,10 @@ export const useProfileForm = (initialStep = 1) => {
     isDirty: false,
     isSubmitting: false
   });
+
+  // Local state for tracking completed steps and draft saving
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
   
   // Update form data when profile is loaded
   useEffect(() => {
@@ -71,9 +76,9 @@ export const useProfileForm = (initialStep = 1) => {
   useEffect(() => {
     setFormState(state => ({
       ...state,
-      isSubmitting: isUpdating || isSavingDraft
+      isSubmitting: loading || isSavingDraft
     }));
-  }, [isUpdating, isSavingDraft]);
+  }, [loading, isSavingDraft]);
   
   // Field change handler
   const handleChange = useCallback((field: string, value: any) => {
@@ -89,85 +94,65 @@ export const useProfileForm = (initialStep = 1) => {
     }));
   }, []);
   
-  // Form validation
-  const validateForm = useCallback((step?: number) => {
-    const currentStep = step || formState.currentStep;
+  // Simple form validation
+  const validateForm = useCallback(() => {
     const errors = validateProfile(formState.formData);
-    
-    // Filter errors relevant to current step
     let stepErrors = {};
     
-    switch (currentStep) {
+    // Only validate current step fields
+    switch (formState.currentStep) {
       case 1: // Basic info
         stepErrors = Object.keys(errors)
-          .filter(key => ['firstName', 'lastName', 'email', 'fitnessLevel', 'goals', 'customGoal'].includes(key))
+          .filter(key => ['firstName', 'lastName', 'email', 'fitnessLevel', 'goals'].includes(key))
           .reduce((obj, key) => ({ ...obj, [key]: errors[key] }), {});
         break;
-        
-      case 2: // Body metrics
+      case 2: // Body metrics - all optional
+        stepErrors = {};
+        break;
+      case 3: // Equipment & location  
         stepErrors = Object.keys(errors)
-          .filter(key => ['weight', 'weightUnit', 'height', 'heightUnit', 'age', 'gender'].includes(key))
+          .filter(key => ['availableEquipment', 'preferredLocation'].includes(key))
           .reduce((obj, key) => ({ ...obj, [key]: errors[key] }), {});
         break;
-        
-      case 3: // Equipment & location
-        stepErrors = Object.keys(errors)
-          .filter(key => ['availableEquipment', 'customEquipment', 'preferredLocation'].includes(key))
-          .reduce((obj, key) => ({ ...obj, [key]: errors[key] }), {});
+      case 4: // Health - all optional
+        stepErrors = {};
         break;
-        
-      case 4: // Health considerations
-        stepErrors = Object.keys(errors)
-          .filter(key => ['limitations', 'limitationNotes', 'medicalConditions'].includes(key))
-          .reduce((obj, key) => ({ ...obj, [key]: errors[key] }), {});
+      case 5: // Preferences - all optional
+        stepErrors = {};
         break;
-        
-      case 5: // Preferences
-        stepErrors = Object.keys(errors)
-          .filter(key => [
-            'preferredWorkoutDuration', 
-            'workoutFrequency', 
-            'customFrequency',
-            'favoriteExercises',
-            'dislikedExercises'
-          ].includes(key))
-          .reduce((obj, key) => ({ ...obj, [key]: errors[key] }), {});
-        break;
-        
-      default:
-        stepErrors = errors;
     }
     
-    setFormState(state => ({
-      ...state,
-      validationErrors: stepErrors
-    }));
-    
+    setFormState(state => ({ ...state, validationErrors: stepErrors }));
     return Object.keys(stepErrors).length === 0;
   }, [formState.currentStep, formState.formData, validateProfile]);
   
-  // Step navigation with auto-save
-  const goToNextStep = useCallback(async () => {
-    if (validateForm()) {
-      // Auto-save current step data before moving to next step
-      try {
-        await saveDraftUserProfile(formState.formData, formState.currentStep);
-        
-        setFormState(state => ({
-          ...state,
-          currentStep: Math.min(state.currentStep + 1, state.totalSteps),
-          isDirty: false
-        }));
-      } catch (error) {
-        console.error('Failed to auto-save step data:', error);
-        // Still allow progression even if save fails
-        setFormState(state => ({
-          ...state,
-          currentStep: Math.min(state.currentStep + 1, state.totalSteps)
-        }));
-      }
+  // Dead simple step navigation
+  const goToNextStep = useCallback(() => {
+    console.log('[ProfileForm] Next step clicked');
+    
+    // Validate current step
+    if (!validateForm()) {
+      console.log('[ProfileForm] Validation failed');
+      return;
     }
-  }, [validateForm, formState.formData, formState.currentStep, formState.totalSteps, saveDraftUserProfile]);
+    
+    console.log('[ProfileForm] Validation passed, advancing step');
+    
+    // Just advance the step
+    setFormState(state => {
+      const newStep = state.currentStep + 1;
+      console.log('[ProfileForm] Moving to step:', newStep);
+      return {
+        ...state,
+        currentStep: newStep,
+        isDirty: false
+      };
+    });
+    
+    // Mark step as completed
+    setCompletedSteps(prev => [...prev, formState.currentStep]);
+    
+  }, [validateForm, formState.currentStep]);
   
   const goToPreviousStep = useCallback(() => {
     setFormState(state => ({
@@ -203,7 +188,14 @@ export const useProfileForm = (initialStep = 1) => {
         profileComplete: true
       };
       
-      await updateUserProfile(updatedData);
+      await updateProfile(updatedData);
+      
+      // Mark final step as completed
+      setCompletedSteps(prev => 
+        prev.includes(formState.currentStep) 
+          ? prev 
+          : [...prev, formState.currentStep]
+      );
       
       setFormState(state => ({
         ...state,
@@ -219,7 +211,7 @@ export const useProfileForm = (initialStep = 1) => {
         isSubmitting: false
       }));
     }
-  }, [formState.formData, updateUserProfile, validateForm]);
+  }, [formState.formData, formState.currentStep, updateProfile, validateForm]);
   
   // Reset form
   const resetForm = useCallback(() => {

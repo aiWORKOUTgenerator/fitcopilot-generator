@@ -172,6 +172,48 @@ export interface SessionSpecificInputs {
    * Current workout environment (gym, home, travel, etc.)
    */
   environment?: 'gym' | 'home' | 'outdoors' | 'travel' | 'limited-space';
+  
+  /**
+   * Today's primary workout focus selected from WorkoutGrid
+   * Maps to the 6 focus options in the WorkoutGeneratorGrid
+   */
+  todaysFocus?: 'fat-burning' | 'muscle-building' | 'endurance' | 'strength' | 'flexibility' | 'general-fitness';
+  
+  /**
+   * Today's intensity level (1-6 scale from WorkoutGrid)
+   * 1=Very Low, 2=Low, 3=Moderate, 4=High, 5=Very High, 6=Extreme
+   */
+  dailyIntensityLevel?: number;
+  
+  /**
+   * Health limitations active today (subset of profile limitations)
+   * User can specify which of their profile health considerations apply today
+   */
+  healthRestrictionsToday?: string[];
+  
+  /**
+   * Equipment specifically available for today's workout
+   * May differ from profile equipment based on location/access
+   */
+  equipmentAvailableToday?: string[];
+  
+  /**
+   * Actual time available for today's workout (overrides profile frequency suggestions)
+   * This is the real constraint for today, different from general availableTime
+   */
+  timeConstraintsToday?: number;
+  
+  /**
+   * Where working out today (may differ from profile preferred location)
+   * Today's actual location choice
+   */
+  locationToday?: 'home' | 'gym' | 'outdoors' | 'travel' | 'limited-space';
+  
+  /**
+   * Custom workout preferences or additional context not covered by other fields
+   * Free-form text input for specific requests, modifications, or notes
+   */
+  workoutCustomization?: string;
 }
 
 /**
@@ -192,6 +234,7 @@ export interface WorkoutFormParams {
   
   /**
    * Dynamic inputs specific to the current workout session
+   * Extended to include WorkoutGrid daily selections
    */
   sessionInputs?: SessionSpecificInputs;
 }

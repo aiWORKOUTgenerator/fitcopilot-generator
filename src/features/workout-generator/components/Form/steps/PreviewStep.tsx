@@ -189,7 +189,11 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
         {/* Session-specific inputs - exclude environment since it's now in the main cards */}
         {(sessionInputs.availableTime || sessionInputs.energyLevel || sessionInputs.moodLevel || 
           sessionInputs.sleepQuality || (sessionInputs.focusArea && sessionInputs.focusArea.length > 0) || 
-          (sessionInputs.currentSoreness && sessionInputs.currentSoreness.length > 0)) && (
+          (sessionInputs.currentSoreness && sessionInputs.currentSoreness.length > 0) ||
+          sessionInputs.todaysFocus || sessionInputs.dailyIntensityLevel || 
+          (sessionInputs.healthRestrictionsToday && sessionInputs.healthRestrictionsToday.length > 0) ||
+          (sessionInputs.equipmentAvailableToday && sessionInputs.equipmentAvailableToday.length > 0) ||
+          sessionInputs.timeConstraintsToday || sessionInputs.locationToday) && (
           <div className="workout-preview__section">
             <h4 className="workout-preview__section-title">
               Today's Workout Factors
@@ -223,8 +227,57 @@ const PreviewStep: React.FC<PreviewStepProps> = ({
                 </div>
               )}
               
-
+              {/* NEW WORKOUTGRID FIELDS */}
+              {sessionInputs.todaysFocus && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Today's Focus:</span> 
+                  <span className="workout-preview__session-value">
+                    {sessionInputs.todaysFocus.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </span>
+                </div>
+              )}
               
+              {sessionInputs.dailyIntensityLevel && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Intensity Level:</span> 
+                  <span className="workout-preview__session-value">{sessionInputs.dailyIntensityLevel}/6</span>
+                </div>
+              )}
+              
+              {sessionInputs.healthRestrictionsToday && sessionInputs.healthRestrictionsToday.length > 0 && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Today's Restrictions:</span> 
+                  <span className="workout-preview__session-value">
+                    {sessionInputs.healthRestrictionsToday.join(', ')}
+                  </span>
+                </div>
+              )}
+              
+              {sessionInputs.equipmentAvailableToday && sessionInputs.equipmentAvailableToday.length > 0 && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Available Equipment:</span> 
+                  <span className="workout-preview__session-value">
+                    {sessionInputs.equipmentAvailableToday.join(', ')}
+                  </span>
+                </div>
+              )}
+              
+              {sessionInputs.timeConstraintsToday && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Time Available Today:</span> 
+                  <span className="workout-preview__session-value">{sessionInputs.timeConstraintsToday} minutes</span>
+                </div>
+              )}
+              
+              {sessionInputs.locationToday && (
+                <div className="workout-preview__session-item">
+                  <span className="workout-preview__session-label">Today's Location:</span> 
+                  <span className="workout-preview__session-value">
+                    {sessionInputs.locationToday.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </span>
+                </div>
+              )}
+
               {sessionInputs.focusArea && sessionInputs.focusArea.length > 0 && (
                 <div className="workout-preview__session-item">
                   <span className="workout-preview__session-label">Focus Areas:</span> 

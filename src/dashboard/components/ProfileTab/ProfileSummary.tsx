@@ -26,7 +26,6 @@ interface UserProfile {
 interface ProfileSummaryProps {
   profile: UserProfile;
   onEditProfile: () => void;
-  onUpdatePreferences: () => void;
   isLoading?: boolean;
 }
 
@@ -36,10 +35,8 @@ interface ProfileSummaryProps {
 export const ProfileSummary: React.FC<ProfileSummaryProps> = ({
   profile,
   onEditProfile,
-  onUpdatePreferences,
   isLoading = false
 }) => {
-  const [showFullGoals, setShowFullGoals] = useState(false);
 
   if (isLoading) {
     return (
@@ -142,75 +139,7 @@ export const ProfileSummary: React.FC<ProfileSummaryProps> = ({
         className="profile-fitness-stats"
       />
 
-      {/* Fitness Goals */}
-      <Card className="fitness-goals-card">
-        <div className="card-header">
-          <h3 className="card-title">Fitness Goals</h3>
-          <Button 
-            variant="text" 
-            size="sm" 
-            onClick={onUpdatePreferences}
-            className="update-goals-btn"
-          >
-            Update
-          </Button>
-        </div>
-        
-        <div className="goals-list">
-          {profile.fitnessGoals.slice(0, showFullGoals ? undefined : 3).map((goal, index) => (
-            <div key={index} className="goal-tag">
-              <span className="goal-icon">🎯</span>
-              <span className="goal-text">{goal}</span>
-            </div>
-          ))}
-          
-          {profile.fitnessGoals.length > 3 && (
-            <button 
-              className="show-more-goals"
-              onClick={() => setShowFullGoals(!showFullGoals)}
-            >
-              {showFullGoals ? 'Show Less' : `+${profile.fitnessGoals.length - 3} More`}
-            </button>
-          )}
-        </div>
-      </Card>
 
-      {/* Workout Preferences */}
-      <Card className="workout-preferences-card">
-        <div className="card-header">
-          <h3 className="card-title">Workout Preferences</h3>
-          <Button 
-            variant="text" 
-            size="sm" 
-            onClick={onUpdatePreferences}
-            className="update-preferences-btn"
-          >
-            Update
-          </Button>
-        </div>
-        
-        <div className="preferences-section">
-          <h4 className="section-title">Preferred Workout Types</h4>
-          <div className="preference-tags">
-            {profile.preferredWorkoutTypes.map((type, index) => (
-              <span key={index} className="preference-tag workout-type">
-                {type}
-              </span>
-            ))}
-          </div>
-        </div>
-        
-        <div className="preferences-section">
-          <h4 className="section-title">Available Equipment</h4>
-          <div className="preference-tags">
-            {profile.availableEquipment.map((equipment, index) => (
-              <span key={index} className="preference-tag equipment">
-                {equipment}
-              </span>
-            ))}
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };

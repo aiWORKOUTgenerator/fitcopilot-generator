@@ -7,7 +7,8 @@ import { WorkoutGeneratorFeature } from '../features/workout-generator/WorkoutGe
 
 // Import profile context and components
 import { ProfileProvider, useProfile } from '../features/profile/context';
-import { ProfileFeature } from '../features/profile';
+import { ProfileFeature, ProfileEditButton } from '../features/profile';
+import ProfileEditModal from '../features/profile/components/modals/ProfileEditModal';
 import type { UserProfile } from '../features/profile/types';
 import type { Profile } from '../features/profile/api/profileApi';
 
@@ -107,9 +108,9 @@ const transformProfileData = (profile: Profile | null) => {
     return Math.round((filledFields / fields.length) * 100);
   };
 
-  // Get user info (we'll need to get this from WordPress user data)
-  const userName = profile.username || 'User';
-  const userEmail = 'user@example.com'; // TODO: Get from WordPress user data
+  // Get user info from profile data
+  const userName = profile.firstName || profile.username || 'User';
+  const userEmail = profile.email || 'user@example.com';
 
   return {
     name: userName,
@@ -241,6 +242,9 @@ const TabContentWrapper: React.FC = () => {
   const [modalMode, setModalMode] = useState<ModalMode>('view');
   const [isModalLoading, setIsModalLoading] = useState(false);
 
+  // Profile edit modal state
+  const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -293,15 +297,11 @@ const TabContentWrapper: React.FC = () => {
 
   // Handle profile edit
   const handleEditProfile = () => {
-    console.log('Edit profile clicked - TODO: Open profile edit modal');
-    // TODO: Implement profile edit functionality
+    console.log('Edit profile clicked - Opening ProfileEditModal');
+    setIsProfileEditModalOpen(true);
   };
 
-  // Handle preferences update
-  const handleUpdatePreferences = () => {
-    console.log('Update preferences clicked - TODO: Open preferences modal');
-    // TODO: Implement preferences update functionality
-  };
+
 
   // Handle profile registration completion
   const handleProfileComplete = () => {
@@ -521,39 +521,7 @@ const TabContentWrapper: React.FC = () => {
               
               {/* Registration Form */}
               <div className="register-form-section">
-                <Card className="register-form-card">
-                  <ProfileFeature />
-                </Card>
-              </div>
-              
-              {/* Registration Info */}
-              <div className="register-info-section">
-                <Card className="register-info-card">
-                  <h3>Why Complete Your Profile?</h3>
-                  <div className="steps-overview">
-                    <div className="step-item">
-                      <div className="step-number">1</div>
-                      <div className="step-content">
-                        <strong>Personalized Workouts</strong>
-                        <p>Get AI-generated workouts that match your fitness level and goals</p>
-                      </div>
-                    </div>
-                    <div className="step-item">
-                      <div className="step-number">2</div>
-                      <div className="step-content">
-                        <strong>Equipment Optimization</strong>
-                        <p>Workouts designed for the equipment you actually have</p>
-                      </div>
-                    </div>
-                    <div className="step-item">
-                      <div className="step-number">3</div>
-                      <div className="step-content">
-                        <strong>Progress Tracking</strong>
-                        <p>Monitor your fitness journey with detailed statistics</p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
+                <ProfileFeature />
               </div>
             </div>
           </div>
@@ -568,10 +536,11 @@ const TabContentWrapper: React.FC = () => {
                 <ProfileSummary 
                   profile={transformedProfile}
                   onEditProfile={handleEditProfile}
-                  onUpdatePreferences={handleUpdatePreferences}
                   isLoading={isLoading}
                 />
               </div>
+
+
               
               {/* API Usage Stats */}
               <div className="api-usage-section">
@@ -620,6 +589,21 @@ const TabContentWrapper: React.FC = () => {
           onDelete={handleModalDelete}
           onDuplicate={handleModalDuplicate}
           onStart={handleModalStart}
+        />
+      )}
+
+      {/* Profile Edit Modal */}
+      {isProfileEditModalOpen && (
+        <ProfileEditModal
+          isOpen={isProfileEditModalOpen}
+          onClose={() => setIsProfileEditModalOpen(false)}
+          onComplete={(updatedProfile: Profile) => {
+            console.log('[Dashboard] Profile updated via modal:', updatedProfile);
+            setIsProfileEditModalOpen(false);
+            // Refresh profile data
+            getProfile();
+            refreshDashboard();
+          }}
         />
       )}
 

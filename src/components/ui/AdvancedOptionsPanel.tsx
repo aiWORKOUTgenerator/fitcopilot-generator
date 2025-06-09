@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ChevronDown, Dumbbell, CheckSquare } from 'lucide-react';
 import { Textarea } from './Textarea';
 import { useProfile } from '../../features/profile/context';
@@ -63,33 +63,26 @@ export const AdvancedOptionsPanel: React.FC<AdvancedOptionsPanelProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   
   // Get profile data for equipment badges with error handling
-  let state, profile, profileLoading, profileMapping;
+  let state, profile, profileLoading;
   try {
     const profileResult = useProfile();
     state = profileResult.state;
     profile = state.profile;
     profileLoading = state.loading;
-    profileMapping = profile ? mapProfileToWorkoutContext(profile) : null;
   } catch (error) {
     console.error('[AdvancedOptionsPanel] Error calling useProfile hook:', error);
     // Fallback values
     state = { profile: null, loading: false, error: null };
     profile = null;
     profileLoading = false;
-    profileMapping = null;
   }
 
-  // Debug logging to understand what's happening
-  React.useEffect(() => {
-    console.log('[AdvancedOptionsPanel] Debug Info:', {
-      profileState: state,
-      profile: profile,
-      profileLoading: profileLoading,
-      profileMappingExists: !!profileMapping,
-      useProfileType: typeof useProfile,
-      profileContextAvailable: !!useProfile,
-    });
-  }, [state, profile, profileLoading, profileMapping]);
+  // Memoize profile mapping to prevent infinite re-renders
+  const profileMapping = useMemo(() => {
+    return profile ? mapProfileToWorkoutContext(profile) : null;
+  }, [profile]);
+
+  // Debug logging removed to prevent infinite re-render loop
 
   /**
    * Toggle advanced options visibility

@@ -22,6 +22,7 @@ export interface ProfileToWorkoutMapping {
     frequency: { value: string; display: string; suggestedDuration: string };
     equipment: Array<{ value: string; display: string; icon: string }>;
     location: { value: string; display: string; context: string; color: string };
+    limitations: Array<{ value: string; display: string; color: string }>;
   };
 }
 
@@ -240,6 +241,34 @@ export const getProfileDisplayData = (profile: Profile): ProfileToWorkoutMapping
   
   const location = profile.preferredLocation || 'home';
   
+  // Limitations Display (no icons - text only)
+  
+  const limitationLabels: Record<string, string> = {
+    'knee_issues': 'Knee Issues',
+    'back_pain': 'Back Pain',
+    'shoulder_issues': 'Shoulder Issues',
+    'ankle_problems': 'Ankle Problems',
+    'wrist_pain': 'Wrist Pain',
+    'hip_issues': 'Hip Issues',
+    'neck_problems': 'Neck Problems',
+    'cardiovascular': 'Cardiovascular',
+    'other': 'Other Limitation',
+    'none': 'No Limitations'
+  };
+  
+  const limitationColors: Record<string, string> = {
+    'knee_issues': '#f59e0b',
+    'back_pain': '#ef4444',
+    'shoulder_issues': '#f59e0b',
+    'ankle_problems': '#f59e0b',
+    'wrist_pain': '#f59e0b',
+    'hip_issues': '#f59e0b',
+    'neck_problems': '#ef4444',
+    'cardiovascular': '#ef4444',
+    'other': '#ef4444',
+    'none': '#10b981'
+  };
+  
   return {
     fitnessLevel: {
       value: fitnessLevel,
@@ -271,7 +300,12 @@ export const getProfileDisplayData = (profile: Profile): ProfileToWorkoutMapping
       display: locationData[location]?.display || 'Home Workouts',
       context: locationData[location]?.context || 'Space-efficient exercises',
       color: locationData[location]?.color || '#10b981'
-    }
+    },
+    limitations: (profile.limitations || ['none']).map(limitation => ({
+      value: limitation,
+      display: limitationLabels[limitation] || limitation,
+      color: limitationColors[limitation] || '#f59e0b'
+    }))
   };
 };
 

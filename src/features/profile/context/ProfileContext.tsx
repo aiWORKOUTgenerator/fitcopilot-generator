@@ -77,19 +77,22 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const updateProfile = useCallback(async (updates: UpdateProfileRequest) => {
+  const updateProfile = useCallback(async (updates: UpdateProfileRequest): Promise<void> => {
     try {
       dispatch({ type: 'LOADING' });
       const response = await profileApi.updateProfile(updates);
       
       if (response.success && response.data) {
         dispatch({ type: 'PROFILE_LOADED', payload: response.data });
+        return Promise.resolve();
       } else {
         dispatch({ type: 'ERROR', payload: response.message || 'Failed to update profile' });
+        return Promise.reject(new Error(response.message || 'Failed to update profile'));
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error occurred';
       dispatch({ type: 'ERROR', payload: message });
+      return Promise.reject(error);
     }
   }, []);
 

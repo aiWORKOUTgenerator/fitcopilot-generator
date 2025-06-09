@@ -1,0 +1,91 @@
+/**
+ * CardHeader Component Styles
+ */
+
+.card-header-profile-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  .profile-section-label {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--color-text-secondary, #b3b3b3);
+    font-weight: var(--font-weight-medium, 500);
+    margin-bottom: var(--spacing-xs, 0.25rem);
+    text-align: center;
+  }
+
+  .profile-section-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs, 0.25rem);
+    justify-content: center;
+    align-items: center;
+
+    .profile-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.2rem 0.4rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      font-size: var(--font-size-xs, 0.75rem);
+      font-weight: var(--font-weight-medium, 500);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(132, 204, 22, 0.5);
+        color: var(--color-text-primary, #ffffff);
+        transform: translateY(-1px);
+        opacity: 1 !important;
+      }
+
+      .badge-icon {
+        margin-right: 0.3rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    .badges-more-indicator {
+      font-size: var(--font-size-xs, 0.75rem);
+      color: var(--color-text-secondary, #b3b3b3);
+      font-weight: var(--font-weight-medium, 500);
+      opacity: 0.7;
+    }
+  }
+}
+
+.card-header-fallback {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  .header-fallback-text {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 0.25rem);
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--color-text-primary, #ffffff);
+    font-weight: 500;
+
+    .header-icon {
+      font-size: 1em;
+    }
+  }
+
+  .header-subtitle {
+    font-size: 0.7rem;
+    color: var(--color-text-secondary, #b3b3b3);
+    margin-top: var(--spacing-xs, 0.25rem);
+    text-align: center;
+    opacity: 0.8;
+  }
+} 

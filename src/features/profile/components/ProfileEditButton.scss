@@ -1,0 +1,168 @@
+/**
+ * Profile Edit Button Styles
+ * 
+ * Self-contained button component styles following design system patterns
+ */
+
+// Import design system
+@import '../../../styles/design-system/tokens/index.scss';
+@import '../../../styles/design-system/mixins/index.scss';
+
+.profile-edit-button {
+  // Base button styles
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  
+  // Remove default button styles
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  
+  // Focus states
+  &:focus {
+    outline: 2px solid var(--color-primary-300);
+    outline-offset: 2px;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  // Size variants
+  &--small {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    
+    .profile-edit-button__icon {
+      font-size: 14px;
+    }
+  }
+  
+  &--medium {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
+    
+    .profile-edit-button__icon {
+      font-size: 16px;
+    }
+  }
+  
+  &--large {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    
+    .profile-edit-button__icon {
+      font-size: 18px;
+    }
+  }
+
+  // Style variants
+  &--primary {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  &--secondary {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-default);
+    
+    &:hover:not(:disabled) {
+      background: var(--color-surface-tertiary);
+      border-color: var(--color-border-hover);
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      background: var(--color-surface-quaternary);
+    }
+  }
+  
+  &--outline {
+    background: transparent;
+    color: var(--color-primary-600);
+    border: 2px solid var(--color-primary-500);
+    
+    &:hover:not(:disabled) {
+      background: var(--color-primary-50);
+      border-color: var(--color-primary-600);
+      color: var(--color-primary-700);
+    }
+    
+    &:active {
+      background: var(--color-primary-100);
+    }
+  }
+
+  // Full width variant
+  &--full-width {
+    width: 100%;
+  }
+
+  // Component parts
+  &__icon {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+  }
+  
+  &__text {
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  // Dark mode support
+  @media (prefers-color-scheme: dark) {
+    &--secondary {
+      background: var(--color-surface-secondary-dark, #2a2a2a);
+      color: var(--color-text-primary-dark, #ffffff);
+      border-color: var(--color-border-default-dark, #404040);
+      
+      &:hover:not(:disabled) {
+        background: var(--color-surface-tertiary-dark, #3a3a3a);
+        border-color: var(--color-border-hover-dark, #505050);
+      }
+    }
+    
+    &--outline {
+      color: var(--color-primary-400);
+      border-color: var(--color-primary-400);
+      
+      &:hover:not(:disabled) {
+        background: rgba(var(--color-primary-500-rgb), 0.1);
+        color: var(--color-primary-300);
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    &--large {
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-base);
+    }
+  }
+} 

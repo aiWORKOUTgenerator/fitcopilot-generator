@@ -93,6 +93,89 @@ export function useWorkoutForm() {
     updateField('intensity', intensity);
   }, [updateField]);
   
+  // === NEW CONVENIENCE METHODS FOR WORKOUTGRID INTEGRATION ===
+  
+  // Add convenience setters for individual WorkoutGrid fields
+  const setTodaysFocus = useCallback((focus: string) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      todaysFocus: focus as any // Type assertion for string literal types
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+
+  const setDailyIntensityLevel = useCallback((level: number) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      dailyIntensityLevel: level
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setHealthRestrictionsToday = useCallback((restrictions: string[]) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      healthRestrictionsToday: restrictions
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setEquipmentAvailableToday = useCallback((equipment: string[]) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      equipmentAvailableToday: equipment
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setTimeConstraintsToday = useCallback((time: number) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      timeConstraintsToday: time
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setLocationToday = useCallback((location: string) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      locationToday: location as any // Type assertion for string literal types
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setEnergyLevel = useCallback((level: number) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      energyLevel: level
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setMoodLevel = useCallback((level: number) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      moodLevel: level
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setSleepQuality = useCallback((level: number) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      sleepQuality: level
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
+  const setWorkoutCustomization = useCallback((customization: string) => {
+    const currentSessionInputs = formValues.sessionInputs || {};
+    setSessionInputs({
+      ...currentSessionInputs,
+      workoutCustomization: customization
+    });
+  }, [formValues.sessionInputs, setSessionInputs]);
+  
   // Validate the form
   const validateForm = useCallback(() => {
     const isValid = validation.validateForm(formValues);
@@ -137,6 +220,18 @@ export function useWorkoutForm() {
     setRestrictions,
     setSessionInputs,
     setIntensity,
+    
+    // New WorkoutGrid convenience methods
+    setTodaysFocus,
+    setDailyIntensityLevel,
+    setHealthRestrictionsToday,
+    setEquipmentAvailableToday,
+    setTimeConstraintsToday,
+    setLocationToday,
+    setEnergyLevel,
+    setMoodLevel,
+    setSleepQuality,
+    setWorkoutCustomization,
     
     // Storage
     clearFormStorage,

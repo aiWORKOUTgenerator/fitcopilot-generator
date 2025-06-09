@@ -10,6 +10,12 @@ export { default as ProfileCard } from './ProfileCard';
 export { default as FormNavigation } from './FormNavigation';
 export { default as FormProgress } from './FormProgress';
 
+// Modal components
+export * from './modals';
+
+// Button components
+export { default as ProfileEditButton, type ProfileEditButtonProps } from './ProfileEditButton';
+
 // Step card components
 export * from './step-cards';
 

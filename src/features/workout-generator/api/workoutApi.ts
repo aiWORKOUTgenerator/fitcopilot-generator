@@ -72,7 +72,7 @@ export interface UserProfile {
 }
 
 /**
- * Workout form parameters type
+ * Workout form parameters type for API
  */
 export interface WorkoutFormParams {
   duration: number;
@@ -81,6 +81,26 @@ export interface WorkoutFormParams {
   equipment?: string[];
   restrictions?: string;
   specific_request?: string;
+  
+  // Enhanced session inputs with WorkoutGrid support
+  sessionInputs?: {
+    // Existing fields
+    availableTime?: number;
+    energyLevel?: number;
+    focusArea?: string[];
+    currentSoreness?: string[];
+    moodLevel?: number;
+    sleepQuality?: number;
+    environment?: string;
+    
+    // New WorkoutGrid daily selection fields
+    todaysFocus?: string;
+    dailyIntensityLevel?: number;
+    healthRestrictionsToday?: string[];
+    equipmentAvailableToday?: string[];
+    timeConstraintsToday?: number;
+    locationToday?: string;
+  };
   
   // Enhanced muscle targeting support
   muscleSelection?: any;

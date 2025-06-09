@@ -1,0 +1,20 @@
+/**
+ * EquipmentCard Component Styles
+ */
+
+.equipment-card {
+  .equipment-selector {
+    // Equipment-specific responsive grid adjustments
+    @media (max-width: 1024px) {
+      .grid-selector-options {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-selector-options {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+  }
+} 

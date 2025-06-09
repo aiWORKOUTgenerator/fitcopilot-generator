@@ -1,0 +1,14 @@
+/**
+ * WorkoutFocusCard Component Styles
+ */
+
+.workout-focus-card {
+  .focus-selector {
+    // Focus-specific responsive grid adjustments
+    @media (max-width: 768px) {
+      .grid-selector-options {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+  }
+} 

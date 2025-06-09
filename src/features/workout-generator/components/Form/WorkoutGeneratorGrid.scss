@@ -2031,12 +2031,24 @@ $workout-generator-card-height: 180px;
                 }
 
                 &.selected {
-                  background: rgba(132, 204, 22, 0.2);
-                  border-color: rgba(132, 204, 22, 0.5);
+                  background: linear-gradient(135deg, #10b981 0%, #22c55e 100%) !important;
+                  border-color: #10b981 !important;
+                  color: white !important;
+                  box-shadow: 
+                    0 4px 12px rgba(16, 185, 129, 0.3),
+                    0 0 0 2px rgba(16, 185, 129, 0.2);
+                  transform: translateY(-1px);
 
                   .equipment-label {
-                    color: rgba(132, 204, 22, 1);
+                    color: white !important;
                     font-weight: var(--font-weight-semibold, 600);
+                  }
+
+                  &:hover {
+                    background: linear-gradient(135deg, #059669 0%, #16a34a 100%) !important;
+                    box-shadow: 
+                      0 6px 16px rgba(16, 185, 129, 0.4),
+                      0 0 0 2px rgba(16, 185, 129, 0.3);
                   }
                 }
 
@@ -2119,9 +2131,27 @@ $workout-generator-card-height: 180px;
               align-items: center;
 
               .profile-restriction-badge {
-                background: rgba(220, 38, 38, 0.1);
-                border-color: rgba(220, 38, 38, 0.3);
-                color: rgba(220, 38, 38, 0.9);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.2rem 0.4rem;
+                border: 1px solid;
+                border-radius: 4px;
+                font-size: var(--font-size-xs, 0.75rem);
+                font-weight: var(--font-weight-medium, 500);
+                transition: all 0.2s ease;
+                backdrop-filter: blur(8px);
+
+                &:hover {
+                  transform: translateY(-1px);
+                  opacity: 1 !important;
+                  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                }
+
+                .workout-type-icon {
+                  margin-right: 0.3rem;
+                  font-size: 0.8rem;
+                }
               }
 
               .profile-no-restrictions {
@@ -2133,6 +2163,7 @@ $workout-generator-card-height: 180px;
               .restrictions-more-indicator {
                 font-size: var(--font-size-xs, 0.75rem);
                 color: var(--color-text-secondary, #b3b3b3);
+                font-weight: var(--font-weight-medium, 500);
                 opacity: 0.7;
               }
             }
@@ -2221,13 +2252,25 @@ $workout-generator-card-height: 180px;
                   }
                 }
 
-                &.restriction-option--selected {
-                  background: rgba(220, 38, 38, 0.2);
-                  border-color: rgba(220, 38, 38, 0.5);
+                &.selected {
+                  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+                  border-color: #f59e0b !important;
+                  color: #92400e !important;
+                  box-shadow: 
+                    0 4px 12px rgba(245, 158, 11, 0.3),
+                    0 0 0 2px rgba(245, 158, 11, 0.2);
+                  transform: translateY(-1px);
 
                   .restriction-label {
-                    color: rgba(220, 38, 38, 1);
+                    color: #92400e !important;
                     font-weight: var(--font-weight-semibold, 600);
+                  }
+
+                  &:hover {
+                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+                    box-shadow: 
+                      0 6px 16px rgba(245, 158, 11, 0.4),
+                      0 0 0 2px rgba(245, 158, 11, 0.3);
                   }
                 }
 
@@ -2937,6 +2980,311 @@ $workout-generator-card-height: 180px;
     .grid-header .grid-insight .insight-text {
       animation: none;
       opacity: 1;
+    }
+  }
+} 
+
+// === SELECTED STATE STYLES FOR INTERACTIVE ELEMENTS ===
+
+// Focus and Intensity Options Selected States
+.focus-option, .intensity-option {
+  &.selected {
+    background: linear-gradient(135deg, #10b981 0%, #22c55e 100%) !important;
+    border-color: #10b981 !important;
+    color: white !important;
+    box-shadow: 
+      0 4px 12px rgba(16, 185, 129, 0.3),
+      0 0 0 2px rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+
+    .focus-icon, .intensity-icon {
+      filter: brightness(1.2);
+      transform: scale(1.1);
+    }
+
+    .focus-label, .intensity-label {
+      color: white !important;
+      font-weight: var(--font-weight-semibold, 600);
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #059669 0%, #16a34a 100%) !important;
+      box-shadow: 
+        0 6px 16px rgba(16, 185, 129, 0.4),
+        0 0 0 2px rgba(16, 185, 129, 0.3);
+    }
+  }
+}
+
+// Duration Options Selected States
+.duration-option {
+  &.selected {
+    background: linear-gradient(135deg, #10b981 0%, #22c55e 100%) !important;
+    border: 2px solid #10b981 !important;
+    color: white !important;
+    box-shadow: 
+      0 4px 12px rgba(16, 185, 129, 0.3),
+      0 0 0 2px rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+
+    .duration-number {
+      color: white !important;
+      font-weight: var(--font-weight-bold, 700);
+    }
+
+    .duration-unit {
+      color: white !important;
+      opacity: 0.9;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #059669 0%, #16a34a 100%) !important;
+      box-shadow: 
+        0 6px 16px rgba(16, 185, 129, 0.4),
+        0 0 0 2px rgba(16, 185, 129, 0.3);
+    }
+  }
+}
+
+// Equipment Badges Selected States
+.profile-equipment-badge {
+  &.selected {
+    background: linear-gradient(135deg, #10b981 0%, #22c55e 100%) !important;
+    border-color: #10b981 !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+
+    .workout-type-icon {
+      filter: brightness(1.2);
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #059669 0%, #16a34a 100%) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+  }
+}
+
+// Health Restriction Badges Active Today States
+.profile-restriction-badge {
+  &.active-today {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    transform: translateY(-1px);
+    font-weight: var(--font-weight-semibold, 600);
+
+    &:hover {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+  }
+}
+
+// Location Options Selected States
+.location-option {
+  &.selected {
+    background: linear-gradient(135deg, #10b981 0%, #22c55e 100%) !important;
+    border-color: #10b981 !important;
+    color: white !important;
+    box-shadow: 
+      0 4px 12px rgba(16, 185, 129, 0.3),
+      0 0 0 2px rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+
+    .location-icon {
+      filter: brightness(1.2);
+      transform: scale(1.1);
+    }
+
+    .location-label {
+      color: white !important;
+      font-weight: var(--font-weight-semibold, 600);
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, #059669 0%, #16a34a 100%) !important;
+      box-shadow: 
+        0 6px 16px rgba(16, 185, 129, 0.4),
+        0 0 0 2px rgba(16, 185, 129, 0.3);
+    }
+  }
+}
+
+// General Interactive Element Enhancements
+.focus-option, .intensity-option, .duration-option, .location-option {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Profile Badge Hover Enhancements
+.profile-equipment-badge, .profile-restriction-badge {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// === WORKOUT CUSTOMIZATION CARD STYLES ===
+
+// Customization card structure - Similar to other complex cards but for text input
+.customization-card-structure {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 0.5rem);
+
+  // Header: Customization Section
+  .customization-card-header {
+    flex: 0 0 auto;
+    min-height: 50px;
+    padding: var(--spacing-xs, 0.25rem);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm, 6px);
+
+    .header-fallback {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+
+      .header-fallback-text {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs, 0.25rem);
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-primary, #ffffff);
+        font-weight: 500;
+
+        .header-icon {
+          font-size: 1em;
+        }
+      }
+
+      .header-subtitle {
+        font-size: 0.7rem;
+        color: var(--color-text-secondary, #b3b3b3);
+        margin-top: var(--spacing-xs, 0.25rem);
+        text-align: center;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  // Body: Customization Input
+  .customization-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 120px;
+    padding: var(--spacing-xs, 0.25rem);
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-sm, 6px);
+
+    .customization-input-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs, 0.25rem);
+      
+      .customization-input-label {
+        font-size: var(--font-size-xs, 0.75rem);
+        color: var(--color-text-secondary, #b3b3b3);
+        font-weight: var(--font-weight-medium, 500);
+        margin-bottom: var(--spacing-xs, 0.25rem);
+        text-align: left;
+        flex: 0 0 auto;
+      }
+
+      .customization-textarea {
+        flex: 1;
+        width: 100%;
+        min-height: 80px;
+        padding: var(--spacing-sm, 0.5rem);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--border-radius-sm, 6px);
+        color: var(--color-text-primary, #ffffff);
+        font-size: var(--font-size-sm, 0.875rem);
+        font-family: inherit;
+        line-height: 1.4;
+        resize: vertical;
+        transition: all 0.2s ease;
+
+        &::placeholder {
+          color: var(--color-text-secondary, #b3b3b3);
+          opacity: 0.7;
+        }
+
+        &:focus {
+          outline: none;
+          background: rgba(255, 255, 255, 0.06);
+          border-color: rgba(168, 85, 247, 0.5);
+          box-shadow: 
+            0 0 0 2px rgba(168, 85, 247, 0.2),
+            0 2px 8px rgba(168, 85, 247, 0.1);
+        }
+
+        &:hover:not(:focus) {
+          background: rgba(255, 255, 255, 0.04);
+          border-color: rgba(255, 255, 255, 0.15);
+        }
+      }
+
+      .customization-character-count {
+        font-size: 0.7rem;
+        color: var(--color-text-secondary, #b3b3b3);
+        text-align: right;
+        opacity: 0.8;
+        flex: 0 0 auto;
+        margin-top: var(--spacing-xs, 0.25rem);
+      }
+    }
+
+    // Responsive adjustments
+    @media (max-width: 1024px) {
+      .customization-input-container {
+        .customization-textarea {
+          min-height: 70px;
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      .customization-input-container {
+        .customization-textarea {
+          min-height: 60px;
+          font-size: 0.75rem;
+        }
+
+        .customization-character-count {
+          font-size: 0.65rem;
+        }
+      }
     }
   }
 } 

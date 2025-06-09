@@ -4,18 +4,31 @@
  * Premium grid-based workout generator interface inspired by FitnessStats design.
  * This component will incrementally replace the existing form implementation.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useProfile } from '../../../profile/context';
+import { useWorkoutForm } from '../../hooks/useWorkoutForm';
+import { SessionSpecificInputs } from '../../types/workout';
 import { 
   mapProfileToWorkoutContext, 
   isProfileSufficientForWorkout 
 } from '../../utils/profileMapping';
 import { MuscleGroupCard } from './cards/MuscleGroupCard';
+import { EquipmentCard } from './cards/EquipmentCard';
 import './WorkoutGeneratorGrid.scss';
 
 interface WorkoutGeneratorGridProps {
   className?: string;
 }
+
+// Migration flags for incremental card replacement
+const USE_MODULAR_CARDS = {
+  equipment: true,    // ✅ Ready for migration
+  focus: false,       // 🚧 Next target
+  intensity: false,   // 🚧 Future
+  duration: false,    // 🚧 Future
+  restrictions: false,// 🚧 Future
+  location: false,    // 🚧 Future
+};
 
 interface FormFieldCardProps {
   title: string;
@@ -76,9 +89,139 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
   const { state: profileState } = useProfile();
   const { profile, loading: profileLoading, error: profileError } = profileState;
   
+  // Form hook integration for session data management
+  const {
+    setTodaysFocus,
+    setDailyIntensityLevel,
+    setHealthRestrictionsToday,
+    setEquipmentAvailableToday,
+    setTimeConstraintsToday,
+    setLocationToday,
+    setEnergyLevel,
+    setMoodLevel,
+    setSleepQuality,
+    setWorkoutCustomization,
+    formValues
+  } = useWorkoutForm();
+  
+  // Local state for daily selections to manage UI interactions
+  const [dailySelections, setDailySelections] = useState<SessionSpecificInputs>({});
+  
+  // Sync local state with form state
+  useEffect(() => {
+    if (formValues.sessionInputs) {
+      setDailySelections(formValues.sessionInputs);
+    }
+  }, [formValues.sessionInputs]);
+  
   // Map profile data to workout context
   const profileMapping = profile ? mapProfileToWorkoutContext(profile) : null;
   const isProfileSufficient = isProfileSufficientForWorkout(profile);
+
+  // Debug logging for profile updates and state changes
+  console.log('[WorkoutGeneratorGrid] Profile state:', {
+    hasProfile: !!profile,
+    profileLoading,
+    profileError,
+    isProfileSufficient,
+    profileMapping: profileMapping ? 'mapped' : 'null',
+    fitnessLevel: profile?.fitnessLevel,
+    goals: profile?.goals,
+    limitations: profile?.limitations,
+    limitationsDisplay: profileMapping?.displayData?.limitations
+  });
+  
+  console.log('[WorkoutGeneratorGrid] Daily selections state:', {
+    dailySelections,
+    formSessionInputs: formValues.sessionInputs,
+    syncStatus: JSON.stringify(dailySelections) === JSON.stringify(formValues.sessionInputs || {}) ? 'synced' : 'out-of-sync'
+  });
+
+  // === EVENT HANDLERS FOR DAILY SELECTIONS ===
+  
+  // Focus selection handler
+  const handleFocusSelection = useCallback((focus: string) => {
+    console.log('[WorkoutGeneratorGrid] Focus selected:', focus);
+    setTodaysFocus(focus);
+    setDailySelections(prev => ({ ...prev, todaysFocus: focus as any }));
+  }, [setTodaysFocus]);
+  
+  // Intensity selection handler
+  const handleIntensitySelection = useCallback((level: number) => {
+    console.log('[WorkoutGeneratorGrid] Intensity selected:', level);
+    setDailyIntensityLevel(level);
+    setDailySelections(prev => ({ ...prev, dailyIntensityLevel: level }));
+  }, [setDailyIntensityLevel]);
+  
+  // Duration selection handler
+  const handleDurationSelection = useCallback((duration: number) => {
+    console.log('[WorkoutGeneratorGrid] Duration selected:', duration);
+    setTimeConstraintsToday(duration);
+    setDailySelections(prev => ({ ...prev, timeConstraintsToday: duration }));
+  }, [setTimeConstraintsToday]);
+  
+  // Equipment toggle handler
+  const handleEquipmentToggle = useCallback((equipment: string) => {
+    const currentEquipment = dailySelections.equipmentAvailableToday || [];
+    const isSelected = currentEquipment.includes(equipment);
+    
+    const newEquipment = isSelected 
+      ? currentEquipment.filter(e => e !== equipment)
+      : [...currentEquipment, equipment];
+      
+    console.log('[WorkoutGeneratorGrid] Equipment toggled:', { equipment, isSelected, newEquipment });
+    setEquipmentAvailableToday(newEquipment);
+    setDailySelections(prev => ({ ...prev, equipmentAvailableToday: newEquipment }));
+  }, [setEquipmentAvailableToday, dailySelections.equipmentAvailableToday]);
+  
+  // Health restrictions toggle handler
+  const handleHealthRestrictionToggle = useCallback((restriction: string) => {
+    const currentRestrictions = dailySelections.healthRestrictionsToday || [];
+    const isActive = currentRestrictions.includes(restriction);
+    
+    const newRestrictions = isActive
+      ? currentRestrictions.filter(r => r !== restriction)
+      : [...currentRestrictions, restriction];
+      
+    console.log('[WorkoutGeneratorGrid] Health restriction toggled:', { restriction, isActive, newRestrictions });
+    setHealthRestrictionsToday(newRestrictions);
+    setDailySelections(prev => ({ ...prev, healthRestrictionsToday: newRestrictions }));
+  }, [setHealthRestrictionsToday, dailySelections.healthRestrictionsToday]);
+  
+  // Location selection handler
+  const handleLocationSelection = useCallback((location: string) => {
+    console.log('[WorkoutGeneratorGrid] Location selected:', location);
+    setLocationToday(location);
+    setDailySelections(prev => ({ ...prev, locationToday: location as any }));
+  }, [setLocationToday]);
+  
+  // Stress/Mood level selection handler
+  const handleStressSelection = useCallback((level: number) => {
+    console.log('[WorkoutGeneratorGrid] Stress level selected:', level);
+    setMoodLevel(level);
+    setDailySelections(prev => ({ ...prev, moodLevel: level }));
+  }, [setMoodLevel]);
+  
+  // Energy level selection handler
+  const handleEnergySelection = useCallback((level: number) => {
+    console.log('[WorkoutGeneratorGrid] Energy level selected:', level);
+    setEnergyLevel(level);
+    setDailySelections(prev => ({ ...prev, energyLevel: level }));
+  }, [setEnergyLevel]);
+  
+  // Sleep quality selection handler
+  const handleSleepSelection = useCallback((level: number) => {
+    console.log('[WorkoutGeneratorGrid] Sleep quality selected:', level);
+    setSleepQuality(level);
+    setDailySelections(prev => ({ ...prev, sleepQuality: level }));
+  }, [setSleepQuality]);
+  
+  // Workout customization text change handler
+  const handleCustomizationChange = useCallback((customization: string) => {
+    console.log('[WorkoutGeneratorGrid] Workout customization updated:', customization);
+    setWorkoutCustomization(customization);
+    setDailySelections(prev => ({ ...prev, workoutCustomization: customization }));
+  }, [setWorkoutCustomization]);
 
   return (
     <div className={`workout-generator-container-premium ${className}`}>
@@ -144,27 +287,51 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 <div className="focus-selector-label">Today's Focus:</div>
                 {/* Note: Showing 6 of 7 legacy options for clean 3x2 grid. "Sport-Specific" can be accessed via advanced options */}
                 <div className="focus-options-grid">
-                  <div className="focus-option" title="Fat Burning & Cardio">
+                  <div 
+                    className={`focus-option ${dailySelections.todaysFocus === 'fat-burning' ? 'selected' : ''}`}
+                    onClick={() => handleFocusSelection('fat-burning')}
+                    title="Fat Burning & Cardio"
+                  >
                     <span className="focus-icon">🔥</span>
                     <span className="focus-label">Fat Burning</span>
                   </div>
-                  <div className="focus-option" title="Muscle Building">
+                  <div 
+                    className={`focus-option ${dailySelections.todaysFocus === 'muscle-building' ? 'selected' : ''}`}
+                    onClick={() => handleFocusSelection('muscle-building')}
+                    title="Muscle Building"
+                  >
                     <span className="focus-icon">💪</span>
                     <span className="focus-label">Build Muscle</span>
                   </div>
-                  <div className="focus-option" title="Endurance & Stamina">
+                  <div 
+                    className={`focus-option ${dailySelections.todaysFocus === 'endurance' ? 'selected' : ''}`}
+                    onClick={() => handleFocusSelection('endurance')}
+                    title="Endurance & Stamina"
+                  >
                     <span className="focus-icon">🏃</span>
                     <span className="focus-label">Endurance</span>
                   </div>
-                  <div className="focus-option" title="Strength Training">
+                  <div 
+                    className={`focus-option ${dailySelections.todaysFocus === 'strength' ? 'selected' : ''}`}
+                    onClick={() => handleFocusSelection('strength')}
+                    title="Strength Training"
+                  >
                     <span className="focus-icon">🏋️</span>
                     <span className="focus-label">Strength</span>
                   </div>
-                  <div className="focus-option" title="Flexibility & Mobility">
+                  <div 
+                    className={`focus-option ${dailySelections.todaysFocus === 'flexibility' ? 'selected' : ''}`}
+                    onClick={() => handleFocusSelection('flexibility')}
+                    title="Flexibility & Mobility"
+                  >
                     <span className="focus-icon">🧘</span>
                     <span className="focus-label">Flexibility</span>
                   </div>
-                  <div className="focus-option" title="General Fitness">
+                  <div 
+                    className={`focus-option ${dailySelections.todaysFocus === 'general-fitness' ? 'selected' : ''}`}
+                    onClick={() => handleFocusSelection('general-fitness')}
+                    title="General Fitness"
+                  >
                     <span className="focus-icon">⚡</span>
                     <span className="focus-label">General</span>
                   </div>
@@ -220,27 +387,51 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 <div className="intensity-selector-label">Today's Intensity:</div>
                 {/* 6-level intensity system in 3x2 grid */}
                 <div className="intensity-options-grid">
-                  <div className="intensity-option" title="Very Low - Gentle, recovery-focused">
+                  <div 
+                    className={`intensity-option ${dailySelections.dailyIntensityLevel === 1 ? 'selected' : ''}`}
+                    onClick={() => handleIntensitySelection(1)}
+                    title="Very Low - Gentle, recovery-focused"
+                  >
                     <span className="intensity-icon">🟢</span>
                     <span className="intensity-label">Very Low</span>
                   </div>
-                  <div className="intensity-option" title="Low - Light activity, easy pace">
+                  <div 
+                    className={`intensity-option ${dailySelections.dailyIntensityLevel === 2 ? 'selected' : ''}`}
+                    onClick={() => handleIntensitySelection(2)}
+                    title="Low - Light activity, easy pace"
+                  >
                     <span className="intensity-icon">🔵</span>
                     <span className="intensity-label">Low</span>
                   </div>
-                  <div className="intensity-option" title="Moderate - Comfortable challenge">
+                  <div 
+                    className={`intensity-option ${dailySelections.dailyIntensityLevel === 3 ? 'selected' : ''}`}
+                    onClick={() => handleIntensitySelection(3)}
+                    title="Moderate - Comfortable challenge"
+                  >
                     <span className="intensity-icon">🟡</span>
                     <span className="intensity-label">Moderate</span>
                   </div>
-                  <div className="intensity-option" title="High - Vigorous, challenging">
+                  <div 
+                    className={`intensity-option ${dailySelections.dailyIntensityLevel === 4 ? 'selected' : ''}`}
+                    onClick={() => handleIntensitySelection(4)}
+                    title="High - Vigorous, challenging"
+                  >
                     <span className="intensity-icon">🟠</span>
                     <span className="intensity-label">High</span>
                   </div>
-                  <div className="intensity-option" title="Very High - Maximum effort">
+                  <div 
+                    className={`intensity-option ${dailySelections.dailyIntensityLevel === 5 ? 'selected' : ''}`}
+                    onClick={() => handleIntensitySelection(5)}
+                    title="Very High - Maximum effort"
+                  >
                     <span className="intensity-icon">🔴</span>
                     <span className="intensity-label">Very High</span>
                   </div>
-                  <div className="intensity-option" title="Extreme - Elite level, push limits">
+                  <div 
+                    className={`intensity-option ${dailySelections.dailyIntensityLevel === 6 ? 'selected' : ''}`}
+                    onClick={() => handleIntensitySelection(6)}
+                    title="Extreme - Elite level, push limits"
+                  >
                     <span className="intensity-icon">🟣</span>
                     <span className="intensity-label">Extreme</span>
                   </div>
@@ -294,27 +485,51 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 <div className="duration-selector-label">Today's Duration:</div>
                 {/* 6 duration options in 3x2 grid */}
                 <div className="duration-options-grid">
-                  <div className="duration-option" title="10 minutes - Quick session">
+                  <div 
+                    className={`duration-option ${dailySelections.timeConstraintsToday === 10 ? 'selected' : ''}`}
+                    onClick={() => handleDurationSelection(10)}
+                    title="10 minutes - Quick session"
+                  >
                     <span className="duration-number">10</span>
                     <span className="duration-unit">min</span>
                   </div>
-                  <div className="duration-option" title="15 minutes - Short workout">
+                  <div 
+                    className={`duration-option ${dailySelections.timeConstraintsToday === 15 ? 'selected' : ''}`}
+                    onClick={() => handleDurationSelection(15)}
+                    title="15 minutes - Short workout"
+                  >
                     <span className="duration-number">15</span>
                     <span className="duration-unit">min</span>
                   </div>
-                  <div className="duration-option" title="20 minutes - Compact session">
+                  <div 
+                    className={`duration-option ${dailySelections.timeConstraintsToday === 20 ? 'selected' : ''}`}
+                    onClick={() => handleDurationSelection(20)}
+                    title="20 minutes - Compact session"
+                  >
                     <span className="duration-number">20</span>
                     <span className="duration-unit">min</span>
                   </div>
-                  <div className="duration-option" title="30 minutes - Standard workout">
+                  <div 
+                    className={`duration-option ${dailySelections.timeConstraintsToday === 30 ? 'selected' : ''}`}
+                    onClick={() => handleDurationSelection(30)}
+                    title="30 minutes - Standard workout"
+                  >
                     <span className="duration-number">30</span>
                     <span className="duration-unit">min</span>
                   </div>
-                  <div className="duration-option" title="45 minutes - Extended session">
+                  <div 
+                    className={`duration-option ${dailySelections.timeConstraintsToday === 45 ? 'selected' : ''}`}
+                    onClick={() => handleDurationSelection(45)}
+                    title="45 minutes - Extended session"
+                  >
                     <span className="duration-number">45</span>
                     <span className="duration-unit">min</span>
                   </div>
-                  <div className="duration-option" title="60 minutes - Full workout">
+                  <div 
+                    className={`duration-option ${dailySelections.timeConstraintsToday === 60 ? 'selected' : ''}`}
+                    onClick={() => handleDurationSelection(60)}
+                    title="60 minutes - Full workout"
+                  >
                     <span className="duration-number">60</span>
                     <span className="duration-unit">min</span>
                   </div>
@@ -339,99 +554,155 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
           />
         </FormFieldCard>
 
-        {/* Equipment Card */}
-        <FormFieldCard
-          title="Equipment"
-          description="What do you have available?"
-          delay={400}
-          variant="complex"
-        >
-          <div className="equipment-card-structure">
-            {/* HEADER: Profile Equipment Section */}
-            <div className="equipment-card-header">
-              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
-                <div className="profile-equipment-section">
-                  <div className="profile-equipment-label">Your Available Equipment:</div>
-                  <div className="profile-equipment-badges">
-                    {profileMapping.displayData.equipment.slice(0, 3).map((equipment, index) => (
-                      <span 
-                        key={equipment.value}
-                        className="workout-type-badge profile-equipment-badge"
-                        style={{ 
-                          cursor: 'pointer',
-                          opacity: 0.8
-                        }}
-                        title={`Click to select: ${equipment.display}`}
-                      >
-                        <span className="workout-type-icon">{equipment.icon}</span>
-                        {equipment.display}
-                      </span>
-                    ))}
-                    {profileMapping.displayData.equipment.length > 3 && (
-                      <span className="equipment-more-indicator">
-                        +{profileMapping.displayData.equipment.length - 3} more
-                      </span>
-                    )}
+        {/* Equipment Card - Migrated to Modular Architecture */}
+        {USE_MODULAR_CARDS.equipment ? (
+          <EquipmentCard delay={400} />
+        ) : (
+          /* Legacy Equipment Card Implementation */
+          <FormFieldCard
+            title="Equipment"
+            description="What do you have available?"
+            delay={400}
+            variant="complex"
+          >
+            <div className="equipment-card-structure">
+              {/* HEADER: Profile Equipment Section */}
+              <div className="equipment-card-header">
+                {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+                  <div className="profile-equipment-section">
+                    <div className="profile-equipment-label">Your Available Equipment:</div>
+                    <div className="profile-equipment-badges">
+                      {profileMapping.displayData.equipment.slice(0, 3).map((equipment, index) => (
+                        <span 
+                          key={equipment.value}
+                          className={`workout-type-badge profile-equipment-badge ${
+                            dailySelections.equipmentAvailableToday?.includes(equipment.value) ? 'selected' : ''
+                          }`}
+                          onClick={() => handleEquipmentToggle(equipment.value)}
+                          style={{ 
+                            cursor: 'pointer',
+                            opacity: dailySelections.equipmentAvailableToday?.includes(equipment.value) ? 1 : 0.8
+                          }}
+                          title={`Click to ${dailySelections.equipmentAvailableToday?.includes(equipment.value) ? 'remove' : 'select'}: ${equipment.display}`}
+                        >
+                          <span className="workout-type-icon">{equipment.icon}</span>
+                          {equipment.display}
+                        </span>
+                      ))}
+                      {profileMapping.displayData.equipment.length > 3 && (
+                        <span className="equipment-more-indicator">
+                          +{profileMapping.displayData.equipment.length - 3} more
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="header-fallback">
-                  <div className="header-fallback-text">
-                    <span className="header-icon">🏋️</span>
-                    <span>Available Equipment</span>
+                ) : (
+                  <div className="header-fallback">
+                    <div className="header-fallback-text">
+                      <span className="header-icon">🏋️</span>
+                      <span>Available Equipment</span>
+                    </div>
+                    <div className="header-subtitle">Set up your profile to see your equipment</div>
                   </div>
-                  <div className="header-subtitle">Set up your profile to see your equipment</div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* BODY: Today's Equipment Selector */}
-            <div className="equipment-card-body">
-              <div className="equipment-selector-container">
-                <div className="equipment-selector-label">Select for Today:</div>
-                {/* All 12 equipment options from original EQUIPMENT_OPTIONS - no icons */}
-                <div className="equipment-options-grid">
-                  <div className="equipment-option" title="None/Bodyweight Only" data-equipment="none">
-                    <span className="equipment-label">No Equipment</span>
-                  </div>
-                  <div className="equipment-option" title="Dumbbells" data-equipment="dumbbells">
-                    <span className="equipment-label">Dumbbells</span>
-                  </div>
-                  <div className="equipment-option" title="Kettlebells" data-equipment="kettlebells">
-                    <span className="equipment-label">Kettlebells</span>
-                  </div>
-                  <div className="equipment-option" title="Resistance Bands" data-equipment="resistance-bands">
-                    <span className="equipment-label">Resistance Bands</span>
-                  </div>
-                  <div className="equipment-option" title="Pull-up Bar" data-equipment="pull-up-bar">
-                    <span className="equipment-label">Pull-up Bar</span>
-                  </div>
-                  <div className="equipment-option" title="Yoga Mat" data-equipment="yoga-mat">
-                    <span className="equipment-label">Yoga Mat</span>
-                  </div>
-                  <div className="equipment-option" title="Weight Bench" data-equipment="bench">
-                    <span className="equipment-label">Bench</span>
-                  </div>
-                  <div className="equipment-option" title="Barbell" data-equipment="barbell">
-                    <span className="equipment-label">Barbell</span>
-                  </div>
-                  <div className="equipment-option" title="TRX/Suspension Trainer" data-equipment="trx">
-                    <span className="equipment-label">TRX</span>
-                  </div>
-                  <div className="equipment-option" title="Medicine Ball" data-equipment="medicine-ball">
-                    <span className="equipment-label">Medicine Ball</span>
-                  </div>
-                  <div className="equipment-option" title="Jump Rope" data-equipment="jump-rope">
-                    <span className="equipment-label">Jump Rope</span>
-                  </div>
-                  <div className="equipment-option" title="Stability Ball" data-equipment="stability-ball">
-                    <span className="equipment-label">Stability Ball</span>
+              {/* BODY: Today's Equipment Selector */}
+              <div className="equipment-card-body">
+                <div className="equipment-selector-container">
+                  <div className="equipment-selector-label">Select for Today:</div>
+                  {/* All 12 equipment options from original EQUIPMENT_OPTIONS - no icons */}
+                  <div className="equipment-options-grid">
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('none') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('none')}
+                      title="None/Bodyweight Only"
+                    >
+                      <span className="equipment-label">No Equipment</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('dumbbells') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('dumbbells')}
+                      title="Dumbbells"
+                    >
+                      <span className="equipment-label">Dumbbells</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('kettlebells') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('kettlebells')}
+                      title="Kettlebells"
+                    >
+                      <span className="equipment-label">Kettlebells</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('resistance-bands') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('resistance-bands')}
+                      title="Resistance Bands"
+                    >
+                      <span className="equipment-label">Resistance Bands</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('pull-up-bar') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('pull-up-bar')}
+                      title="Pull-up Bar"
+                    >
+                      <span className="equipment-label">Pull-up Bar</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('yoga-mat') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('yoga-mat')}
+                      title="Yoga Mat"
+                    >
+                      <span className="equipment-label">Yoga Mat</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('bench') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('bench')}
+                      title="Weight Bench"
+                    >
+                      <span className="equipment-label">Bench</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('barbell') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('barbell')}
+                      title="Barbell"
+                    >
+                      <span className="equipment-label">Barbell</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('trx') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('trx')}
+                      title="TRX/Suspension Trainer"
+                    >
+                      <span className="equipment-label">TRX</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('medicine-ball') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('medicine-ball')}
+                      title="Medicine Ball"
+                    >
+                      <span className="equipment-label">Medicine Ball</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('jump-rope') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('jump-rope')}
+                      title="Jump Rope"
+                    >
+                      <span className="equipment-label">Jump Rope</span>
+                    </div>
+                    <div 
+                      className={`equipment-option ${dailySelections.equipmentAvailableToday?.includes('stability-ball') ? 'selected' : ''}`}
+                      onClick={() => handleEquipmentToggle('stability-ball')}
+                      title="Stability Ball"
+                    >
+                      <span className="equipment-label">Stability Ball</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </FormFieldCard>
+          </FormFieldCard>
+        )}
 
         {/* Restrictions Card */}
         <FormFieldCard
@@ -443,19 +714,47 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
           <div className="restrictions-card-structure">
             {/* HEADER: Profile Limitations Section */}
             <div className="restrictions-card-header">
-              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
+              {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.limitations.length > 0 ? (
                 <div className="profile-restrictions-section">
                   <div className="profile-restrictions-label">Health & Safety Focus:</div>
                   <div className="profile-restrictions-badges">
-                    <span className="profile-no-restrictions">Select areas to avoid today</span>
+                    {profileMapping.displayData.limitations.slice(0, 3).map((limitation, index) => (
+                      <span 
+                        key={limitation.value}
+                        className={`workout-type-badge profile-restriction-badge ${
+                          dailySelections.healthRestrictionsToday?.includes(limitation.value) ? 'active-today' : ''
+                        }`}
+                        onClick={() => handleHealthRestrictionToggle(limitation.value)}
+                        style={{ 
+                          backgroundColor: dailySelections.healthRestrictionsToday?.includes(limitation.value) 
+                            ? `${limitation.color}40` 
+                            : `${limitation.color}20`,
+                          borderColor: dailySelections.healthRestrictionsToday?.includes(limitation.value)
+                            ? limitation.color
+                            : `${limitation.color}60`,
+                          color: limitation.color,
+                          cursor: 'pointer',
+                          opacity: dailySelections.healthRestrictionsToday?.includes(limitation.value) ? 1 : 0.8
+                        }}
+                        title={`Click to ${dailySelections.healthRestrictionsToday?.includes(limitation.value) ? 'remove' : 'add'} this restriction for today: ${limitation.display}`}
+                      >
+                        {limitation.display}
+                      </span>
+                    ))}
+                    {profileMapping.displayData.limitations.length > 3 && (
+                      <span className="restrictions-more-indicator">
+                        +{profileMapping.displayData.limitations.length - 3} more
+                      </span>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="header-fallback">
                   <div className="header-fallback-text">
-                    <span>Current Restrictions</span>
+                    <span className="header-icon">⚠️</span>
+                    <span>Health & Safety</span>
                   </div>
-                  <div className="header-subtitle">Select any areas with soreness or discomfort</div>
+                  <div className="header-subtitle">Set up your profile to see health considerations</div>
                 </div>
               )}
             </div>
@@ -468,31 +767,67 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 </div>
                 
                 <div className="restrictions-grid">
-                  <div className="restriction-option" title="Shoulders soreness or discomfort" data-restriction="shoulders">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('shoulders') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('shoulders')}
+                    title="Shoulders soreness or discomfort"
+                  >
                     <span className="restriction-label">Shoulders</span>
                   </div>
-                  <div className="restriction-option" title="Arms soreness or discomfort" data-restriction="arms">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('arms') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('arms')}
+                    title="Arms soreness or discomfort"
+                  >
                     <span className="restriction-label">Arms</span>
                   </div>
-                  <div className="restriction-option" title="Chest soreness or discomfort" data-restriction="chest">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('chest') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('chest')}
+                    title="Chest soreness or discomfort"
+                  >
                     <span className="restriction-label">Chest</span>
                   </div>
-                  <div className="restriction-option" title="Back soreness or discomfort" data-restriction="back">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('back') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('back')}
+                    title="Back soreness or discomfort"
+                  >
                     <span className="restriction-label">Back</span>
                   </div>
-                  <div className="restriction-option" title="Core/Abs soreness or discomfort" data-restriction="core">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('core') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('core')}
+                    title="Core/Abs soreness or discomfort"
+                  >
                     <span className="restriction-label">Core/Abs</span>
                   </div>
-                  <div className="restriction-option" title="Hips soreness or discomfort" data-restriction="hips">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('hips') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('hips')}
+                    title="Hips soreness or discomfort"
+                  >
                     <span className="restriction-label">Hips</span>
                   </div>
-                  <div className="restriction-option" title="Legs soreness or discomfort" data-restriction="legs">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('legs') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('legs')}
+                    title="Legs soreness or discomfort"
+                  >
                     <span className="restriction-label">Legs</span>
                   </div>
-                  <div className="restriction-option" title="Knees soreness or discomfort" data-restriction="knees">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('knees') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('knees')}
+                    title="Knees soreness or discomfort"
+                  >
                     <span className="restriction-label">Knees</span>
                   </div>
-                  <div className="restriction-option" title="Ankles soreness or discomfort" data-restriction="ankles">
+                  <div 
+                    className={`restriction-option ${dailySelections.healthRestrictionsToday?.includes('ankles') ? 'selected' : ''}`}
+                    onClick={() => handleHealthRestrictionToggle('ankles')}
+                    title="Ankles soreness or discomfort"
+                  >
                     <span className="restriction-label">Ankles</span>
                   </div>
                 </div>
@@ -555,19 +890,35 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 </div>
                 
                 <div className="location-grid">
-                  <div className="location-option" title="Home workouts - Space-efficient exercises" data-location="home">
+                  <div 
+                    className={`location-option ${dailySelections.locationToday === 'home' ? 'selected' : ''}`}
+                    onClick={() => handleLocationSelection('home')}
+                    title="Home workouts - Space-efficient exercises"
+                  >
                     <span className="location-icon">🏠</span>
                     <span className="location-label">Home</span>
                   </div>
-                  <div className="location-option" title="Gym training - Full equipment access" data-location="gym">
+                  <div 
+                    className={`location-option ${dailySelections.locationToday === 'gym' ? 'selected' : ''}`}
+                    onClick={() => handleLocationSelection('gym')}
+                    title="Gym training - Full equipment access"
+                  >
                     <span className="location-icon">🏋️</span>
                     <span className="location-label">Gym</span>
                   </div>
-                  <div className="location-option" title="Outdoor activities - Fresh air workouts" data-location="outdoors">
+                  <div 
+                    className={`location-option ${dailySelections.locationToday === 'outdoors' ? 'selected' : ''}`}
+                    onClick={() => handleLocationSelection('outdoors')}
+                    title="Outdoor activities - Fresh air workouts"
+                  >
                     <span className="location-icon">🌳</span>
                     <span className="location-label">Outdoors</span>
                   </div>
-                  <div className="location-option" title="Travel workouts - Portable exercises" data-location="travel">
+                  <div 
+                    className={`location-option ${dailySelections.locationToday === 'travel' ? 'selected' : ''}`}
+                    onClick={() => handleLocationSelection('travel')}
+                    title="Travel workouts - Portable exercises"
+                  >
                     <span className="location-icon">✈️</span>
                     <span className="location-label">Travel</span>
                   </div>
@@ -623,27 +974,51 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 <div className="stress-selector-label">Today's Stress:</div>
                 {/* 6-level stress system in 3x2 grid matching intensity colors */}
                 <div className="stress-options-grid">
-                  <div className="stress-option" title="Very Low - Completely relaxed">
+                  <div 
+                    className={`stress-option ${dailySelections.moodLevel === 1 ? 'selected' : ''}`}
+                    onClick={() => handleStressSelection(1)}
+                    title="Very Low - Completely relaxed"
+                  >
                     <span className="stress-icon">🟢</span>
                     <span className="stress-label">Very Low</span>
                   </div>
-                  <div className="stress-option" title="Low - Mostly calm and relaxed">
+                  <div 
+                    className={`stress-option ${dailySelections.moodLevel === 2 ? 'selected' : ''}`}
+                    onClick={() => handleStressSelection(2)}
+                    title="Low - Mostly calm and relaxed"
+                  >
                     <span className="stress-icon">🔵</span>
                     <span className="stress-label">Low</span>
                   </div>
-                  <div className="stress-option" title="Moderate - Some tension, manageable">
+                  <div 
+                    className={`stress-option ${dailySelections.moodLevel === 3 ? 'selected' : ''}`}
+                    onClick={() => handleStressSelection(3)}
+                    title="Moderate - Some tension, manageable"
+                  >
                     <span className="stress-icon">🟡</span>
                     <span className="stress-label">Moderate</span>
                   </div>
-                  <div className="stress-option" title="High - Feeling stressed and tense">
+                  <div 
+                    className={`stress-option ${dailySelections.moodLevel === 4 ? 'selected' : ''}`}
+                    onClick={() => handleStressSelection(4)}
+                    title="High - Feeling stressed and tense"
+                  >
                     <span className="stress-icon">🟠</span>
                     <span className="stress-label">High</span>
                   </div>
-                  <div className="stress-option" title="Very High - Significant stress and anxiety">
+                  <div 
+                    className={`stress-option ${dailySelections.moodLevel === 5 ? 'selected' : ''}`}
+                    onClick={() => handleStressSelection(5)}
+                    title="Very High - Significant stress and anxiety"
+                  >
                     <span className="stress-icon">🔴</span>
                     <span className="stress-label">Very High</span>
                   </div>
-                  <div className="stress-option" title="Extreme - Overwhelmed and very anxious">
+                  <div 
+                    className={`stress-option ${dailySelections.moodLevel === 6 ? 'selected' : ''}`}
+                    onClick={() => handleStressSelection(6)}
+                    title="Extreme - Overwhelmed and very anxious"
+                  >
                     <span className="stress-icon">🟣</span>
                     <span className="stress-label">Extreme</span>
                   </div>
@@ -699,27 +1074,51 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 <div className="motivation-selector-label">Today's Energy:</div>
                 {/* 6-level motivation system in 3x2 grid matching intensity colors */}
                 <div className="motivation-options-grid">
-                  <div className="motivation-option" title="Very Low - Need gentle movement">
+                  <div 
+                    className={`motivation-option ${dailySelections.energyLevel === 1 ? 'selected' : ''}`}
+                    onClick={() => handleEnergySelection(1)}
+                    title="Very Low - Need gentle movement"
+                  >
                     <span className="motivation-icon">🟢</span>
                     <span className="motivation-label">Very Low</span>
                   </div>
-                  <div className="motivation-option" title="Low - Prefer lighter activities">
+                  <div 
+                    className={`motivation-option ${dailySelections.energyLevel === 2 ? 'selected' : ''}`}
+                    onClick={() => handleEnergySelection(2)}
+                    title="Low - Prefer lighter activities"
+                  >
                     <span className="motivation-icon">🔵</span>
                     <span className="motivation-label">Low</span>
                   </div>
-                  <div className="motivation-option" title="Moderate - Ready for balanced workout">
+                  <div 
+                    className={`motivation-option ${dailySelections.energyLevel === 3 ? 'selected' : ''}`}
+                    onClick={() => handleEnergySelection(3)}
+                    title="Moderate - Ready for balanced workout"
+                  >
                     <span className="motivation-icon">🟡</span>
                     <span className="motivation-label">Moderate</span>
                   </div>
-                  <div className="motivation-option" title="High - Feeling strong and motivated">
+                  <div 
+                    className={`motivation-option ${dailySelections.energyLevel === 4 ? 'selected' : ''}`}
+                    onClick={() => handleEnergySelection(4)}
+                    title="High - Feeling strong and motivated"
+                  >
                     <span className="motivation-icon">🟠</span>
                     <span className="motivation-label">High</span>
                   </div>
-                  <div className="motivation-option" title="Very High - Maximum motivation and energy">
+                  <div 
+                    className={`motivation-option ${dailySelections.energyLevel === 5 ? 'selected' : ''}`}
+                    onClick={() => handleEnergySelection(5)}
+                    title="Very High - Maximum motivation and energy"
+                  >
                     <span className="motivation-icon">🔴</span>
                     <span className="motivation-label">Very High</span>
                   </div>
-                  <div className="motivation-option" title="Extreme - Peak energy and drive">
+                  <div 
+                    className={`motivation-option ${dailySelections.energyLevel === 6 ? 'selected' : ''}`}
+                    onClick={() => handleEnergySelection(6)}
+                    title="Extreme - Peak energy and drive"
+                  >
                     <span className="motivation-icon">🟣</span>
                     <span className="motivation-label">Extreme</span>
                   </div>
@@ -732,79 +1131,11 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
 
       {/* Third Row: 2-Column Layout */}
       <div className="generator-row generator-row--third">
-        {/* Current Soreness Card */}
-        <FormFieldCard
-          title="Current Soreness"
-          description="Any areas feeling sore or tight today?"
-          delay={900}
-          variant="complex"
-        >
-          <div className="soreness-card-structure">
-            {/* HEADER: Profile Soreness Section */}
-            <div className="soreness-card-header">
-              {!profileLoading && !profileError && isProfileSufficient && profileMapping ? (
-                <div className="profile-soreness-section">
-                  <div className="profile-soreness-label">Recovery Focus:</div>
-                  <div className="profile-soreness-badges">
-                    <span className="profile-no-soreness">Select any sore areas today</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="header-fallback">
-                  <div className="header-fallback-text">
-                    <span>Current Soreness</span>
-                  </div>
-                  <div className="header-subtitle">Select areas that need extra attention</div>
-                </div>
-              )}
-            </div>
-
-            {/* BODY: Today's Soreness Selector */}
-            <div className="soreness-card-body">
-              <div className="soreness-selector-container">
-                <div className="soreness-selector-label">
-                  Areas feeling sore or tight:
-                </div>
-                
-                <div className="soreness-grid">
-                  <div className="soreness-option" title="Shoulders feeling sore or tight" data-soreness="shoulders">
-                    <span className="soreness-label">Shoulders</span>
-                  </div>
-                  <div className="soreness-option" title="Arms feeling sore or tight" data-soreness="arms">
-                    <span className="soreness-label">Arms</span>
-                  </div>
-                  <div className="soreness-option" title="Chest feeling sore or tight" data-soreness="chest">
-                    <span className="soreness-label">Chest</span>
-                  </div>
-                  <div className="soreness-option" title="Back feeling sore or tight" data-soreness="back">
-                    <span className="soreness-label">Back</span>
-                  </div>
-                  <div className="soreness-option" title="Core/Abs feeling sore or tight" data-soreness="core">
-                    <span className="soreness-label">Core/Abs</span>
-                  </div>
-                  <div className="soreness-option" title="Hips feeling sore or tight" data-soreness="hips">
-                    <span className="soreness-label">Hips</span>
-                  </div>
-                  <div className="soreness-option" title="Legs feeling sore or tight" data-soreness="legs">
-                    <span className="soreness-label">Legs</span>
-                  </div>
-                  <div className="soreness-option" title="Knees feeling sore or tight" data-soreness="knees">
-                    <span className="soreness-label">Knees</span>
-                  </div>
-                  <div className="soreness-option" title="Ankles feeling sore or tight" data-soreness="ankles">
-                    <span className="soreness-label">Ankles</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </FormFieldCard>
-
         {/* Sleep Quality Card */}
         <FormFieldCard
           title="Sleep Quality"
           description="How well did you sleep last night?"
-          delay={1000}
+          delay={900}
           variant="complex"
         >
           <div className="sleep-card-structure">
@@ -835,24 +1166,91 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
                 </div>
                 
                 <div className="sleep-grid">
-                  <div className="sleep-option" title="Excellent - Deep, restful sleep all night" data-sleep="excellent">
+                  <div 
+                    className={`sleep-option ${dailySelections.sleepQuality === 6 ? 'selected' : ''}`}
+                    onClick={() => handleSleepSelection(6)}
+                    title="Excellent - Deep, restful sleep all night"
+                  >
                     <span className="sleep-label">Excellent</span>
                   </div>
-                  <div className="sleep-option" title="Good - Solid sleep with minimal interruptions" data-sleep="good">
+                  <div 
+                    className={`sleep-option ${dailySelections.sleepQuality === 5 ? 'selected' : ''}`}
+                    onClick={() => handleSleepSelection(5)}
+                    title="Good - Solid sleep with minimal interruptions"
+                  >
                     <span className="sleep-label">Good</span>
                   </div>
-                  <div className="sleep-option" title="Fair - Decent sleep but some restlessness" data-sleep="fair">
+                  <div 
+                    className={`sleep-option ${dailySelections.sleepQuality === 4 ? 'selected' : ''}`}
+                    onClick={() => handleSleepSelection(4)}
+                    title="Fair - Decent sleep but some restlessness"
+                  >
                     <span className="sleep-label">Fair</span>
                   </div>
-                  <div className="sleep-option" title="Poor - Restless night with frequent waking" data-sleep="poor">
+                  <div 
+                    className={`sleep-option ${dailySelections.sleepQuality === 3 ? 'selected' : ''}`}
+                    onClick={() => handleSleepSelection(3)}
+                    title="Poor - Restless night with frequent waking"
+                  >
                     <span className="sleep-label">Poor</span>
                   </div>
-                  <div className="sleep-option" title="Very Poor - Little sleep, very restless" data-sleep="very-poor">
+                  <div 
+                    className={`sleep-option ${dailySelections.sleepQuality === 2 ? 'selected' : ''}`}
+                    onClick={() => handleSleepSelection(2)}
+                    title="Very Poor - Little sleep, very restless"
+                  >
                     <span className="sleep-label">Very Poor</span>
                   </div>
-                  <div className="sleep-option" title="Terrible - Almost no sleep, exhausted" data-sleep="terrible">
+                  <div 
+                    className={`sleep-option ${dailySelections.sleepQuality === 1 ? 'selected' : ''}`}
+                    onClick={() => handleSleepSelection(1)}
+                    title="Terrible - Almost no sleep, exhausted"
+                  >
                     <span className="sleep-label">Terrible</span>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormFieldCard>
+
+        {/* Workout Customization Card */}
+        <FormFieldCard
+          title="Workout Customization"
+          description="Any specific requests or modifications?"
+          delay={1000}
+          variant="complex"
+        >
+          <div className="customization-card-structure">
+            {/* HEADER: Customization Section */}
+            <div className="customization-card-header">
+              <div className="header-fallback">
+                <div className="header-fallback-text">
+                  <span className="header-icon">✏️</span>
+                  <span>Custom Requests</span>
+                </div>
+                <div className="header-subtitle">Add any specific preferences or modifications</div>
+              </div>
+            </div>
+
+            {/* BODY: Customization Text Input */}
+            <div className="customization-card-body">
+              <div className="customization-input-container">
+                <div className="customization-input-label">
+                  Additional preferences or notes:
+                </div>
+                
+                <textarea
+                  className="customization-textarea"
+                  placeholder="e.g., Focus on upper body, avoid jumping exercises, include more stretching, use specific equipment..."
+                  value={dailySelections.workoutCustomization || ''}
+                  onChange={(e) => handleCustomizationChange(e.target.value)}
+                  rows={4}
+                  maxLength={500}
+                />
+                
+                <div className="customization-character-count">
+                  {(dailySelections.workoutCustomization || '').length}/500 characters
                 </div>
               </div>
             </div>

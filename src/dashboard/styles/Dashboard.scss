@@ -119,18 +119,12 @@
       
       /* Register Tab Layout */
       .register-tab-layout {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: var(--spacing-xl);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
         height: 100%;
         
-        @media (max-width: 1024px) {
-          grid-template-columns: 1fr;
-          gap: var(--spacing-lg);
-        }
-        
         .register-header {
-          grid-column: 1 / -1;
           margin-bottom: var(--spacing-lg);
           
           h2 {
@@ -149,80 +143,7 @@
         }
         
         .register-form-section {
-          .register-form-card {
-            height: fit-content;
-            
-            .dashboard-profile-feature {
-              margin: 0;
-              
-              .profile-feature__subtitle {
-                display: none; // Hide duplicate subtitle
-              }
-            }
-          }
-        }
-        
-        .register-info-section {
-          .register-info-card {
-            height: fit-content;
-            position: sticky;
-            top: var(--spacing-lg);
-            
-            h3 {
-              font-size: 1.25rem;
-              font-weight: 600;
-              color: var(--text-primary);
-              margin: 0 0 var(--spacing-lg) 0;
-            }
-            
-            .steps-overview {
-              display: flex;
-              flex-direction: column;
-              gap: var(--spacing-md);
-              
-              .step-item {
-                display: flex;
-                align-items: flex-start;
-                gap: var(--spacing-md);
-                padding: var(--spacing-md);
-                border-radius: 8px;
-                background: rgba(99, 102, 241, 0.1);
-                border: 1px solid rgba(99, 102, 241, 0.2);
-                
-                .step-number {
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  width: 32px;
-                  height: 32px;
-                  background: var(--accent-color);
-                  color: white;
-                  border-radius: 50%;
-                  font-weight: 600;
-                  font-size: 0.875rem;
-                  flex-shrink: 0;
-                }
-                
-                .step-content {
-                  flex: 1;
-                  
-                  h4 {
-                    font-size: 1rem;
-                    font-weight: 600;
-                    color: var(--text-primary);
-                    margin: 0 0 0.25rem 0;
-                  }
-                  
-                  p {
-                    font-size: 0.875rem;
-                    color: var(--text-secondary);
-                    margin: 0;
-                    line-height: 1.4;
-                  }
-                }
-              }
-            }
-          }
+          flex: 1;
         }
       }
     }
