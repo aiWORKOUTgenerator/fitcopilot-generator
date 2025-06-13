@@ -183,11 +183,118 @@ export function useWorkoutForm() {
     return isValid;
   }, [formValues, dispatch, validation]);
   
+  // Validate form with modular card support
+  const validateFormWithModularSupport = useCallback(() => {
+    // Map focus values from sessionInputs to goals values
+    const mapFocusToGoals = (focus?: string): string => {
+      switch (focus) {
+        case 'fat-burning': return 'lose-weight';
+        case 'muscle-building': return 'build-muscle';
+        case 'endurance': return 'improve-endurance';
+        case 'strength': return 'increase-strength';
+        case 'flexibility': return 'enhance-flexibility';
+        case 'general-fitness': return 'general-fitness';
+        default: return 'general-fitness'; // Default fallback
+      }
+    };
+
+    // Create a mapped version of form values that includes session inputs
+    const mappedFormValues = {
+      ...formValues,
+      // Map session inputs to main form fields for validation
+      duration: formValues.sessionInputs?.timeConstraintsToday || formValues.duration,
+      goals: formValues.sessionInputs?.todaysFocus 
+        ? mapFocusToGoals(formValues.sessionInputs.todaysFocus)
+        : formValues.goals,
+      // Set default difficulty if not set (modular cards don't set this yet)
+      difficulty: formValues.difficulty || 'intermediate'
+    };
+    
+    console.log('[useWorkoutForm] Validating with mapped values:', {
+      original: formValues,
+      mapped: mappedFormValues,
+      sessionInputs: formValues.sessionInputs,
+      focusMapping: {
+        from: formValues.sessionInputs?.todaysFocus,
+        to: mappedFormValues.goals
+      }
+    });
+
+    const isValid = validation.validateForm(mappedFormValues);
+    dispatch({ type: 'SET_FORM_ERRORS', payload: validation.errors });
+    return isValid;
+  }, [formValues, dispatch, validation]);
+  
   // Reset form errors
   const resetFormErrors = useCallback(() => {
     validation.resetErrors();
     dispatch({ type: 'SET_FORM_ERRORS', payload: null });
   }, [dispatch, validation]);
+  
+  // Get mapped form values for generation (includes session input mapping and muscle targeting)
+  const getMappedFormValues = useCallback((): Partial<WorkoutFormParams> => {
+    // Map focus values from sessionInputs to goals values
+    const mapFocusToGoals = (focus?: string): string => {
+      switch (focus) {
+        case 'fat-burning': return 'lose-weight';
+        case 'muscle-building': return 'build-muscle';
+        case 'endurance': return 'improve-endurance';
+        case 'strength': return 'increase-strength';
+        case 'flexibility': return 'enhance-flexibility';
+        case 'general-fitness': return 'general-fitness';
+        default: return 'general-fitness';
+      }
+    };
+
+    // Create mapped form values for generation
+    const mappedValues = {
+      ...formValues,
+      // Map session inputs to main form fields for generation
+      duration: formValues.sessionInputs?.timeConstraintsToday || formValues.duration,
+      goals: formValues.sessionInputs?.todaysFocus 
+        ? mapFocusToGoals(formValues.sessionInputs.todaysFocus)
+        : formValues.goals,
+      difficulty: formValues.difficulty || 'intermediate',
+      // Preserve session inputs for AI context
+      sessionInputs: formValues.sessionInputs
+    };
+
+    // Include muscle targeting data from sessionInputs (muscle integration hook syncs here)
+    if (formValues.sessionInputs?.muscleTargeting) {
+      mappedValues.muscleTargeting = formValues.sessionInputs.muscleTargeting;
+    }
+
+    // Include muscle selection data if available (from muscle integration hook)
+    if (formValues.muscleSelection) {
+      mappedValues.muscleSelection = formValues.muscleSelection;
+    }
+
+    // Include direct muscle targeting fields for backward compatibility
+    if (formValues.targetMuscleGroups) {
+      mappedValues.targetMuscleGroups = formValues.targetMuscleGroups;
+    }
+    if (formValues.specificMuscles) {
+      mappedValues.specificMuscles = formValues.specificMuscles;
+    }
+    if (formValues.primaryFocus) {
+      mappedValues.primaryFocus = formValues.primaryFocus;
+    }
+
+    // Extract muscle targeting from sessionInputs.muscleTargeting for backward compatibility
+    if (formValues.sessionInputs?.muscleTargeting) {
+      const sessionMuscleTargeting = formValues.sessionInputs.muscleTargeting;
+      mappedValues.targetMuscleGroups = sessionMuscleTargeting.targetMuscleGroups;
+      mappedValues.specificMuscles = sessionMuscleTargeting.specificMuscles;
+      mappedValues.primaryFocus = sessionMuscleTargeting.primaryFocus;
+    }
+
+    // Include focus area from sessionInputs (muscle groups as strings)
+    if (formValues.sessionInputs?.focusArea?.length) {
+      mappedValues.focusArea = formValues.sessionInputs.focusArea;
+    }
+
+    return mappedValues;
+  }, [formValues]);
   
   // Clear form storage
   const clearFormStorage = useCallback(() => {
@@ -208,6 +315,7 @@ export function useWorkoutForm() {
     // Form validation
     isValid: validation.isFormValid(formValues),
     validateForm,
+    validateFormWithModularSupport,
     resetFormErrors,
     
     // Form update methods
@@ -235,6 +343,9 @@ export function useWorkoutForm() {
     
     // Storage
     clearFormStorage,
-    hasStoredData: persistence.hasStoredData
+    hasStoredData: persistence.hasStoredData,
+    
+    // New getMappedFormValues method
+    getMappedFormValues
   };
 } 

@@ -1,0 +1,363 @@
+/**
+ * SleepQualityCard Component Styles
+ * 
+ * Styling for sleep quality assessment card with:
+ * - Profile integration badges
+ * - 3x2 grid layout for 6 sleep quality levels
+ * - Sleep-themed color gradients (purple/blue tones)
+ * - Responsive design and accessibility
+ */
+
+/* Main Card Container */
+.sleep-quality-card {
+  .sleep-card-structure {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 240px;
+  }
+
+  /* HEADER: Profile Sleep Section */
+  .sleep-card-header {
+    .profile-sleep-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      .profile-sleep-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+      }
+      
+      .profile-sleep-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      
+      .profile-sleep-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        background: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+      }
+    }
+    
+    .header-fallback {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      
+      .header-fallback-text {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+        
+        .header-icon {
+          font-size: 1.125rem;
+        }
+      }
+      
+      .header-subtitle {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+    }
+  }
+
+  /* BODY: Sleep Quality Selection */
+  .sleep-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .sleep-selector-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      
+      .sleep-selector-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      /* 3x2 Grid Layout for 6 Sleep Quality Levels */
+      .sleep-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 0.75rem;
+        
+        .sleep-option {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.25rem;
+          padding: 0.875rem 0.5rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 0.5rem;
+          background: #ffffff;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          min-height: 80px;
+          position: relative;
+          
+          /* Default hover state */
+          &:hover {
+            border-color: #8b5cf6;
+            background: #f3f4f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+          }
+          
+          &.selected {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+          }
+          
+          .sleep-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            text-align: center;
+            line-height: 1.2;
+            transition: color 0.2s ease;
+          }
+          
+          /* Sleep Quality Specific Color Themes */
+          
+          /* Excellent (6) - Deep purple gradient */
+          &:nth-child(1) {
+            &.selected {
+              border-color: #6366f1;
+              background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+              
+              .sleep-label {
+                color: #4f46e5;
+                font-weight: 700;
+              }
+            }
+            
+            &:hover:not(.selected) {
+              border-color: #6366f1;
+              background: #eef2ff;
+            }
+          }
+          
+          /* Good (5) - Indigo */
+          &:nth-child(2) {
+            &.selected {
+              border-color: #8b5cf6;
+              background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+              
+              .sleep-label {
+                color: #7c3aed;
+                font-weight: 700;
+              }
+            }
+            
+            &:hover:not(.selected) {
+              border-color: #8b5cf6;
+              background: #f5f3ff;
+            }
+          }
+          
+          /* Fair (4) - Blue */
+          &:nth-child(3) {
+            &.selected {
+              border-color: #3b82f6;
+              background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+              
+              .sleep-label {
+                color: #2563eb;
+                font-weight: 700;
+              }
+            }
+            
+            &:hover:not(.selected) {
+              border-color: #3b82f6;
+              background: #eff6ff;
+            }
+          }
+          
+          /* Poor (3) - Yellow warning */
+          &:nth-child(4) {
+            &.selected {
+              border-color: #f59e0b;
+              background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+              
+              .sleep-label {
+                color: #d97706;
+                font-weight: 700;
+              }
+            }
+            
+            &:hover:not(.selected) {
+              border-color: #f59e0b;
+              background: #fffbeb;
+            }
+          }
+          
+          /* Very Poor (2) - Orange alert */
+          &:nth-child(5) {
+            &.selected {
+              border-color: #f97316;
+              background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+              
+              .sleep-label {
+                color: #ea580c;
+                font-weight: 700;
+              }
+            }
+            
+            &:hover:not(.selected) {
+              border-color: #f97316;
+              background: #fff7ed;
+            }
+          }
+          
+          /* Terrible (1) - Red critical */
+          &:nth-child(6) {
+            &.selected {
+              border-color: #ef4444;
+              background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+              
+              .sleep-label {
+                color: #dc2626;
+                font-weight: 700;
+              }
+            }
+            
+            &:hover:not(.selected) {
+              border-color: #ef4444;
+              background: #fef2f2;
+            }
+          }
+          
+          /* Enhanced visual feedback */
+          &:hover .sleep-label {
+            color: #374151;
+          }
+          
+          &.selected .sleep-label {
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .sleep-card-structure {
+      gap: 0.75rem;
+      min-height: 200px;
+    }
+    
+    .sleep-card-body .sleep-selector-container .sleep-grid {
+      gap: 0.5rem;
+      
+      .sleep-option {
+        padding: 0.75rem 0.25rem;
+        min-height: 70px;
+        
+        .sleep-label {
+          font-size: 0.6875rem;
+        }
+      }
+    }
+    
+    .sleep-card-header {
+      .profile-sleep-section .profile-sleep-badges .profile-sleep-info {
+        font-size: 0.6875rem;
+        padding: 0.1875rem 0.375rem;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sleep-card-body .sleep-selector-container .sleep-grid {
+      /* Stack to 2x3 on very small screens for better touch targets */
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      
+      .sleep-option {
+        min-height: 65px;
+        padding: 0.625rem 0.25rem;
+        
+        .sleep-label {
+          font-size: 0.65rem;
+        }
+      }
+    }
+  }
+
+  /* Accessibility Enhancements */
+  @media (prefers-reduced-motion: reduce) {
+    .sleep-option {
+      transition: none;
+      
+      &:hover,
+      &.selected {
+        transform: none;
+      }
+      
+      .sleep-label {
+        transition: none;
+        transform: none !important;
+      }
+    }
+  }
+
+  /* High Contrast Mode Support */
+  @media (prefers-contrast: high) {
+    .sleep-option {
+      border-width: 3px;
+      
+      &.selected {
+        border-color: #000000;
+        background: #ffffff;
+        
+        .sleep-label {
+          color: #000000;
+        }
+      }
+      
+      &:hover:not(.selected) {
+        border-color: #000000;
+        background: #f3f4f6;
+        
+        .sleep-label {
+          color: #000000;
+        }
+      }
+    }
+  }
+
+  /* Focus Management for Keyboard Navigation */
+  .sleep-option {
+    &:focus {
+      outline: 2px solid #8b5cf6;
+      outline-offset: 2px;
+    }
+    
+    &:focus-visible {
+      outline: 2px solid #8b5cf6;
+      outline-offset: 2px;
+    }
+  }
+} 

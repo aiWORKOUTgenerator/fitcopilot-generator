@@ -1,0 +1,281 @@
+/**
+ * WorkoutDisplay Styles
+ * 
+ * Clean, accessible styles that focus on readability and performance.
+ * No glassmorphism complexity, no hover overlay issues.
+ */
+
+.workout-display {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #ffffff;
+  font-family: var(--font-family-base, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+
+  // Compact variant
+  &--compact {
+    padding: 1.5rem;
+    
+    .workout-display__title {
+      font-size: 1.25rem;
+    }
+    
+    .workout-display__section {
+      margin-bottom: 1rem;
+    }
+    
+    .workout-display__exercise {
+      padding: 0.75rem;
+    }
+  }
+
+  // Header
+  &__header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+
+  &__description {
+    font-size: 1rem;
+    color: #b3b3b3;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  // Content
+  &__content {
+    margin-bottom: 2rem;
+  }
+
+  &__no-content {
+    text-align: center;
+    color: #888888;
+    font-style: italic;
+    padding: 2rem;
+  }
+
+  // Sections
+  &__section {
+    margin-bottom: 2rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  &__section-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ffffff;
+  }
+
+  &__section-duration {
+    font-size: 0.875rem;
+    color: #84cc16;
+    background: rgba(132, 204, 22, 0.1);
+    border: 1px solid rgba(132, 204, 22, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  // Exercises
+  &__exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__exercise {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  &__exercise-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #ffffff;
+  }
+
+  &__exercise-details {
+    margin-bottom: 0.5rem;
+  }
+
+  &__exercise-metric {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+  }
+
+  &__exercise-description {
+    font-size: 0.875rem;
+    color: #b3b3b3;
+    margin: 0.5rem 0 0 0;
+    line-height: 1.5;
+  }
+
+  &__exercise-tips {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    
+    strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    
+    ul {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: #b3b3b3;
+      line-height: 1.4;
+      
+      li {
+        margin-bottom: 0.25rem;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  // Actions
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    
+    &__title {
+      font-size: 1.5rem;
+    }
+    
+    &__section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    
+    &__actions {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+    
+    &__title {
+      font-size: 1.25rem;
+    }
+    
+    &__exercise {
+      padding: 0.75rem;
+    }
+  }
+
+  // Print styles
+  @media print {
+    background: white;
+    color: black;
+    border: 1px solid #ccc;
+    box-shadow: none;
+    
+    &__actions {
+      display: none;
+    }
+    
+    &__title {
+      color: black;
+    }
+    
+    &__section-name {
+      color: black;
+    }
+    
+    &__exercise-name {
+      color: black;
+    }
+    
+    &__exercise-metric {
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      color: black;
+    }
+    
+    &__section-duration {
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      color: black;
+    }
+  }
+
+  // Focus styles for accessibility
+  &__actions button:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .workout-display {
+    border: 2px solid #ffffff;
+    
+    &__section,
+    &__exercise {
+      border: 1px solid #ffffff;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .workout-display * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+} 

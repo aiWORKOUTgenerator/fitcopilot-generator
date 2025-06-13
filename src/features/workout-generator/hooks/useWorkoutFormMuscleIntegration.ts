@@ -1,254 +1,509 @@
 /**
- * Hook for integrating muscle selection with workout form state
+ * Workout Form Muscle Integration Hook
  * 
- * Provides coordination between muscle targeting and other workout form parameters,
- * ensuring consistent state management and validation across the entire form.
+ * Architectural bridge between muscle selection domain and workout form domain.
+ * Implements clean separation of concerns with proper data flow orchestration.
+ * 
+ * This hook serves as the Application Layer component that orchestrates
+ * the integration between:
+ * - Muscle Selection Domain (useMuscleSelection)
+ * - Muscle API Persistence Layer (POST /muscle-selection)
+ * - Workout Form Domain (useWorkoutForm) 
+ * - Profile Domain (useProfile)
+ * 
+ * Key Architectural Principles:
+ * - Single Responsibility: Only handles muscle-form integration
+ * - Dependency Inversion: Depends on abstractions, not concretions
+ * - Open/Closed: Extensible for other form integrations
+ * - Interface Segregation: Clean, focused interfaces
+ * - API-First: Integrates with unique muscle API endpoints
  */
 
-import { useCallback, useEffect, useMemo } from 'react';
-import { useMuscleSelection } from './useMuscleSelection';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useWorkoutForm } from './useWorkoutForm';
-import { MuscleGroup, MuscleSelectionData } from '../types/muscle-types';
+import { useMuscleSelection } from './useMuscleSelection';
+import { useProfile } from '../../profile/context';
+import { MuscleSelectionData, MuscleGroup } from '../types/muscle-types';
+import { formatMuscleSelectionForAPI, generateMuscleSelectionSummary } from '../utils/muscle-helpers';
 import { WorkoutFormParams } from '../types/workout';
-import { 
-  formatMuscleSelectionForAPI,
-  calculateWorkoutBalance,
-  generateMuscleSelectionSummary
-} from '../utils/muscle-helpers';
 
 /**
- * Extended workout form parameters with muscle targeting
+ * API Service for muscle selection persistence
  */
-export interface WorkoutFormWithMuscleParams extends WorkoutFormParams {
-  muscleSelection?: MuscleSelectionData;
-  targetMuscleGroups?: MuscleGroup[];
-  primaryMuscleGroup?: MuscleGroup;
+const muscleSelectionAPI = {
+  async save(selectionData: MuscleSelectionData): Promise<boolean> {
+    try {
+      const response = await fetch('/wp-json/fitcopilot/v1/muscle-selection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          selectedGroups: selectionData.selectedGroups,
+          selectedMuscles: selectionData.selectedMuscles
+        })
+      });
+      
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error('[MuscleAPI] Save failed:', error);
+      return false;
+    }
+  },
+  
+  async load(): Promise<MuscleSelectionData | null> {
+    try {
+      const response = await fetch('/wp-json/fitcopilot/v1/muscle-selection');
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        return {
+          selectedGroups: result.data.selectedGroups || [],
+          selectedMuscles: result.data.selectedMuscles || {}
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('[MuscleAPI] Load failed:', error);
+      return null;
+    }
+  }
+};
+
+/**
+ * Integration state interface for type safety
+ */
+export interface MuscleFormIntegrationState {
+  // Muscle selection state
+  muscleSelection: MuscleSelectionData;
+  hasMuscleSelection: boolean;
+  
+  // Form integration state
+  isIntegrated: boolean;
+  isSynced: boolean;
+  
+  // Validation state
+  isValid: boolean;
+  validationErrors: string[];
+  
+  // Profile integration
+  hasProfileSuggestions: boolean;
+  profileSuggestedGroups: MuscleGroup[];
 }
 
 /**
- * Hook return type for workout form with muscle integration
+ * Integration actions interface for clean API
+ */
+export interface MuscleFormIntegrationActions {
+  // Core integration actions
+  syncMuscleSelectionToForm: () => void;
+  clearMuscleSelection: () => void;
+  resetIntegration: () => void;
+  
+  // Form data preparation
+  getFormDataWithMuscleSelection: () => WorkoutFormParams & {
+    muscleSelection: MuscleSelectionData;
+    muscleTargeting: {
+      targetMuscleGroups: MuscleGroup[];
+      specificMuscles: Record<MuscleGroup, string[]>;
+      primaryFocus: MuscleGroup | undefined;
+      selectionSummary: string;
+    };
+  };
+  
+  // Validation
+  validateIntegratedForm: () => boolean;
+  
+  // Profile integration
+  applySuggestedMuscleGroups: (groups: MuscleGroup[]) => void;
+}
+
+/**
+ * Integration hook return interface
  */
 export interface UseWorkoutFormMuscleIntegrationReturn {
-  // Muscle selection functionality
-  muscleSelection: ReturnType<typeof useMuscleSelection>;
+  // State
+  state: MuscleFormIntegrationState;
   
-  // Workout form functionality
-  workoutForm: ReturnType<typeof useWorkoutForm>;
+  // Actions
+  actions: MuscleFormIntegrationActions;
   
-  // Integration methods
-  getCompleteFormData: () => WorkoutFormWithMuscleParams;
-  updateFormWithMuscleData: () => void;
-  validateCompleteForm: () => boolean;
-  resetCompleteForm: () => void;
+  // Computed values
+  completionPercentage: number;
+  selectionSummary: string;
   
-  // Enhanced form state
-  isFormComplete: boolean;
-  formCompletionPercentage: number;
-  estimatedWorkoutDuration: number;
-  workoutComplexity: 'Simple' | 'Moderate' | 'Complex';
-  balanceScore: number;
-  
-  // Quick actions
-  applyMusclePreset: (preset: 'upper-body' | 'lower-body' | 'full-body' | 'core-focus') => void;
-  optimizeForGoals: () => void;
+  // Integration metadata
+  metadata: {
+    lastSyncTimestamp: number | null;
+    integrationVersion: string;
+    isDebugging: boolean;
+  };
 }
 
 /**
- * Hook for integrating muscle selection with workout form
+ * Configuration options for the integration
  */
-export const useWorkoutFormMuscleIntegration = (): UseWorkoutFormMuscleIntegrationReturn => {
+interface MuscleFormIntegrationOptions {
+  // Sync behavior
+  autoSync?: boolean;
+  syncDebounceMs?: number;
   
-  // Initialize both hooks
-  const muscleSelection = useMuscleSelection();
+  // Validation
+  requireMuscleSelection?: boolean;
+  maxMuscleGroups?: number;
+  
+  // Profile integration
+  enableProfileSuggestions?: boolean;
+  
+  // Debug mode
+  enableDebugLogging?: boolean;
+}
+
+/**
+ * Default configuration - Production optimized for Target Muscles card
+ */
+const DEFAULT_OPTIONS: Required<MuscleFormIntegrationOptions> = {
+  autoSync: true,        // ✅ ENABLED: Auto-sync muscle selection to form state
+  syncDebounceMs: 150,   // ✅ OPTIMIZED: Faster sync for better UX  
+  requireMuscleSelection: false,
+  maxMuscleGroups: 3,
+  enableProfileSuggestions: true,
+  enableDebugLogging: false
+};
+
+/**
+ * Main integration hook implementation
+ * 
+ * Provides clean, type-safe integration between muscle selection and workout form
+ * following clean architecture principles.
+ */
+export function useWorkoutFormMuscleIntegration(
+  options: MuscleFormIntegrationOptions = {}
+): UseWorkoutFormMuscleIntegrationReturn {
+  
+  // Merge with defaults
+  const config = useMemo(() => ({ ...DEFAULT_OPTIONS, ...options }), [options]);
+  
+  // Core dependencies
   const workoutForm = useWorkoutForm();
+  const muscleSelection = useMuscleSelection(config.maxMuscleGroups, true);
+  const { profileData, isLoading: profileLoading } = useProfile();
   
-  // Sync muscle selection with form session inputs
-  useEffect(() => {
-    const currentFocusArea = workoutForm.formValues.sessionInputs?.focusArea || [];
-    const muscleGroups = muscleSelection.selectionData.selectedGroups.map(group => group.toString());
-    
-    // Update session inputs if muscle selection has changed
-    if (JSON.stringify(currentFocusArea) !== JSON.stringify(muscleGroups)) {
-      workoutForm.updateField('sessionInputs', {
-        ...workoutForm.formValues.sessionInputs,
-        focusArea: muscleGroups
-      });
+  // Integration state tracking
+  const lastSyncTimestamp = useRef<number | null>(null);
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Debug logging utility
+  const debugLog = useCallback((message: string, data?: any) => {
+    if (config.enableDebugLogging) {
+      console.log(`[MuscleFormIntegration] ${message}`, data);
     }
-  }, [muscleSelection.selectionData.selectedGroups, workoutForm]);
+  }, [config.enableDebugLogging]);
   
-  // Get complete form data including muscle selection
-  const getCompleteFormData = useCallback((): WorkoutFormWithMuscleParams => {
-    const musclePayload = formatMuscleSelectionForAPI(muscleSelection.selectionData);
+  // Profile-based muscle suggestions
+  const profileSuggestedGroups = useMemo((): MuscleGroup[] => {
+    if (!config.enableProfileSuggestions || !profileData?.goals) return [];
     
-    return {
-      ...workoutForm.formValues,
-      muscleSelection: muscleSelection.selectionData,
-      targetMuscleGroups: musclePayload.targetMuscleGroups,
-      primaryMuscleGroup: musclePayload.primaryFocus,
-      sessionInputs: {
-        ...workoutForm.formValues.sessionInputs,
-        focusArea: muscleSelection.selectionData.selectedGroups.map(g => g.toString())
+    // Map profile goals to suggested muscle groups
+    const goalToMuscleMap: Record<string, MuscleGroup[]> = {
+      'strength': [MuscleGroup.Chest, MuscleGroup.Back, MuscleGroup.Legs],
+      'muscle': [MuscleGroup.Chest, MuscleGroup.Back, MuscleGroup.Arms],
+      'cardio': [MuscleGroup.Legs, MuscleGroup.Core],
+      'flexibility': [MuscleGroup.Core, MuscleGroup.Back],
+      'endurance': [MuscleGroup.Legs, MuscleGroup.Core, MuscleGroup.Back]
+    };
+    
+    const suggestedGroups = new Set<MuscleGroup>();
+    profileData.goals.forEach((goal: any) => {
+      const goalKey = goal.value || goal;
+      if (goalToMuscleMap[goalKey]) {
+        goalToMuscleMap[goalKey].forEach(group => suggestedGroups.add(group));
+      }
+    });
+    
+    return Array.from(suggestedGroups).slice(0, 3);
+  }, [profileData?.goals, config.enableProfileSuggestions]);
+  
+  // Enhanced sync with API persistence integration
+  const syncMuscleSelectionToForm = useCallback(() => {
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+    
+    syncTimeoutRef.current = setTimeout(async () => {
+      const muscleGroups = muscleSelection.selectionData.selectedGroups.map(group => group.toString());
+      const currentFocusArea = workoutForm.formValues.sessionInputs?.focusArea || [];
+      
+      // Only sync if there's a meaningful change
+      if (JSON.stringify(currentFocusArea.sort()) !== JSON.stringify(muscleGroups.sort())) {
+        debugLog('Syncing muscle selection to form with API persistence', {
+          muscleGroups,
+          currentFocusArea,
+          selectionData: muscleSelection.selectionData
+        });
+        
+        // 1. Persist to API (unique to Target Muscles card)
+        const hasMuscleSelection = muscleSelection.selectionData.selectedGroups.length > 0;
+        if (hasMuscleSelection) {
+          const apiSaveSuccess = await muscleSelectionAPI.save(muscleSelection.selectionData);
+          debugLog('API persistence result', { success: apiSaveSuccess });
+        }
+        
+        // 2. Sync to form state for PremiumPreviewStep
+        const muscleApiData = formatMuscleSelectionForAPI(muscleSelection.selectionData);
+        const selectionSummary = generateMuscleSelectionSummary(muscleSelection.selectionData);
+        
+        workoutForm.updateField('sessionInputs', {
+          ...workoutForm.formValues.sessionInputs,
+          focusArea: muscleGroups,
+          muscleTargeting: {
+            targetMuscleGroups: muscleApiData.targetMuscleGroups,
+            specificMuscles: muscleApiData.specificMuscles,
+            primaryFocus: muscleApiData.primaryFocus,
+            selectionSummary: selectionSummary.displayText
+          }
+        });
+        
+        lastSyncTimestamp.current = Date.now();
+      }
+    }, config.syncDebounceMs);
+  }, [muscleSelection.selectionData, workoutForm, config.syncDebounceMs, debugLog]);
+  
+  // Auto-sync effect
+  useEffect(() => {
+    if (config.autoSync) {
+      syncMuscleSelectionToForm();
+    }
+    
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
       }
     };
-  }, [muscleSelection.selectionData, workoutForm.formValues]);
+  }, [config.autoSync, syncMuscleSelectionToForm]);
   
-  // Update form with current muscle data
-  const updateFormWithMuscleData = useCallback(() => {
-    const muscleGroups = muscleSelection.selectionData.selectedGroups.map(g => g.toString());
+  // Initialize muscle integration from API and cached data on mount
+  useEffect(() => {
+    const initializeMuscleIntegration = async () => {
+      // 1. Try loading from API first (unique to Target Muscles card)
+      const apiData = await muscleSelectionAPI.load();
+      
+      // 2. Check local cached data
+      const hasCachedMuscleData = muscleSelection.selectionData.selectedGroups.length > 0;
+      const hasFormMuscleData = workoutForm.formValues.sessionInputs?.focusArea?.length > 0;
+      
+      debugLog('Initializing muscle integration', {
+        apiData,
+        cachedData: muscleSelection.selectionData,
+        formData: workoutForm.formValues.sessionInputs?.focusArea
+      });
+      
+      // 3. Determine data source priority: API > cached > none
+      let dataToSync = null;
+      
+      if (apiData && apiData.selectedGroups.length > 0) {
+        // API data takes priority - restore to muscle selection
+        debugLog('Restoring from API data');
+        // Convert string muscle groups to proper MuscleGroup enum values
+        apiData.selectedGroups.forEach(groupString => {
+          // Convert lowercase API string to proper MuscleGroup enum
+          const muscleGroupKey = Object.keys(MuscleGroup).find(key => 
+            MuscleGroup[key as keyof typeof MuscleGroup].toLowerCase() === groupString.toLowerCase()
+          );
+          if (muscleGroupKey) {
+            const muscleGroup = MuscleGroup[muscleGroupKey as keyof typeof MuscleGroup];
+            muscleSelection.addMuscleGroup(muscleGroup);
+          }
+        });
+        dataToSync = apiData;
+      } else if (hasCachedMuscleData && !hasFormMuscleData) {
+        // Use cached data if no API data
+        debugLog('Using cached muscle data');
+        dataToSync = muscleSelection.selectionData;
+      }
+      
+      // 4. Sync to form if we have data
+      if (dataToSync) {
+        syncMuscleSelectionToForm();
+      }
+    };
+    
+    initializeMuscleIntegration();
+  }, []);  // Run only once on mount
+  
+  // Clear muscle selection
+  const clearMuscleSelection = useCallback(() => {
+    debugLog('Clearing muscle selection');
+    muscleSelection.clearSelection();
+    
+    // Clear from form as well
     workoutForm.updateField('sessionInputs', {
       ...workoutForm.formValues.sessionInputs,
-      focusArea: muscleGroups
+      focusArea: [],
+      muscleTargeting: undefined
     });
-  }, [muscleSelection.selectionData.selectedGroups, workoutForm]);
-  
-  // Validate complete form including muscle selection
-  const validateCompleteForm = useCallback((): boolean => {
-    const isWorkoutFormValid = workoutForm.validateForm();
-    const isMuscleSelectionValid = muscleSelection.validation.isValid;
     
-    return isWorkoutFormValid && isMuscleSelectionValid;
-  }, [workoutForm, muscleSelection.validation.isValid]);
+    lastSyncTimestamp.current = Date.now();
+  }, [muscleSelection, workoutForm, debugLog]);
   
-  // Reset complete form
-  const resetCompleteForm = useCallback(() => {
-    workoutForm.updateForm({
-      duration: 30,
-      difficulty: 'beginner',
-      equipment: [],
-      goals: '',
-      restrictions: '',
-      preferences: '',
-      intensity: 3,
-      sessionInputs: {}
+  // Reset integration
+  const resetIntegration = useCallback(() => {
+    debugLog('Resetting muscle-form integration');
+    clearMuscleSelection();
+    lastSyncTimestamp.current = null;
+  }, [clearMuscleSelection, debugLog]);
+  
+  // Get form data with muscle selection
+  const getFormDataWithMuscleSelection = useCallback(() => {
+    const muscleApiData = formatMuscleSelectionForAPI(muscleSelection.selectionData);
+    const selectionSummary = generateMuscleSelectionSummary(muscleSelection.selectionData);
+    
+    // Use getMappedFormValues to ensure duration mapping works correctly
+    const mappedFormValues = workoutForm.getMappedFormValues();
+    
+    debugLog('Preparing form data with muscle selection', {
+      muscleApiData,
+      selectionSummary,
+      formValues: workoutForm.formValues,
+      mappedFormValues
     });
-    muscleSelection.clearSelection();
-  }, [workoutForm, muscleSelection]);
+    
+    return {
+      ...mappedFormValues,
+      muscleSelection: muscleSelection.selectionData,
+      muscleTargeting: {
+        targetMuscleGroups: muscleApiData.targetMuscleGroups,
+        specificMuscles: muscleApiData.specificMuscles,
+        primaryFocus: muscleApiData.primaryFocus,
+        selectionSummary: selectionSummary.displayText
+      }
+    };
+  }, [muscleSelection.selectionData, workoutForm, debugLog]);
   
-  // Calculate form completion percentage
-  const formCompletionPercentage = useMemo(() => {
+  // Validate integrated form
+  const validateIntegratedForm = useCallback(() => {
+    const baseValidation = workoutForm.validateForm();
+    const hasMuscleSelection = muscleSelection.selectionData.selectedGroups.length > 0;
+    
+    if (config.requireMuscleSelection && !hasMuscleSelection) {
+      debugLog('Validation failed: Muscle selection required but not provided');
+      return false;
+    }
+    
+    const muscleValidation = muscleSelection.validation;
+    const isValid = baseValidation && muscleValidation.isValid;
+    
+    debugLog('Integrated form validation result', {
+      baseValidation,
+      hasMuscleSelection,
+      muscleValidation,
+      isValid
+    });
+    
+    return isValid;
+  }, [workoutForm, muscleSelection, config.requireMuscleSelection, debugLog]);
+  
+  // Apply suggested muscle groups
+  const applySuggestedMuscleGroups = useCallback((groups: MuscleGroup[]) => {
+    debugLog('Applying suggested muscle groups', { groups });
+    
+    // Clear current selection first
+    muscleSelection.clearSelection();
+    
+    // Add suggested groups
+    groups.slice(0, config.maxMuscleGroups).forEach(group => {
+      muscleSelection.addMuscleGroup(group);
+    });
+  }, [muscleSelection, config.maxMuscleGroups, debugLog]);
+  
+  // Computed state
+  const state = useMemo((): MuscleFormIntegrationState => {
+    const hasMuscleSelection = muscleSelection.selectionData.selectedGroups.length > 0;
+    const formFocusArea = workoutForm.formValues.sessionInputs?.focusArea || [];
+    const muscleGroups = muscleSelection.selectionData.selectedGroups.map(g => g.toString());
+    const isSynced = JSON.stringify(formFocusArea.sort()) === JSON.stringify(muscleGroups.sort());
+    
+    return {
+      muscleSelection: muscleSelection.selectionData,
+      hasMuscleSelection,
+      isIntegrated: hasMuscleSelection && isSynced,
+      isSynced,
+      isValid: muscleSelection.validation.isValid,
+      validationErrors: muscleSelection.validation.warnings,
+      hasProfileSuggestions: profileSuggestedGroups.length > 0,
+      profileSuggestedGroups
+    };
+  }, [muscleSelection.selectionData, muscleSelection.validation, workoutForm.formValues.sessionInputs, profileSuggestedGroups]);
+  
+  // Completion percentage calculation
+  const completionPercentage = useMemo(() => {
     let completed = 0;
-    let total = 7; // Total required fields
+    const total = 7;
     
     if (workoutForm.formValues.duration > 0) completed++;
     if (workoutForm.formValues.difficulty) completed++;
-    if (workoutForm.formValues.goals && workoutForm.formValues.goals.trim()) completed++;
-    if (workoutForm.formValues.equipment && workoutForm.formValues.equipment.length > 0) completed++;
-    if (workoutForm.formValues.intensity && workoutForm.formValues.intensity > 0) completed++;
-    if (muscleSelection.selectionData.selectedGroups.length > 0) completed++;
+    if (workoutForm.formValues.goals?.trim()) completed++;
+    if (workoutForm.formValues.equipment?.length > 0) completed++;
+    if (workoutForm.formValues.intensity > 0) completed++;
+    if (state.hasMuscleSelection) completed++;
     if (workoutForm.formValues.sessionInputs && Object.keys(workoutForm.formValues.sessionInputs).length > 0) completed++;
     
     return Math.round((completed / total) * 100);
-  }, [workoutForm.formValues, muscleSelection.selectionData]);
+  }, [workoutForm.formValues, state.hasMuscleSelection]);
   
-  // Calculate estimated workout duration including muscle targeting
-  const estimatedWorkoutDuration = useMemo(() => {
-    const baseDuration = workoutForm.formValues.duration || 30;
-    const muscleGroups = muscleSelection.selectionData.selectedGroups.length;
-    const complexity = muscleGroups > 2 ? 1.2 : muscleGroups > 1 ? 1.1 : 1.0;
-    
-    return Math.round(baseDuration * complexity);
-  }, [workoutForm.formValues.duration, muscleSelection.selectionData.selectedGroups.length]);
-  
-  // Calculate workout complexity
-  const workoutComplexity = useMemo((): 'Simple' | 'Moderate' | 'Complex' => {
-    const muscleGroups = muscleSelection.selectionData.selectedGroups.length;
-    const hasSpecificMuscles = Object.values(muscleSelection.selectionData.selectedMuscles || {})
-      .some(muscles => muscles && muscles.length > 0);
-    const hasAdvancedSettings = workoutForm.formValues.intensity && workoutForm.formValues.intensity > 3;
-    const hasRestrictions = workoutForm.formValues.restrictions && workoutForm.formValues.restrictions.trim();
-    
-    if (muscleGroups >= 3 || hasSpecificMuscles || hasAdvancedSettings || hasRestrictions) {
-      return 'Complex';
-    } else if (muscleGroups === 2 || workoutForm.formValues.equipment?.length > 2) {
-      return 'Moderate';
-    } else {
-      return 'Simple';
-    }
-  }, [muscleSelection.selectionData, workoutForm.formValues]);
-  
-  // Calculate balance score
-  const balanceScore = useMemo(() => {
-    const balance = calculateWorkoutBalance(muscleSelection.selectionData);
-    return balance.score;
+  // Selection summary
+  const selectionSummary = useMemo(() => {
+    return generateMuscleSelectionSummary(muscleSelection.selectionData).displayText;
   }, [muscleSelection.selectionData]);
   
-  // Check if form is complete
-  const isFormComplete = useMemo(() => {
-    return formCompletionPercentage >= 80 && validateCompleteForm();
-  }, [formCompletionPercentage, validateCompleteForm]);
+  // Actions object
+  const actions = useMemo((): MuscleFormIntegrationActions => ({
+    syncMuscleSelectionToForm,
+    clearMuscleSelection,
+    resetIntegration,
+    getFormDataWithMuscleSelection,
+    validateIntegratedForm,
+    applySuggestedMuscleGroups
+  }), [
+    syncMuscleSelectionToForm,
+    clearMuscleSelection,
+    resetIntegration,
+    getFormDataWithMuscleSelection,
+    validateIntegratedForm,
+    applySuggestedMuscleGroups
+  ]);
   
-  // Apply muscle group presets
-  const applyMusclePreset = useCallback((preset: 'upper-body' | 'lower-body' | 'full-body' | 'core-focus') => {
-    muscleSelection.clearSelection();
-    
-    switch (preset) {
-      case 'upper-body':
-        muscleSelection.addMuscleGroup(MuscleGroup.Chest);
-        muscleSelection.addMuscleGroup(MuscleGroup.Back);
-        break;
-      case 'lower-body':
-        muscleSelection.addMuscleGroup(MuscleGroup.Legs);
-        muscleSelection.addMuscleGroup(MuscleGroup.Core);
-        break;
-      case 'full-body':
-        muscleSelection.addMuscleGroup(MuscleGroup.Chest);
-        muscleSelection.addMuscleGroup(MuscleGroup.Back);
-        muscleSelection.addMuscleGroup(MuscleGroup.Legs);
-        break;
-      case 'core-focus':
-        muscleSelection.addMuscleGroup(MuscleGroup.Core);
-        muscleSelection.addMuscleGroup(MuscleGroup.Back);
-        break;
-    }
-    
-    updateFormWithMuscleData();
-  }, [muscleSelection, updateFormWithMuscleData]);
-  
-  // Optimize muscle selection for current goals
-  const optimizeForGoals = useCallback(() => {
-    const goals = workoutForm.formValues.goals?.toLowerCase() || '';
-    
-    muscleSelection.clearSelection();
-    
-    if (goals.includes('strength') || goals.includes('muscle')) {
-      // Focus on major muscle groups for strength
-      muscleSelection.addMuscleGroup(MuscleGroup.Chest);
-      muscleSelection.addMuscleGroup(MuscleGroup.Back);
-      muscleSelection.addMuscleGroup(MuscleGroup.Legs);
-    } else if (goals.includes('cardio') || goals.includes('endurance')) {
-      // Full body for cardio
-      muscleSelection.addMuscleGroup(MuscleGroup.Legs);
-      muscleSelection.addMuscleGroup(MuscleGroup.Core);
-    } else if (goals.includes('tone') || goals.includes('definition')) {
-      // Balanced approach for toning
-      muscleSelection.addMuscleGroup(MuscleGroup.Arms);
-      muscleSelection.addMuscleGroup(MuscleGroup.Core);
-    } else if (goals.includes('flexibility') || goals.includes('mobility')) {
-      // Core and back for flexibility base
-      muscleSelection.addMuscleGroup(MuscleGroup.Core);
-      muscleSelection.addMuscleGroup(MuscleGroup.Back);
-    } else {
-      // Default balanced selection
-      muscleSelection.addMuscleGroup(MuscleGroup.Chest);
-      muscleSelection.addMuscleGroup(MuscleGroup.Legs);
-    }
-    
-    updateFormWithMuscleData();
-  }, [workoutForm.formValues.goals, muscleSelection, updateFormWithMuscleData]);
+  // Metadata
+  const metadata = useMemo(() => ({
+    lastSyncTimestamp: lastSyncTimestamp.current,
+    integrationVersion: '1.0.0',
+    isDebugging: config.enableDebugLogging
+  }), [lastSyncTimestamp.current, config.enableDebugLogging]);
   
   return {
-    muscleSelection,
-    workoutForm,
-    getCompleteFormData,
-    updateFormWithMuscleData,
-    validateCompleteForm,
-    resetCompleteForm,
-    isFormComplete,
-    formCompletionPercentage,
-    estimatedWorkoutDuration,
-    workoutComplexity,
-    balanceScore,
-    applyMusclePreset,
-    optimizeForGoals
+    state,
+    actions,
+    completionPercentage,
+    selectionSummary,
+    metadata
   };
+}
+
+/**
+ * Hook factory for pre-configured integration instances
+ */
+export const createMuscleFormIntegration = (options: MuscleFormIntegrationOptions = {}) => {
+  return () => useWorkoutFormMuscleIntegration(options);
+};
+
+/**
+ * Debug-enabled integration hook for development
+ */
+export const useWorkoutFormMuscleIntegrationDebug = () => {
+  return useWorkoutFormMuscleIntegration({
+    enableDebugLogging: true,
+    autoSync: true,
+    syncDebounceMs: 100
+  });
 }; 

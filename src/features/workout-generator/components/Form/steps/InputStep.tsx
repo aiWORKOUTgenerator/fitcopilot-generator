@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { Card } from '../../../../../components/ui';
 import { Button } from '../../../../../components/ui';
 import { Textarea } from '../../../../../components/ui/Textarea';
-import { AdvancedOptionsPanel } from '../../../../../components/ui';
+// import { AdvancedOptionsPanel } from '../../../../../components/ui'; // REMOVED: No longer needed
 import { WorkoutFormParams, WorkoutDifficulty, SessionSpecificInputs } from '../../../types/workout';
 import { ValidationErrors } from '../../../domain/validators';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -38,18 +38,8 @@ const EQUIPMENT_OPTIONS = [
   { id: 'none', label: 'None/Bodyweight Only' }
 ];
 
-/**
- * Daily workout focus options
- */
-const GOAL_OPTIONS = [
-  { value: 'lose-weight', label: 'Fat Burning & Cardio' },
-  { value: 'build-muscle', label: 'Muscle Building' },
-  { value: 'improve-endurance', label: 'Endurance & Stamina' },
-  { value: 'increase-strength', label: 'Strength Training' },
-  { value: 'enhance-flexibility', label: 'Flexibility & Mobility' },
-  { value: 'general-fitness', label: 'General Fitness' },
-  { value: 'sport-specific', label: 'Sport-Specific Training' }
-];
+// GOAL_OPTIONS - REMOVED: Now only available in modular workout generator
+// const GOAL_OPTIONS = [...]
 
 /**
  * Difficulty level options
@@ -82,8 +72,7 @@ interface InputStepProps {
   hasFieldError: (field: keyof WorkoutFormParams) => boolean;
   /** Function to get error message for a field */
   getFieldError: (field: keyof WorkoutFormParams) => string | undefined;
-  /** Update goals field */
-  setGoals: (goals: string) => void;
+  // setGoals: REMOVED - No longer used in legacy form
   /** Update difficulty field */
   setDifficulty: (difficulty: WorkoutDifficulty) => void;
   /** Update duration field */
@@ -113,7 +102,7 @@ export const InputStep: React.FC<InputStepProps> = ({
   isValid,
   hasFieldError,
   getFieldError,
-  setGoals,
+  // setGoals, // REMOVED: No longer used in legacy form
   setDifficulty,
   setDuration,
   setEquipment,
@@ -194,11 +183,7 @@ export const InputStep: React.FC<InputStepProps> = ({
       case 'difficulty':
         setDifficulty(profileMapping.fitnessLevel);
         break;
-      case 'goals':
-        if (profileMapping.goals.length > 0) {
-          setGoals(profileMapping.goals[0]); // Use first goal
-        }
-        break;
+      // case 'goals': REMOVED - No longer used in legacy form
       case 'equipment':
         setEquipment(profileMapping.availableEquipment);
         break;
@@ -235,9 +220,7 @@ export const InputStep: React.FC<InputStepProps> = ({
       case 'auto-fill-all':
         // Auto-fill all available fields
         setDifficulty(profileMapping.fitnessLevel);
-        if (profileMapping.goals.length > 0) {
-          setGoals(profileMapping.goals[0]);
-        }
+        // Goals removed - no longer available in legacy form
         setEquipment(profileMapping.availableEquipment);
         break;
     }
@@ -259,69 +242,7 @@ export const InputStep: React.FC<InputStepProps> = ({
           <div className="input-step__form-grid">
             {/* Column 1: Goals and Duration */}
             <div className="input-step__form-column">
-              {/* Goals Selection */}
-              <div className="input-step__form-group">
-                <label htmlFor="goals" className="input-step__label">
-                  What is the focus of today's workout?
-                  {hasFieldError('goals') && (
-                    <span className="input-step__error">{getFieldError('goals')}</span>
-                  )}
-                </label>
-                
-                {/* Profile Fitness Goals Badge - Show user's current goals if available */}
-                {!profileLoading && !profileError && isProfileSufficient && profileMapping && profileMapping.displayData.goals.length > 0 && (
-                  <div className="input-step__profile-context">
-                    <div className="input-step__profile-label">Your Long-term Fitness Goals:</div>
-                    <div className="meta-badges">
-                      {profileMapping.displayData.goals.slice(0, 2).map((goal, index) => (
-                        <span 
-                          key={goal.value}
-                          className="workout-type-badge"
-                          style={{ 
-                            cursor: 'pointer',
-                            opacity: 0.8
-                          }}
-                          onClick={() => handleAutoFillFromProfile('goals')}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => e.key === 'Enter' && handleAutoFillFromProfile('goals')}
-                          title="Click to align today's workout with your long-term goals"
-                        >
-                          <span className="workout-type-icon">{goal.icon}</span>
-                          {goal.display}
-                        </span>
-                      ))}
-                      {profileMapping.displayData.goals.length > 2 && (
-                        <span className="goals-more-indicator">
-                          +{profileMapping.displayData.goals.length - 2} more
-                        </span>
-                      )}
-                    </div>
-                    <div className="input-step__profile-note" style={{ fontSize: '0.85em', color: '#666', marginTop: '4px' }}>
-                      Your workout will be personalized to support these goals
-                    </div>
-                  </div>
-                )}
-                
-                <div className="input-step__select-container">
-                  <select
-                    id="goals"
-                    className={`input-step__select ${activeDropdown === 'goals' ? 'input-step__select--focused' : ''}`}
-                    value={formValues.goals || ''}
-                    onChange={e => setGoals(e.target.value)}
-                    onFocus={() => handleDropdownFocus('goals')}
-                    onBlur={handleDropdownBlur}
-                  >
-                    <option value="">Select today's focus</option>
-                    {GOAL_OPTIONS.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="input-step__select-icon" />
-                </div>
-              </div>
+              {/* Goals Selection - REMOVED: Now only available in modular workout generator */}
 
               {/* Duration Selection */}
               <div className="input-step__form-group">
@@ -488,20 +409,7 @@ export const InputStep: React.FC<InputStepProps> = ({
             onToggleExpand={() => setIsSessionInputsExpanded(!isSessionInputsExpanded)}
           />
           
-          {/* Advanced Options */}
-          <AdvancedOptionsPanel 
-            equipmentOptions={EQUIPMENT_OPTIONS}
-            selectedEquipment={formValues.equipment || []}
-            onEquipmentChange={setEquipment}
-            intensity={formValues.intensity || 3}
-            onIntensityChange={setIntensity}
-            preferences={formValues.preferences || ''}
-            onPreferencesChange={setPreferences}
-            restrictions={formValues.restrictions || ''}
-            onRestrictionsChange={setRestrictions}
-            className="input-step__advanced-options"
-            onAutoFillEquipment={setEquipment}
-          />
+          {/* Advanced Options - REMOVED: Equipment selection now only available in modular workout generator */}
 
           {/* Submit Button */}
           <div className="input-step__actions">

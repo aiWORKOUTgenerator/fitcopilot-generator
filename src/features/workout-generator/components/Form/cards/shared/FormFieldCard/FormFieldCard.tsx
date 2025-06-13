@@ -3,8 +3,7 @@
  * 
  * Reusable card wrapper for all workout generator form fields
  */
-import React, { useEffect, useState } from 'react';
-import { CardVariant } from '../types';
+import React from 'react';
 import './FormFieldCard.scss';
 
 interface FormFieldCardProps {
@@ -13,10 +12,14 @@ interface FormFieldCardProps {
   children: React.ReactNode;
   delay?: number;
   className?: string;
-  variant?: CardVariant;
+  variant?: 'standard' | 'complex';
   profileSection?: React.ReactNode;
 }
 
+/**
+ * Shared form field card component with content-first architecture
+ * Extracted from WorkoutGeneratorGrid for reusability across all cards
+ */
 export const FormFieldCard: React.FC<FormFieldCardProps> = ({
   title,
   description,
@@ -26,21 +29,22 @@ export const FormFieldCard: React.FC<FormFieldCardProps> = ({
   variant = 'standard',
   profileSection
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
 
   return (
     <div 
-      className={`form-field-card ${isVisible ? 'visible' : ''} ${
-        variant === 'complex' ? 'form-field-card--complex' : ''
-      } ${className}`}
+      className={`form-field-card ${isVisible ? 'visible' : ''} ${variant === 'complex' ? 'form-field-card--complex' : ''} ${className}`}
     >
       <div className="form-field-card-inner">
-        {/* Header Section */}
+        {/* Profile Section (if provided) */}
+        {profileSection}
+        
+        {/* Compact Header */}
         <div className="field-header">
           <div className="field-title">{title}</div>
           {description && (
@@ -48,27 +52,13 @@ export const FormFieldCard: React.FC<FormFieldCardProps> = ({
           )}
         </div>
 
-        {/* Content Area */}
+        {/* Content Area - Gets majority of space */}
         <div className="field-content">
-          {variant === 'complex' && (
-            <div className="card-structure">
-              {/* Profile Section Header */}
-              {profileSection && (
-                <div className="card-header">
-                  {profileSection}
-                </div>
-              )}
-              
-              {/* Main Content Body */}
-              <div className="card-body">
-                {children}
-              </div>
-            </div>
-          )}
-          
-          {variant === 'standard' && children}
+          {children}
         </div>
       </div>
     </div>
   );
-}; 
+};
+
+export default FormFieldCard; 

@@ -48,8 +48,10 @@ import { GenerationError } from '../../types/errors';
 
 import { InputStep } from './steps/InputStep';
 import PreviewStep from './steps/PreviewStep';
+import PremiumPreviewStep from './steps/PremiumPreviewStep';
 import GeneratingStep from './steps/GeneratingStep';
 import { ResultStep } from './steps/ResultStep';
+import { WorkoutGeneratorGrid } from './WorkoutGeneratorGrid';
 import ErrorBoundary from '../common/ErrorBoundary';
 import './form.scss';
 
@@ -111,6 +113,10 @@ const DURATION_OPTIONS = [
 interface WorkoutRequestFormProps {
   // No props needed currently
 }
+
+// Feature toggle for testing the new Premium Preview Step
+const USE_PREMIUM_PREVIEW = true; // 🚧 Set to true to test new modular preview
+const USE_PREMIUM_INPUT = true; // 🚧 Set to true to use WorkoutGeneratorGrid for input
 
 /**
  * WorkoutRequestForm Component with wrapped FormFlowProvider
@@ -241,8 +247,17 @@ function WorkoutRequestFormInner() {
    */
   const handlePreviewStep = useCallback(async () => {
     try {
-      // Validate form before previewing
-      const isValid = workoutForm.validateForm();
+      // Use modular validation for premium input, legacy validation for standard input
+      const isValid = USE_PREMIUM_INPUT 
+        ? workoutForm.validateFormWithModularSupport()
+        : workoutForm.validateForm();
+      
+      console.log('[WorkoutRequestForm] Preview validation result:', {
+        isValid,
+        usePremiumInput: USE_PREMIUM_INPUT,
+        formValues: workoutForm.formValues,
+        sessionInputs: workoutForm.formValues.sessionInputs
+      });
       
       if (isValid) {
         // No errors, proceed to preview
@@ -269,7 +284,31 @@ function WorkoutRequestFormInner() {
    */
   const handleSubmitForm = useCallback(async () => {
     try {
-      const formValues = workoutForm.formValues;
+      // Get complete form values including muscle targeting integration
+      let formValues;
+      
+      if (USE_PREMIUM_INPUT) {
+        // Use getMappedFormValues which now includes muscle targeting integration
+        formValues = workoutForm.getMappedFormValues();
+        
+        console.log('[WorkoutRequestForm] Using premium form data with muscle integration:', {
+          hasMuscleTargeting: !!formValues.muscleTargeting,
+          hasTargetGroups: !!formValues.targetMuscleGroups?.length,
+          hasPrimaryFocus: !!formValues.primaryFocus,
+          hasMuscleFocusArea: !!formValues.sessionInputs?.focusArea?.length,
+          selectionSummary: formValues.muscleTargeting?.selectionSummary,
+          formValues
+        });
+      } else {
+        // Legacy form handling
+        formValues = workoutForm.formValues;
+      }
+      
+      console.log('[WorkoutRequestForm] Generation starting with:', {
+        usePremiumInput: USE_PREMIUM_INPUT,
+        hasMuscleTargeting: !!formValues.muscleTargeting,
+        formValues
+      });
       
       // First reset any existing error state
       setError(null);
@@ -283,7 +322,7 @@ function WorkoutRequestFormInner() {
       // Force transition to generating step before API call
       goToGeneratingStep();
       
-      // Start generation process with fresh state
+      // Start generation process with enhanced form data
       await startGeneration(formValues);
     } catch (error) {
       // Even if there's an error, stay on generating step to show error state
@@ -291,11 +330,14 @@ function WorkoutRequestFormInner() {
       handleError(error, {
         componentName: 'WorkoutRequestForm',
         action: 'handleSubmitForm',
-        additionalData: { formValues: workoutForm.formValues }
+        additionalData: { 
+          formValues: workoutForm.formValues,
+          hasMuscleTargeting: !!workoutForm.formValues.muscleTargeting 
+        }
       });
       // Error UI is handled by GeneratingStep component
     }
-  }, [workoutForm.formValues, setPreviewMode, goToGeneratingStep, startGeneration, handleError, resetGenerator, setError]);
+  }, [workoutForm, setPreviewMode, goToGeneratingStep, startGeneration, handleError, resetGenerator, setError]);
   
   /**
    * Handle editing form from preview
@@ -353,41 +395,77 @@ function WorkoutRequestFormInner() {
     <ErrorBoundary>
       {/* Use derivedStep to determine which component to render */}
       {derivedStep === 'input' && (
-        <InputStep 
-          formValues={workoutForm.formValues}
-          formErrors={workoutForm.formErrors || {}}
-          isValid={workoutForm.isValid}
-          hasFieldError={(field) => Boolean(workoutForm.formErrors?.[field])}
-          getFieldError={(field) => workoutForm.formErrors?.[field]}
-          setGoals={(goals) => workoutForm.updateField('goals', goals)}
-          setDifficulty={(difficulty) => workoutForm.updateField('difficulty', difficulty)}
-          setDuration={(duration) => workoutForm.updateField('duration', duration)}
-          setEquipment={(equipment) => workoutForm.updateField('equipment', equipment)}
-          setRestrictions={(restrictions) => workoutForm.updateField('restrictions', restrictions)}
-          setPreferences={(preferences) => workoutForm.updateField('preferences', preferences)}
-          setSessionInputs={workoutForm.setSessionInputs}
-          setIntensity={workoutForm.setIntensity}
-          validateForm={workoutForm.validateForm}
-          onContinue={handlePreviewStep}
-        />
+        USE_PREMIUM_INPUT ? (
+          <WorkoutGeneratorGrid 
+            onContinue={handlePreviewStep}
+          />
+        ) : (
+          <InputStep 
+            formValues={workoutForm.formValues}
+            formErrors={workoutForm.formErrors || {}}
+            isValid={workoutForm.isValid}
+            hasFieldError={(field) => Boolean(workoutForm.formErrors?.[field])}
+            getFieldError={(field) => workoutForm.formErrors?.[field]}
+            setDifficulty={(difficulty) => workoutForm.updateField('difficulty', difficulty)}
+            setDuration={(duration) => workoutForm.updateField('duration', duration)}
+            setEquipment={(equipment) => workoutForm.updateField('equipment', equipment)}
+            setRestrictions={(restrictions) => workoutForm.updateField('restrictions', restrictions)}
+            setPreferences={(preferences) => workoutForm.updateField('preferences', preferences)}
+            setSessionInputs={workoutForm.setSessionInputs}
+            setIntensity={workoutForm.setIntensity}
+            validateForm={workoutForm.validateForm}
+            onContinue={handlePreviewStep}
+          />
+        )
       )}
       
       {derivedStep === 'preview' && (
-        <PreviewStep 
-          formValues={{
-            duration: Number(workoutForm.formValues.duration || 0),
-            difficulty: workoutForm.formValues.difficulty || 'beginner',
-            equipment: workoutForm.formValues.equipment || [],
-            goals: workoutForm.formValues.goals || '',
-            restrictions: workoutForm.formValues.restrictions,
-            preferences: workoutForm.formValues.preferences,
-            intensity: workoutForm.formValues.intensity,
-            sessionInputs: workoutForm.formValues.sessionInputs
-          }} 
-          onEditRequest={handleEditForm}
-          onGenerateWorkout={handleSubmitForm}
-          isLoading={isGeneratorRunning}
-        />
+        USE_PREMIUM_PREVIEW ? (
+          <PremiumPreviewStep
+            formValues={USE_PREMIUM_INPUT ? (() => {
+              const mappedValues = workoutForm.getMappedFormValues();
+              const finalFormValues = {
+                duration: Number(mappedValues.duration || 0),
+                difficulty: mappedValues.difficulty || 'beginner',
+                equipment: mappedValues.equipment || [],
+                goals: mappedValues.goals || '',
+                ...mappedValues
+              };
+              
+              // Data ready for Premium Preview
+              
+              return finalFormValues;
+            })() : {
+              duration: Number(workoutForm.formValues.duration || 0),
+              difficulty: workoutForm.formValues.difficulty || 'beginner',
+              equipment: workoutForm.formValues.equipment || [],
+              goals: workoutForm.formValues.goals || '',
+              restrictions: workoutForm.formValues.restrictions,
+              preferences: workoutForm.formValues.preferences,
+              intensity: workoutForm.formValues.intensity,
+              sessionInputs: workoutForm.formValues.sessionInputs
+            }}
+            onEditRequest={handleEditForm}
+            onGenerateWorkout={handleSubmitForm}
+            isLoading={isGeneratorRunning}
+          />
+        ) : (
+          <PreviewStep 
+            formValues={{
+              duration: Number(workoutForm.formValues.duration || 0),
+              difficulty: workoutForm.formValues.difficulty || 'beginner',
+              equipment: workoutForm.formValues.equipment || [],
+              goals: workoutForm.formValues.goals || '',
+              restrictions: workoutForm.formValues.restrictions,
+              preferences: workoutForm.formValues.preferences,
+              intensity: workoutForm.formValues.intensity,
+              sessionInputs: workoutForm.formValues.sessionInputs
+            }} 
+            onEditRequest={handleEditForm}
+            onGenerateWorkout={handleSubmitForm}
+            isLoading={isGeneratorRunning}
+          />
+        )
       )}
       
       {derivedStep === 'generating' && (

@@ -11,4 +11,133 @@
       }
     }
   }
+}
+
+// WorkoutFocusCard Component Styles
+// Extracted from WorkoutGeneratorGrid for modular architecture
+
+.focus-selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+
+  .focus-selector-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+  }
+
+  .focus-options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    flex: 1;
+
+    .focus-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      min-height: 70px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      &.selected {
+        background: rgba(34, 197, 94, 0.15);
+        border-color: rgba(34, 197, 94, 0.4);
+        color: rgba(34, 197, 94, 1);
+
+        .focus-icon {
+          transform: scale(1.1);
+        }
+      }
+
+      .focus-icon {
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+        transition: transform 0.2s ease;
+      }
+
+      .focus-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.2;
+      }
+
+      &.selected .focus-label {
+        color: rgba(34, 197, 94, 0.9);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .focus-selector-container {
+    gap: 10px;
+
+    .focus-selector-label {
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+
+    .focus-options-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+
+      .focus-option {
+        padding: 10px 6px;
+        min-height: 60px;
+
+        .focus-icon {
+          font-size: 1.2rem;
+          margin-bottom: 4px;
+        }
+
+        .focus-label {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .focus-selector-container {
+    .focus-options-grid {
+      grid-template-columns: 1fr;
+      
+      .focus-option {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 12px;
+        text-align: left;
+
+        .focus-icon {
+          margin-bottom: 0;
+          margin-right: 12px;
+          font-size: 1.3rem;
+        }
+
+        .focus-label {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
 } 

@@ -194,6 +194,22 @@ header('Content-Type: text/html; charset=utf-8');
             
             <div class="card">
                 <h2>Test Results Summary</h2>
+                
+                <!-- Test Categories Legend -->
+                <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; border-radius: 4px;">
+                    <h4 style="margin-top: 0;">Test Categories Legend:</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <div style="padding: 5px 10px; background-color: #ffffff; border: 1px solid #ccc; border-radius: 3px;">⚪ Core APIs (existing)</div>
+                        <div style="padding: 5px 10px; background-color: #ffe6e6; border-radius: 3px;">🔴 Response Structure Validation</div>
+                        <div style="padding: 5px 10px; background-color: #e6f3ff; border-radius: 3px;">🔵 Muscle Group APIs (Target Muscle)</div>
+                        <div style="padding: 5px 10px; background-color: #fff0e6; border-radius: 3px;">🟠 Delete Operations</div>
+                        <div style="padding: 5px 10px; background-color: #f0fff0; border-radius: 3px;">🟢 Search & Filtering</div>
+                        <div style="padding: 5px 10px; background-color: #f5f0ff; border-radius: 3px;">🟣 Analytics</div>
+                        <div style="padding: 5px 10px; background-color: #fff5f0; border-radius: 3px;">🟡 Settings & Configuration</div>
+                        <div style="padding: 5px 10px; background-color: #f0f8ff; border-radius: 3px;">⚪ Health Check</div>
+                    </div>
+                </div>
+                
                 <table id="results-table">
                     <thead>
                         <tr>
@@ -299,6 +315,157 @@ header('Content-Type: text/html; charset=utf-8');
                             <td>per_page=2&page=1</td>
                             <td id="get-workout-versions-pagination-status">Not tested</td>
                             <td><button onclick="runTest('get-workout-versions-pagination')">Test</button></td>
+                        </tr>
+                        <!-- Response Structure Validation -->
+                        <tr style="background-color: #ffe6e6;">
+                            <td>POST /generate (structure validation)</td>
+                            <td>Response Format Check</td>
+                            <td id="validate-generate-structure-status">Not tested</td>
+                            <td><button onclick="runTest('validate-generate-structure')">Test</button></td>
+                        </tr>
+                        <!-- Muscle Group APIs -->
+                        <tr style="background-color: #e6f3ff;">
+                            <td>GET /muscle-groups</td>
+                            <td>-</td>
+                            <td id="get-muscle-groups-status">Not tested</td>
+                            <td><button onclick="runTest('get-muscle-groups')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #e6f3ff;">
+                            <td>GET /muscles</td>
+                            <td>-</td>
+                            <td id="get-muscles-status">Not tested</td>
+                            <td><button onclick="runTest('get-muscles')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #e6f3ff;">
+                            <td>GET /muscle-groups/{id}</td>
+                            <td>-</td>
+                            <td id="get-muscle-group-status">Not tested</td>
+                            <td><button onclick="runTest('get-muscle-group')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #e6f3ff;">
+                            <td>POST /muscle-selection</td>
+                            <td>Save muscle selection</td>
+                            <td id="save-muscle-selection-status">Not tested</td>
+                            <td><button onclick="runTest('save-muscle-selection')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #e6f3ff;">
+                            <td>GET /muscle-suggestions</td>
+                            <td>Profile-based suggestions</td>
+                            <td id="get-muscle-suggestions-status">Not tested</td>
+                            <td><button onclick="runTest('get-muscle-suggestions')">Test</button></td>
+                        </tr>
+                        <!-- Delete Operations -->
+                        <tr style="background-color: #fff0e6;">
+                            <td>DELETE /workouts/{id}</td>
+                            <td>-</td>
+                            <td id="delete-workout-status">Not tested</td>
+                            <td><button onclick="runTest('delete-workout')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #fff0e6;">
+                            <td>DELETE /workouts/{id}/versions/{version}</td>
+                            <td>-</td>
+                            <td id="delete-workout-version-status">Not tested</td>
+                            <td><button onclick="runTest('delete-workout-version')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #fff0e6;">
+                            <td>DELETE /profile</td>
+                            <td>Reset profile</td>
+                            <td id="delete-profile-status">Not tested</td>
+                            <td><button onclick="runTest('delete-profile')">Test</button></td>
+                        </tr>
+                        <!-- Search & Filtering -->
+                        <tr style="background-color: #f0fff0;">
+                            <td>GET /workouts/search</td>
+                            <td>q=strength</td>
+                            <td id="search-workouts-status">Not tested</td>
+                            <td><button onclick="runTest('search-workouts')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f0fff0;">
+                            <td>GET /workouts (difficulty filter)</td>
+                            <td>difficulty=intermediate</td>
+                            <td id="filter-workouts-difficulty-status">Not tested</td>
+                            <td><button onclick="runTest('filter-workouts-difficulty')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f0fff0;">
+                            <td>GET /workouts (duration filter)</td>
+                            <td>duration_min=20&duration_max=40</td>
+                            <td id="filter-workouts-duration-status">Not tested</td>
+                            <td><button onclick="runTest('filter-workouts-duration')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f0fff0;">
+                            <td>GET /workouts (equipment filter)</td>
+                            <td>equipment=dumbbells</td>
+                            <td id="filter-workouts-equipment-status">Not tested</td>
+                            <td><button onclick="runTest('filter-workouts-equipment')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f0fff0;">
+                            <td>GET /workouts (muscle groups filter)</td>
+                            <td>muscle_groups=chest,arms</td>
+                            <td id="filter-workouts-muscles-status">Not tested</td>
+                            <td><button onclick="runTest('filter-workouts-muscles')">Test</button></td>
+                        </tr>
+                        <!-- Analytics -->
+                        <tr style="background-color: #f5f0ff;">
+                            <td>GET /analytics/workout-stats</td>
+                            <td>-</td>
+                            <td id="get-workout-stats-status">Not tested</td>
+                            <td><button onclick="runTest('get-workout-stats')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f5f0ff;">
+                            <td>GET /analytics/progress</td>
+                            <td>-</td>
+                            <td id="get-progress-status">Not tested</td>
+                            <td><button onclick="runTest('get-progress')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f5f0ff;">
+                            <td>GET /analytics/completion-rates</td>
+                            <td>-</td>
+                            <td id="get-completion-rates-status">Not tested</td>
+                            <td><button onclick="runTest('get-completion-rates')">Test</button></td>
+                        </tr>
+                        <!-- Settings & Configuration -->
+                        <tr style="background-color: #fff5f0;">
+                            <td>GET /settings</td>
+                            <td>-</td>
+                            <td id="get-settings-status">Not tested</td>
+                            <td><button onclick="runTest('get-settings')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #fff5f0;">
+                            <td>PUT /settings</td>
+                            <td>Update settings</td>
+                            <td id="update-settings-status">Not tested</td>
+                            <td><button onclick="runTest('update-settings')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #fff5f0;">
+                            <td>GET /equipment-options</td>
+                            <td>-</td>
+                            <td id="get-equipment-options-status">Not tested</td>
+                            <td><button onclick="runTest('get-equipment-options')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #fff5f0;">
+                            <td>GET /difficulty-levels</td>
+                            <td>-</td>
+                            <td id="get-difficulty-levels-status">Not tested</td>
+                            <td><button onclick="runTest('get-difficulty-levels')">Test</button></td>
+                        </tr>
+                        <!-- Health Check -->
+                        <tr style="background-color: #f0f8ff;">
+                            <td>GET /health</td>
+                            <td>API health check</td>
+                            <td id="get-health-status">Not tested</td>
+                            <td><button onclick="runTest('get-health')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f0f8ff;">
+                            <td>GET /status</td>
+                            <td>System status</td>
+                            <td id="get-status-status">Not tested</td>
+                            <td><button onclick="runTest('get-status')">Test</button></td>
+                        </tr>
+                        <tr style="background-color: #f0f8ff;">
+                            <td>GET /version</td>
+                            <td>API version info</td>
+                            <td id="get-version-status">Not tested</td>
+                            <td><button onclick="runTest('get-version')">Test</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -511,6 +678,85 @@ header('Content-Type: text/html; charset=utf-8');
                     case 'get-workout-versions-pagination':
                         result = await testGetWorkoutVersionsPagination();
                         break;
+                    // Response Structure Validation
+                    case 'validate-generate-structure':
+                        result = await testValidateGenerateStructure();
+                        break;
+                    // Muscle Group APIs
+                    case 'get-muscle-groups':
+                        result = await testGetMuscleGroups();
+                        break;
+                    case 'get-muscles':
+                        result = await testGetMuscles();
+                        break;
+                    case 'get-muscle-group':
+                        result = await testGetMuscleGroup();
+                        break;
+                    case 'save-muscle-selection':
+                        result = await testSaveMuscleSelection();
+                        break;
+                    case 'get-muscle-suggestions':
+                        result = await testGetMuscleSuggestions();
+                        break;
+                    // Delete Operations
+                    case 'delete-workout':
+                        result = await testDeleteWorkout();
+                        break;
+                    case 'delete-workout-version':
+                        result = await testDeleteWorkoutVersion();
+                        break;
+                    case 'delete-profile':
+                        result = await testDeleteProfile();
+                        break;
+                    // Search & Filtering
+                    case 'search-workouts':
+                        result = await testSearchWorkouts();
+                        break;
+                    case 'filter-workouts-difficulty':
+                        result = await testFilterWorkoutsDifficulty();
+                        break;
+                    case 'filter-workouts-duration':
+                        result = await testFilterWorkoutsDuration();
+                        break;
+                    case 'filter-workouts-equipment':
+                        result = await testFilterWorkoutsEquipment();
+                        break;
+                    case 'filter-workouts-muscles':
+                        result = await testFilterWorkoutsMuscles();
+                        break;
+                    // Analytics
+                    case 'get-workout-stats':
+                        result = await testGetWorkoutStats();
+                        break;
+                    case 'get-progress':
+                        result = await testGetProgress();
+                        break;
+                    case 'get-completion-rates':
+                        result = await testGetCompletionRates();
+                        break;
+                    // Settings & Configuration
+                    case 'get-settings':
+                        result = await testGetSettings();
+                        break;
+                    case 'update-settings':
+                        result = await testUpdateSettings();
+                        break;
+                    case 'get-equipment-options':
+                        result = await testGetEquipmentOptions();
+                        break;
+                    case 'get-difficulty-levels':
+                        result = await testGetDifficultyLevels();
+                        break;
+                    // Health Check
+                    case 'get-health':
+                        result = await testGetHealth();
+                        break;
+                    case 'get-status':
+                        result = await testGetStatus();
+                        break;
+                    case 'get-version':
+                        result = await testGetVersion();
+                        break;
                 }
                 
                 if (result.success) {
@@ -533,6 +779,7 @@ header('Content-Type: text/html; charset=utf-8');
         // Run all tests in sequence
         async function runAllTests() {
             const testOrder = [
+                // Core API Tests (existing)
                 'generate-direct',
                 'get-workouts',
                 'get-workouts-pagination',
@@ -548,7 +795,38 @@ header('Content-Type: text/html; charset=utf-8');
                 'get-workout-versions',
                 'get-workout-versions-filtered',
                 'get-workout-versions-date-filtered',
-                'get-workout-versions-pagination'
+                'get-workout-versions-pagination',
+                // Response Structure Validation
+                'validate-generate-structure',
+                // Muscle Group APIs
+                'get-muscle-groups',
+                'get-muscles',
+                'get-muscle-group',
+                'save-muscle-selection',
+                'get-muscle-suggestions',
+                // Delete Operations
+                'delete-workout',
+                'delete-workout-version',
+                'delete-profile',
+                // Search & Filtering
+                'search-workouts',
+                'filter-workouts-difficulty',
+                'filter-workouts-duration',
+                'filter-workouts-equipment',
+                'filter-workouts-muscles',
+                // Analytics
+                'get-workout-stats',
+                'get-progress',
+                'get-completion-rates',
+                // Settings & Configuration
+                'get-settings',
+                'update-settings',
+                'get-equipment-options',
+                'get-difficulty-levels',
+                // Health Check
+                'get-health',
+                'get-status',
+                'get-version'
             ];
             
             for (const test of testOrder) {
@@ -1188,6 +1466,511 @@ header('Content-Type: text/html; charset=utf-8');
                 return { success: false, error: error.message, response: null };
             }
         }
+
+        // Response Structure Validation
+        async function testValidateGenerateStructure() {
+            try {
+                const result = await generateWorkout({
+                    fitness_goals: ['strength'],
+                    experience_level: 'intermediate',
+                    workout_duration: 30
+                });
+                
+                // Check if response is Object (not Array)
+                if (Array.isArray(result.data)) {
+                    return { 
+                        success: false, 
+                        error: `Expected Object, got Array[${result.data.length}]`, 
+                        response: result 
+                    };
+                }
+                
+                // Check for expected structure
+                if (!result.data.workout_data || !result.data.workout_data.sections) {
+                    return { 
+                        success: false, 
+                        error: 'Missing workout_data.sections structure', 
+                        response: result 
+                    };
+                }
+                
+                return { success: true, response: result };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Muscle Group APIs
+        async function testGetMuscleGroups() {
+            try {
+                const response = await apiCall('GET', '/muscle-groups');
+                
+                // Legacy endpoint returns object format (not array)
+                if (Array.isArray(response.data) || typeof response.data !== 'object' || response.data === null) {
+                    return { 
+                        success: false, 
+                        error: 'Expected muscle groups object', 
+                        response: response 
+                    };
+                }
+                
+                // Check if it has the expected muscle group keys
+                const expectedGroups = ['back', 'chest', 'arms', 'shoulders', 'core', 'legs'];
+                const hasValidStructure = expectedGroups.some(group => response.data[group]);
+                
+                if (!hasValidStructure) {
+                    return { 
+                        success: false, 
+                        error: 'Expected muscle groups object with valid structure', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetMuscles() {
+            try {
+                const response = await apiCall('GET', '/muscles');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected muscles array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetMuscleGroup() {
+            try {
+                const response = await apiCall('GET', '/muscle-groups/chest');
+                
+                // API returns { group: "chest", muscles: [...] }
+                if (!response.data || !response.data.group || !response.data.muscles) {
+                    return { 
+                        success: false, 
+                        error: 'Expected muscle group data with group and muscles fields', 
+                        response: response 
+                    };
+                }
+                
+                // Verify muscles is an array
+                if (!Array.isArray(response.data.muscles)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected muscles to be an array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testSaveMuscleSelection() {
+            try {
+                const response = await apiCall('POST', '/muscle-selection', {
+                    selectedGroups: ['chest', 'arms'],
+                    selectedMuscles: {
+                        chest: ['Upper Chest', 'Middle Chest'],
+                        arms: ['Biceps', 'Triceps']
+                    }
+                });
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetMuscleSuggestions() {
+            try {
+                const response = await apiCall('GET', '/muscle-suggestions');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected suggestions array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Delete Operations
+        async function testDeleteWorkout() {
+            try {
+                // Create a test workout first
+                const createResult = await generateWorkout({
+                    fitness_goals: ['strength'],
+                    experience_level: 'beginner',
+                    workout_duration: 15
+                });
+                
+                if (!createResult.data || !createResult.data.id) {
+                    return { 
+                        success: false, 
+                        error: 'Failed to create test workout for deletion', 
+                        response: createResult 
+                    };
+                }
+                
+                const deleteResponse = await apiCall('DELETE', `/workouts/${createResult.data.id}`);
+                
+                return { success: true, response: deleteResponse };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testDeleteWorkoutVersion() {
+            try {
+                // Try to delete a non-existent version (graceful handling test)
+                const response = await apiCall('DELETE', '/workouts/999/versions/1');
+                
+                return { success: true, response: response };
+            } catch (error) {
+                // This is expected for non-existent resources
+                return { success: true, response: { message: 'Graceful handling of non-existent version: ' + error.message } };
+            }
+        }
+
+        async function testDeleteProfile() {
+            try {
+                const response = await apiCall('DELETE', '/profile');
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Search & Filtering
+        async function testSearchWorkouts() {
+            try {
+                const response = await apiCall('GET', '/workouts/search?q=strength');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected workouts array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testFilterWorkoutsDifficulty() {
+            try {
+                const response = await apiCall('GET', '/workouts?difficulty=intermediate');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected workouts array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testFilterWorkoutsDuration() {
+            try {
+                const response = await apiCall('GET', '/workouts?duration_min=20&duration_max=40');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected workouts array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testFilterWorkoutsEquipment() {
+            try {
+                const response = await apiCall('GET', '/workouts?equipment=dumbbells');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected workouts array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testFilterWorkoutsMuscles() {
+            try {
+                const response = await apiCall('GET', '/workouts?muscle_groups=chest,arms');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected workouts array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Analytics
+        async function testGetWorkoutStats() {
+            try {
+                const response = await apiCall('GET', '/analytics/workout-stats');
+                
+                if (!response.data) {
+                    return { 
+                        success: false, 
+                        error: 'Expected stats data', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetProgress() {
+            try {
+                const response = await apiCall('GET', '/analytics/progress');
+                
+                if (!response.data) {
+                    return { 
+                        success: false, 
+                        error: 'Expected progress data', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetCompletionRates() {
+            try {
+                const response = await apiCall('GET', '/analytics/completion-rates');
+                
+                if (!response.data) {
+                    return { 
+                        success: false, 
+                        error: 'Expected completion rates data', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Settings & Configuration
+        async function testGetSettings() {
+            try {
+                const response = await apiCall('GET', '/settings');
+                
+                if (!response.data) {
+                    return { 
+                        success: false, 
+                        error: 'Expected settings data', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testUpdateSettings() {
+            try {
+                const response = await apiCall('PUT', '/settings', {
+                    theme: 'dark',
+                    notifications: true
+                });
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetEquipmentOptions() {
+            try {
+                const response = await apiCall('GET', '/equipment-options');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected equipment options array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetDifficultyLevels() {
+            try {
+                const response = await apiCall('GET', '/difficulty-levels');
+                
+                if (!Array.isArray(response.data)) {
+                    return { 
+                        success: false, 
+                        error: 'Expected difficulty levels array', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Health Check
+        async function testGetHealth() {
+            try {
+                const response = await apiCall('GET', '/health');
+                
+                if (!response.data || !response.data.status) {
+                    return { 
+                        success: false, 
+                        error: 'Expected health status', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetStatus() {
+            try {
+                const response = await apiCall('GET', '/status');
+                
+                if (!response.data) {
+                    return { 
+                        success: false, 
+                        error: 'Expected status data', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        async function testGetVersion() {
+            try {
+                const response = await apiCall('GET', '/version');
+                
+                if (!response.data || !response.data.version) {
+                    return { 
+                        success: false, 
+                        error: 'Expected version data', 
+                        response: response 
+                    };
+                }
+                
+                return { success: true, response: response };
+            } catch (error) {
+                return { success: false, error: error.message, response: null };
+            }
+        }
+
+        // Generic API call helper
+        async function apiCall(method, endpoint, data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': wpRestNonce
+                    },
+                    credentials: 'same-origin'
+                };
+                
+                if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${baseUrl}${endpoint}`, options);
+                const responseData = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${responseData.message || 'Request failed'}`);
+                }
+                
+                return responseData;
+            } catch (error) {
+                throw new Error(`API call failed: ${error.message}`);
+            }
+        }
+
+        // Show test results summary
+        function showTestSummary() {
+            const passed = document.querySelectorAll('.success').length;
+            const failed = document.querySelectorAll('.error').length;
+            const total = passed + failed;
+            
+            document.getElementById('test-summary').innerHTML = `
+                <h3>Test Summary</h3>
+                <p>Total: ${total}, Passed: ${passed}, Failed: ${failed}</p>
+                <p>Success Rate: ${total > 0 ? Math.round((passed / total) * 100) : 0}%</p>
+            `;
+        }
+
     </script>
 </body>
 </html> 

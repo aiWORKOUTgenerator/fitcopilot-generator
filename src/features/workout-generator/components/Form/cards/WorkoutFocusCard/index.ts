@@ -1,1 +1,2 @@
-export { WorkoutFocusCard } from './WorkoutFocusCard'; 
+export { WorkoutFocusCard } from './WorkoutFocusCard';
+export { default } from './WorkoutFocusCard'; 

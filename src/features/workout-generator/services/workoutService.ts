@@ -100,15 +100,25 @@ export async function getWorkouts(page = 1, perPage = 10): Promise<GeneratedWork
 
 /**
  * Generate a new workout
- * @param workoutRequest - The workout generation request data
+ * @param workoutRequest - The workout generation request data with muscle targeting support
  * @returns Promise with the generated workout data
  */
 export async function generateWorkout(workoutRequest: any): Promise<GeneratedWorkout> {
   try {
+    // Enhanced data transformation to include muscle targeting
+    const enhancedRequest = transformWorkoutRequestForAPI(workoutRequest);
+    
+    console.log('[WorkoutService] Generating workout with enhanced request:', {
+      hasMuscleTargeting: !!enhancedRequest.muscleTargeting,
+      muscleGroups: enhancedRequest.muscleTargeting?.targetMuscleGroups,
+      primaryFocus: enhancedRequest.muscleTargeting?.primaryFocus,
+      originalRequest: workoutRequest
+    });
+    
     // apiFetch returns the data directly, not a wrapped response
     const data = await apiFetch<any>(`/generate`, {
       method: 'POST',
-      body: JSON.stringify(workoutRequest)
+      body: JSON.stringify(enhancedRequest)
     });
     
     if (!data) {
@@ -120,6 +130,100 @@ export async function generateWorkout(workoutRequest: any): Promise<GeneratedWor
     console.error('Failed to generate workout:', error);
     throw error;
   }
+}
+
+/**
+ * Transform workout request for API submission
+ * Ensures muscle targeting data is properly formatted and included
+ */
+function transformWorkoutRequestForAPI(workoutRequest: any): any {
+  // Base transformation with muscle targeting support
+  const apiRequest: any = {
+    duration: workoutRequest.duration,
+    difficulty: workoutRequest.difficulty,
+    equipment: workoutRequest.equipment || [],
+    goals: workoutRequest.goals,
+    restrictions: workoutRequest.restrictions,
+    preferences: workoutRequest.preferences,
+    intensity: workoutRequest.intensity,
+    sessionInputs: workoutRequest.sessionInputs || {}
+  };
+  
+  // Enhanced muscle targeting data handling - supports multiple data formats
+  const hasMuscleTargeting = workoutRequest.muscleTargeting;
+  const hasFocusArea = workoutRequest.focusArea && workoutRequest.focusArea.length > 0;
+  const hasDirectMuscleGroups = workoutRequest.targetMuscleGroups && workoutRequest.targetMuscleGroups.length > 0;
+  
+  if (hasMuscleTargeting || hasFocusArea || hasDirectMuscleGroups) {
+    console.log('[WorkoutService] Processing muscle targeting data:', {
+      hasMuscleTargeting,
+      hasFocusArea,
+      hasDirectMuscleGroups,
+      muscleTargeting: workoutRequest.muscleTargeting,
+      focusArea: workoutRequest.focusArea,
+      targetMuscleGroups: workoutRequest.targetMuscleGroups
+    });
+    
+    let targetGroups: string[] = [];
+    let primaryFocus: string | undefined;
+    let selectionSummary = 'No muscle targeting specified';
+    let specificMuscles = {};
+    
+    // Primary: Use structured muscleTargeting data
+    if (hasMuscleTargeting) {
+      const muscleTargeting = workoutRequest.muscleTargeting;
+      targetGroups = muscleTargeting.targetMuscleGroups?.map((group: any) => group.toString()) || [];
+      primaryFocus = muscleTargeting.primaryFocus;
+      selectionSummary = muscleTargeting.selectionSummary || `${targetGroups.length} muscle groups selected`;
+      specificMuscles = muscleTargeting.specificMuscles || {};
+    }
+    // Fallback: Use focusArea from sessionInputs
+    else if (hasFocusArea) {
+      targetGroups = workoutRequest.focusArea;
+      primaryFocus = targetGroups[0];
+      selectionSummary = `Focus areas: ${targetGroups.join(', ')}`;
+    }
+    // Fallback: Use direct targetMuscleGroups
+    else if (hasDirectMuscleGroups) {
+      targetGroups = workoutRequest.targetMuscleGroups;
+      primaryFocus = workoutRequest.primaryFocus || targetGroups[0];
+      selectionSummary = `Target muscle groups: ${targetGroups.join(', ')}`;
+      specificMuscles = workoutRequest.specificMuscles || {};
+    }
+    
+    // Add to session inputs for PHP compatibility
+    apiRequest.sessionInputs = {
+      ...apiRequest.sessionInputs,
+      focusArea: targetGroups,
+      targetMuscles: targetGroups,
+      primaryMuscleGroup: primaryFocus,
+      muscleSelectionSummary: selectionSummary,
+      // Include specific muscle data if available
+      specificMuscles: specificMuscles
+    };
+    
+    // Add dedicated muscle targeting section for OpenAI provider
+    apiRequest.muscleTargeting = {
+      targetMuscleGroups: targetGroups,
+      specificMuscles: specificMuscles,
+      primaryFocus: primaryFocus,
+      selectionSummary: selectionSummary
+    };
+    
+    // Include complete muscle selection data if available
+    if (workoutRequest.muscleSelection) {
+      apiRequest.muscleSelection = workoutRequest.muscleSelection;
+    }
+    
+    console.log('[WorkoutService] Muscle targeting data processed:', {
+      targetGroups,
+      primaryFocus,
+      selectionSummary,
+      hasSpecificMuscles: Object.keys(specificMuscles).length > 0
+    });
+  }
+  
+  return apiRequest;
 }
 
 /**

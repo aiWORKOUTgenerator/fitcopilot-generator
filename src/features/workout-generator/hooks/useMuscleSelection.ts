@@ -46,11 +46,10 @@ export const useMuscleSelection = (
   // Form persistence for muscle selection
   const persistence = useFormPersistence<MuscleSelectionData>(
     MUSCLE_SELECTION_STORAGE_KEY, 
-    selectionData,
-    enablePersistence
+    selectionData
   );
   
-  // Load persisted data on mount
+  // Load persisted data on mount (fixed dependency to prevent loops)
   useEffect(() => {
     if (enablePersistence) {
       const storedData = persistence.loadData();
@@ -58,14 +57,14 @@ export const useMuscleSelection = (
         setSelectionData(storedData);
       }
     }
-  }, [enablePersistence, persistence]);
+  }, [enablePersistence]); // Removed persistence object dependency
   
-  // Persist data whenever selection changes
+  // Persist data whenever selection changes (fixed dependency to prevent loops)
   useEffect(() => {
     if (enablePersistence) {
       persistence.saveData(selectionData);
     }
-  }, [selectionData, enablePersistence, persistence]);
+  }, [selectionData, enablePersistence]); // Removed persistence object dependency
   
   // Add muscle group to selection
   const addMuscleGroup = useCallback((group: MuscleGroup) => {

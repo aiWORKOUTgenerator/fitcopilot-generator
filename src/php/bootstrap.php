@@ -88,6 +88,8 @@ function enqueue_frontend_assets() {
             FITCOPILOT_VERSION
         );
         
+        // Note: TabbedWorkoutDisplay.scss removed - functionality integrated into WorkoutDisplay.scss
+        
         // Add fullwidth styles inline
         wp_add_inline_style('fitcopilot-styles', '
             .fitcopilot-fullwidth-container {

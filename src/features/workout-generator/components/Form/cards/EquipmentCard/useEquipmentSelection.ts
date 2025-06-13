@@ -4,10 +4,10 @@
  * Manages equipment selection state and profile integration
  */
 import { useCallback, useMemo } from 'react';
-import { useWorkoutForm } from '../../../../../hooks/useWorkoutForm';
-import { useProfile } from '../../../../../../profile/context';
-import { GridOption } from '../../shared/types';
-import { mapProfileToWorkoutContext } from '../../../../../utils/profileMapping';
+import { useWorkoutForm } from '../../../../hooks/useWorkoutForm';
+import { useProfile } from '../../../../../profile/context';
+import { GridOption } from '../shared/types';
+import { mapProfileToWorkoutContext } from '../../../../utils/profileMapping';
 
 // Equipment options with consistent data structure
 const EQUIPMENT_OPTIONS: GridOption<string>[] = [

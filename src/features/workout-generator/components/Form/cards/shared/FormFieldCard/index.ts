@@ -1,1 +1,2 @@
-export { FormFieldCard } from './FormFieldCard'; 
+export { FormFieldCard } from './FormFieldCard';
+export { default } from './FormFieldCard'; 

@@ -53,37 +53,6 @@ export const WorkoutGeneratorFeature: React.FC = () => {
       <NavigationProvider>
         <WorkoutGeneratorProvider>
           <div className="workout-generator-feature">
-            {/* NEW: Premium Grid-based Generator */}
-            <div className="new-generator-section">
-              <h4 style={{ 
-                textAlign: 'center', 
-                color: '#a3e635', 
-                marginBottom: '1rem',
-                fontSize: '1.1rem',
-                fontWeight: '600'
-              }}>
-                🚀 New Premium Interface (Preview)
-              </h4>
-              <WorkoutGeneratorGrid />
-            </div>
-
-            {/* Divider */}
-            <div style={{
-              margin: '3rem 0',
-              padding: '1rem 0',
-              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-              textAlign: 'center'
-            }}>
-              <span style={{ 
-                color: '#b3b3b3', 
-                fontSize: '0.875rem',
-                fontWeight: '500'
-              }}>
-                ⬇️ Current Implementation (Functional) ⬇️
-              </span>
-            </div>
-
             <DebugControls />
             <WorkoutRequestForm />
             <TipsCard />

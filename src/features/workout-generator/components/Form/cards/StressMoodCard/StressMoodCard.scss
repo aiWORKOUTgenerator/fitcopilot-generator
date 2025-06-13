@@ -1,0 +1,246 @@
+/**
+ * StressMoodCard Component Styles
+ * 
+ * Styles for the stress and mood level selection card.
+ * Includes profile integration, 3x2 grid layout, and accessibility features.
+ */
+
+.stress-mood-card {
+  .stress-card-structure {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stress-card-header {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(var(--color-border-light-rgb), 0.1);
+
+    .profile-stress-section {
+      .profile-stress-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(var(--color-text-secondary-rgb), 0.9);
+        margin-bottom: 0.5rem;
+      }
+
+      .profile-stress-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+
+        .profile-stress-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 1rem;
+          font-size: 0.75rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          border: 1px solid rgba(59, 130, 246, 0.3);
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+
+          &:hover {
+            transform: translateY(-1px);
+            opacity: 1 !important;
+            background-color: rgba(59, 130, 246, 0.15) !important;
+          }
+
+          .workout-type-icon {
+            font-size: 0.875rem;
+          }
+        }
+      }
+    }
+
+    .header-fallback {
+      .header-fallback-text {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: rgba(var(--color-text-primary-rgb), 0.9);
+
+        .header-icon {
+          font-size: 1.125rem;
+        }
+      }
+
+      .header-subtitle {
+        font-size: 0.875rem;
+        color: rgba(var(--color-text-secondary-rgb), 0.7);
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  .stress-card-body {
+    .stress-selector-container {
+      .stress-selector-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(var(--color-text-secondary-rgb), 0.9);
+        margin-bottom: 0.75rem;
+      }
+
+      .stress-options-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+
+        .stress-option {
+          padding: 0.875rem 0.625rem;
+          border: 2px solid rgba(var(--color-border-light-rgb), 0.2);
+          border-radius: 0.5rem;
+          background-color: rgba(var(--color-background-secondary-rgb), 0.3);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.375rem;
+
+          &:hover {
+            border-color: rgba(var(--color-primary-rgb), 0.4);
+            background-color: rgba(var(--color-primary-rgb), 0.05);
+            transform: translateY(-1px);
+          }
+
+          &.selected {
+            border-color: rgb(var(--color-primary-rgb));
+            background-color: rgba(var(--color-primary-rgb), 0.1);
+            color: rgb(var(--color-primary-rgb));
+
+            .stress-label {
+              font-weight: 600;
+            }
+
+            .stress-icon {
+              transform: scale(1.1);
+            }
+          }
+
+          .stress-icon {
+            font-size: 1.25rem;
+            transition: transform 0.2s ease;
+            line-height: 1;
+          }
+
+          .stress-label {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            transition: font-weight 0.2s ease;
+            line-height: 1.2;
+          }
+
+          // Stress level specific colors
+          &:nth-child(1) .stress-icon { filter: hue-rotate(120deg); } // Green
+          &:nth-child(2) .stress-icon { filter: hue-rotate(240deg); } // Blue
+          &:nth-child(3) .stress-icon { filter: hue-rotate(60deg); }  // Yellow
+          &:nth-child(4) .stress-icon { filter: hue-rotate(30deg); }  // Orange
+          &:nth-child(5) .stress-icon { filter: hue-rotate(0deg); }   // Red
+          &:nth-child(6) .stress-icon { filter: hue-rotate(300deg); } // Purple
+        }
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .stress-card-body {
+      .stress-selector-container {
+        .stress-options-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.5rem;
+
+          .stress-option {
+            padding: 0.75rem 0.5rem;
+
+            .stress-icon {
+              font-size: 1.125rem;
+            }
+
+            .stress-label {
+              font-size: 0.75rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stress-card-body {
+      .stress-selector-container {
+        .stress-options-grid {
+          grid-template-columns: repeat(2, 1fr);
+
+          .stress-option {
+            padding: 0.625rem 0.5rem;
+
+            .stress-icon {
+              font-size: 1rem;
+            }
+
+            .stress-label {
+              font-size: 0.75rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  .stress-mood-card {
+    .stress-option,
+    .profile-stress-badge {
+      transition: none;
+      
+      &:hover {
+        transform: none;
+      }
+    }
+
+    .stress-icon {
+      transition: none;
+      
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .stress-mood-card {
+    .stress-option {
+      border-width: 3px;
+      
+      &.selected {
+        background-color: rgba(var(--color-primary-rgb), 0.2);
+      }
+    }
+  }
+}
+
+// Focus states for keyboard navigation
+.stress-mood-card {
+  .stress-option {
+    &:focus {
+      outline: 2px solid rgb(var(--color-primary-rgb));
+      outline-offset: 2px;
+    }
+  }
+
+  .profile-stress-badge {
+    &:focus {
+      outline: 2px solid rgba(59, 130, 246, 0.5);
+      outline-offset: 2px;
+    }
+  }
+} 

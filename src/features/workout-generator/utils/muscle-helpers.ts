@@ -336,17 +336,27 @@ export const formatMuscleSelectionDisplay = (selectionData: MuscleSelectionData)
     return 'All muscle groups';
   }
   
+  // Helper function to safely get muscle group display name
+  const getGroupDisplay = (group: MuscleGroup): string => {
+    try {
+      return muscleGroupData[group]?.display || group.toString();
+    } catch (error) {
+      console.warn(`[MuscleHelpers] Invalid muscle group in display: ${group}`, error);
+      return group.toString();
+    }
+  };
+  
   if (selectionData.selectedGroups.length === 1) {
-    return muscleGroupData[selectionData.selectedGroups[0]].display;
+    return getGroupDisplay(selectionData.selectedGroups[0]);
   }
   
   if (selectionData.selectedGroups.length === 2) {
-    return `${muscleGroupData[selectionData.selectedGroups[0]].display} & ${muscleGroupData[selectionData.selectedGroups[1]].display}`;
+    return `${getGroupDisplay(selectionData.selectedGroups[0])} & ${getGroupDisplay(selectionData.selectedGroups[1])}`;
   }
   
   // For 3+ groups, show first two and "& X more"
   const firstTwo = selectionData.selectedGroups.slice(0, 2)
-    .map(group => muscleGroupData[group].display)
+    .map(group => getGroupDisplay(group))
     .join(', ');
   const remaining = selectionData.selectedGroups.length - 2;
   
@@ -558,7 +568,16 @@ export const generateMuscleSelectionSummary = (selectionData: MuscleSelectionDat
   
   const groupSummary = selectionData.selectedGroups.map(group => {
     const selectedMuscles = selectionData.selectedMuscles[group] || [];
-    const totalMusclesInGroup = getMusclesInGroup(group).length;
+    
+    // Safety check: ensure group exists in muscleGroupData
+    let totalMusclesInGroup = 0;
+    try {
+      totalMusclesInGroup = getMusclesInGroup(group).length;
+    } catch (error) {
+      console.warn(`[MuscleHelpers] Invalid muscle group: ${group}`, error);
+      totalMusclesInGroup = 0;
+    }
+    
     totalMuscles += selectedMuscles.length;
     
     return {

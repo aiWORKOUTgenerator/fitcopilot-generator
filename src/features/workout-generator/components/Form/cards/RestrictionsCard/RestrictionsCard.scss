@@ -1,0 +1,194 @@
+/**
+ * RestrictionsCard Component Styles
+ * 
+ * Styles for the health restrictions and limitations selection card.
+ * Includes profile integration, grid layout, and accessibility features.
+ */
+
+.restrictions-card {
+  .restrictions-card-structure {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .restrictions-card-header {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(var(--color-border-light-rgb), 0.1);
+
+    .profile-restrictions-section {
+      .profile-restrictions-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(var(--color-text-secondary-rgb), 0.9);
+        margin-bottom: 0.5rem;
+      }
+
+      .profile-restrictions-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+
+        .profile-restriction-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 1rem;
+          font-size: 0.75rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          border: 1px solid;
+
+          &:hover {
+            transform: translateY(-1px);
+            opacity: 1 !important;
+          }
+
+          &.active-today {
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+        }
+
+        .restrictions-more-indicator {
+          padding: 0.25rem 0.75rem;
+          border-radius: 1rem;
+          font-size: 0.75rem;
+          color: rgba(var(--color-text-secondary-rgb), 0.7);
+          background-color: rgba(var(--color-background-secondary-rgb), 0.5);
+          border: 1px dashed rgba(var(--color-border-light-rgb), 0.3);
+        }
+      }
+    }
+
+    .header-fallback {
+      .header-fallback-text {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: rgba(var(--color-text-primary-rgb), 0.9);
+
+        .header-icon {
+          font-size: 1.125rem;
+        }
+      }
+
+      .header-subtitle {
+        font-size: 0.875rem;
+        color: rgba(var(--color-text-secondary-rgb), 0.7);
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  .restrictions-card-body {
+    .restrictions-selector-container {
+      .restrictions-selector-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: rgba(var(--color-text-secondary-rgb), 0.9);
+        margin-bottom: 0.75rem;
+      }
+
+      .restrictions-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+
+        .restriction-option {
+          padding: 0.75rem;
+          border: 2px solid rgba(var(--color-border-light-rgb), 0.2);
+          border-radius: 0.5rem;
+          background-color: rgba(var(--color-background-secondary-rgb), 0.3);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: center;
+
+          &:hover {
+            border-color: rgba(var(--color-primary-rgb), 0.4);
+            background-color: rgba(var(--color-primary-rgb), 0.05);
+            transform: translateY(-1px);
+          }
+
+          &.selected {
+            border-color: rgb(var(--color-primary-rgb));
+            background-color: rgba(var(--color-primary-rgb), 0.1);
+            color: rgb(var(--color-primary-rgb));
+
+            .restriction-label {
+              font-weight: 600;
+            }
+          }
+
+          .restriction-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: font-weight 0.2s ease;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .restrictions-card-body {
+      .restrictions-selector-container {
+        .restrictions-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 0.5rem;
+
+          .restriction-option {
+            padding: 0.625rem 0.5rem;
+
+            .restriction-label {
+              font-size: 0.8125rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .restrictions-card-body {
+      .restrictions-selector-container {
+        .restrictions-grid {
+          grid-template-columns: 1fr;
+
+          .restriction-option {
+            .restriction-label {
+              font-size: 0.875rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  .restrictions-card {
+    .restriction-option,
+    .profile-restriction-badge {
+      transition: none;
+      
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .restrictions-card {
+    .restriction-option {
+      border-width: 3px;
+      
+      &.selected {
+        background-color: rgba(var(--color-primary-rgb), 0.2);
+      }
+    }
+  }
+} 

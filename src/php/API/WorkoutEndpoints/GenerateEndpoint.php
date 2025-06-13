@@ -120,7 +120,25 @@ class GenerateEndpoint extends AbstractEndpoint {
                 'specific_request' => $params['specific_request'],
                 // Add session inputs to generation parameters
                 'session_inputs'  => $session_inputs,
+                // Include muscle targeting data for OpenAI provider
+                'muscleTargeting' => $params['muscleTargeting'] ?? null,
+                'focusArea'       => $params['focusArea'] ?? ($session_inputs['focusArea'] ?? []),
+                'targetMuscleGroups' => $params['targetMuscleGroups'] ?? ($session_inputs['targetMuscles'] ?? []),
+                'specificMuscles' => $params['specificMuscles'] ?? ($session_inputs['specificMuscles'] ?? []),
+                'primaryFocus'    => $params['primaryFocus'] ?? ($session_inputs['primaryMuscleGroup'] ?? null),
+                'muscleSelectionSummary' => $params['selectionSummary'] ?? ($session_inputs['muscleSelectionSummary'] ?? ''),
             ];
+            
+            // Debug log muscle targeting data
+            if (!empty($params['muscleTargeting']) || !empty($session_inputs['focusArea'])) {
+                error_log('[GenerateEndpoint] Processing muscle targeting data: ' . print_r([
+                    'has_muscleTargeting' => !empty($params['muscleTargeting']),
+                    'has_focusArea' => !empty($params['focusArea']),
+                    'session_focusArea' => $session_inputs['focusArea'] ?? 'none',
+                    'muscleTargeting_data' => $params['muscleTargeting'] ?? 'none',
+                    'focusArea_data' => $params['focusArea'] ?? 'none'
+                ], true));
+            }
             
             // Debug log - parameters sent to generator
             error_log('Parameters sent to generator: ' . print_r($generation_params, true));

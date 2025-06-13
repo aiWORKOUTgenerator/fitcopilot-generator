@@ -1,1 +1,2 @@
-export { DurationCard } from './DurationCard'; 
+export { DurationCard } from './DurationCard';
+export { default } from './DurationCard'; 

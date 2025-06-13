@@ -71,7 +71,7 @@ class OpenAIProvider {
      */
     private function buildPrompt($params) {
         $duration = $params['duration'] ?? 30;
-        $difficulty = $params['difficulty'] ?? 'intermediate';
+        $difficulty = $params['difficulty'] ?? 'intermediate';  
         $equipment = isset($params['equipment']) ? implode(', ', $params['equipment']) : 'no equipment';
         $daily_focus = $params['daily_focus'] ?? $params['goals'] ?? 'general fitness';
         $profile_goals = isset($params['profile_goals']) && is_array($params['profile_goals']) ? $params['profile_goals'] : [];
@@ -91,6 +91,12 @@ class OpenAIProvider {
         $prompt = "Create a detailed {$difficulty} level workout for {$duration} minutes at {$intensity_description}. ";
         $prompt .= "Equipment available: {$equipment}. ";
         $prompt .= "Today's workout focus: {$daily_focus}. ";
+        
+        // Add muscle targeting integration
+        $muscle_targeting = $this->buildMuscleTargetingText($params);
+        if (!empty($muscle_targeting)) {
+            $prompt .= $muscle_targeting . " ";
+        }
         
         // Add profile context if available
         if (!empty($profile_goals)) {
@@ -122,6 +128,69 @@ class OpenAIProvider {
         }";
 
         return $prompt;
+    }
+
+    /**
+     * Build muscle targeting text for the workout prompt
+     *
+     * @param array $params Workout parameters
+     * @return string Muscle targeting text for the prompt
+     */
+    private function buildMuscleTargetingText($params) {
+        $muscle_text = '';
+        
+        // Check for muscle targeting data (new integration format)
+        if (isset($params['muscleTargeting']) && is_array($params['muscleTargeting'])) {
+            $muscle_targeting = $params['muscleTargeting'];
+            
+            if (!empty($muscle_targeting['selectionSummary'])) {
+                $muscle_text = "MUSCLE TARGETING: " . $muscle_targeting['selectionSummary'] . ".";
+            } else if (!empty($muscle_targeting['targetMuscleGroups'])) {
+                $groups = is_array($muscle_targeting['targetMuscleGroups']) 
+                    ? implode(', ', $muscle_targeting['targetMuscleGroups']) 
+                    : $muscle_targeting['targetMuscleGroups'];
+                $muscle_text = "TARGET MUSCLE GROUPS: Focus primarily on {$groups}.";
+                
+                if (!empty($muscle_targeting['primaryFocus'])) {
+                    $muscle_text .= " Primary emphasis on {$muscle_targeting['primaryFocus']}.";
+                }
+            }
+        }
+        
+        // Check for legacy focusArea format (backward compatibility)
+        else if (isset($params['focusArea']) && is_array($params['focusArea']) && !empty($params['focusArea'])) {
+            $focus_areas = implode(', ', $params['focusArea']);
+            $muscle_text = "TARGET MUSCLE GROUPS: Focus primarily on {$focus_areas}.";
+        }
+        
+        // Check for direct muscle targeting fields (backward compatibility)
+        else if (isset($params['targetMuscleGroups']) && !empty($params['targetMuscleGroups'])) {
+            $groups = is_array($params['targetMuscleGroups']) 
+                ? implode(', ', $params['targetMuscleGroups']) 
+                : $params['targetMuscleGroups'];
+            $muscle_text = "TARGET MUSCLE GROUPS: Focus primarily on {$groups}.";
+            
+            if (isset($params['primaryFocus']) && !empty($params['primaryFocus'])) {
+                $muscle_text .= " Primary emphasis on {$params['primaryFocus']}.";
+            }
+        }
+        
+        // Check for sessionInputs muscle targeting (integration hook format)
+        else if (isset($params['sessionInputs']['muscleTargeting']) && is_array($params['sessionInputs']['muscleTargeting'])) {
+            $session_targeting = $params['sessionInputs']['muscleTargeting'];
+            
+            if (!empty($session_targeting['selectionSummary'])) {
+                $muscle_text = "MUSCLE TARGETING: " . $session_targeting['selectionSummary'] . ".";
+            }
+        }
+        
+        // Check for sessionInputs focus area (integration hook format)
+        else if (isset($params['sessionInputs']['focusArea']) && is_array($params['sessionInputs']['focusArea']) && !empty($params['sessionInputs']['focusArea'])) {
+            $focus_areas = implode(', ', $params['sessionInputs']['focusArea']);
+            $muscle_text = "TARGET MUSCLE GROUPS: Focus primarily on {$focus_areas}.";
+        }
+        
+        return $muscle_text;
     }
 
     /**

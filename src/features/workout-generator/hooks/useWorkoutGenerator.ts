@@ -27,8 +27,20 @@ export type GenerationStatus = 'idle' | 'starting' | 'submitting' | 'generating'
 
 // Type adapter function to convert WorkoutData to GeneratedWorkout
 function adaptWorkoutData(workout: WorkoutData): GeneratedWorkout {
+  // Extract all exercises from all sections for the top-level exercises array
+  const allExercises = workout.sections.flatMap(section => 
+    section.exercises.map(ex => ({
+      name: ex.name,
+      duration: ex.duration || "",
+      description: ex.description,
+      sets: ex.sets || 0,
+      reps: ex.reps || 0
+    }))
+  );
+
   return {
     title: workout.title,
+    exercises: allExercises,
     sections: workout.sections.map(section => ({
       name: section.name,
       duration: section.duration,
@@ -130,15 +142,9 @@ export function useWorkoutGenerator() {
     }
     
     try {
-      // Validate the form before submitting
-      if (!validateForm()) {
-        throw new Error('Please fix the form errors before submitting.');
-      }
-      
-      // Ensure all required fields are present
-      if (!isValid) {
-        throw new Error('Please fill in all required fields.');
-      }
+      // Skip validation here since it's already done at the form level
+      // The WorkoutRequestForm validates before calling startGeneration
+      console.log('[useWorkoutGenerator] Starting generation with params:', workoutParams);
 
       // Ensure all required fields have default values if missing
       const completeParams: WorkoutFormParams = {
@@ -147,6 +153,10 @@ export function useWorkoutGenerator() {
         goals: workoutParams.goals || 'general-fitness',
         equipment: workoutParams.equipment || [],
         restrictions: workoutParams.restrictions || '',
+        // Include session inputs for modular card support
+        sessionInputs: workoutParams.sessionInputs,
+        // Include any additional fields that may be passed
+        ...workoutParams,
       };
       
       // First, set the status to submitting (start generation)

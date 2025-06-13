@@ -4,61 +4,92 @@
  * Reusable header component for profile sections in cards
  */
 import React from 'react';
-import { CardProfileSection } from '../types';
 import './CardHeader.scss';
 
-interface CardHeaderProps extends CardProfileSection {
-  isLoading?: boolean;
-  error?: string;
+interface ProfileBadge {
+  value: string;
+  display: string;
+  icon?: string;
+  color?: string;
+  bgColor?: string;
 }
 
+interface FallbackHeader {
+  icon: string;
+  text: string;
+  subtitle: string;
+}
+
+interface CardHeaderProps {
+  label: string;
+  badges?: ProfileBadge[];
+  fallback: FallbackHeader;
+  maxBadges?: number;
+  onBadgeClick?: (badge: ProfileBadge) => void;
+  className?: string;
+}
+
+/**
+ * Reusable card header component for profile sections
+ * Handles profile data display with fallback states
+ */
 export const CardHeader: React.FC<CardHeaderProps> = ({
   label,
   badges = [],
   fallback,
-  isLoading = false,
-  error
+  maxBadges = 3,
+  onBadgeClick,
+  className = ''
 }) => {
-  // Show fallback if loading, error, or no badges
-  const showFallback = isLoading || error || badges.length === 0;
+  const hasBadges = badges.length > 0;
+  const displayBadges = badges.slice(0, maxBadges);
+  const remainingCount = badges.length - maxBadges;
 
-  if (showFallback && fallback) {
+  if (hasBadges) {
     return (
-      <div className="card-header-fallback">
+      <div className={`card-header ${className}`}>
+        <div className="profile-section">
+          <div className="profile-label">{label}</div>
+          <div className="profile-badges">
+            {displayBadges.map((badge, index) => (
+              <span 
+                key={badge.value}
+                className="workout-type-badge profile-badge"
+                onClick={() => onBadgeClick?.(badge)}
+                style={{ 
+                  backgroundColor: badge.bgColor || 'rgba(59, 130, 246, 0.1)',
+                  color: badge.color || '#3b82f6',
+                  cursor: onBadgeClick ? 'pointer' : 'default',
+                  opacity: 0.8
+                }}
+                title={`${badge.display}${onBadgeClick ? ' - Click to apply' : ''}`}
+              >
+                {badge.icon && <span className="workout-type-icon">{badge.icon}</span>}
+                {badge.display}
+              </span>
+            ))}
+            {remainingCount > 0 && (
+              <span className="badges-more-indicator">
+                +{remainingCount} more
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`card-header ${className}`}>
+      <div className="header-fallback">
         <div className="header-fallback-text">
           <span className="header-icon">{fallback.icon}</span>
           <span>{fallback.text}</span>
         </div>
         <div className="header-subtitle">{fallback.subtitle}</div>
       </div>
-    );
-  }
-
-  return (
-    <div className="card-header-profile-section">
-      <div className="profile-section-label">{label}</div>
-      <div className="profile-section-badges">
-        {badges.slice(0, 3).map((badge, index) => (
-          <span 
-            key={badge.value}
-            className="profile-badge"
-            style={{ 
-              backgroundColor: badge.bgColor || 'rgba(255, 255, 255, 0.05)',
-              color: badge.color || 'var(--color-text-secondary, #b3b3b3)',
-              borderColor: badge.color ? `${badge.color}40` : 'rgba(255, 255, 255, 0.1)'
-            }}
-            title={badge.display}
-          >
-            {badge.icon && <span className="badge-icon">{badge.icon}</span>}
-            {badge.display}
-          </span>
-        ))}
-        {badges.length > 3 && (
-          <span className="badges-more-indicator">
-            +{badges.length - 3} more
-          </span>
-        )}
-      </div>
     </div>
   );
-}; 
+};
+
+export default CardHeader; 

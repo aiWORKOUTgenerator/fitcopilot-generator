@@ -1,35 +1,83 @@
 /**
  * WorkoutCard Component Styles
+ * Updated to match WorkoutGeneratorGrid glassmorphism design patterns
  */
 
 .workout-card {
-  background-color: #0b0332;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 24px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-lg, 12px);
+  padding: var(--spacing-xl, 2rem);
   width: 100%;
   max-width: 1080px;
   margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  // CRITICAL FIX: Force disable ALL white hover backgrounds on workout content
+  // This fixes the white overlay bug that was making workout titles unreadable
+  *, *:hover, *::before:hover, *::after:hover {
+    background-color: transparent !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  // Override any parent hover effects that might affect the workout title
+  &:hover, &:hover *, &:hover *:hover {
+    background: rgba(255, 255, 255, 0.02) !important;
+  }
+
+  // Signature inner glow effect (matching WorkoutGeneratorGrid)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.01) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  // Content above the glow effect
+  & > * {
+    position: relative;
+    z-index: 2;
+  }
 
   &__header {
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #eaeaea;
+    margin-bottom: var(--spacing-lg, 1.5rem);
+    padding-bottom: var(--spacing-md, 1rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   &__title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #333;
+    font-size: var(--font-size-xl, 1.5rem);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--color-text-primary, #ffffff);
     margin: 0;
+    text-align: center;
   }
 
   &__content {
-    margin-bottom: 32px;
+    margin-bottom: var(--spacing-xl, 2rem);
   }
 
   &__section {
-    margin-bottom: 28px;
+    margin-bottom: var(--spacing-lg, 1.5rem);
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-md, 8px);
+    padding: var(--spacing-md, 1rem);
+    backdrop-filter: blur(8px);
 
     &:last-child {
       margin-bottom: 0;
@@ -40,67 +88,107 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: var(--spacing-md, 1rem);
   }
 
   &__section-name {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
+    font-size: var(--font-size-lg, 1.125rem);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--color-text-primary, #ffffff);
     margin: 0;
   }
 
   &__section-duration {
-    font-size: 14px;
-    color: #666;
-    background-color: #f5f5f5;
-    padding: 4px 10px;
-    border-radius: 50px;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--color-text-secondary, #b3b3b3);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-xs, 0.25rem) var(--spacing-sm, 0.5rem);
+    border-radius: var(--border-radius-full, 50px);
+    font-weight: var(--font-weight-medium, 500);
+    backdrop-filter: blur(4px);
   }
 
   &__exercises {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-sm, 0.5rem);
   }
 
   &__exercise-container {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 16px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius-sm, 6px);
+    padding: var(--spacing-md, 1rem);
+    backdrop-filter: blur(6px);
+    overflow: hidden;
+
+    // Subtle inner highlight (matching header chips pattern)
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(
+        circle at center,
+        rgba(255, 255, 255, 0.01) 0%,
+        transparent 60%
+      );
+      pointer-events: none;
+    }
+
+    // Content above the glow
+    & > * {
+      position: relative;
+      z-index: 1;
+    }
   }
 
   &__exercise {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-xs, 0.25rem);
   }
 
   &__exercise-name {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--font-size-base, 1rem);
+    font-weight: var(--font-weight-semibold, 600);
     margin: 0;
-    color: #333;
+    color: var(--color-text-primary, #ffffff);
   }
 
   &__exercise-details {
-    font-size: 14px;
-    font-weight: 500;
-    color: #007bff;
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: var(--font-weight-medium, 500);
+    color: rgba(132, 204, 22, 0.9);
+    background: rgba(132, 204, 22, 0.1);
+    border: 1px solid rgba(132, 204, 22, 0.2);
+    padding: var(--spacing-xs, 0.25rem) var(--spacing-sm, 0.5rem);
+    border-radius: var(--border-radius-sm, 4px);
+    display: inline-block;
+    backdrop-filter: blur(4px);
   }
 
   &__exercise-description {
-    font-size: 14px;
-    color: #555;
-    margin: 0;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--color-text-secondary, #b3b3b3);
+    margin: var(--spacing-xs, 0.25rem) 0 0 0;
     line-height: 1.5;
   }
 
   &__actions {
     display: flex;
-    gap: 16px;
-    justify-content: flex-end;
-    margin-top: 24px;
+    gap: var(--spacing-md, 1rem);
+    justify-content: center;
+    margin-top: var(--spacing-lg, 1.5rem);
+    padding: var(--spacing-md, 1rem);
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-lg, 12px);
+    backdrop-filter: blur(8px);
     
     // Media query for smaller screens
     @media (max-width: 600px) {
@@ -109,6 +197,23 @@
       button {
         width: 100%;
       }
+    }
+  }
+
+  // Responsive design enhancements
+  @media (max-width: 768px) {
+    padding: var(--spacing-lg, 1.5rem);
+
+    &__title {
+      font-size: var(--font-size-lg, 1.25rem);
+    }
+
+    &__section {
+      padding: var(--spacing-sm, 0.5rem);
+    }
+
+    &__exercise-container {
+      padding: var(--spacing-sm, 0.5rem);
     }
   }
 } 

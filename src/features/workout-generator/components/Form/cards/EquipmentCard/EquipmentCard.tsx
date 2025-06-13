@@ -7,7 +7,7 @@ import React from 'react';
 import { FormFieldCard } from '../shared/FormFieldCard';
 import { GridSelector } from '../shared/GridSelector';
 import { CardHeader } from '../shared/CardHeader';
-import { useEquipmentSelection } from './hooks/useEquipmentSelection';
+import { useEquipmentSelection } from './useEquipmentSelection';
 import { BaseCardProps } from '../shared/types';
 import './EquipmentCard.scss';
 

@@ -6,14 +6,14 @@
  * muscle targeting with up to 3 muscle groups and specific muscle selection.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useMuscleSelection } from '../../../hooks/useMuscleSelection';
-import { MuscleGroup } from '../../../types/muscle-types';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useMuscleSelection } from '../../../../hooks/useMuscleSelection';
+import { MuscleGroup } from '../../../../types/muscle-types';
 import { 
   muscleGroupData, 
   MUSCLE_GROUP_DISPLAY_ORDER,
   getMusclesInGroup 
-} from '../../../constants/muscle-data';
+} from '../../../../constants/muscle-data';
 import { ChevronDown, X, Plus } from 'lucide-react';
 import './MuscleGroupCard.scss';
 
@@ -22,73 +22,83 @@ interface MuscleGroupCardProps {
   profileError?: any;
   isProfileSufficient?: boolean;
   profileMapping?: any;
+  // Optional callback for external integration (legacy bridge support)
+  onSelectionChange?: () => void;
 }
 
 export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
   profileLoading = false,
   profileError = null,
   isProfileSufficient = false,
-  profileMapping = null
+  profileMapping = null,
+  onSelectionChange
 }) => {
   
-  // Use muscle selection directly WITHOUT the sync wrapper to avoid conflicts
-  const muscleSelection = useMuscleSelection(3, false); // Disable auto-persistence
+  /**
+   * Initialize muscle selection with internal state management
+   * Ensures reliable functionality independent of external systems
+   */
+  const muscleSelection = useMuscleSelection(3, true);
   const [expandedGroups, setExpandedGroups] = useState<Set<MuscleGroup>>(new Set());
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isOperationInProgress, setIsOperationInProgress] = useState(false);
   
-  // Debounced state updates to prevent flickering
-  const [stableSelectionData, setStableSelectionData] = useState(muscleSelection.selectionData);
+  /**
+   * Direct state reference for optimal performance
+   * Prevents unnecessary re-renders and state conflicts
+   */
+  const stableSelectionData = muscleSelection.selectionData;
   
-  // Update stable selection data with debouncing
+  /**
+   * External sync callback with optimized dependencies
+   * Provides integration with parent form systems
+   */
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setStableSelectionData(muscleSelection.selectionData);
-    }, 10);
-    
-    return () => clearTimeout(timeout);
-  }, [muscleSelection.selectionData]);
+    if (onSelectionChange && typeof onSelectionChange === 'function') {
+      try {
+        onSelectionChange();
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[MuscleGroupCard] External sync callback failed:', error);
+        }
+      }
+    }
+  }, [
+    onSelectionChange,
+    muscleSelection.selectionData.selectedGroups.length,
+    Object.keys(muscleSelection.selectionData.selectedMuscles).length
+  ]);
   
-  // Handle muscle group selection from dropdown
+  /**
+   * Handle muscle group selection from dropdown
+   * Optimized for performance with minimal state updates
+   */
   const handleGroupSelect = useCallback((group: MuscleGroup) => {
-    if (isOperationInProgress) return;
-    
-    setIsOperationInProgress(true);
-    
     if (!muscleSelection.isGroupSelected(group) && muscleSelection.canAddMore) {
       muscleSelection.addMuscleGroup(group);
       setExpandedGroups(prev => new Set([...prev, group]));
     }
     setShowDropdown(false);
-    
-    // Clear operation lock quickly
-    setTimeout(() => setIsOperationInProgress(false), 100);
-  }, [muscleSelection, isOperationInProgress]);
+  }, [muscleSelection]);
   
-  // Handle muscle group removal with immediate state updates
+  /**
+   * Handle muscle group removal with immediate UI feedback
+   * Ensures consistent state between UI and data layers
+   */
   const handleGroupRemove = useCallback((group: MuscleGroup) => {
-    if (isOperationInProgress) return;
-    
-    setIsOperationInProgress(true);
-    
-    // Remove from expanded groups immediately
     setExpandedGroups(prev => {
       const newSet = new Set(prev);
       newSet.delete(group);
       return newSet;
     });
     
-    // Remove from muscle selection
     muscleSelection.removeMuscleGroup(group);
-    
-    // Clear operation lock
-    setTimeout(() => setIsOperationInProgress(false), 100);
-  }, [muscleSelection, isOperationInProgress]);
+  }, [muscleSelection]);
   
-  // Toggle expanded state for muscle detail grids
+  /**
+   * Toggle expanded state for muscle detail grids
+   * Provides progressive disclosure of muscle-specific options
+   */
   const toggleGroupExpanded = useCallback((group: MuscleGroup) => {
-    if (isOperationInProgress) return;
-    
     setExpandedGroups(prev => {
       const newSet = new Set(prev);
       if (newSet.has(group)) {
@@ -98,14 +108,22 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
       }
       return newSet;
     });
-  }, [isOperationInProgress]);
+  }, []);
   
-  // Get available groups for dropdown (use stable data to prevent flickering)
-  const availableGroups = MUSCLE_GROUP_DISPLAY_ORDER.filter(
-    group => !stableSelectionData.selectedGroups.includes(group)
+  /**
+   * Get available groups for dropdown selection
+   * Memoized to prevent unnecessary recalculations and flickering
+   */
+  const availableGroups = useMemo(() => 
+    MUSCLE_GROUP_DISPLAY_ORDER.filter(
+      group => !stableSelectionData.selectedGroups.includes(group)
+    ), [stableSelectionData.selectedGroups]
   );
   
-  // Generate profile-based muscle preferences display
+  /**
+   * Generate profile-based muscle preferences display
+   * Maps user fitness goals to relevant muscle group suggestions
+   */
   const getProfileMuscleDisplay = useCallback(() => {
     if (!profileMapping?.displayData?.goals) return null;
     
@@ -145,8 +163,8 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
                   className={`muscle-suggestion-badge ${
                     stableSelectionData.selectedGroups.includes(group) ? 'suggestion-badge--selected' : ''
                   }`}
-                  onClick={() => !stableSelectionData.selectedGroups.includes(group) && !isOperationInProgress && handleGroupSelect(group)}
-                  disabled={stableSelectionData.selectedGroups.includes(group) || isOperationInProgress}
+                  onClick={() => !stableSelectionData.selectedGroups.includes(group) && handleGroupSelect(group)}
+                  disabled={stableSelectionData.selectedGroups.includes(group)}
                   title={`${muscleGroupData[group].description}`}
                   id={`muscle-suggestion-${group.toLowerCase()}`}
                   name={`muscle-suggestion`}
@@ -174,7 +192,7 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
               const totalMuscles = getMusclesInGroup(group).length;
               return (
                 <div 
-                  key={`chip-${group}-${index}`} 
+                  key={`chip-${group}`} 
                   className="muscle-group-chip"
                 >
                   <div className="chip-content">
@@ -191,7 +209,6 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
                     name={`remove-muscle-chip`}
                     value={group}
                     aria-label={`Remove ${muscleGroupData[group].display} muscle group`}
-                    disabled={isOperationInProgress}
                   >
                     <X size={12} />
                   </button>
@@ -215,7 +232,7 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
               <button
                 className="muscle-dropdown-trigger"
                 onClick={() => setShowDropdown(!showDropdown)}
-                disabled={stableSelectionData.selectedGroups.length >= 3 || isOperationInProgress}
+                disabled={stableSelectionData.selectedGroups.length >= 3}
                 aria-expanded={showDropdown}
                 aria-haspopup="listbox"
                 id="muscle-group-dropdown-trigger"
@@ -242,7 +259,6 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
                       id={`muscle-group-option-${group.toLowerCase()}`}
                       name={`muscle-group-option`}
                       value={group}
-                      disabled={isOperationInProgress}
                     >
                       <div className="option-content">
                         <span className="option-label">{muscleGroupData[group].display}</span>
@@ -273,7 +289,7 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
               const selectedMuscles = muscleSelection.getMusclesInGroup(group);
               
               return (
-                <div key={`grid-${group}-${index}`} className="muscle-detail-grid">
+                <div key={`grid-${group}`} className="muscle-detail-grid">
                   <button
                     className="grid-header"
                     onClick={() => toggleGroupExpanded(group)}
@@ -283,7 +299,6 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
                     value={group}
                     aria-expanded={isExpanded}
                     aria-controls={`muscle-grid-content-${group.toLowerCase()}`}
-                    disabled={isOperationInProgress}
                   >
                     <div className="grid-header-content">
                       <span className="grid-title">{muscleGroupData[group].display}</span>
@@ -315,10 +330,9 @@ export const MuscleGroupCard: React.FC<MuscleGroupCardProps> = ({
                               name={`muscle-selection-${group}`}
                               value={muscle}
                               checked={isSelected}
-                              onChange={() => !isOperationInProgress && muscleSelection.toggleMuscle(group, muscle)}
+                              onChange={() => muscleSelection.toggleMuscle(group, muscle)}
                               className="muscle-checkbox"
                               aria-label={`Select ${muscle} in ${muscleGroupData[group].display} group`}
-                              disabled={isOperationInProgress}
                             />
                             <span className="muscle-label">{muscle}</span>
                           </label>

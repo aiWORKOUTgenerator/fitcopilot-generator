@@ -352,7 +352,7 @@ export function WorkoutGeneratorProvider({ children }: WorkoutGeneratorProviderP
         API_ENDPOINTS.GENERATE,
         {
           method: 'POST',
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify({ workout: requestBody })  // Wrap in workout key as expected by API
         }
       );
       

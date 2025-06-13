@@ -5,26 +5,42 @@
  */
 import React from 'react';
 import { FormFieldCard } from '../shared/FormFieldCard';
-import { GridSelector } from '../shared/GridSelector';
 import { CardHeader } from '../shared/CardHeader';
-import { useFocusSelection } from './hooks/useFocusSelection';
-import { BaseCardProps } from '../shared/types';
+import { useFocusSelection } from './useFocusSelection';
 import './WorkoutFocusCard.scss';
 
-interface WorkoutFocusCardProps extends BaseCardProps {}
+interface WorkoutFocusCardProps {
+  delay?: number;
+}
 
+/**
+ * Workout Focus Selection Card Component
+ * Handles selection of today's workout focus with profile integration
+ */
 export const WorkoutFocusCard: React.FC<WorkoutFocusCardProps> = ({ 
-  delay = 0, 
-  className = '' 
+  delay = 0 
 }) => {
   const {
     focusOptions,
     selectedFocus,
     profileGoals,
-    isLoading,
-    error,
-    handleFocusChange
+    hasProfileData,
+    handleFocusSelection
   } = useFocusSelection();
+
+  const profileSection = (
+    <CardHeader
+      label="Your Long-term Goals:"
+      badges={profileGoals}
+      maxBadges={2}
+      fallback={{
+        icon: "🎯",
+        text: "Profile Goals",
+        subtitle: "Set up your profile to see personalized goals"
+      }}
+      onBadgeClick={(badge) => handleFocusSelection(badge.value)}
+    />
+  );
 
   return (
     <FormFieldCard
@@ -32,30 +48,26 @@ export const WorkoutFocusCard: React.FC<WorkoutFocusCardProps> = ({
       description="What's your fitness focus today?"
       delay={delay}
       variant="complex"
-      className={`workout-focus-card ${className}`}
-      profileSection={
-        <CardHeader
-          label="Your Long-term Goals:"
-          badges={profileGoals}
-          isLoading={isLoading}
-          error={error}
-          fallback={{
-            icon: "🎯",
-            text: "Profile Goals",
-            subtitle: "Set up your profile to see personalized goals"
-          }}
-        />
-      }
+      profileSection={hasProfileData ? profileSection : undefined}
     >
-      <GridSelector
-        options={focusOptions}
-        selectedValues={selectedFocus}
-        onSelectionChange={handleFocusChange}
-        multiSelect={false}
-        gridColumns={3}
-        label="Today's Focus:"
-        className="focus-selector"
-      />
+      <div className="focus-selector-container">
+        <div className="focus-selector-label">Today's Focus:</div>
+        <div className="focus-options-grid">
+          {focusOptions.map((option) => (
+            <div
+              key={option.value}
+              className={`focus-option ${selectedFocus === option.value ? 'selected' : ''}`}
+              onClick={() => handleFocusSelection(option.value)}
+              title={option.tooltip}
+            >
+              <span className="focus-icon">{option.icon}</span>
+              <span className="focus-label">{option.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </FormFieldCard>
   );
-}; 
+};
+
+export default WorkoutFocusCard; 

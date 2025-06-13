@@ -473,9 +473,10 @@
     transition: all 0.2s ease;
     flex-shrink: 0;
     
-    .workout-editor__checkbox-label:hover & {
-      background-color: rgba(255, 255, 255, 0.15); // Slightly more opaque on hover
-    }
+    // Hover effect removed to prevent white overlay issues
+    // .workout-editor__checkbox-label:hover & {
+    //   background-color: rgba(255, 255, 255, 0.15); // Slightly more opaque on hover
+    // }
   }
 
   &__checkbox-indicator {

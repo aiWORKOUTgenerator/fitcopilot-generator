@@ -12,18 +12,19 @@ import './SessionInputsPanel.scss';
 /**
  * Focus area options for workouts
  */
-const FOCUS_AREA_OPTIONS = [
-  { id: 'upper-body', label: 'Upper Body' },
-  { id: 'lower-body', label: 'Lower Body' },
-  { id: 'core', label: 'Core' },
-  { id: 'back', label: 'Back' },
-  { id: 'shoulders', label: 'Shoulders' },
-  { id: 'chest', label: 'Chest' },
-  { id: 'arms', label: 'Arms' },
-  { id: 'mobility', label: 'Mobility/Flexibility' },
-  { id: 'cardio', label: 'Cardio' },
-  { id: 'recovery', label: 'Recovery/Stretching' }
-];
+// FOCUS_AREA_OPTIONS - REMOVED: No longer used in legacy form
+// const FOCUS_AREA_OPTIONS = [
+//   { id: 'upper-body', label: 'Upper Body' },
+//   { id: 'lower-body', label: 'Lower Body' },
+//   { id: 'core', label: 'Core' },
+//   { id: 'back', label: 'Back' },
+//   { id: 'shoulders', label: 'Shoulders' },
+//   { id: 'chest', label: 'Chest' },
+//   { id: 'arms', label: 'Arms' },
+//   { id: 'mobility', label: 'Mobility/Flexibility' },
+//   { id: 'cardio', label: 'Cardio' },
+//   { id: 'recovery', label: 'Recovery/Stretching' }
+// ];
 
 
 
@@ -110,24 +111,7 @@ export const SessionInputsPanel: React.FC<SessionInputsPanelProps> = ({
     });
   };
 
-  /**
-   * Handle change in focus area selection
-   */
-  const handleFocusAreaChange = (id: string, checked: boolean) => {
-    const currentFocusAreas = sessionInputs.focusArea || [];
-    let newFocusAreas: string[];
-    
-    if (checked) {
-      newFocusAreas = [...currentFocusAreas, id];
-    } else {
-      newFocusAreas = currentFocusAreas.filter(item => item !== id);
-    }
-    
-    onSessionInputsChange({
-      ...sessionInputs,
-      focusArea: newFocusAreas
-    });
-  };
+  // Focus area handler - REMOVED: No longer needed
 
   /**
    * Handle change in soreness selection
@@ -208,39 +192,7 @@ export const SessionInputsPanel: React.FC<SessionInputsPanelProps> = ({
             )}
           </div>
 
-          {/* Focus Area */}
-          <div className="session-inputs__form-group">
-            <label className="session-inputs__label">
-              Focus area for today's workout
-            </label>
-            <div className="session-inputs__form-grid">
-              <div className="session-inputs__checkbox-grid">
-                {FOCUS_AREA_OPTIONS.map(option => {
-                  const isSelected = (sessionInputs.focusArea || []).includes(option.id);
-                  return (
-                    <label 
-                      key={option.id} 
-                      className={`session-inputs__checkbox-label ${
-                        isSelected ? 'checkbox-label--selected' : ''
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className="session-inputs__checkbox-input"
-                        value={option.id}
-                        checked={isSelected}
-                        onChange={(e) => handleFocusAreaChange(option.id, e.target.checked)}
-                      />
-                      <div className="session-inputs__checkbox-box">
-                        <Check size={14} className="session-inputs__checkbox-indicator" />
-                      </div>
-                      <span className="session-inputs__checkbox-text">{option.label}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+          {/* Focus Area - REMOVED: Now only available in modular workout generator */}
 
           {/* Current Soreness */}
           <div className="session-inputs__form-group">

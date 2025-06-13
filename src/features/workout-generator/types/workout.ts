@@ -217,7 +217,8 @@ export interface SessionSpecificInputs {
 }
 
 /**
- * Workout form parameters
+ * Workout Form Parameters
+ * Enhanced to support muscle targeting integration
  */
 export interface WorkoutFormParams {
   duration: number;
@@ -237,6 +238,52 @@ export interface WorkoutFormParams {
    * Extended to include WorkoutGrid daily selections
    */
   sessionInputs?: SessionSpecificInputs;
+  
+  /**
+   * Muscle targeting data from muscle selection integration
+   * Added to support the new muscle-form integration architecture
+   */
+  muscleTargeting?: {
+    /**
+     * Selected muscle groups for targeting
+     */
+    targetMuscleGroups: import('./muscle-types').MuscleGroup[];
+    
+    /**
+     * Specific muscles selected within each group
+     */
+    specificMuscles: Record<import('./muscle-types').MuscleGroup, string[]>;
+    
+    /**
+     * Primary focus muscle group (first selected)
+     */
+    primaryFocus: import('./muscle-types').MuscleGroup | undefined;
+    
+    /**
+     * Human-readable summary of muscle selection
+     */
+    selectionSummary: string;
+  };
+  
+  /**
+   * Complete muscle selection data (for advanced processing)
+   * Includes the full muscle selection state for detailed workout generation
+   */
+  muscleSelection?: import('./muscle-types').MuscleSelectionData;
+  
+  /**
+   * Backward compatibility fields for direct muscle targeting
+   * These fields provide direct access to muscle data for legacy API integrations
+   */
+  targetMuscleGroups?: string[];
+  specificMuscles?: { [key: string]: string[] };
+  primaryFocus?: string;
+  
+  /**
+   * Focus area from sessionInputs (muscle groups as strings)
+   * Used for muscle targeting integration
+   */
+  focusArea?: string[];
 }
 
 /**

@@ -8,14 +8,14 @@
 @use "sass:math";
 
 // Import existing system tokens and patterns
-@import '../../../styles/_variables';
-@import '../../../styles/_color-tokens';
-@import '../../../styles/components/_component-tokens';
-@import '../../../../../styles/design-system/compatibility/_compatibility';
-@import '../../../../../styles/design-system/tokens/semantic/surfaces';
+@import '../../../../styles/_variables';
+@import '../../../../styles/_color-tokens';
+@import '../../../../styles/components/_component-tokens';
+@import '../../../../../../styles/design-system/compatibility/_compatibility';
+@import '../../../../../../styles/design-system/tokens/semantic/surfaces';
 
 // Import all component styles
-@import './components/index';
+@import '../components/index';
 
 /* ===========================================================================
  * MUSCLE GROUP CARD STRUCTURE

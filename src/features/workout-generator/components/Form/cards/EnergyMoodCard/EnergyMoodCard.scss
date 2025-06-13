@@ -1,0 +1,294 @@
+/**
+ * EnergyMoodCard Component Styles
+ * 
+ * Styling for energy and motivation level selection card with:
+ * - Profile integration badges
+ * - 3x2 grid layout for 6 energy levels
+ * - Color-coded emoji indicators
+ * - Responsive design and accessibility
+ */
+
+/* Main Card Container */
+.energy-mood-card {
+  .motivation-card-structure {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 240px;
+  }
+
+  /* HEADER: Profile Energy Section */
+  .motivation-card-header {
+    .profile-motivation-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      .profile-motivation-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+      }
+      
+      .profile-motivation-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      
+      .profile-motivation-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        transition: all 0.2s ease;
+        
+        &:hover {
+          opacity: 1 !important;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(34, 197, 94, 0.15);
+        }
+        
+        .workout-type-icon {
+          font-size: 0.875rem;
+        }
+      }
+    }
+    
+    .header-fallback {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      
+      .header-fallback-text {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+        
+        .header-icon {
+          font-size: 1.125rem;
+        }
+      }
+      
+      .header-subtitle {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+    }
+  }
+
+  /* BODY: Energy Level Selection */
+  .motivation-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .motivation-selector-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      
+      .motivation-selector-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      /* 3x2 Grid Layout for 6 Energy Levels */
+      .motivation-options-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 0.75rem;
+        
+        .motivation-option {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.875rem 0.5rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 0.5rem;
+          background: #ffffff;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          min-height: 80px;
+          
+          /* Color-coded background states */
+          &:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+          }
+          
+          &.selected {
+            border-color: #10b981;
+            background: #ecfdf5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+          }
+          
+          .motivation-icon {
+            font-size: 1.5rem;
+            transition: transform 0.2s ease;
+          }
+          
+          .motivation-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            text-align: center;
+            line-height: 1.2;
+          }
+          
+          /* Enhanced visual feedback */
+          &:hover .motivation-icon {
+            transform: scale(1.1);
+          }
+          
+          &.selected .motivation-icon {
+            transform: scale(1.15);
+          }
+          
+          /* Individual energy level color themes */
+          &:nth-child(1) { /* Very Low */
+            &.selected {
+              border-color: #10b981;
+              background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            }
+          }
+          
+          &:nth-child(2) { /* Low */
+            &.selected {
+              border-color: #3b82f6;
+              background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            }
+          }
+          
+          &:nth-child(3) { /* Moderate */
+            &.selected {
+              border-color: #f59e0b;
+              background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            }
+          }
+          
+          &:nth-child(4) { /* High */
+            &.selected {
+              border-color: #f97316;
+              background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+            }
+          }
+          
+          &:nth-child(5) { /* Very High */
+            &.selected {
+              border-color: #ef4444;
+              background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            }
+          }
+          
+          &:nth-child(6) { /* Extreme */
+            &.selected {
+              border-color: #8b5cf6;
+              background: linear-gradient(135deg, #f5f3ff 0%, #e9d5ff 100%);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .motivation-card-structure {
+      gap: 0.75rem;
+      min-height: 200px;
+    }
+    
+    .motivation-card-body .motivation-selector-container .motivation-options-grid {
+      gap: 0.5rem;
+      
+      .motivation-option {
+        padding: 0.75rem 0.25rem;
+        min-height: 70px;
+        
+        .motivation-icon {
+          font-size: 1.25rem;
+        }
+        
+        .motivation-label {
+          font-size: 0.6875rem;
+        }
+      }
+    }
+    
+    .motivation-card-header {
+      .profile-motivation-section .profile-motivation-badges .profile-motivation-badge {
+        font-size: 0.6875rem;
+        padding: 0.1875rem 0.375rem;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .motivation-card-body .motivation-selector-container .motivation-options-grid {
+      /* Stack to 2x3 on very small screens for better touch targets */
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      
+      .motivation-option {
+        min-height: 65px;
+        padding: 0.625rem 0.25rem;
+      }
+    }
+  }
+
+  /* Accessibility Enhancements */
+  @media (prefers-reduced-motion: reduce) {
+    .motivation-option {
+      transition: none;
+      
+      &:hover,
+      &.selected {
+        transform: none;
+      }
+    }
+  }
+
+  /* High Contrast Mode Support */
+  @media (prefers-contrast: high) {
+    .motivation-option {
+      border-width: 3px;
+      
+      &.selected {
+        border-color: #000000;
+        background: #ffffff;
+      }
+      
+      &:hover:not(.selected) {
+        border-color: #000000;
+        background: #f3f4f6;
+      }
+    }
+  }
+
+  /* Focus Management for Keyboard Navigation */
+  .motivation-option {
+    &:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+    
+    &:focus-visible {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+  }
+} 

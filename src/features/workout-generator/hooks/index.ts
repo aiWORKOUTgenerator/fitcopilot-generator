@@ -17,6 +17,8 @@ export { default as useWorkoutForm } from './useWorkoutForm';
 export { useMuscleSelection } from './useMuscleSelection';
 export { useWorkoutFormMuscleIntegration } from './useWorkoutFormMuscleIntegration';
 export { useWorkoutFormMuscleSync } from './useWorkoutFormMuscleSync';
+export { useMuscleFormBridge, useMuscleFormBridgeDebug, createMuscleFormBridge } from './useMuscleFormBridge';
+export type { MuscleFormBridgeReturn } from './useMuscleFormBridge';
 
 // Performance optimization
 export { default as usePerformanceCache } from './usePerformanceCache';

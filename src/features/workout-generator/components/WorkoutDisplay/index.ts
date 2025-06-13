@@ -1,8 +1,31 @@
 /**
- * Workout Display Components
+ * WorkoutDisplay Components
  * 
- * This barrel file exports all components related to displaying workouts
- * and workout previews for easier importing.
+ * Simplified workout display system with single, clean component.
+ * 
+ * @example
+ * ```tsx
+ * import { WorkoutDisplay } from '@/components/WorkoutDisplay';
+ * 
+ * <WorkoutDisplay 
+ *   workout={workout} 
+ *   variant="default" 
+ *   showActions={true} 
+ * />
+ * ```
  */
 
-export * from './WorkoutCard'; 
+// Main Display Component
+export { default as WorkoutDisplay } from './WorkoutDisplay';
+
+// Legacy Components (for backward compatibility only)
+export { default as WorkoutCard } from './WorkoutCard';
+
+// Types
+export type {
+  WorkoutDisplayVariant,
+  BaseDisplayProps,
+} from './types';
+
+// Shared Utilities
+export * from './shared/formatters/workoutFormatters'; 
