@@ -107,19 +107,53 @@ class GenerateEndpoint extends AbstractEndpoint {
             // Extract session inputs from the request
             $session_inputs = $params['sessionInputs'] ?? [];
             
-            // Prepare parameters for workout generation
+            // Prepare parameters for workout generation with fitness-specific context
             $generation_params = [
                 'duration'        => $params['duration'] ?? 30,
-                'difficulty'      => $params['difficulty'] ?? 'intermediate',
+                // REFACTOR: Replace difficulty with fitness_level + intensity + complexity
+                'fitness_level'   => $params['fitness_level'] ?? $params['difficulty'] ?? 'intermediate', // Backward compatibility
+                'intensity_level' => $params['intensity_level'] ?? $params['intensity'] ?? 3,
+                'exercise_complexity' => $params['exercise_complexity'] ?? self::derive_exercise_complexity($params['fitness_level'] ?? $params['difficulty'] ?? 'intermediate'),
                 'equipment'       => $params['equipment'] ?? [],
                 'goals'           => $params['goals'] ?? 'general fitness',
                 'daily_focus'     => $params['daily_focus'] ?? $params['goals'] ?? 'general fitness',
                 'profile_goals'   => $params['profile_goals'] ?? [],
                 'restrictions'    => $params['restrictions'] ?? '',
-                'intensity'       => $params['intensity'] ?? 3,
                 'specific_request' => $params['specific_request'],
+                
+                // SPRINT 1: NEW WorkoutGeneratorGrid parameters following fitness model
+                'stress_level'    => $params['stress_level'] ?? ($session_inputs['stressLevel'] ?? null),
+                'energy_level'    => $params['energy_level'] ?? ($session_inputs['energyLevel'] ?? null),
+                'sleep_quality'   => $params['sleep_quality'] ?? ($session_inputs['sleepQuality'] ?? null),
+                'location'        => $params['location'] ?? ($session_inputs['location'] ?? 'any'),
+                'custom_notes'    => $params['custom_notes'] ?? ($session_inputs['customNotes'] ?? ''),
+                'primary_muscle_focus' => $params['primary_muscle_focus'] ?? ($session_inputs['primaryMuscleGroup'] ?? null),
+                
                 // Add session inputs to generation parameters
                 'session_inputs'  => $session_inputs,
+                
+                // SPRINT 1: NEW Structured session context (all daily selections)
+                'session_context' => [
+                    'daily_state' => [
+                        'stress' => $params['stress_level'] ?? ($session_inputs['stressLevel'] ?? null),
+                        'energy' => $params['energy_level'] ?? ($session_inputs['energyLevel'] ?? null),
+                        'sleep' => $params['sleep_quality'] ?? ($session_inputs['sleepQuality'] ?? null)
+                    ],
+                    'environment' => [
+                        'location' => $params['location'] ?? ($session_inputs['location'] ?? 'any'),
+                        'equipment' => $params['equipment'] ?? []
+                    ],
+                    'focus' => [
+                        'primary_goal' => $params['goals'] ?? 'general fitness',
+                        'muscle_groups' => $session_inputs['selectedMuscleGroups'] ?? [],
+                        'restrictions' => $params['restrictions'] ?? ''
+                    ],
+                    'customization' => [
+                        'notes' => $params['custom_notes'] ?? ($session_inputs['customNotes'] ?? ''),
+                        'intensity_preference' => $params['intensity_level'] ?? 3
+                    ]
+                ],
+                
                 // Include muscle targeting data for OpenAI provider
                 'muscleTargeting' => $params['muscleTargeting'] ?? null,
                 'focusArea'       => $params['focusArea'] ?? ($session_inputs['focusArea'] ?? []),
@@ -127,6 +161,8 @@ class GenerateEndpoint extends AbstractEndpoint {
                 'specificMuscles' => $params['specificMuscles'] ?? ($session_inputs['specificMuscles'] ?? []),
                 'primaryFocus'    => $params['primaryFocus'] ?? ($session_inputs['primaryMuscleGroup'] ?? null),
                 'muscleSelectionSummary' => $params['selectionSummary'] ?? ($session_inputs['muscleSelectionSummary'] ?? ''),
+                // BACKWARD COMPATIBILITY: Keep difficulty for transition period
+                'difficulty'      => $params['fitness_level'] ?? $params['difficulty'] ?? 'intermediate',
             ];
             
             // Debug log muscle targeting data
@@ -152,17 +188,32 @@ class GenerateEndpoint extends AbstractEndpoint {
             // Get version metadata for the newly created workout
             $metadata = VersioningUtils::get_version_metadata($post_id);
             
-            // CRITICAL FIX: Return standardized workout data instead of raw OpenAI response
+            // CRITICAL FIX: Return standardized workout data with new fitness-specific fields
             // Get the standardized workout that includes the user's duration from params
             $standardized_workout = [
                 'title' => $workout['title'] ?? __('Generated Workout', 'fitcopilot'),
                 'exercises' => $workout['exercises'] ?? [],
                 'sections' => $workout['sections'] ?? [],
                 'duration' => $workout['duration'] ?? $generation_params['duration'], // ✅ User's duration preserved
+                // PHASE 1: New fitness-specific response fields
+                'fitness_level' => $workout['fitness_level'] ?? $generation_params['fitness_level'],
+                'intensity_level' => $workout['intensity_level'] ?? $generation_params['intensity_level'],
+                'exercise_complexity' => $workout['exercise_complexity'] ?? $generation_params['exercise_complexity'],
+                // BACKWARD COMPATIBILITY: Keep difficulty field during transition
                 'difficulty' => $workout['difficulty'] ?? $generation_params['difficulty'],
                 'equipment' => $workout['equipment'] ?? $generation_params['equipment'],
                 'goals' => $workout['goals'] ?? $generation_params['goals'],
                 'restrictions' => $workout['restrictions'] ?? $generation_params['restrictions'],
+                
+                // SPRINT 1: NEW WorkoutGeneratorGrid response fields following fitness model
+                'stress_level' => $workout['stress_level'] ?? $generation_params['stress_level'],
+                'energy_level' => $workout['energy_level'] ?? $generation_params['energy_level'],
+                'sleep_quality' => $workout['sleep_quality'] ?? $generation_params['sleep_quality'],
+                'location' => $workout['location'] ?? $generation_params['location'],
+                'custom_notes' => $workout['custom_notes'] ?? $generation_params['custom_notes'],
+                'primary_muscle_focus' => $workout['primary_muscle_focus'] ?? $generation_params['primary_muscle_focus'],
+                'session_context' => $generation_params['session_context'],
+                
                 // Include session inputs in the response
                 'sessionInputs' => $session_inputs,
             ];
@@ -198,6 +249,22 @@ class GenerateEndpoint extends AbstractEndpoint {
                 500
             );
         }
+    }
+    
+    /**
+     * Derive exercise complexity from fitness level
+     *
+     * @param string $fitness_level User's fitness level (beginner, intermediate, advanced)
+     * @return string Exercise complexity level (basic, moderate, advanced)
+     */
+    private static function derive_exercise_complexity($fitness_level) {
+        $complexity_mapping = [
+            'beginner'     => 'basic',
+            'intermediate' => 'moderate', 
+            'advanced'     => 'advanced'
+        ];
+        
+        return $complexity_mapping[$fitness_level] ?? 'moderate';
     }
     
     /**
@@ -251,30 +318,77 @@ class GenerateEndpoint extends AbstractEndpoint {
             error_log('FitCopilot: Extracted ' . count($exercises) . ' exercises from sections');
         }
         
-        // Standardize workout data format for consistency
+        // Standardize workout data format for consistency with new fitness-specific fields
         $standardized_workout = [
             'title' => $workout['title'] ?? __('Generated Workout', 'fitcopilot'),
             'exercises' => $exercises,  // Now properly populated from sections
             'sections' => $workout['sections'] ?? [],
             'duration' => $workout['duration'] ?? $params['duration'],
+            // PHASE 1: New fitness-specific data fields
+            'fitness_level' => $workout['fitness_level'] ?? $params['fitness_level'],
+            'intensity_level' => $workout['intensity_level'] ?? $params['intensity_level'],
+            'exercise_complexity' => $workout['exercise_complexity'] ?? $params['exercise_complexity'],
+            // BACKWARD COMPATIBILITY: Keep difficulty field during transition
             'difficulty' => $workout['difficulty'] ?? $params['difficulty'],
             'equipment' => $workout['equipment'] ?? $params['equipment'],
             'goals' => $workout['goals'] ?? $params['goals'],
             'restrictions' => $workout['restrictions'] ?? $params['restrictions'],
+            
+            // SPRINT 1: NEW WorkoutGeneratorGrid data fields following fitness model
+            'stress_level' => $workout['stress_level'] ?? $params['stress_level'],
+            'energy_level' => $workout['energy_level'] ?? $params['energy_level'],
+            'sleep_quality' => $workout['sleep_quality'] ?? $params['sleep_quality'],
+            'location' => $workout['location'] ?? $params['location'],
+            'custom_notes' => $workout['custom_notes'] ?? $params['custom_notes'],
+            'primary_muscle_focus' => $workout['primary_muscle_focus'] ?? $params['primary_muscle_focus'],
+            'session_context' => $params['session_context'],
+            
             'metadata' => [
                 'ai_generated' => true,
                 'created_at' => $now,
                 'generation_params' => $params,
                 'openai_model' => $workout['model'] ?? 'unknown',
-                'format_version' => '1.0',
-                'exercises_extracted_from_sections' => !empty($workout['sections']) && empty($workout['exercises'])
+                'format_version' => '1.2', // Updated version for WorkoutGeneratorGrid fields
+                'exercises_extracted_from_sections' => !empty($workout['sections']) && empty($workout['exercises']),
+                'fitness_refactor_phase' => 1, // Track refactoring progress
+                'workoutgrid_integration_phase' => 1 // Track WorkoutGeneratorGrid integration progress
             ]
         ];
         
         // Save standardized workout data
         update_post_meta($post_id, '_workout_data', wp_json_encode($standardized_workout));
         
-        // Save generation parameters as separate meta for backward compatibility
+        // Save generation parameters as separate meta for backward compatibility and new fitness-specific fields
+        // PHASE 1: New fitness-specific meta fields
+        update_post_meta($post_id, '_workout_fitness_level', $params['fitness_level'] ?? $params['difficulty']);
+        update_post_meta($post_id, '_workout_intensity_level', $params['intensity_level'] ?? 3);
+        update_post_meta($post_id, '_workout_exercise_complexity', $params['exercise_complexity'] ?? 'moderate');
+        
+        // SPRINT 1: NEW WorkoutGeneratorGrid meta fields following fitness model
+        if (!empty($params['stress_level'])) {
+            update_post_meta($post_id, '_workout_stress_level', sanitize_text_field($params['stress_level']));
+        }
+        if (!empty($params['energy_level'])) {
+            update_post_meta($post_id, '_workout_energy_level', sanitize_text_field($params['energy_level']));
+        }
+        if (!empty($params['sleep_quality'])) {
+            update_post_meta($post_id, '_workout_sleep_quality', sanitize_text_field($params['sleep_quality']));
+        }
+        if (!empty($params['location']) && $params['location'] !== 'any') {
+            update_post_meta($post_id, '_workout_location', sanitize_text_field($params['location']));
+        }
+        if (!empty($params['custom_notes'])) {
+            update_post_meta($post_id, '_workout_custom_notes', sanitize_textarea_field($params['custom_notes']));
+        }
+        if (!empty($params['primary_muscle_focus'])) {
+            update_post_meta($post_id, '_workout_primary_focus', sanitize_text_field($params['primary_muscle_focus']));
+        }
+        // Save complete session context as JSON
+        if (!empty($params['session_context'])) {
+            update_post_meta($post_id, '_workout_session_context', wp_json_encode($params['session_context']));
+        }
+        
+        // BACKWARD COMPATIBILITY: Keep existing meta fields during transition
         update_post_meta($post_id, '_workout_difficulty', $params['difficulty']);
         update_post_meta($post_id, '_workout_duration', $params['duration']);
         update_post_meta($post_id, '_workout_equipment', $params['equipment']);

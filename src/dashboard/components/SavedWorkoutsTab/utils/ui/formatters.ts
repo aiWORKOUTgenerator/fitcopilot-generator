@@ -266,6 +266,96 @@ export class WorkoutFormatters {
            (hasHalfStar ? '☆' : '') + 
            '☆'.repeat(emptyStars);
   }
+
+  // PHASE 5: New fitness-specific formatting functions
+  
+  /**
+   * Get fitness level icon
+   * 
+   * @param fitnessLevel - Fitness level
+   * @returns Icon emoji for fitness level
+   */
+  static getFitnessLevelIcon(fitnessLevel: string): string {
+    const icons = {
+      beginner: '🟢',
+      intermediate: '🟡', 
+      advanced: '🔴'
+    };
+    return icons[fitnessLevel as keyof typeof icons] || '🟡';
+  }
+
+  /**
+   * Get intensity level icon
+   * 
+   * @param intensityLevel - Intensity level (1-5)
+   * @returns Icon emoji for intensity level
+   */
+  static getIntensityLevelIcon(intensityLevel: number): string {
+    const icons = {
+      1: '💤',
+      2: '🚶',
+      3: '💪',
+      4: '🔥',
+      5: '⚡'
+    };
+    return icons[intensityLevel as keyof typeof icons] || '💪';
+  }
+
+  /**
+   * Get exercise complexity icon
+   * 
+   * @param complexity - Exercise complexity
+   * @returns Icon emoji for exercise complexity
+   */
+  static getExerciseComplexityIcon(complexity: string): string {
+    const icons = {
+      basic: '⚙️',
+      moderate: '🔧',
+      advanced: '🛠️'
+    };
+    return icons[complexity as keyof typeof icons] || '🔧';
+  }
+
+  /**
+   * Format fitness level for display
+   * 
+   * @param fitnessLevel - Fitness level
+   * @returns Formatted fitness level string
+   */
+  static formatFitnessLevel(fitnessLevel: string): string {
+    if (typeof fitnessLevel !== 'string') return 'Intermediate';
+    
+    return fitnessLevel.charAt(0).toUpperCase() + fitnessLevel.slice(1);
+  }
+
+  /**
+   * Format intensity level for display
+   * 
+   * @param intensityLevel - Intensity level (1-5)
+   * @returns Formatted intensity level string
+   */
+  static formatIntensityLevel(intensityLevel: number): string {
+    const labels = {
+      1: 'Very Light',
+      2: 'Light',
+      3: 'Moderate',
+      4: 'High',
+      5: 'Maximum'
+    };
+    return labels[intensityLevel as keyof typeof labels] || 'Moderate';
+  }
+
+  /**
+   * Format exercise complexity for display
+   * 
+   * @param complexity - Exercise complexity
+   * @returns Formatted exercise complexity string
+   */
+  static formatExerciseComplexity(complexity: string): string {
+    if (typeof complexity !== 'string') return 'Moderate';
+    
+    return complexity.charAt(0).toUpperCase() + complexity.slice(1);
+  }
 }
 
 // Also export as default for flexible importing

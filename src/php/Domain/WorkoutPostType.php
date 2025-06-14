@@ -165,7 +165,15 @@ function add_workout_meta_boxes() {
  * Display workout details meta box
  */
 function workout_details_meta_box($post) {
+    // PHASE 4: Get new fitness-specific meta fields
+    $fitness_level = get_post_meta($post->ID, '_workout_fitness_level', true);
+    $intensity_level = get_post_meta($post->ID, '_workout_intensity_level', true);
+    $exercise_complexity = get_post_meta($post->ID, '_workout_exercise_complexity', true);
+    
+    // BACKWARD COMPATIBILITY: Get legacy difficulty field
     $difficulty = get_post_meta($post->ID, '_workout_difficulty', true);
+    
+    // Other existing fields
     $duration = get_post_meta($post->ID, '_workout_duration', true);
     $equipment = get_post_meta($post->ID, '_workout_equipment', true);
     $goals = get_post_meta($post->ID, '_workout_goals', true);
@@ -176,10 +184,37 @@ function workout_details_meta_box($post) {
     echo '<table class="form-table">';
     echo '<tbody>';
     
+    // PHASE 4: Display new fitness-specific fields
     echo '<tr>';
-    echo '<th scope="row"><label>' . __('Difficulty', 'fitcopilot-generator') . '</label></th>';
-    echo '<td><strong>' . esc_html($difficulty ?: 'Not set') . '</strong></td>';
+    echo '<th scope="row"><label>' . __('Fitness Level', 'fitcopilot-generator') . '</label></th>';
+    echo '<td><strong>' . esc_html($fitness_level ?: ($difficulty ?: 'Not set')) . '</strong>';
+    if ($fitness_level && $difficulty && $fitness_level !== $difficulty) {
+        echo ' <em>(migrated from: ' . esc_html($difficulty) . ')</em>';
+    }
+    echo '</td>';
     echo '</tr>';
+    
+    echo '<tr>';
+    echo '<th scope="row"><label>' . __('Intensity Level', 'fitcopilot-generator') . '</label></th>';
+    echo '<td><strong>' . esc_html($intensity_level ?: 'Not set') . '</strong>';
+    if ($intensity_level) {
+        echo ' <span style="color: #666;">(' . esc_html($intensity_level) . '/5)</span>';
+    }
+    echo '</td>';
+    echo '</tr>';
+    
+    echo '<tr>';
+    echo '<th scope="row"><label>' . __('Exercise Complexity', 'fitcopilot-generator') . '</label></th>';
+    echo '<td><strong>' . esc_html($exercise_complexity ?: 'Not set') . '</strong></td>';
+    echo '</tr>';
+    
+    // BACKWARD COMPATIBILITY: Show legacy difficulty if different from fitness level
+    if ($difficulty && (!$fitness_level || $difficulty !== $fitness_level)) {
+        echo '<tr style="opacity: 0.7;">';
+        echo '<th scope="row"><label>' . __('Legacy Difficulty', 'fitcopilot-generator') . '</label></th>';
+        echo '<td><strong>' . esc_html($difficulty) . '</strong> <em>(deprecated)</em></td>';
+        echo '</tr>';
+    }
     
     echo '<tr>';
     echo '<th scope="row"><label>' . __('Duration', 'fitcopilot-generator') . '</label></th>';
@@ -392,7 +427,14 @@ function workout_debug_meta_box($post) {
     echo '</ul>';
     
     // Metadata info
-    $metadata_fields = ['_workout_difficulty', '_workout_duration', '_workout_equipment', '_workout_goals'];
+    $metadata_fields = [
+        '_workout_fitness_level', 
+        '_workout_intensity_level', 
+        '_workout_exercise_complexity',
+        '_workout_duration', 
+        '_workout_equipment', 
+        '_workout_goals'
+    ];
     $metadata_count = 0;
     foreach ($metadata_fields as $field) {
         if (!empty(get_post_meta($post->ID, $field, true))) {
@@ -416,7 +458,9 @@ function add_workout_admin_columns($columns) {
         $new_columns[$key] = $value;
         
         if ($key === 'title') {
-            $new_columns['difficulty'] = __('Difficulty', 'fitcopilot-generator');
+            // PHASE 4: Replace difficulty with fitness_level
+            $new_columns['fitness_level'] = __('Fitness Level', 'fitcopilot-generator');
+            $new_columns['intensity_level'] = __('Intensity', 'fitcopilot-generator');
             $new_columns['duration'] = __('Duration', 'fitcopilot-generator');
             $new_columns['exercises'] = __('Exercises', 'fitcopilot-generator');
             $new_columns['data_status'] = __('Data Status', 'fitcopilot-generator');
@@ -431,18 +475,27 @@ function add_workout_admin_columns($columns) {
  */
 function workout_admin_column_content($column, $post_id) {
     switch ($column) {
-        case 'difficulty':
-            $difficulty = get_post_meta($post_id, '_workout_difficulty', true);
-            if ($difficulty) {
+        case 'fitness_level':
+            $fitness_level = get_post_meta($post_id, '_workout_fitness_level', true);
+            if ($fitness_level) {
                 $difficulty_colors = [
                     'beginner' => '#28a745',
                     'intermediate' => '#ffc107', 
                     'advanced' => '#dc3545'
                 ];
-                $color = $difficulty_colors[$difficulty] ?? '#6c757d';
+                $color = $difficulty_colors[$fitness_level] ?? '#6c757d';
                 echo '<span style="background: ' . $color . '; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;">';
-                echo esc_html(ucfirst($difficulty));
+                echo esc_html(ucfirst($fitness_level));
                 echo '</span>';
+            } else {
+                echo '<span style="color: #999;">Not set</span>';
+            }
+            break;
+            
+        case 'intensity_level':
+            $intensity_level = get_post_meta($post_id, '_workout_intensity_level', true);
+            if ($intensity_level) {
+                echo '<strong>' . esc_html($intensity_level) . '</strong>';
             } else {
                 echo '<span style="color: #999;">Not set</span>';
             }

@@ -4,9 +4,9 @@
  * Main state management hook for the workout generator grid
  */
 import { useCallback } from 'react';
-import { useWorkoutForm } from '../../hooks/useWorkoutForm';
-import { useProfile } from '../../../profile/context';
-import { mapProfileToWorkoutContext, isProfileSufficientForWorkout } from '../../utils/profileMapping';
+import { useWorkoutForm } from '../../../hooks/useWorkoutForm';
+import { useProfile } from '../../../../profile/context';
+import { mapProfileToWorkoutContext, isProfileSufficientForWorkout } from '../../../utils/profileMapping';
 
 export const useWorkoutGeneratorGrid = () => {
   const { formValues } = useWorkoutForm();
@@ -22,14 +22,13 @@ export const useWorkoutGeneratorGrid = () => {
     const sessionInputs = formValues.sessionInputs;
     if (!sessionInputs) return false;
 
-    const requiredFields = [
-      'todaysFocus',
-      'dailyIntensityLevel',
-      'timeConstraintsToday',
-      'locationToday'
-    ];
-
-    return requiredFields.every(field => sessionInputs[field] !== undefined && sessionInputs[field] !== null);
+    // Check required fields using type-safe property access
+    return (
+      sessionInputs.todaysFocus !== undefined && sessionInputs.todaysFocus !== null &&
+      sessionInputs.dailyIntensityLevel !== undefined && sessionInputs.dailyIntensityLevel !== null &&
+      sessionInputs.timeConstraintsToday !== undefined && sessionInputs.timeConstraintsToday !== null &&
+      sessionInputs.locationToday !== undefined && sessionInputs.locationToday !== null
+    );
   }, [formValues.sessionInputs]);
 
   // Get completion status for UI feedback
@@ -37,24 +36,20 @@ export const useWorkoutGeneratorGrid = () => {
     const sessionInputs = formValues.sessionInputs;
     if (!sessionInputs) return { completed: 0, total: 8 };
 
-    const fields = [
-      'todaysFocus',
-      'dailyIntensityLevel', 
-      'timeConstraintsToday',
-      'targetMuscles',
-      'equipmentAvailableToday',
-      'healthRestrictionsToday',
-      'locationToday',
-      'energyLevel'
-    ];
+    let completed = 0;
+    const total = 8;
 
-    const completed = fields.filter(field => {
-      const value = sessionInputs[field];
-      if (Array.isArray(value)) return value.length > 0;
-      return value !== undefined && value !== null;
-    }).length;
+    // Check each field using type-safe property access based on SessionSpecificInputs interface
+    if (sessionInputs.todaysFocus !== undefined && sessionInputs.todaysFocus !== null) completed++;
+    if (sessionInputs.dailyIntensityLevel !== undefined && sessionInputs.dailyIntensityLevel !== null) completed++;
+    if (sessionInputs.timeConstraintsToday !== undefined && sessionInputs.timeConstraintsToday !== null) completed++;
+    if (sessionInputs.focusArea && Array.isArray(sessionInputs.focusArea) && sessionInputs.focusArea.length > 0) completed++;
+    if (sessionInputs.equipmentAvailableToday && Array.isArray(sessionInputs.equipmentAvailableToday) && sessionInputs.equipmentAvailableToday.length > 0) completed++;
+    if (sessionInputs.healthRestrictionsToday && Array.isArray(sessionInputs.healthRestrictionsToday) && sessionInputs.healthRestrictionsToday.length > 0) completed++;
+    if (sessionInputs.locationToday !== undefined && sessionInputs.locationToday !== null) completed++;
+    if (sessionInputs.energyLevel !== undefined && sessionInputs.energyLevel !== null) completed++;
 
-    return { completed, total: fields.length };
+    return { completed, total };
   }, [formValues.sessionInputs]);
 
   return {

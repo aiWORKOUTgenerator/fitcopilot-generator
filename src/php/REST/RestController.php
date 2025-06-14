@@ -186,6 +186,11 @@ function get_workouts(\WP_REST_Request $request) {
                 'date' => get_the_date('c'),
                 'excerpt' => get_the_excerpt(),
                 'duration' => (int) get_post_meta($post_id, 'workout_duration', true),
+                'fitness_level' => get_post_meta($post_id, '_workout_fitness_level', true) ?: 
+                                  (get_post_meta($post_id, '_workout_difficulty', true) ?: 
+                                   get_post_meta($post_id, 'workout_difficulty', true)),
+                'intensity_level' => get_post_meta($post_id, '_workout_intensity_level', true) ?: 3,
+                'exercise_complexity' => get_post_meta($post_id, '_workout_exercise_complexity', true) ?: 'moderate',
                 'difficulty' => get_post_meta($post_id, 'workout_difficulty', true),
             ];
         }
@@ -227,6 +232,11 @@ function get_workout(\WP_REST_Request $request) {
         'content' => $post->post_content,
         'date' => get_the_date('c', $post),
         'duration' => (int) get_post_meta($post_id, 'workout_duration', true),
+        'fitness_level' => get_post_meta($post_id, '_workout_fitness_level', true) ?: 
+                          (get_post_meta($post_id, '_workout_difficulty', true) ?: 
+                           get_post_meta($post_id, 'workout_difficulty', true)),
+        'intensity_level' => get_post_meta($post_id, '_workout_intensity_level', true) ?: 3,
+        'exercise_complexity' => get_post_meta($post_id, '_workout_exercise_complexity', true) ?: 'moderate',
         'difficulty' => get_post_meta($post_id, 'workout_difficulty', true),
     ];
     
@@ -381,6 +391,18 @@ function create_workout(\WP_REST_Request $request) {
         }
         
         // Save workout metadata
+        // PHASE 4: Save new fitness-specific meta fields
+        if (isset($workout_data['fitness_level'])) {
+            update_post_meta($post_id, '_workout_fitness_level', sanitize_text_field($workout_data['fitness_level']));
+        }
+        if (isset($workout_data['intensity_level'])) {
+            update_post_meta($post_id, '_workout_intensity_level', intval($workout_data['intensity_level']));
+        }
+        if (isset($workout_data['exercise_complexity'])) {
+            update_post_meta($post_id, '_workout_exercise_complexity', sanitize_text_field($workout_data['exercise_complexity']));
+        }
+        
+        // BACKWARD COMPATIBILITY: Keep difficulty field during transition
         if (isset($workout_data['difficulty'])) {
             update_post_meta($post_id, '_workout_difficulty', sanitize_text_field($workout_data['difficulty']));
             update_post_meta($post_id, 'workout_difficulty', sanitize_text_field($workout_data['difficulty'])); // Legacy support
@@ -415,6 +437,11 @@ function create_workout(\WP_REST_Request $request) {
         $response_data = [
             'id' => $post_id,
             'title' => $workout_data['title'],
+            // PHASE 4: New fitness-specific fields in response
+            'fitness_level' => $workout_data['fitness_level'] ?? ($workout_data['difficulty'] ?? 'intermediate'),
+            'intensity_level' => $workout_data['intensity_level'] ?? 3,
+            'exercise_complexity' => $workout_data['exercise_complexity'] ?? 'moderate',
+            // BACKWARD COMPATIBILITY: Keep difficulty field during transition
             'difficulty' => $workout_data['difficulty'] ?? 'intermediate',
             'duration' => $workout_data['duration'] ?? 30,
             'equipment' => $workout_data['equipment'] ?? [],

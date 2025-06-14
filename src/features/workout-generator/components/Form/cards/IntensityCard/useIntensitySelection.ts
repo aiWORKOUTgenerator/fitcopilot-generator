@@ -45,9 +45,15 @@ const INTENSITY_OPTIONS: IntensityOption[] = [
   },
   {
     value: 5,
-    label: 'Maximum',
+    label: 'Very Hard',
+    icon: '💥',
+    tooltip: 'Very Hard - Intense, demanding effort'
+  },
+  {
+    value: 6,
+    label: 'Extreme',
     icon: '⚡',
-    tooltip: 'Maximum - All-out effort'
+    tooltip: 'Extreme - Maximum all-out effort'
   }
 ];
 
@@ -57,7 +63,7 @@ export const useIntensitySelection = () => {
   const { profile, loading: profileLoading, error: profileError } = profileState;
   
   // Get current intensity from form values
-  const selectedIntensity = formValues.sessionInputs?.dailyIntensityLevel || formValues.intensity || 3;
+  const selectedIntensity = formValues.sessionInputs?.dailyIntensityLevel || formValues.intensity_level || 0;
   
   // Map profile data for display
   const profileMapping = useMemo(() => {
@@ -70,34 +76,34 @@ export const useIntensitySelection = () => {
 
   const hasProfileData = !profileLoading && !profileError && isProfileSufficient && profileMapping;
 
-  // Get profile intensity data if available
+  // Get profile intensity suggestion if available
   const profileIntensity: ProfileIntensity | null = useMemo(() => {
     if (!profileMapping?.displayData?.fitnessLevel) return null;
     
-    // Map fitness level to typical intensity preference
+    // Map fitness level to suggested intensity
     const fitnessLevel = profileMapping.displayData.fitnessLevel.value;
-    let intensityValue = 3; // Default moderate
+    let suggestedIntensity = 3; // Default moderate
     
     switch (fitnessLevel) {
       case 'beginner':
-        intensityValue = 2; // Easy
+        suggestedIntensity = 2; // Easy
         break;
       case 'intermediate':
-        intensityValue = 3; // Moderate
+        suggestedIntensity = 3; // Moderate
         break;
       case 'advanced':
-        intensityValue = 4; // Hard
+        suggestedIntensity = 4; // Hard
         break;
     }
     
-    const option = INTENSITY_OPTIONS.find(opt => opt.value === intensityValue);
+    const option = INTENSITY_OPTIONS.find(opt => opt.value === suggestedIntensity) || INTENSITY_OPTIONS[2];
     
     return {
-      value: intensityValue,
-      display: `${option?.label} (${intensityValue}/5)`,
-      icon: option?.icon || '💪',
+      value: suggestedIntensity,
+      display: `${option.label} (${suggestedIntensity}/6)`,
+      icon: option.icon,
       color: '#fff',
-      bgColor: intensityValue <= 2 ? '#4ade80' : intensityValue === 3 ? '#f59e0b' : '#ef4444'
+      bgColor: suggestedIntensity <= 2 ? '#22c55e' : suggestedIntensity <= 4 ? '#f59e0b' : '#ef4444'
     };
   }, [profileMapping]);
 

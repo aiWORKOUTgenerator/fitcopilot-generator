@@ -25,7 +25,10 @@ export const WorkoutFocusCard: React.FC<WorkoutFocusCardProps> = ({
     selectedFocus,
     profileGoals,
     hasProfileData,
-    handleFocusSelection
+    handleFocusSelection,
+    isLoadingLastSelection,
+    hasPreviousSelection,
+    lastSelectionTimestamp
   } = useFocusSelection();
 
   const profileSection = (
@@ -51,20 +54,41 @@ export const WorkoutFocusCard: React.FC<WorkoutFocusCardProps> = ({
       profileSection={hasProfileData ? profileSection : undefined}
     >
       <div className="focus-selector-container">
-        <div className="focus-selector-label">Today's Focus:</div>
-        <div className="focus-options-grid">
-          {focusOptions.map((option) => (
-            <div
-              key={option.value}
-              className={`focus-option ${selectedFocus === option.value ? 'selected' : ''}`}
-              onClick={() => handleFocusSelection(option.value)}
-              title={option.tooltip}
-            >
-              <span className="focus-icon">{option.icon}</span>
-              <span className="focus-label">{option.label}</span>
+        <div className="focus-selector-header">
+          <div className="focus-selector-label">Today's Focus:</div>
+          {hasPreviousSelection && lastSelectionTimestamp && (
+            <div className="last-selection-indicator">
+              <span className="last-selection-icon">🕒</span>
+              <span className="last-selection-text">
+                Last: {new Date(lastSelectionTimestamp).toLocaleDateString()}
+              </span>
             </div>
-          ))}
+          )}
         </div>
+        
+        {isLoadingLastSelection ? (
+          <div className="focus-loading-state">
+            <div className="loading-spinner"></div>
+            <span>Loading your last selection...</span>
+          </div>
+        ) : (
+          <div className="focus-options-grid">
+            {focusOptions.map((option) => (
+              <div
+                key={option.value}
+                className={`focus-option ${selectedFocus === option.value ? 'selected' : ''}`}
+                onClick={() => handleFocusSelection(option.value)}
+                title={option.tooltip}
+              >
+                <span className="focus-icon">{option.icon}</span>
+                <span className="focus-label">{option.label}</span>
+                {selectedFocus === option.value && hasPreviousSelection && (
+                  <span className="selection-badge">Cached</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </FormFieldCard>
   );

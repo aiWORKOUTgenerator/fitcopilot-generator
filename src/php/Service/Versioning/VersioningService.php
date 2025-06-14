@@ -23,6 +23,11 @@ class VersioningService {
      * @var array
      */
     private $relevant_meta_keys = [
+        // PHASE 4: New fitness-specific meta fields
+        '_workout_fitness_level',
+        '_workout_intensity_level',
+        '_workout_exercise_complexity',
+        // BACKWARD COMPATIBILITY: Keep difficulty field during transition
         '_workout_difficulty',
         '_workout_duration',
         '_workout_equipment',

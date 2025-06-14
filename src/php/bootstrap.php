@@ -43,6 +43,7 @@ require_once FITCOPILOT_DIR . 'src/php/Service/Versioning/VersioningService.php'
 
 // Register Analytics components
 require_once FITCOPILOT_DIR . 'src/php/Analytics/EventTracking.php';
+require_once FITCOPILOT_DIR . 'src/php/Analytics/WorkoutFocusTracking.php';
 
 // Register Admin components
 require_once FITCOPILOT_DIR . 'src/php/Admin/Settings.php';

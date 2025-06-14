@@ -13,6 +13,11 @@ interface EnhancedWorkoutData {
   title: string;
   description: string;
   duration: number;
+  // PHASE 5: New fitness-specific fields
+  fitness_level?: 'beginner' | 'intermediate' | 'advanced';
+  intensity_level?: number;
+  exercise_complexity?: 'basic' | 'moderate' | 'advanced';
+  // BACKWARD COMPATIBILITY: Keep difficulty field during transition
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   exercises: any[];
   equipment: string[];
@@ -38,28 +43,48 @@ interface VersionAwareCardMetaProps {
   showDebugInfo?: boolean;
 }
 
-const DIFFICULTY_CONFIG = {
+// PHASE 5: Enhanced fitness-specific configuration
+const FITNESS_LEVEL_CONFIG = {
   beginner: { 
     icon: '🟢', 
     color: 'green', 
     label: 'Beginner',
     bgColor: 'rgba(16, 185, 129, 0.1)',
-    textColor: '#10b981'
+    textColor: '#10b981',
+    description: 'New to fitness'
   },
   intermediate: { 
     icon: '🟡', 
     color: 'yellow', 
     label: 'Intermediate',
     bgColor: 'rgba(245, 158, 11, 0.1)',
-    textColor: '#f59e0b'
+    textColor: '#f59e0b',
+    description: '6+ months experience'
   },
   advanced: { 
     icon: '🔴', 
     color: 'red', 
     label: 'Advanced',
     bgColor: 'rgba(239, 68, 68, 0.1)',
-    textColor: '#ef4444'
+    textColor: '#ef4444',
+    description: '2+ years experience'
   }
+};
+
+// PHASE 5: Intensity level configuration
+const INTENSITY_CONFIG = {
+  1: { icon: '💤', label: 'Very Light', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.1)' },
+  2: { icon: '🚶', label: 'Light', color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)' },
+  3: { icon: '💪', label: 'Moderate', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)' },
+  4: { icon: '🔥', label: 'High', color: '#f97316', bgColor: 'rgba(249, 115, 22, 0.1)' },
+  5: { icon: '⚡', label: 'Maximum', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.1)' }
+};
+
+// PHASE 5: Exercise complexity configuration
+const COMPLEXITY_CONFIG = {
+  basic: { icon: '⚙️', label: 'Basic', color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)' },
+  moderate: { icon: '🔧', label: 'Moderate', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.1)' },
+  advanced: { icon: '🛠️', label: 'Advanced', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.1)' }
 };
 
 /**
@@ -72,8 +97,17 @@ export const VersionAwareCardMeta: React.FC<VersionAwareCardMetaProps> = ({
   showVersionInfo = true,
   showDebugInfo = false
 }) => {
-  const difficultyConfig = DIFFICULTY_CONFIG[workout.difficulty];
+  const difficultyConfig = FITNESS_LEVEL_CONFIG[workout.difficulty];
   const exerciseCount = Array.isArray(workout.exercises) ? workout.exercises.length : 0;
+  
+  // PHASE 5: Get fitness-specific configurations with fallback logic
+  const fitnessLevel = workout.fitness_level || workout.difficulty || 'intermediate';
+  const intensityLevel = workout.intensity_level || 3;
+  const exerciseComplexity = workout.exercise_complexity || 'moderate';
+  
+  const fitnessLevelConfig = FITNESS_LEVEL_CONFIG[fitnessLevel];
+  const intensityConfig = INTENSITY_CONFIG[intensityLevel as keyof typeof INTENSITY_CONFIG];
+  const complexityConfig = COMPLEXITY_CONFIG[exerciseComplexity];
   
   // Get version freshness indicator
   const freshnessIndicator = VersionAwareWorkoutService.getWorkoutFreshnessIndicator(workout);
@@ -98,17 +132,45 @@ export const VersionAwareCardMeta: React.FC<VersionAwareCardMetaProps> = ({
 
   return (
     <div className="version-aware-workout-meta">
-      {/* Primary Meta Badges */}
+      {/* PHASE 5: Enhanced Primary Meta Badges with Fitness-Specific Parameters */}
       <div className="meta-badges">
+        {/* Fitness Level Badge */}
         <span 
-          className="difficulty-badge"
+          className="fitness-level-badge"
           style={{ 
-            backgroundColor: difficultyConfig.bgColor,
-            color: difficultyConfig.textColor 
+            backgroundColor: fitnessLevelConfig.bgColor,
+            color: fitnessLevelConfig.textColor 
           }}
+          title={`Fitness Level: ${fitnessLevelConfig.label} - ${fitnessLevelConfig.description}`}
         >
-          <span className="difficulty-icon">{difficultyConfig.icon}</span>
-          {difficultyConfig.label}
+          <span className="fitness-level-icon">{fitnessLevelConfig.icon}</span>
+          {fitnessLevelConfig.label}
+        </span>
+        
+        {/* Intensity Level Badge */}
+        <span 
+          className="intensity-level-badge"
+          style={{ 
+            backgroundColor: intensityConfig.bgColor,
+            color: intensityConfig.color 
+          }}
+          title={`Today's Intensity: ${intensityConfig.label} (${intensityLevel}/5)`}
+        >
+          <span className="intensity-level-icon">{intensityConfig.icon}</span>
+          {intensityLevel}/5
+        </span>
+        
+        {/* Exercise Complexity Badge */}
+        <span 
+          className="exercise-complexity-badge"
+          style={{ 
+            backgroundColor: complexityConfig.bgColor,
+            color: complexityConfig.color 
+          }}
+          title={`Exercise Complexity: ${complexityConfig.label}`}
+        >
+          <span className="exercise-complexity-icon">{complexityConfig.icon}</span>
+          {complexityConfig.label}
         </span>
         
         {/* Version Info Badge */}

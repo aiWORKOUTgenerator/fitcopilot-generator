@@ -88,7 +88,7 @@ const GOAL_OPTIONS = [
 ];
 
 /**
- * Experience level options that adjust the difficulty of the generated workout
+    * Fitness level options that adjust the difficulty of the generated workout
  */
 const EXPERIENCE_OPTIONS = [
   { value: 'beginner', label: 'Beginner' },

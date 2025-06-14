@@ -2,15 +2,16 @@
  * Muscle Group Dropdown Component
  * 
  * Multi-select dropdown for choosing muscle groups with limit validation.
+ * Optimized with React.memo to prevent unnecessary re-renders.
  */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { MuscleGroup, MuscleGroupDropdownProps } from '../../../../types/muscle-types';
 import { 
   muscleGroupData, 
   MUSCLE_GROUP_DISPLAY_ORDER 
 } from '../../../../constants/muscle-data';
 
-export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = ({
+export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = React.memo(({
   selectedGroups = [],
   onGroupSelect,
   disabled = false,
@@ -21,9 +22,23 @@ export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = ({
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Available groups (not already selected)
-  const availableGroups = MUSCLE_GROUP_DISPLAY_ORDER.filter(
-    group => !selectedGroups.includes(group)
+  // Memoize available groups calculation to prevent recalculation on every render
+  const availableGroups = useMemo(() => 
+    MUSCLE_GROUP_DISPLAY_ORDER.filter(
+      group => !selectedGroups.includes(group)
+    ), [selectedGroups]
+  );
+
+  // Memoize disabled state to prevent unnecessary comparisons
+  const isDisabled = useMemo(() => 
+    disabled || availableGroups.length === 0, 
+    [disabled, availableGroups.length]
+  );
+
+  // Memoize placeholder text to prevent string recreation
+  const displayText = useMemo(() => 
+    availableGroups.length === 0 ? 'All muscle groups selected' : placeholder,
+    [availableGroups.length, placeholder]
   );
 
   // Close dropdown when clicking outside
@@ -39,9 +54,9 @@ export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle keyboard navigation
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (disabled || availableGroups.length === 0) return;
+  // Memoize keyboard handler to prevent recreation on every render
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (isDisabled) return;
 
     switch (event.key) {
       case 'Enter':
@@ -51,7 +66,7 @@ export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = ({
           setIsOpen(true);
           setFocusedIndex(0);
         } else if (focusedIndex >= 0 && focusedIndex < availableGroups.length) {
-          handleGroupSelect(availableGroups[focusedIndex]);
+          onGroupSelect(availableGroups[focusedIndex]);
         }
         break;
       case 'Escape':
@@ -78,42 +93,48 @@ export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = ({
         }
         break;
     }
-  };
+  }, [isDisabled, isOpen, focusedIndex, availableGroups, onGroupSelect]);
 
-  // Handle group selection
-  const handleGroupSelect = (group: MuscleGroup) => {
+  // Memoize group selection handler
+  const handleGroupSelect = useCallback((group: MuscleGroup) => {
     onGroupSelect(group);
     setIsOpen(false);
     setFocusedIndex(-1);
-  };
+  }, [onGroupSelect]);
 
-  // Toggle dropdown
-  const toggleDropdown = () => {
-    if (disabled || availableGroups.length === 0) return;
+  // Memoize dropdown toggle handler
+  const toggleDropdown = useCallback(() => {
+    if (isDisabled) return;
     setIsOpen(!isOpen);
     if (!isOpen) {
       setFocusedIndex(0);
     }
-  };
+  }, [isDisabled, isOpen]);
+
+  // Memoize mouse enter handler for options
+  const createMouseEnterHandler = useCallback((index: number) => 
+    () => setFocusedIndex(index), 
+    []
+  );
 
   return (
     <div 
-      className={`muscle-group-dropdown ${disabled ? 'disabled' : ''} ${isOpen ? 'open' : ''}`}
+      className={`muscle-group-dropdown ${isDisabled ? 'disabled' : ''} ${isOpen ? 'open' : ''}`}
       ref={dropdownRef}
     >
       <div
         className="dropdown-trigger"
         onClick={toggleDropdown}
         onKeyDown={handleKeyDown}
-        tabIndex={disabled ? -1 : 0}
+        tabIndex={isDisabled ? -1 : 0}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label="Select muscle group"
-        aria-disabled={disabled}
+        aria-disabled={isDisabled}
       >
         <span className="dropdown-text">
-          {availableGroups.length === 0 ? 'All muscle groups selected' : placeholder}
+          {displayText}
         </span>
         <span className={`dropdown-arrow ${isOpen ? 'rotated' : ''}`}>
           ▼
@@ -122,26 +143,21 @@ export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = ({
 
       {isOpen && availableGroups.length > 0 && (
         <div className="dropdown-menu" role="listbox" aria-label="Available muscle groups">
-          {availableGroups.map((group, index) => (
-            <div
-              key={group}
-              className={`dropdown-option ${index === focusedIndex ? 'focused' : ''}`}
-              onClick={() => handleGroupSelect(group)}
-              onMouseEnter={() => setFocusedIndex(index)}
-              role="option"
-              aria-selected={false}
-              tabIndex={-1}
-            >
-              <span className="option-icon">{muscleGroupData[group].icon}</span>
-              <div className="option-content">
-                <div className="option-name">{muscleGroupData[group].display}</div>
-                <div className="option-description">{muscleGroupData[group].description}</div>
-              </div>
-              <div className="option-muscle-count">
-                {muscleGroupData[group].muscles.length} muscles
-              </div>
-            </div>
-          ))}
+          {availableGroups.map((group, index) => {
+            const groupData = muscleGroupData[group];
+            const isFocused = index === focusedIndex;
+            
+            return (
+              <DropdownOption
+                key={group}
+                group={group}
+                groupData={groupData}
+                isFocused={isFocused}
+                onSelect={handleGroupSelect}
+                onMouseEnter={createMouseEnterHandler(index)}
+              />
+            );
+          })}
         </div>
       )}
 
@@ -153,4 +169,40 @@ export const MuscleGroupDropdown: React.FC<MuscleGroupDropdownProps> = ({
       )}
     </div>
   );
-}; 
+});
+
+// Memoized dropdown option component to prevent unnecessary re-renders
+const DropdownOption: React.FC<{
+  group: MuscleGroup;
+  groupData: any;
+  isFocused: boolean;
+  onSelect: (group: MuscleGroup) => void;
+  onMouseEnter: () => void;
+}> = React.memo(({ group, groupData, isFocused, onSelect, onMouseEnter }) => {
+  // Memoize click handler for this specific group
+  const handleClick = useCallback(() => onSelect(group), [onSelect, group]);
+
+  return (
+    <div
+      className={`dropdown-option ${isFocused ? 'focused' : ''}`}
+      onClick={handleClick}
+      onMouseEnter={onMouseEnter}
+      role="option"
+      aria-selected={false}
+      tabIndex={-1}
+    >
+      <span className="option-icon">{groupData.icon}</span>
+      <div className="option-content">
+        <div className="option-name">{groupData.display}</div>
+        <div className="option-description">{groupData.description}</div>
+      </div>
+      <div className="option-muscle-count">
+        {groupData.muscles.length} muscles
+      </div>
+    </div>
+  );
+});
+
+// Add display names for React DevTools
+MuscleGroupDropdown.displayName = 'MuscleGroupDropdown';
+DropdownOption.displayName = 'DropdownOption'; 

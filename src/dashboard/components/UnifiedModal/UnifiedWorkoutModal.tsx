@@ -26,6 +26,8 @@ import Button from '../../../components/ui/Button/Button';
 import { useWorkoutContext } from '../../../features/workout-generator/context/WorkoutContext';
 import { useNavigation } from '../../../features/workout-generator/navigation/NavigationContext';
 import { GeneratedWorkout, Exercise, TimedExercise, SetsExercise } from '../../../features/workout-generator/types/workout';
+import { WorkoutSelectionSummary } from './components/WorkoutSelectionSummary';
+import { getWorkout } from '../../../features/workout-generator/services/workoutService';
 import './UnifiedModal.scss';
 
 export type ModalMode = 'view' | 'edit';
@@ -364,14 +366,47 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
   const [hasChanges, setHasChanges] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['warm-up', 'main', 'cool-down']));
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // CRITICAL FIX: Load complete workout data using WorkoutService (same as EnhancedWorkoutModal)
+  const [completeWorkout, setCompleteWorkout] = useState<GeneratedWorkout | null>(null);
+  const [isLoadingComplete, setIsLoadingComplete] = useState(false);
+
+  // CRITICAL FIX: Load complete workout data when modal opens (same as EnhancedWorkoutModal)
+  useEffect(() => {
+    const loadCompleteWorkout = async () => {
+      if (isOpen && workout?.id) {
+        setIsLoadingComplete(true);
+        try {
+          console.log('[UnifiedWorkoutModal] Loading complete workout data using WorkoutService (same as EnhancedWorkoutModal)');
+          const completeData = await getWorkout(workout.id.toString());
+          console.log('[UnifiedWorkoutModal] Complete workout loaded:', {
+            id: completeData.id,
+            title: completeData.title,
+            exerciseCount: completeData.exercises?.length || 0,
+            sectionCount: completeData.sections?.length || 0
+          });
+          setCompleteWorkout(completeData);
+        } catch (error) {
+          console.error('[UnifiedWorkoutModal] Failed to load complete workout:', error);
+          // Fallback to original workout data
+          setCompleteWorkout(workout);
+        } finally {
+          setIsLoadingComplete(false);
+        }
+      }
+    };
+
+    loadCompleteWorkout();
+  }, [isOpen, workout?.id]);
 
   // Initialize edited workout when switching to edit mode
   useEffect(() => {
-    if (mode === 'edit' && workout) {
-      setEditedWorkout({ ...workout });
+    const workoutToEdit = completeWorkout || workout;
+    if (mode === 'edit' && workoutToEdit) {
+      setEditedWorkout({ ...workoutToEdit });
       setHasChanges(false);
     }
-  }, [mode, workout]);
+  }, [mode, completeWorkout, workout]);
 
   // Handle escape key with proper cleanup
   useEffect(() => {
@@ -408,20 +443,34 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
     };
   }, [isOpen]);
 
-  // Workout statistics computation
+  // Use WorkoutSelectionSummary's proven calculation logic for header stats
   const workoutStats = useMemo(() => {
-    if (!workout) return null;
+    const currentWorkout = mode === 'edit' ? editedWorkout : (completeWorkout || workout);
+    if (!currentWorkout) return null;
 
-    const exercises = workout.exercises || [];
-    const estimatedDuration = workout.duration || 30;
-    const difficulty = workout.difficulty || 'intermediate';
+    // EXACT COPY of calculateWorkoutStats from WorkoutSelectionSummary
+    const totalExercises = currentWorkout.exercises?.length || 
+      currentWorkout.sections?.reduce((total, section) => total + (section.exercises?.length || 0), 0) || 0;
+    
+    const estimatedDuration = currentWorkout.duration || 30;
+    const difficulty = currentWorkout.difficulty || 'intermediate';
 
     return {
-      totalExercises: exercises.length,
+      totalExercises,
       estimatedDuration,
-      difficulty
+      difficulty,
+      workout: currentWorkout, // For WorkoutSelectionSummary in body
+      fitness_level: currentWorkout.fitness_level,
+      intensity_level: currentWorkout.intensity_level,
+      exercise_complexity: currentWorkout.exercise_complexity,
+      stress_level: currentWorkout.stress_level,
+      energy_level: currentWorkout.energy_level,
+      sleep_quality: currentWorkout.sleep_quality,
+      location: currentWorkout.location,
+      primary_muscle_focus: currentWorkout.primary_muscle_focus,
+      custom_notes: currentWorkout.custom_notes
     };
-  }, [workout]);
+  }, [mode, editedWorkout, completeWorkout, workout]);
 
   // Section toggle handler
   const handleSectionToggle = useCallback((sectionId: string) => {
@@ -630,6 +679,8 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
     onStart(workout);
   }, [workout, onStart]);
 
+
+
   // Backdrop click handler
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget && !isSaving && !isDeleting) {
@@ -640,7 +691,8 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
   // Don't render if not open or no workout
   if (!isOpen || !workout) return null;
 
-  const currentWorkout = mode === 'edit' ? editedWorkout : workout;
+  // CRITICAL FIX: Use complete workout data (same as EnhancedWorkoutModal)
+  const currentWorkout = mode === 'edit' ? editedWorkout : (completeWorkout || workout);
   if (!currentWorkout) return null;
 
   return (
@@ -674,6 +726,7 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
               
               {workoutStats && (
                 <div className="workout-stats" id="modal-description">
+                  {/* Core Workout Stats */}
                   <div className="stat glass-stat">
                     <Target size={16} aria-hidden="true" />
                     <span>{workoutStats.totalExercises} exercises</span>
@@ -682,12 +735,119 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
                     <Clock size={16} aria-hidden="true" />
                     <span>{workoutStats.estimatedDuration} min</span>
                   </div>
+                  
+                  {/* PHASE 5: Enhanced fitness-specific stats */}
                   <div className="stat glass-stat">
-                    <Zap size={16} aria-hidden="true" />
-                    <span className={`difficulty difficulty-${workoutStats.difficulty}`}>
-                      {workoutStats.difficulty}
+                    <span className={`fitness-level fitness-level-${workoutStats.fitness_level || workoutStats.difficulty}`}>
+                      {workoutStats.fitness_level ? 
+                        `🟢 ${workoutStats.fitness_level}` : 
+                        `🟡 ${workoutStats.difficulty}`
+                      }
                     </span>
                   </div>
+                  {workoutStats.intensity_level && (
+                    <div className="stat glass-stat">
+                      <Zap size={16} aria-hidden="true" />
+                      <span className="intensity-level">
+                        {workoutStats.intensity_level}/5
+                      </span>
+                    </div>
+                  )}
+                  {workoutStats.exercise_complexity && (
+                    <div className="stat glass-stat">
+                      <span className={`exercise-complexity exercise-complexity-${workoutStats.exercise_complexity}`}>
+                        🔧 {workoutStats.exercise_complexity}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* SPRINT 3: NEW WorkoutGeneratorGrid daily state stats */}
+                  {workoutStats.stress_level && (
+                    <div className="stat glass-stat daily-state-stat">
+                      <span className="daily-state-icon">
+                        {workoutStats.stress_level === 'low' && '😌'}
+                        {workoutStats.stress_level === 'moderate' && '😐'}
+                        {workoutStats.stress_level === 'high' && '😰'}
+                        {workoutStats.stress_level === 'very_high' && '😫'}
+                      </span>
+                      <span>Stress: {
+                        workoutStats.stress_level === 'low' ? 'Calm' :
+                        workoutStats.stress_level === 'moderate' ? 'Moderate' :
+                        workoutStats.stress_level === 'high' ? 'Stressed' :
+                        'Very Stressed'
+                      }</span>
+                    </div>
+                  )}
+                  
+                  {workoutStats.energy_level && (
+                    <div className="stat glass-stat daily-state-stat">
+                      <span className="daily-state-icon">
+                        {workoutStats.energy_level === 'very_low' && '😴'}
+                        {workoutStats.energy_level === 'low' && '😑'}
+                        {workoutStats.energy_level === 'moderate' && '😊'}
+                        {workoutStats.energy_level === 'high' && '😄'}
+                        {workoutStats.energy_level === 'very_high' && '🤩'}
+                      </span>
+                      <span>Energy: {
+                        workoutStats.energy_level === 'very_low' ? 'Drained' :
+                        workoutStats.energy_level === 'low' ? 'Low' :
+                        workoutStats.energy_level === 'moderate' ? 'Balanced' :
+                        workoutStats.energy_level === 'high' ? 'Energetic' :
+                        'Pumped'
+                      }</span>
+                    </div>
+                  )}
+                  
+                  {workoutStats.sleep_quality && (
+                    <div className="stat glass-stat daily-state-stat">
+                      <span className="daily-state-icon">
+                        {workoutStats.sleep_quality === 'poor' && '😵'}
+                        {workoutStats.sleep_quality === 'fair' && '😪'}
+                        {workoutStats.sleep_quality === 'good' && '😌'}
+                        {workoutStats.sleep_quality === 'excellent' && '😴'}
+                      </span>
+                      <span>Sleep: {
+                        workoutStats.sleep_quality === 'poor' ? 'Poor' :
+                        workoutStats.sleep_quality === 'fair' ? 'Fair' :
+                        workoutStats.sleep_quality === 'good' ? 'Good' :
+                        'Excellent'
+                      }</span>
+                    </div>
+                  )}
+                  
+                  {/* SPRINT 3: NEW Environment context stat */}
+                  {workoutStats.location && workoutStats.location !== 'any' && (
+                    <div className="stat glass-stat environment-stat">
+                      <span className="environment-icon">
+                        {workoutStats.location === 'home' && '🏠'}
+                        {workoutStats.location === 'gym' && '🏋️'}
+                        {workoutStats.location === 'outdoors' && '🌳'}
+                        {workoutStats.location === 'travel' && '✈️'}
+                      </span>
+                      <span>{
+                        workoutStats.location === 'home' ? 'Home' :
+                        workoutStats.location === 'gym' ? 'Gym' :
+                        workoutStats.location === 'outdoors' ? 'Outdoors' :
+                        'Travel'
+                      }</span>
+                    </div>
+                  )}
+                  
+                  {/* SPRINT 3: NEW Primary muscle focus stat */}
+                  {workoutStats.primary_muscle_focus && (
+                    <div className="stat glass-stat muscle-focus-stat">
+                      <span className="muscle-focus-icon">🎯</span>
+                      <span>Focus: {workoutStats.primary_muscle_focus}</span>
+                    </div>
+                  )}
+                  
+                  {/* SPRINT 3: NEW Custom notes indicator */}
+                  {workoutStats.custom_notes && (
+                    <div className="stat glass-stat custom-notes-stat">
+                      <span className="notes-icon">📝</span>
+                      <span>Custom Notes</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -736,33 +896,42 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
 
         {/* Modal Body */}
         <div className="modal-body">
-          {isLoading || isTransitioning ? (
+          {isLoading || isTransitioning || isLoadingComplete ? (
             <div className="loading-state">
               <div className="loading-spinner">
                 <Loader size={32} className="spinning" />
               </div>
               <p className="loading-text">
-                {isTransitioning ? 'Switching modes...' : 'Loading workout...'}
+                {isTransitioning ? 'Switching modes...' : 
+                 isLoadingComplete ? 'Loading complete workout data...' : 
+                 'Loading workout...'}
               </p>
             </div>
           ) : (
             <div className="workout-content">
-              {/* Workout Description */}
-              <div className="workout-description-section">
-                <h3 className="section-title">Description</h3>
+              {/* Workout Configuration Summary */}
+              <div className="workout-configuration-section">
                 {mode === 'edit' ? (
-                  <textarea
-                    className="workout-description-input"
-                    value={currentWorkout.description || ''}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Describe your workout..."
-                    rows={3}
-                    disabled={isSaving}
-                  />
+                  <>
+                    <h3 className="section-title">Description</h3>
+                    <textarea
+                      className="workout-description-input"
+                      value={currentWorkout.description || ''}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      placeholder="Describe your workout..."
+                      rows={3}
+                      disabled={isSaving}
+                    />
+                  </>
                 ) : (
-                  <p className="workout-description">
-                    {currentWorkout.description || 'No description provided.'}
-                  </p>
+                  <WorkoutSelectionSummary
+                    duration={workoutStats?.workout?.duration}
+                    difficulty={workoutStats?.workout?.difficulty}
+                    equipment={workoutStats?.workout?.equipment}
+                    goals={workoutStats?.workout?.goals}
+                    sessionInputs={(workoutStats?.workout as any)?.sessionInputs}
+                    workoutData={workoutStats?.workout}
+                  />
                 )}
               </div>
 
@@ -802,98 +971,173 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
 
               {/* Exercise Sections */}
               <div className="exercise-sections">
-                {currentWorkout.exercises && currentWorkout.exercises.length > 0 ? (
+                {(currentWorkout.exercises && currentWorkout.exercises.length > 0) || 
+                 (currentWorkout.sections && currentWorkout.sections.length > 0 && 
+                  currentWorkout.sections.some(section => section.exercises && section.exercises.length > 0)) ? (
                   <>
-                    {mode === 'edit' ? (
-                      // Edit Mode - Use Editable Exercise Sections
+                    {currentWorkout.exercises && currentWorkout.exercises.length > 0 ? (
+                      // Direct exercises format
                       <>
-                        <EditableExerciseSection
-                          title="Warm-up"
-                          exercises={currentWorkout.exercises.filter(ex => 
-                            ex.type === 'warm-up' || 
-                            (ex.section && ex.section.toLowerCase().includes('warm'))
-                          ) || []}
-                          sectionType="warm-up"
-                          isExpanded={expandedSections.has('warm-up')}
-                          onToggle={() => handleSectionToggle('warm-up')}
-                          onExercisesChange={(exercises, sectionType) => {
-                            handleExercisesChange(exercises, sectionType);
-                          }}
-                        />
-                        <EditableExerciseSection
-                          title="Main Workout"
-                          exercises={currentWorkout.exercises.filter(ex => 
-                            ex.type === 'main' || 
-                            ex.type === 'strength' ||
-                            !ex.type ||
-                            (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
-                          ) || currentWorkout.exercises}
-                          sectionType="main"
-                          isExpanded={expandedSections.has('main')}
-                          onToggle={() => handleSectionToggle('main')}
-                          onExercisesChange={(exercises, sectionType) => {
-                            handleExercisesChange(exercises, sectionType);
-                          }}
-                        />
-                        <EditableExerciseSection
-                          title="Cool-down"
-                          exercises={currentWorkout.exercises.filter(ex => 
-                            ex.type === 'cool-down' || 
-                            (ex.section && ex.section.toLowerCase().includes('cool'))
-                          ) || []}
-                          sectionType="cool-down"
-                          isExpanded={expandedSections.has('cool-down')}
-                          onToggle={() => handleSectionToggle('cool-down')}
-                          onExercisesChange={(exercises, sectionType) => {
-                            handleExercisesChange(exercises, sectionType);
-                          }}
-                        />
+                        {mode === 'edit' ? (
+                          // Edit Mode - Use Editable Exercise Sections
+                          <>
+                            <EditableExerciseSection
+                              title="Warm-up"
+                              exercises={currentWorkout.exercises.filter(ex => 
+                                ex.type === 'warm-up' || 
+                                (ex.section && ex.section.toLowerCase().includes('warm'))
+                              ) || []}
+                              sectionType="warm-up"
+                              isExpanded={expandedSections.has('warm-up')}
+                              onToggle={() => handleSectionToggle('warm-up')}
+                              onExercisesChange={(exercises, sectionType) => {
+                                handleExercisesChange(exercises, sectionType);
+                              }}
+                            />
+                            <EditableExerciseSection
+                              title="Main Workout"
+                              exercises={currentWorkout.exercises.filter(ex => 
+                                ex.type === 'main' || 
+                                ex.type === 'strength' ||
+                                !ex.type ||
+                                (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
+                              ) || currentWorkout.exercises}
+                              sectionType="main"
+                              isExpanded={expandedSections.has('main')}
+                              onToggle={() => handleSectionToggle('main')}
+                              onExercisesChange={(exercises, sectionType) => {
+                                handleExercisesChange(exercises, sectionType);
+                              }}
+                            />
+                            <EditableExerciseSection
+                              title="Cool-down"
+                              exercises={currentWorkout.exercises.filter(ex => 
+                                ex.type === 'cool-down' || 
+                                (ex.section && ex.section.toLowerCase().includes('cool'))
+                              ) || []}
+                              sectionType="cool-down"
+                              isExpanded={expandedSections.has('cool-down')}
+                              onToggle={() => handleSectionToggle('cool-down')}
+                              onExercisesChange={(exercises, sectionType) => {
+                                handleExercisesChange(exercises, sectionType);
+                              }}
+                            />
+                          </>
+                        ) : (
+                          // View Mode - Use Regular Exercise Sections
+                          <>
+                            <ExerciseSection
+                              title="Warm-up"
+                              exercises={currentWorkout.exercises.filter(ex => 
+                                ex.type === 'warm-up' || 
+                                (ex.section && ex.section.toLowerCase().includes('warm'))
+                              ) || []}
+                              isExpanded={expandedSections.has('warm-up')}
+                              onToggle={() => handleSectionToggle('warm-up')}
+                              mode={mode}
+                            />
+                            <ExerciseSection
+                              title="Main Workout"
+                              exercises={currentWorkout.exercises.filter(ex => 
+                                ex.type === 'main' || 
+                                ex.type === 'strength' ||
+                                !ex.type ||
+                                (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
+                              ) || currentWorkout.exercises}
+                              isExpanded={expandedSections.has('main')}
+                              onToggle={() => handleSectionToggle('main')}
+                              mode={mode}
+                            />
+                            <ExerciseSection
+                              title="Cool-down"
+                              exercises={currentWorkout.exercises.filter(ex => 
+                                ex.type === 'cool-down' || 
+                                (ex.section && ex.section.toLowerCase().includes('cool'))
+                              ) || []}
+                              isExpanded={expandedSections.has('cool-down')}
+                              onToggle={() => handleSectionToggle('cool-down')}
+                              mode={mode}
+                            />
+                          </>
+                        )}
                       </>
-                    ) : (
-                      // View Mode - Use Regular Exercise Sections
+                    ) : currentWorkout.sections && currentWorkout.sections.length > 0 ? (
+                      // Sections format - render sections directly
                       <>
-                        <ExerciseSection
-                          title="Warm-up"
-                          exercises={currentWorkout.exercises.filter(ex => 
-                            ex.type === 'warm-up' || 
-                            (ex.section && ex.section.toLowerCase().includes('warm'))
-                          ) || []}
-                          isExpanded={expandedSections.has('warm-up')}
-                          onToggle={() => handleSectionToggle('warm-up')}
-                          mode={mode}
-                        />
-                        <ExerciseSection
-                          title="Main Workout"
-                          exercises={currentWorkout.exercises.filter(ex => 
-                            ex.type === 'main' || 
-                            ex.type === 'strength' ||
-                            !ex.type ||
-                            (ex.section && !ex.section.toLowerCase().includes('warm') && !ex.section.toLowerCase().includes('cool'))
-                          ) || currentWorkout.exercises}
-                          isExpanded={expandedSections.has('main')}
-                          onToggle={() => handleSectionToggle('main')}
-                          mode={mode}
-                        />
-                        <ExerciseSection
-                          title="Cool-down"
-                          exercises={currentWorkout.exercises.filter(ex => 
-                            ex.type === 'cool-down' || 
-                            (ex.section && ex.section.toLowerCase().includes('cool'))
-                          ) || []}
-                          isExpanded={expandedSections.has('cool-down')}
-                          onToggle={() => handleSectionToggle('cool-down')}
-                          mode={mode}
-                        />
+                        {currentWorkout.sections.map((section: any, index: number) => (
+                          <ExerciseSection
+                            key={section.name || `section-${index}`}
+                            title={section.name || `Section ${index + 1}`}
+                            exercises={section.exercises || []}
+                            duration={section.duration}
+                            isExpanded={expandedSections.has(section.name || `section-${index}`)}
+                            onToggle={() => handleSectionToggle(section.name || `section-${index}`)}
+                            mode={mode}
+                          />
+                        ))}
                       </>
-                    )}
+                    ) : null}
                   </>
                 ) : (
                   <div className="no-exercises">
                     <p>⚠️ No exercises found in this workout.</p>
                     <p style={{ fontSize: '0.875rem', marginTop: '0.5rem', opacity: 0.7 }}>
-                      This may indicate a data loading issue. Try refreshing the page or contact support if the problem persists.
+                      This may indicate a data loading issue. The workout might have exercises stored in a different format.
                     </p>
+                    
+                    {/* Check if exercises exist in sections format */}
                     {currentWorkout.sections && currentWorkout.sections.length > 0 && (
+                      <div style={{ marginTop: '1rem' }}>
+                        <p style={{ fontSize: '0.875rem', color: '#22c55e', marginBottom: '0.5rem' }}>
+                          ✅ Found {currentWorkout.sections.length} workout section(s) with exercises:
+                        </p>
+                        {currentWorkout.sections.map((section: any, index: number) => (
+                          <div key={index} style={{ 
+                            background: 'rgba(255,255,255,0.02)', 
+                            padding: '0.75rem', 
+                            borderRadius: '4px', 
+                            marginBottom: '0.5rem',
+                            border: '1px solid rgba(255,255,255,0.1)'
+                          }}>
+                            <h4 style={{ 
+                              margin: '0 0 0.5rem 0', 
+                              color: '#ffffff', 
+                              fontSize: '0.875rem',
+                              fontWeight: '600' 
+                            }}>
+                              {section.name || `Section ${index + 1}`}
+                              {section.duration && ` (${section.duration} min)`}
+                            </h4>
+                            <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>
+                              {section.exercises && section.exercises.length > 0 ? (
+                                <ul style={{ margin: '0', paddingLeft: '1rem' }}>
+                                  {section.exercises.slice(0, 3).map((exercise: any, exerciseIndex: number) => (
+                                    <li key={exerciseIndex} style={{ marginBottom: '0.25rem' }}>
+                                      {exercise.name || `Exercise ${exerciseIndex + 1}`}
+                                      {exercise.sets && exercise.reps && ` - ${exercise.sets} sets × ${exercise.reps} reps`}
+                                      {exercise.duration && ` - ${exercise.duration}`}
+                                    </li>
+                                  ))}
+                                  {section.exercises.length > 3 && (
+                                    <li style={{ color: '#6b7280', fontStyle: 'italic' }}>
+                                      +{section.exercises.length - 3} more exercises
+                                    </li>
+                                  )}
+                                </ul>
+                              ) : (
+                                <span style={{ color: '#ef4444' }}>No exercises in this section</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                          Try closing and reopening this modal to reload the exercise data properly.
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Debug info for technical troubleshooting */}
+                    {process.env.NODE_ENV === 'development' && (
                       <details style={{ marginTop: '1rem', fontSize: '0.75rem' }}>
                         <summary style={{ cursor: 'pointer', opacity: 0.7 }}>Debug: Show raw data</summary>
                         <pre style={{ background: 'rgba(0,0,0,0.2)', padding: '0.5rem', marginTop: '0.5rem', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>

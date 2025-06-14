@@ -10,18 +10,17 @@ import { MuscleSelectionData } from '../types/muscle-types';
 
 /**
  * Required form fields for workout generation
+ * Updated per user requirement: Only duration is required for workout generation
  */
 export const REQUIRED_FORM_FIELDS = {
-  // Core workout parameters
+  // Core workout parameters - ONLY duration is required
   duration: 'Workout Duration',
-  difficulty: 'Experience Level', 
-  goals: 'Fitness Goal',
   
-  // Optional but recommended
+  // All other fields are optional but recommended
+  difficulty: 'Fitness Level', 
+  goals: 'Fitness Goal',
   intensity: 'Intensity Level',
   equipment: 'Equipment',
-  
-  // Session-specific (optional)
   restrictions: 'Health Restrictions',
   location: 'Workout Location'
 } as const;
@@ -106,21 +105,14 @@ export function validateFormField(
 
 /**
  * Get missing required fields from form data
+ * Updated: Only duration is required for workout generation
  */
 export function getMissingRequiredFields(formData: Partial<WorkoutFormParams>): string[] {
   const missingFields: string[] = [];
   
-  // Check core required fields
+  // Only duration is required for workout generation
   if (!formData.duration || formData.duration <= 0) {
     missingFields.push(REQUIRED_FORM_FIELDS.duration);
-  }
-  
-  if (!formData.difficulty || formData.difficulty.trim().length === 0) {
-    missingFields.push(REQUIRED_FORM_FIELDS.difficulty);
-  }
-  
-  if (!formData.goals || formData.goals.trim().length === 0) {
-    missingFields.push(REQUIRED_FORM_FIELDS.goals);
   }
   
   return missingFields;
@@ -196,15 +188,12 @@ export function validateCompleteForm(
 
 /**
  * Check if form has minimum required data for generation
+ * Updated: Only duration is required for workout generation
  */
 export function hasMinimumRequiredData(formData: Partial<WorkoutFormParams>): boolean {
   return !!(
     formData.duration && 
-    formData.duration > 0 &&
-    formData.difficulty && 
-    formData.difficulty.trim().length > 0 &&
-    formData.goals && 
-    formData.goals.trim().length > 0
+    formData.duration > 0
   );
 }
 

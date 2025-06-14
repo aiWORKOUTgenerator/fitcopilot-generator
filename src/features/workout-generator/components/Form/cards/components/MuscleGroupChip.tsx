@@ -2,15 +2,16 @@
  * Muscle Group Chip Component
  * 
  * Displays selected muscle groups as removable chips with expand/collapse functionality.
+ * Optimized with React.memo to prevent unnecessary re-renders.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { MuscleGroup, MuscleGroupChipProps } from '../../../../types/muscle-types';
 import { muscleGroupData } from '../../../../constants/muscle-data';
 
 export const MuscleGroupChip: React.FC<MuscleGroupChipProps & {
   isExpanded?: boolean;
   onToggleExpanded?: () => void;
-}> = ({
+}> = React.memo(({
   group,
   onRemove,
   selectedMuscleCount = 0,
@@ -20,23 +21,36 @@ export const MuscleGroupChip: React.FC<MuscleGroupChipProps & {
 }) => {
   const groupData = muscleGroupData[group];
   
-  // Calculate completion percentage for visual indicator
-  const completionPercentage = totalMuscleCount > 0 
-    ? Math.round((selectedMuscleCount / totalMuscleCount) * 100)
-    : 0;
+  // Memoize completion percentage calculation to prevent recalculation on every render
+  const completionPercentage = useMemo(() => {
+    return totalMuscleCount > 0 
+      ? Math.round((selectedMuscleCount / totalMuscleCount) * 100)
+      : 0;
+  }, [selectedMuscleCount, totalMuscleCount]);
 
-  // Handle remove with confirmation for better UX
-  const handleRemove = (event: React.MouseEvent) => {
+  // Memoize completion status to avoid repeated calculations
+  const isComplete = useMemo(() => completionPercentage === 100, [completionPercentage]);
+
+  // Handle remove with confirmation for better UX - memoized to prevent function recreation
+  const handleRemove = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent triggering expand/collapse
     onRemove(group);
-  };
+  }, [onRemove, group]);
 
-  // Handle expand/collapse
-  const handleToggleExpanded = () => {
+  // Handle expand/collapse - memoized to prevent function recreation
+  const handleToggleExpanded = React.useCallback(() => {
     if (onToggleExpanded) {
       onToggleExpanded();
     }
-  };
+  }, [onToggleExpanded]);
+
+  // Memoize keyboard handler to prevent recreation
+  const handleKeyDown = React.useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleToggleExpanded();
+    }
+  }, [handleToggleExpanded]);
 
   return (
     <div 
@@ -45,12 +59,7 @@ export const MuscleGroupChip: React.FC<MuscleGroupChipProps & {
       role="button"
       tabIndex={0}
       aria-label={`${groupData.display} muscle group chip. ${selectedMuscleCount} of ${totalMuscleCount} muscles selected. Click to ${isExpanded ? 'collapse' : 'expand'} details.`}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleToggleExpanded();
-        }
-      }}
+      onKeyDown={handleKeyDown}
     >
       {/* Chip Content */}
       <div className="chip-content">
@@ -107,11 +116,14 @@ export const MuscleGroupChip: React.FC<MuscleGroupChipProps & {
       )}
 
       {/* Subtle completion indicator */}
-      {completionPercentage === 100 && (
+      {isComplete && (
         <div className="chip-complete-indicator" title="All muscles in this group selected">
           ✓
         </div>
       )}
     </div>
   );
-}; 
+});
+
+// Add display name for React DevTools
+MuscleGroupChip.displayName = 'MuscleGroupChip'; 

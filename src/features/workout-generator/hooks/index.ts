@@ -14,11 +14,10 @@ export { default as useErrorHandler } from './useErrorHandler';
 export { default as useFormPersistence } from './useFormPersistence';
 export { default as useFormValidation } from './useFormValidation';
 export { default as useWorkoutForm } from './useWorkoutForm';
+
+// Muscle selection hooks - Simplified and clean
 export { useMuscleSelection } from './useMuscleSelection';
-export { useWorkoutFormMuscleIntegration } from './useWorkoutFormMuscleIntegration';
-export { useWorkoutFormMuscleSync } from './useWorkoutFormMuscleSync';
-export { useMuscleFormBridge, useMuscleFormBridgeDebug, createMuscleFormBridge } from './useMuscleFormBridge';
-export type { MuscleFormBridgeReturn } from './useMuscleFormBridge';
+export { useWorkoutGridCompletion } from './useWorkoutGridCompletion';
 
 // Performance optimization
 export { default as usePerformanceCache } from './usePerformanceCache';

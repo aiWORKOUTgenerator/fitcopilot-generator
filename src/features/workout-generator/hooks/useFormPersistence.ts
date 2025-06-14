@@ -22,9 +22,9 @@ export function useFormPersistence<T>(key: string, initialData?: T) {
     if (typeof window === 'undefined') return;
 
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      sessionStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
-              console.warn(`Failed to save data to localStorage with key "${key}":`, error);
+              console.warn(`Failed to save data to sessionStorage with key "${key}":`, error);
     }
   }, [key]);
 
@@ -37,12 +37,12 @@ export function useFormPersistence<T>(key: string, initialData?: T) {
     if (typeof window === 'undefined') return initialData;
 
     try {
-      const storedData = localStorage.getItem(key);
+      const storedData = sessionStorage.getItem(key);
       if (storedData) {
         return JSON.parse(storedData);
       }
     } catch (error) {
-              console.warn(`Failed to load data from localStorage with key "${key}":`, error);
+              console.warn(`Failed to load data from sessionStorage with key "${key}":`, error);
     }
     
     return initialData;
@@ -55,9 +55,9 @@ export function useFormPersistence<T>(key: string, initialData?: T) {
     if (typeof window === 'undefined') return;
 
     try {
-      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
     } catch (error) {
-              console.warn(`Failed to clear data from localStorage with key "${key}":`, error);
+              console.warn(`Failed to clear data from sessionStorage with key "${key}":`, error);
     }
   }, [key]);
 
@@ -70,9 +70,9 @@ export function useFormPersistence<T>(key: string, initialData?: T) {
     if (typeof window === 'undefined') return false;
 
     try {
-      return localStorage.getItem(key) !== null;
+      return sessionStorage.getItem(key) !== null;
     } catch (error) {
-              console.warn(`Failed to check if data exists in localStorage with key "${key}":`, error);
+              console.warn(`Failed to check if data exists in sessionStorage with key "${key}":`, error);
       return false;
     }
   }, [key]);

@@ -66,6 +66,8 @@ export const useMuscleSelection = (
     }
   }, [selectionData, enablePersistence]); // Removed persistence object dependency
   
+
+  
   // Add muscle group to selection
   const addMuscleGroup = useCallback((group: MuscleGroup) => {
     setSelectionData(current => {
@@ -184,7 +186,7 @@ export const useMuscleSelection = (
       displayText
     };
   }, [selectionData]);
-  
+
   // Get muscles selected in a specific group
   const getMusclesInGroup = useCallback((group: MuscleGroup): string[] => {
     return selectionData.selectedMuscles[group] || [];
@@ -223,7 +225,7 @@ export const useMuscleSelection = (
     getAvailableGroups,
     
     // Persistence helpers
-    hasStoredData: enablePersistence ? persistence.hasStoredData : false,
+    hasStoredData: enablePersistence ? persistence.hasStoredData() : false,
     clearStoredData: enablePersistence ? persistence.clearData : () => {}
   };
 }; 

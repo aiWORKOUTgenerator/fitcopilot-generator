@@ -590,6 +590,10 @@
           gap: 0.5rem;
           flex-wrap: wrap;
           
+          // PHASE 5: Enhanced fitness-specific badge styles
+          .fitness-level-badge,
+          .intensity-level-badge,
+          .exercise-complexity-badge,
           .difficulty-badge {
             display: flex;
             align-items: center;
@@ -614,6 +618,9 @@
               color: #8b5cf6;
             }
             
+            .fitness-level-icon,
+            .intensity-level-icon,
+            .exercise-complexity-icon,
             .difficulty-icon {
               font-size: 0.625rem;
             }

@@ -177,6 +177,7 @@ export const EnhancedWorkoutGrid: React.FC<EnhancedWorkoutGridProps> = ({
           duration: workout.duration || 30,
           difficulty: workout.difficulty || 'intermediate',
           exercises: workout.exercises || [],
+          sections: workout.sections || [], // CRITICAL FIX: Pass sections data to CardMeta
           equipment: workout.equipment || [],
           created_at: workout.created_at || new Date().toISOString(),
           updated_at: workout.updated_at || new Date().toISOString(),

@@ -18,6 +18,22 @@ if (!defined('ABSPATH')) {
 class Utilities {
     
     /**
+     * Derive exercise complexity from difficulty (for backward compatibility)
+     *
+     * @param string $difficulty Legacy difficulty level
+     * @return string Exercise complexity level
+     */
+    private static function derive_exercise_complexity_from_difficulty($difficulty) {
+        $complexity_mapping = [
+            'beginner'     => 'basic',
+            'intermediate' => 'moderate', 
+            'advanced'     => 'advanced'
+        ];
+        
+        return $complexity_mapping[$difficulty] ?? 'moderate';
+    }
+
+    /**
      * Apply defaults to workout parameters
      *
      * @param array $params The parameters
@@ -26,6 +42,11 @@ class Utilities {
     public static function apply_workout_defaults($params) {
         $defaults = [
             'duration' => 30,
+            // PHASE 1: New fitness-specific defaults
+            'fitness_level' => 'intermediate',
+            'intensity_level' => 3,
+            'exercise_complexity' => 'moderate',
+            // BACKWARD COMPATIBILITY: Keep difficulty default during transition
             'difficulty' => 'intermediate',
             'goals' => 'general fitness',
             'equipment' => [],
@@ -89,7 +110,31 @@ class Utilities {
             $workout_data = self::get_default_workout_data();
         }
         
-        // Get workout metadata
+        // Get workout metadata - PHASE 1: Include new fitness-specific fields
+        // New fitness-specific meta fields
+        $fitness_level = get_post_meta($post_id, '_workout_fitness_level', true);
+        $intensity_level = get_post_meta($post_id, '_workout_intensity_level', true);
+        $exercise_complexity = get_post_meta($post_id, '_workout_exercise_complexity', true);
+        
+        // SPRINT 1: NEW WorkoutGeneratorGrid meta fields following fitness model
+        $stress_level = get_post_meta($post_id, '_workout_stress_level', true);
+        $energy_level = get_post_meta($post_id, '_workout_energy_level', true);
+        $sleep_quality = get_post_meta($post_id, '_workout_sleep_quality', true);
+        $location = get_post_meta($post_id, '_workout_location', true);
+        $custom_notes = get_post_meta($post_id, '_workout_custom_notes', true);
+        $primary_muscle_focus = get_post_meta($post_id, '_workout_primary_focus', true);
+        $session_context_raw = get_post_meta($post_id, '_workout_session_context', true);
+        
+        // Parse session context JSON
+        $session_context = [];
+        if ($session_context_raw) {
+            $decoded = json_decode($session_context_raw, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $session_context = $decoded;
+            }
+        }
+        
+        // Existing meta fields (backward compatibility)
         $difficulty = get_post_meta($post_id, '_workout_difficulty', true);
         $duration = get_post_meta($post_id, '_workout_duration', true);
         $equipment = get_post_meta($post_id, '_workout_equipment', true);
@@ -112,13 +157,28 @@ class Utilities {
         $last_modified = get_post_meta($post_id, '_workout_last_modified', true) ?: $post->post_modified;
         $modified_by = (int) get_post_meta($post_id, '_workout_modified_by', true) ?: $post->post_author;
         
-        // Format the response
+        // Format the response - PHASE 1: Include new fitness-specific fields
         return [
             'id' => $post_id,
             'title' => $post->post_title,
             'date' => $post->post_date,
             'modified' => $post->post_modified,
-            'difficulty' => $difficulty,
+            // PHASE 1: New fitness-specific response fields
+            'fitness_level' => $fitness_level ?: ($difficulty ?: 'intermediate'), // Fallback to difficulty for backward compatibility
+            'intensity_level' => $intensity_level ?: 3, // Default intensity
+            'exercise_complexity' => $exercise_complexity ?: self::derive_exercise_complexity_from_difficulty($difficulty ?: 'intermediate'),
+            
+            // SPRINT 1: NEW WorkoutGeneratorGrid response fields following fitness model
+            'stress_level' => $stress_level ?: null,
+            'energy_level' => $energy_level ?: null,
+            'sleep_quality' => $sleep_quality ?: null,
+            'location' => $location ?: null,
+            'custom_notes' => $custom_notes ?: '',
+            'primary_muscle_focus' => $primary_muscle_focus ?: null,
+            'session_context' => $session_context,
+            
+            // BACKWARD COMPATIBILITY: Keep existing fields during transition
+            'difficulty' => $difficulty ?: 'intermediate',
             'duration' => $duration,
             'equipment' => $equipment,
             'goals' => $goals,
@@ -150,11 +210,28 @@ class Utilities {
                 'exercises' => $data['exercises'],
                 'sections' => $data['sections'] ?? [],
                 'duration' => $data['duration'] ?? null,
+                // PHASE 1: New fitness-specific fields in normalized data
+                'fitness_level' => $data['fitness_level'] ?? $data['difficulty'] ?? null,
+                'intensity_level' => $data['intensity_level'] ?? null,
+                'exercise_complexity' => $data['exercise_complexity'] ?? null,
+                
+                // SPRINT 1: NEW WorkoutGeneratorGrid fields in normalized data
+                'stress_level' => $data['stress_level'] ?? null,
+                'energy_level' => $data['energy_level'] ?? null,
+                'sleep_quality' => $data['sleep_quality'] ?? null,
+                'location' => $data['location'] ?? null,
+                'custom_notes' => $data['custom_notes'] ?? '',
+                'primary_muscle_focus' => $data['primary_muscle_focus'] ?? null,
+                'session_context' => $data['session_context'] ?? [],
+                
+                // BACKWARD COMPATIBILITY: Keep difficulty field
                 'difficulty' => $data['difficulty'] ?? null,
                 'equipment' => $data['equipment'] ?? [],
                 'metadata' => [
                     'format' => 'ai_generated',
-                    'normalized_at' => current_time('mysql')
+                    'normalized_at' => current_time('mysql'),
+                    'fitness_refactor_phase' => 1,
+                    'workoutgrid_integration_phase' => 1
                 ]
             ];
         }

@@ -1,5 +1,5 @@
 // IntensityCard Component Styles
-// Extracted from WorkoutGeneratorGrid for modular architecture
+// Patterned after DurationCard for consistent modular architecture
 
 .intensity-selector-container {
   display: flex;
@@ -14,25 +14,24 @@
     margin-bottom: 8px;
   }
 
-  .intensity-rating-selector {
-    display: flex;
-    gap: 8px;
+  .intensity-options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
     flex: 1;
-    justify-content: space-between;
 
-    .intensity-rating-button {
+    .intensity-option {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 12px 8px;
+      padding: 16px 12px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
-      min-width: 60px;
-      flex: 1;
+      min-height: 80px;
 
       &:hover {
         background: rgba(255, 255, 255, 0.06);
@@ -44,36 +43,37 @@
         background: rgba(139, 215, 103, 0.15);
         border-color: rgba(139, 215, 103, 0.4);
         
-        .intensity-rating-number {
+        .intensity-number {
           color: #8bd767;
-          font-weight: 600;
+          font-weight: 700;
         }
         
-        .intensity-rating-icon {
-          transform: scale(1.1);
+        .intensity-icon {
+          filter: brightness(1.2);
         }
         
-        .intensity-rating-label {
+        .intensity-label {
           color: rgba(255, 255, 255, 0.9);
         }
       }
 
-      .intensity-rating-number {
-        font-size: 1.2rem;
+      .intensity-number {
+        font-size: 1.5rem;
         font-weight: 600;
         color: rgba(255, 255, 255, 0.9);
-        margin-bottom: 4px;
+        line-height: 1;
+        margin-bottom: 2px;
         transition: all 0.3s ease;
       }
 
-      .intensity-rating-icon {
-        font-size: 1.1rem;
-        margin-bottom: 4px;
-        transition: transform 0.3s ease;
+      .intensity-icon {
+        font-size: 1.2rem;
+        margin-bottom: 6px;
+        transition: filter 0.3s ease;
       }
 
-      .intensity-rating-label {
-        font-size: 0.75rem;
+      .intensity-label {
+        font-size: 0.8rem;
         color: rgba(255, 255, 255, 0.7);
         font-weight: 500;
         text-align: center;
@@ -82,17 +82,16 @@
     }
   }
 
-  .intensity-scale-labels {
+  .intensity-scale-info {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: 500;
     margin-top: 4px;
 
-    .scale-label-start,
-    .scale-label-end {
+    .scale-info {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 500;
       font-style: italic;
     }
   }
@@ -101,22 +100,49 @@
 // Responsive design
 @media (max-width: 768px) {
   .intensity-selector-container {
-    .intensity-rating-selector {
-      gap: 6px;
+    .intensity-options-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
       
-      .intensity-rating-button {
-        padding: 10px 6px;
-        min-width: 50px;
+      .intensity-option {
+        padding: 14px 10px;
+        min-height: 70px;
         
-        .intensity-rating-number {
+        .intensity-number {
+          font-size: 1.3rem;
+        }
+        
+        .intensity-icon {
           font-size: 1.1rem;
         }
         
-        .intensity-rating-icon {
+        .intensity-label {
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .intensity-selector-container {
+    .intensity-options-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      
+      .intensity-option {
+        padding: 12px 8px;
+        min-height: 60px;
+        
+        .intensity-number {
+          font-size: 1.2rem;
+        }
+        
+        .intensity-icon {
           font-size: 1rem;
         }
         
-        .intensity-rating-label {
+        .intensity-label {
           font-size: 0.7rem;
         }
       }
@@ -127,8 +153,8 @@
 // High contrast mode support
 @media (prefers-contrast: high) {
   .intensity-selector-container {
-    .intensity-rating-selector {
-      .intensity-rating-button {
+    .intensity-options-grid {
+      .intensity-option {
         border-color: rgba(255, 255, 255, 0.2);
         
         &:hover {
@@ -147,16 +173,12 @@
 // Reduced motion support
 @media (prefers-reduced-motion: reduce) {
   .intensity-selector-container {
-    .intensity-rating-selector {
-      .intensity-rating-button {
+    .intensity-options-grid {
+      .intensity-option {
         transition: none;
         
         &:hover {
           transform: none;
-        }
-        
-        .intensity-rating-icon {
-          transition: none;
         }
       }
     }

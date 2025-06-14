@@ -173,7 +173,7 @@ const PremiumPreviewStep: React.FC<PremiumPreviewStepProps> = ({
         id: 'intensity',
         label: 'Intensity (Modular)',
         value: sessionInputs.dailyIntensityLevel 
-          ? `${sessionInputs.dailyIntensityLevel}/5`
+          ? `${sessionInputs.dailyIntensityLevel}/6 - ${getIntensityLabel(sessionInputs.dailyIntensityLevel)}`
           : 'No intensity selected',
         isModular: true,
         badge: '✨'

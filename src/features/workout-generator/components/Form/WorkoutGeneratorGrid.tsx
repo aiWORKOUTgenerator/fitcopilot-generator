@@ -12,8 +12,7 @@
  */
 import React, { useCallback, useMemo } from 'react';
 import { useProfile } from '../../../profile/context';
-import { useWorkoutFormMuscleIntegration } from '../../hooks/useWorkoutFormMuscleIntegration';
-import { useMuscleFormBridge } from '../../hooks/useMuscleFormBridge';
+import { useWorkoutGridCompletion } from '../../hooks/useWorkoutGridCompletion';
 import { useWorkoutForm } from '../../hooks/useWorkoutForm';
 import { 
   mapProfileToWorkoutContext, 
@@ -56,20 +55,13 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
   const { state: profileState } = useProfile();
   const { profile: profileData, loading: profileLoading, error: profileError } = profileState;
   
-     // SIMPLIFIED: Single muscle integration system (removed competing bridge system)
-   const muscleFormIntegration = useWorkoutFormMuscleIntegration({
-     enableDebugLogging: process.env.NODE_ENV === 'development',
-     autoSync: true, // Enable auto-sync to ensure data flows to preview
-     syncDebounceMs: 150, // Reduced debounce for faster sync
-     enableProfileSuggestions: true
-   });
-   
-   const { 
-     state, 
-     actions, 
-     completionPercentage, 
-     selectionSummary 
-   } = muscleFormIntegration;
+  // SIMPLIFIED: Clean completion tracking (replaced 811-line over-engineered hook)
+  const { 
+    completionPercentage, 
+    hasMuscleSelection, 
+    selectionSummary,
+    muscleSelection 
+  } = useWorkoutGridCompletion();
   
   // Profile mapping for component props
   const profileMapping = useMemo(() => {
@@ -90,8 +82,7 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
     
     if (isValid) {
       console.log('[WorkoutGeneratorGrid] Form validation passed, proceeding with workout generation data:');
-      console.log('- Muscle Selection:', state.muscleSelection);
-      console.log('- Form Data:', actions.getFormDataWithMuscleSelection());
+      console.log('- Muscle Selection:', muscleSelection.selectionData);
       console.log('- Completion:', `${completionPercentage}%`);
       
       if (onContinue) {
@@ -99,14 +90,14 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
       }
     } else {
       // Get detailed validation errors for user feedback
-      const formData = actions.getFormDataWithMuscleSelection();
-      const missingFields = getMissingRequiredFields(formData);
+      const { formValues } = useWorkoutForm();
+      const missingFields = getMissingRequiredFields(formValues);
       const errorMessage = getValidationErrorMessage(missingFields);
       
       console.warn('[WorkoutGeneratorGrid] Form validation failed:', {
         missingFields,
         errorMessage,
-        muscleSelection: state.hasMuscleSelection,
+        muscleSelection: hasMuscleSelection,
         formCompletion: completionPercentage
       });
       
@@ -117,32 +108,30 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
         alert("Please complete all required fields to continue."); // Fallback message
       }
     }
-  }, [validateFormWithModularSupport, actions, state, completionPercentage, onContinue]);
+  }, [validateFormWithModularSupport, completionPercentage, onContinue]);
   
-  // Handle continue button state - restored to original logic with muscle enhancement
+  // Handle continue button state - simplified logic
+  const { formValues } = useWorkoutForm();
   const canReviewWorkout = useMemo(() => {
     // Original requirement: Only duration selection needed
-    const formData = actions.getFormDataWithMuscleSelection();
-    const hasDuration = formData.duration && formData.duration > 0;
-    
+    const hasDuration = formValues.sessionInputs?.timeConstraintsToday && formValues.sessionInputs.timeConstraintsToday > 0;
     return hasDuration;
-  }, [actions]);
+  }, [formValues.sessionInputs?.timeConstraintsToday]);
   
   // Helper for enhanced button messaging
   const getButtonMessage = useCallback(() => {
-    const formData = actions.getFormDataWithMuscleSelection();
-    const hasDuration = formData.duration && formData.duration > 0;
+    const hasDuration = formValues.sessionInputs?.timeConstraintsToday && formValues.sessionInputs.timeConstraintsToday > 0;
     
     if (!hasDuration) {
       return "Select duration to continue";
     }
     
-    if (state.hasMuscleSelection) {
+    if (hasMuscleSelection) {
       return `Preview your workout with ${selectionSummary} (${completionPercentage}% complete)`;
     }
     
     return `Preview your workout (${completionPercentage}% complete)`;
-  }, [actions, state.hasMuscleSelection, selectionSummary, completionPercentage]);
+  }, [formValues.sessionInputs?.timeConstraintsToday, hasMuscleSelection, selectionSummary, completionPercentage]);
   
   return (
     <div className={`workout-generator-container-premium ${className}`}>
@@ -152,7 +141,7 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
           <div className="grid-insight">
             <span className="insight-text">
               🚀 Ready to create your perfect workout? Let's get started!
-              {state.hasMuscleSelection && (
+              {hasMuscleSelection && (
                 <span className="muscle-status"> 🎯 {selectionSummary}</span>
               )}
             </span>
@@ -165,7 +154,7 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
           {/* Workout Focus Card - Modular Component */}
           <WorkoutFocusCard delay={0} />
 
-          {/* Workout Intensity Card - Modular Component */}
+          {/* Workout Intensity Card - Modular Component (includes profile fitness level badge) */}
           <IntensityCard delay={100} />
           
           {/* Duration Card - Modular Component */}
@@ -183,7 +172,7 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
               profileError={profileError}
               isProfileSufficient={isProfileSufficient}
               profileMapping={profileMapping}
-                             onSelectionChange={actions.syncMuscleSelectionToForm}
+                             onSelectionChange={() => {}} // Simplified - no sync needed
             />
           </FormFieldCard>
 
@@ -244,8 +233,8 @@ export const WorkoutGeneratorGrid: React.FC<WorkoutGeneratorGridProps> = ({
         <details className="debug-integration-info" style={{ marginTop: '1rem', fontSize: '0.8rem' }}>
           <summary>🔧 Muscle Integration Debug</summary>
           <div style={{ background: '#f5f5f5', padding: '0.5rem', borderRadius: '4px', marginTop: '0.5rem' }}>
-            <p><strong>Progress:</strong> {completionPercentage}% | <strong>Muscle Selection:</strong> {state.hasMuscleSelection ? 'Yes' : 'No'} | <strong>Can Continue:</strong> {canReviewWorkout ? 'Yes' : 'No'}</p>
-            {state.hasMuscleSelection && <p><strong>Selection:</strong> {selectionSummary}</p>}
+            <p><strong>Progress:</strong> {completionPercentage}% | <strong>Muscle Selection:</strong> {hasMuscleSelection ? 'Yes' : 'No'} | <strong>Can Continue:</strong> {canReviewWorkout ? 'Yes' : 'No'}</p>
+            {hasMuscleSelection && <p><strong>Selection:</strong> {selectionSummary}</p>}
           </div>
         </details>
       )}

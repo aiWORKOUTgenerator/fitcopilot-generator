@@ -40,7 +40,7 @@ export function validateWorkoutForm(formValues: Partial<WorkoutFormParams>): Val
   }
 
   if (!formValues.difficulty) {
-    errors.difficulty = 'Please select your experience level';
+    errors.difficulty = 'Please select your fitness level';
   }
 
   if (!formValues.duration) {

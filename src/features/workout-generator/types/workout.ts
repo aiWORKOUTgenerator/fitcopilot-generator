@@ -3,6 +3,22 @@
  */
 export type WorkoutDifficulty = 'beginner' | 'intermediate' | 'advanced';
 
+// PHASE 5: New fitness-specific types
+/**
+ * Fitness level (user's experience)
+ */
+export type FitnessLevel = 'beginner' | 'intermediate' | 'advanced';
+
+/**
+ * Intensity level (today's workout intensity)
+ */
+export type IntensityLevel = 1 | 2 | 3 | 4 | 5;
+
+/**
+ * Exercise complexity level
+ */
+export type ExerciseComplexity = 'basic' | 'moderate' | 'advanced';
+
 /**
  * Form steps type
  */
@@ -83,8 +99,80 @@ export interface GeneratedWorkout {
    */
   duration?: number;
   
+  // PHASE 2: New fitness-specific fields in generated workouts
   /**
-   * Workout difficulty level
+   * User's fitness level (replaces vague "difficulty" concept)
+   */
+  fitness_level?: WorkoutDifficulty;
+  
+  /**
+   * Workout intensity level (1-5 scale)
+   */
+  intensity_level?: number;
+  
+  /**
+   * Exercise complexity level (basic, moderate, advanced)
+   */
+  exercise_complexity?: 'basic' | 'moderate' | 'advanced';
+  
+  // SPRINT 2: NEW WorkoutGeneratorGrid response fields following fitness model
+  /**
+   * User's stress level during workout generation
+   */
+  stress_level?: 'low' | 'moderate' | 'high' | 'very_high';
+  
+  /**
+   * User's energy level during workout generation
+   */
+  energy_level?: 'very_low' | 'low' | 'moderate' | 'high' | 'very_high';
+  
+  /**
+   * User's sleep quality affecting workout generation
+   */
+  sleep_quality?: 'poor' | 'fair' | 'good' | 'excellent';
+  
+  /**
+   * Workout location context
+   */
+  location?: 'home' | 'gym' | 'outdoors' | 'travel' | 'any';
+  
+  /**
+   * Custom notes provided for workout generation
+   */
+  custom_notes?: string;
+  
+  /**
+   * Primary muscle focus for the workout
+   */
+  primary_muscle_focus?: string;
+  
+  /**
+   * Complete session context from generation
+   */
+  session_context?: {
+    daily_state: {
+      stress?: string;
+      energy?: string;
+      sleep?: string;
+    };
+    environment: {
+      location?: string;
+      equipment?: string[];
+    };
+    focus: {
+      primary_goal?: string;
+      muscle_groups?: string[];
+      restrictions?: string[];
+    };
+    customization: {
+      notes?: string;
+      intensity_preference?: number;
+    };
+  };
+  
+  // BACKWARD COMPATIBILITY: Keep difficulty field during transition
+  /**
+   * Workout difficulty level (legacy field)
    */
   difficulty?: WorkoutDifficulty;
   
@@ -218,20 +306,90 @@ export interface SessionSpecificInputs {
 
 /**
  * Workout Form Parameters
- * Enhanced to support muscle targeting integration
+ * PHASE 2: Enhanced with fitness-specific parameters and muscle targeting integration
  */
 export interface WorkoutFormParams {
   duration: number;
-  difficulty: WorkoutDifficulty;
-  equipment?: string[];
-  goals: string;
-  restrictions?: string;
-  preferences?: string;
+  
+  // PHASE 2: New fitness-specific parameters
+  /**
+   * User's fitness level (replaces vague "difficulty" concept)
+   */
+  fitness_level?: WorkoutDifficulty;
   
   /**
    * Workout intensity level (1-5 scale: Low to High)
    */
+  intensity_level?: number;
+  
+  /**
+   * Exercise complexity level (basic, moderate, advanced)
+   */
+  exercise_complexity?: 'basic' | 'moderate' | 'advanced';
+  
+  // SPRINT 2: NEW WorkoutGeneratorGrid parameters following fitness model
+  /**
+   * User's current stress level affecting workout adaptation
+   */
+  stress_level?: 'low' | 'moderate' | 'high' | 'very_high';
+  
+  /**
+   * User's current energy/motivation level for workout intensity
+   */
+  energy_level?: 'very_low' | 'low' | 'moderate' | 'high' | 'very_high';
+  
+  /**
+   * User's recent sleep quality affecting recovery and intensity
+   */
+  sleep_quality?: 'poor' | 'fair' | 'good' | 'excellent';
+  
+  /**
+   * Today's workout location (may differ from profile preference)
+   */
+  location?: 'home' | 'gym' | 'outdoors' | 'travel' | 'any';
+  
+  /**
+   * Custom workout notes and specific user requests
+   */
+  custom_notes?: string;
+  
+  /**
+   * Primary muscle focus for enhanced targeting
+   */
+  primary_muscle_focus?: string;
+  
+  /**
+   * Structured session context containing all daily selections
+   */
+  session_context?: {
+    daily_state: {
+      stress?: string;
+      energy?: string;
+      sleep?: string;
+    };
+    environment: {
+      location?: string;
+      equipment?: string[];
+    };
+    focus: {
+      primary_goal?: string;
+      muscle_groups?: string[];
+      restrictions?: string[];
+    };
+    customization: {
+      notes?: string;
+      intensity_preference?: number;
+    };
+  };
+  
+  // BACKWARD COMPATIBILITY: Keep existing fields during transition
+  difficulty: WorkoutDifficulty;
   intensity?: number;
+  
+  equipment?: string[];
+  goals: string;
+  restrictions?: string;
+  preferences?: string;
   
   /**
    * Dynamic inputs specific to the current workout session

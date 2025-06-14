@@ -287,6 +287,10 @@
           gap: calc(var(--card-spacing) * 0.5);
           margin-bottom: calc(var(--card-spacing) * 0.5);
 
+          // PHASE 5: Enhanced fitness-specific badge styles
+          .fitness-level-badge,
+          .intensity-level-badge,
+          .exercise-complexity-badge,
           .difficulty-badge {
             display: flex;
             align-items: center;
@@ -297,6 +301,9 @@
             font-weight: 600;
             border: 1px solid currentColor;
 
+            .fitness-level-icon,
+            .intensity-level-icon,
+            .exercise-complexity-icon,
             .difficulty-icon {
               font-size: 0.7rem;
             }

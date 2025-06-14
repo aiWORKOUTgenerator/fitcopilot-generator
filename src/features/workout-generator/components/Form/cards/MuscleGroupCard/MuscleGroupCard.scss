@@ -610,4 +610,149 @@
       background: rgba($lime-400, 0.3);
     }
   }
+}
+
+/* ===========================================================================
+ * SKELETON LOADING STATES
+ * Performance-optimized loading indicators
+ * =========================================================================== */
+
+.muscle-card-skeleton {
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 0.5rem);
+  
+  .skeleton-header {
+    flex: 0 0 auto;
+    min-height: 60px;
+    padding: var(--spacing-xs, 0.25rem);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius-sm, 6px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-xs, 0.25rem);
+    
+    .skeleton-line {
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.05) 100%
+      );
+      border-radius: 4px;
+      animation: skeletonPulse 1.5s ease-in-out infinite;
+      
+      &.skeleton-title {
+        width: 120px;
+        height: 16px;
+      }
+      
+      &.skeleton-subtitle {
+        width: 200px;
+        height: 12px;
+        opacity: 0.7;
+      }
+    }
+  }
+  
+  .skeleton-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm, 0.5rem);
+    padding: var(--spacing-xs, 0.25rem);
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-sm, 6px);
+    
+    .skeleton-dropdown {
+      width: 100%;
+      height: 44px;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0.03) 100%
+      );
+      border-radius: var(--border-radius-sm, 6px);
+      animation: skeletonPulse 1.5s ease-in-out infinite;
+    }
+    
+    .skeleton-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs, 0.25rem);
+      justify-content: center;
+      
+      .skeleton-chip {
+        width: 80px;
+        height: 28px;
+        background: linear-gradient(
+          90deg,
+          rgba(132, 204, 22, 0.05) 0%,
+          rgba(132, 204, 22, 0.15) 50%,
+          rgba(132, 204, 22, 0.05) 100%
+        );
+        border-radius: 6px;
+        animation: skeletonPulse 1.5s ease-in-out infinite;
+        
+        &:nth-child(2) {
+          animation-delay: 0.2s;
+          width: 100px;
+        }
+        
+        &:nth-child(3) {
+          animation-delay: 0.4s;
+          width: 90px;
+        }
+      }
+    }
+  }
+}
+
+@keyframes skeletonPulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* ===========================================================================
+ * ERROR BOUNDARY STATES
+ * Graceful error handling display
+ * =========================================================================== */
+
+.muscle-card-error {
+  width: 100%;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: var(--border-radius-sm, 6px);
+  text-align: center;
+  
+  .error-title {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: #ef4444;
+    font-weight: var(--font-weight-semibold, 600);
+    margin-bottom: var(--spacing-xs, 0.25rem);
+  }
+  
+  .error-subtitle {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--color-text-secondary, #b3b3b3);
+    opacity: 0.8;
+  }
 } 

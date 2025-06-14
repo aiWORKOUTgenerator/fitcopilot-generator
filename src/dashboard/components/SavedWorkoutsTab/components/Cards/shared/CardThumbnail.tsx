@@ -59,18 +59,58 @@ export const CardThumbnail: React.FC<CardThumbnailProps> = React.memo(({
     ...displayConfig
   }), [displayConfig]);
 
-  // 🚀 PERFORMANCE: Memoize thumbnail color calculation
-  const thumbnailColor = useMemo(() => {
-    const colors = ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
-    return colors[workout.id.toString().length % colors.length];
+  // 🚀 DESIGN SYSTEM: Use Workout Generator Grid color palette and styling
+  const thumbnailStyling = useMemo(() => {
+    // Design system colors matching WorkoutGeneratorGrid glassmorphism pattern
+    const designSystemColors = [
+      {
+        // Primary Brand (Lime) - matching $color-primary-500
+        background: 'linear-gradient(135deg, rgba(132, 204, 22, 0.15), rgba(132, 204, 22, 0.08))',
+        border: 'rgba(132, 204, 22, 0.2)',
+        textColor: '#84cc16'
+      },
+      {
+        // Secondary Brand (Cyan) - matching $color-secondary-500  
+        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.08))',
+        border: 'rgba(6, 182, 212, 0.2)',
+        textColor: '#06b6d4'
+      },
+      {
+        // Success (Green) - matching $color-success-500
+        background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.08))',
+        border: 'rgba(34, 197, 94, 0.2)',
+        textColor: '#22c55e'
+      },
+      {
+        // Info (Blue) - matching $color-info-500
+        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.08))',
+        border: 'rgba(59, 130, 246, 0.2)',
+        textColor: '#3b82f6'
+      },
+      {
+        // Warning (Amber) - matching $color-warning-500
+        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08))',
+        border: 'rgba(245, 158, 11, 0.2)',
+        textColor: '#f59e0b'
+      },
+      {
+        // Purple - matching design system purple
+        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.08))',
+        border: 'rgba(139, 92, 246, 0.2)',
+        textColor: '#8b5cf6'
+      }
+    ];
+    
+    const colorIndex = workout.id.toString().length % designSystemColors.length;
+    return designSystemColors[colorIndex];
   }, [workout.id]);
     
-  // 🚀 PERFORMANCE: Simplified thumbnail data (color now memoized above)
+  // 🚀 PERFORMANCE: Simplified thumbnail data (styling now memoized above)
   const getThumbnailData = () => {
-    return { color: thumbnailColor };
+    return { styling: thumbnailStyling };
   };
 
-  const { color } = getThumbnailData();
+  const { styling } = getThumbnailData();
   
   // 🚀 STORY 3.2: Comprehensive fallback strategy system
   const getFallbackContent = (): { content: string; source: string; emoji?: string } => {
@@ -367,8 +407,13 @@ export const CardThumbnail: React.FC<CardThumbnailProps> = React.memo(({
   return (
     <div className="workout-thumbnail-container">
       <div 
-        className="workout-thumbnail"
-        style={{ backgroundColor: thumbnailColor }}
+        className="workout-thumbnail workout-thumbnail--design-system"
+        style={{ 
+          background: styling.background,
+          border: `1px solid ${styling.border}`,
+          color: styling.textColor,
+          backdropFilter: 'blur(12px)'
+        }}
         data-has-tooltip={isTextTruncated}
       >
         <div className="thumbnail-title-container">

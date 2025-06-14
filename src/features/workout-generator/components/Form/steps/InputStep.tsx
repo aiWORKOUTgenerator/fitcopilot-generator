@@ -278,7 +278,7 @@ export const InputStep: React.FC<InputStepProps> = ({
               {/* Difficulty Selection */}
               <div className="input-step__form-group">
                 <label className="input-step__label">
-                  What is your fitness experience level?
+                  What is your fitness level?
                   {hasFieldError('difficulty') && (
                     <span className="input-step__error">{getFieldError('difficulty')}</span>
                   )}

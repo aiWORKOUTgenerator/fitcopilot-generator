@@ -30,7 +30,7 @@ export const IntensityCard: React.FC<IntensityCardProps> = ({
 
   const profileSection = hasProfileData ? (
     <CardHeader
-      label="Your Typical Intensity:"
+      label="Your Profile Suggests:"
       badges={profileIntensity ? [{
         value: profileIntensity.value.toString(),
         display: profileIntensity.display,
@@ -40,8 +40,8 @@ export const IntensityCard: React.FC<IntensityCardProps> = ({
       }] : []}
       fallback={{
         icon: "💪",
-        text: "Workout Intensity",
-        subtitle: "Set up your profile to see your typical intensity"
+        text: "Suggested Intensity",
+        subtitle: "Set up your profile to see your fitness level and typical intensity"
       }}
       maxBadges={1}
     />
@@ -49,7 +49,7 @@ export const IntensityCard: React.FC<IntensityCardProps> = ({
 
   return (
     <FormFieldCard
-      title="Intensity Level"
+      title="Intensity"
       description="How intense should today's workout be?"
       delay={delay}
       variant={hasProfileData ? 'complex' : 'standard'}
@@ -57,30 +57,29 @@ export const IntensityCard: React.FC<IntensityCardProps> = ({
     >
       <div className="intensity-selector-container">
         <div className="intensity-selector-label">
-          Select intensity level (1-5 scale):
+          Select workout intensity:
         </div>
         
-        <div className="intensity-rating-selector">
+        <div className="intensity-options-grid">
           {intensityOptions.map((option) => (
             <button
               key={option.value}
               type="button"
-              className={`intensity-rating-button ${
+              className={`intensity-option ${
                 selectedIntensity === option.value ? 'selected' : ''
               }`}
               onClick={() => handleIntensitySelection(option.value)}
               title={option.tooltip}
             >
-              <span className="intensity-rating-number">{option.value}</span>
-              <span className="intensity-rating-icon">{option.icon}</span>
-              <span className="intensity-rating-label">{option.label}</span>
+              <span className="intensity-number">{option.value}</span>
+              <span className="intensity-icon">{option.icon}</span>
+              <span className="intensity-label">{option.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="intensity-scale-labels">
-          <span className="scale-label-start">Light</span>
-          <span className="scale-label-end">Very Intense</span>
+        <div className="intensity-scale-info">
+          <span className="scale-info">Optional - enhances workout personalization</span>
         </div>
       </div>
     </FormFieldCard>

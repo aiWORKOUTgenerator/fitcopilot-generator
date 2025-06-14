@@ -109,12 +109,27 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
             // Get version metadata
             $metadata = VersioningUtils::get_version_metadata($post_id, $post);
             
-            // Build basic workout data
+            // PHASE 4: Build workout data with new fitness-specific parameters
             $workout_data = [
                 'id'          => $post_id,
                 'title'       => $post->post_title,
                 'date'        => $post->post_date,
                 'modified'    => $post->post_modified,
+                // PHASE 4: New fitness-specific fields
+                'fitness_level' => get_post_meta($post_id, '_workout_fitness_level', true) ?: 
+                                  (get_post_meta($post_id, '_workout_difficulty', true) ?: 'intermediate'),
+                'intensity_level' => get_post_meta($post_id, '_workout_intensity_level', true) ?: 3,
+                'exercise_complexity' => get_post_meta($post_id, '_workout_exercise_complexity', true) ?: 'moderate',
+                
+                // SPRINT 1: NEW WorkoutGeneratorGrid fields following fitness model
+                'stress_level' => get_post_meta($post_id, '_workout_stress_level', true) ?: null,
+                'energy_level' => get_post_meta($post_id, '_workout_energy_level', true) ?: null,
+                'sleep_quality' => get_post_meta($post_id, '_workout_sleep_quality', true) ?: null,
+                'location' => get_post_meta($post_id, '_workout_location', true) ?: null,
+                'custom_notes' => get_post_meta($post_id, '_workout_custom_notes', true) ?: '',
+                'primary_muscle_focus' => get_post_meta($post_id, '_workout_primary_focus', true) ?: null,
+                
+                // BACKWARD COMPATIBILITY: Keep difficulty field during transition
                 'difficulty'  => get_post_meta($post_id, '_workout_difficulty', true) ?: get_post_meta($post_id, 'workout_difficulty', true),
                 'duration'    => get_post_meta($post_id, '_workout_duration', true) ?: get_post_meta($post_id, 'workout_duration', true),
                 'excerpt'     => wp_trim_words($post->post_content, 20),
@@ -227,6 +242,41 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
             }
             
             // Save workout metadata
+            // PHASE 4: Save new fitness-specific meta fields
+            if (isset($params['fitness_level'])) {
+                update_post_meta($post_id, '_workout_fitness_level', sanitize_text_field($params['fitness_level']));
+            }
+            if (isset($params['intensity_level'])) {
+                update_post_meta($post_id, '_workout_intensity_level', intval($params['intensity_level']));
+            }
+            if (isset($params['exercise_complexity'])) {
+                update_post_meta($post_id, '_workout_exercise_complexity', sanitize_text_field($params['exercise_complexity']));
+            }
+            
+            // SPRINT 1: NEW WorkoutGeneratorGrid meta fields following fitness model
+            if (isset($params['stress_level'])) {
+                update_post_meta($post_id, '_workout_stress_level', sanitize_text_field($params['stress_level']));
+            }
+            if (isset($params['energy_level'])) {
+                update_post_meta($post_id, '_workout_energy_level', sanitize_text_field($params['energy_level']));
+            }
+            if (isset($params['sleep_quality'])) {
+                update_post_meta($post_id, '_workout_sleep_quality', sanitize_text_field($params['sleep_quality']));
+            }
+            if (isset($params['location'])) {
+                update_post_meta($post_id, '_workout_location', sanitize_text_field($params['location']));
+            }
+            if (isset($params['custom_notes'])) {
+                update_post_meta($post_id, '_workout_custom_notes', sanitize_textarea_field($params['custom_notes']));
+            }
+            if (isset($params['primary_muscle_focus'])) {
+                update_post_meta($post_id, '_workout_primary_focus', sanitize_text_field($params['primary_muscle_focus']));
+            }
+            if (isset($params['session_context']) && is_array($params['session_context'])) {
+                update_post_meta($post_id, '_workout_session_context', wp_json_encode($params['session_context']));
+            }
+            
+            // BACKWARD COMPATIBILITY: Keep difficulty field during transition
             if (isset($params['difficulty'])) {
                 update_post_meta($post_id, '_workout_difficulty', sanitize_text_field($params['difficulty']));
             }
@@ -246,6 +296,21 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
                 'exercises' => $params['exercises'] ?? [],
                 'sections' => $params['sections'] ?? [],
                 'duration' => $params['duration'] ?? 30,
+                // PHASE 4: New fitness-specific fields in standardized data
+                'fitness_level' => $params['fitness_level'] ?? ($params['difficulty'] ?? 'intermediate'),
+                'intensity_level' => $params['intensity_level'] ?? 3,
+                'exercise_complexity' => $params['exercise_complexity'] ?? 'moderate',
+                
+                // SPRINT 1: NEW WorkoutGeneratorGrid fields in standardized data
+                'stress_level' => $params['stress_level'] ?? null,
+                'energy_level' => $params['energy_level'] ?? null,
+                'sleep_quality' => $params['sleep_quality'] ?? null,
+                'location' => $params['location'] ?? null,
+                'custom_notes' => $params['custom_notes'] ?? '',
+                'primary_muscle_focus' => $params['primary_muscle_focus'] ?? null,
+                'session_context' => $params['session_context'] ?? [],
+                
+                // BACKWARD COMPATIBILITY: Keep difficulty field during transition
                 'difficulty' => $params['difficulty'] ?? 'intermediate',
                 'equipment' => $params['equipment'] ?? [],
                 'goals' => $params['goals'] ?? [],
@@ -254,7 +319,9 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
                     'ai_generated' => false,
                     'created_at' => current_time('mysql'),
                     'manually_created' => true,
-                    'format_version' => '1.0'
+                    'format_version' => '1.2', // Updated version for WorkoutGeneratorGrid fields
+                    'fitness_refactor_phase' => 4, // Track refactoring progress
+                    'workoutgrid_integration_phase' => 1 // Track WorkoutGeneratorGrid integration progress
                 ]
             ];
             
@@ -289,6 +356,11 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
             $response_data = [
                 'id' => $post_id,
                 'title' => $params['title'],
+                // PHASE 4: New fitness-specific fields in response
+                'fitness_level' => $params['fitness_level'] ?? ($params['difficulty'] ?? 'intermediate'),
+                'intensity_level' => $params['intensity_level'] ?? 3,
+                'exercise_complexity' => $params['exercise_complexity'] ?? 'moderate',
+                // BACKWARD COMPATIBILITY: Keep difficulty field during transition
                 'difficulty' => $params['difficulty'] ?? 'intermediate',
                 'duration' => $params['duration'] ?? 30,
                 'equipment' => $params['equipment'] ?? [],
