@@ -158,6 +158,7 @@ export interface UserProfile {
   // Workout preferences
   workoutFrequency: WorkoutFrequency;
   customFrequency?: string;
+  preferredWorkoutDuration?: number; // Preferred workout duration in minutes
   favoriteExercises?: string[];
   dislikedExercises?: string[];
   

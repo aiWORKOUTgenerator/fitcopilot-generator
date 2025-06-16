@@ -187,6 +187,7 @@ class ProfileEndpoints {
             $limitations = get_user_meta($user_id, '_profile_limitations', true);
             $limitation_notes = get_user_meta($user_id, '_profile_limitationNotes', true);
             $workout_frequency = get_user_meta($user_id, '_profile_workoutFrequency', true);
+            $preferred_workout_duration = get_user_meta($user_id, '_profile_preferredWorkoutDuration', true);
             $custom_frequency = get_user_meta($user_id, '_profile_customFrequency', true);
             $favorite_exercises = get_user_meta($user_id, '_profile_favoriteExercises', true);
             $disliked_exercises = get_user_meta($user_id, '_profile_dislikedExercises', true);
@@ -226,6 +227,7 @@ class ProfileEndpoints {
                 'limitations' => is_array($limitations) ? $limitations : ['none'],
                 'limitationNotes' => $limitation_notes ?: '',
                 'workoutFrequency' => $workout_frequency ?: '3-4',
+                'preferredWorkoutDuration' => intval($preferred_workout_duration),
                 'customFrequency' => $custom_frequency ?: '',
                 'favoriteExercises' => is_array($favorite_exercises) ? $favorite_exercises : [],
                 'dislikedExercises' => is_array($disliked_exercises) ? $disliked_exercises : [],
@@ -371,6 +373,10 @@ class ProfileEndpoints {
             
             if (isset($params['workoutFrequency'])) {
                 update_user_meta($user_id, '_profile_workoutFrequency', sanitize_text_field($params['workoutFrequency']));
+            }
+            
+            if (isset($params['preferredWorkoutDuration'])) {
+                update_user_meta($user_id, '_profile_preferredWorkoutDuration', intval($params['preferredWorkoutDuration']));
             }
             
             if (isset($params['customFrequency'])) {

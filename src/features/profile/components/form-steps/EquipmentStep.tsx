@@ -65,9 +65,9 @@ const EquipmentStep: React.FC<EquipmentStepProps> = ({
   
   return (
     <div className="form-step equipment-step">
-      <h2>Equipment & Location</h2>
+      <h2>Available Equipment</h2>
       <p className="step-description">
-        Tell us about the equipment you have access to and where you prefer to work out.
+        Select the equipment you have access to so we can create workouts that fit your setup.
       </p>
       
       <div className="form-section">

@@ -133,6 +133,9 @@ class WorkoutRetrievalEndpoint extends AbstractEndpoint {
                 'difficulty'  => get_post_meta($post_id, '_workout_difficulty', true) ?: get_post_meta($post_id, 'workout_difficulty', true),
                 'duration'    => get_post_meta($post_id, '_workout_duration', true) ?: get_post_meta($post_id, 'workout_duration', true),
                 'excerpt'     => wp_trim_words($post->post_content, 20),
+                
+                // 🔍 CRITICAL FIX: Include sessionInputs for WorkoutDisplay compatibility
+                'sessionInputs' => json_decode(get_post_meta($post_id, '_workout_session_inputs', true) ?: '{}', true),
             ];
             
             // Add version metadata to the response

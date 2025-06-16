@@ -60,9 +60,9 @@ const HealthStep: React.FC<HealthStepProps> = ({
   
   return (
     <div className="form-step health-step">
-      <h2>Health Considerations</h2>
+      <h2>Health & Safety</h2>
       <p className="step-description">
-        Tell us about any physical limitations or health conditions we should consider when creating your workouts.
+        Help us keep you safe by sharing any health considerations or physical limitations.
       </p>
       
       <div className="form-section">

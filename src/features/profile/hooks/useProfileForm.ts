@@ -127,21 +127,38 @@ export const useProfileForm = (initialStep = 1) => {
   }, [formState.currentStep, formState.formData, validateProfile]);
   
   // Dead simple step navigation
-  const goToNextStep = useCallback(() => {
+  const goToNextStep = useCallback(async (): Promise<boolean> => {
     console.log('[ProfileForm] Next step clicked');
     
     // Validate current step
     if (!validateForm()) {
       console.log('[ProfileForm] Validation failed');
-      return;
+      return false;
     }
     
     console.log('[ProfileForm] Validation passed, advancing step');
+    
+    // If we're on the last step, save the profile instead of advancing
+    if (formState.currentStep === formState.totalSteps) {
+      console.log('[ProfileForm] On last step, saving profile instead of advancing');
+      const success = await submitForm();
+      if (success) {
+        console.log('[ProfileForm] Profile saved successfully from goToNextStep');
+        // The ProfileEditModal will handle the completion via onComplete callback
+      }
+      return success;
+    }
     
     // Just advance the step
     setFormState(state => {
       const newStep = state.currentStep + 1;
       console.log('[ProfileForm] Moving to step:', newStep);
+      
+      // Add specific logging for reaching step 5
+      if (newStep === 5) {
+        console.log('[ProfileForm] ✅ REACHED STEP 5 (PreferencesStep) - User should now see workout preferences');
+      }
+      
       return {
         ...state,
         currentStep: newStep,
@@ -152,7 +169,9 @@ export const useProfileForm = (initialStep = 1) => {
     // Mark step as completed
     setCompletedSteps(prev => [...prev, formState.currentStep]);
     
-  }, [validateForm, formState.currentStep]);
+    return true; // Successfully advanced to next step
+    
+  }, [validateForm, formState.currentStep, formState.totalSteps, submitForm]);
   
   const goToPreviousStep = useCallback(() => {
     setFormState(state => ({
@@ -172,9 +191,19 @@ export const useProfileForm = (initialStep = 1) => {
   
   // Form submission
   const submitForm = useCallback(async () => {
+    // Add comprehensive debugging to track what's calling submitForm
+    console.log('[ProfileForm] 🚨 submitForm() called!');
+    console.log('[ProfileForm] Current step:', formState.currentStep);
+    console.log('[ProfileForm] Total steps:', formState.totalSteps);
+    console.log('[ProfileForm] Is last step:', formState.currentStep === formState.totalSteps);
+    console.log('[ProfileForm] Stack trace:', new Error().stack);
+    
     if (!validateForm()) {
+      console.log('[ProfileForm] submitForm() validation failed, aborting');
       return false;
     }
+    
+    console.log('[ProfileForm] submitForm() validation passed, proceeding with save');
     
     setFormState(state => ({
       ...state,
@@ -188,6 +217,7 @@ export const useProfileForm = (initialStep = 1) => {
         profileComplete: true
       };
       
+      console.log('[ProfileForm] submitForm() calling updateProfile with data:', updatedData);
       await updateProfile(updatedData);
       
       // Mark final step as completed
@@ -202,8 +232,10 @@ export const useProfileForm = (initialStep = 1) => {
         isDirty: false
       }));
       
+      console.log('[ProfileForm] submitForm() completed successfully');
       return true;
     } catch (err) {
+      console.log('[ProfileForm] submitForm() failed with error:', err);
       return false;
     } finally {
       setFormState(state => ({

@@ -107,18 +107,148 @@ class GenerateEndpoint extends AbstractEndpoint {
             // Extract session inputs from the request
             $session_inputs = $params['sessionInputs'] ?? [];
             
-            // Prepare parameters for workout generation with fitness-specific context
+            // 🔧 FIXED: Get user profile data with configurable defaults (no hardcoded values)
+            $user_id = get_current_user_id();
+            
+            // Use WordPress filters for default values - allowing customization
+            $default_fitness_level = apply_filters('wg_default_fitness_level', 'beginner');
+            $default_frequency = apply_filters('wg_default_workout_frequency', '2-3');
+            $default_location = apply_filters('wg_default_workout_location', 'any');
+            
+            // Get profile data with dynamic defaults
+            $user_goals = get_user_meta($user_id, '_profile_goals', true) ?: [];
+            $user_equipment = get_user_meta($user_id, '_profile_availableEquipment', true) ?: [];
+            $user_fitness_level = get_user_meta($user_id, '_profile_fitnessLevel', true) ?: $default_fitness_level;
+            $user_frequency = get_user_meta($user_id, '_profile_workoutFrequency', true) ?: $default_frequency;
+            $user_location = get_user_meta($user_id, '_profile_preferredLocation', true) ?: $default_location;
+            $user_limitations = get_user_meta($user_id, '_profile_limitations', true) ?: [];
+            $user_limitation_notes = get_user_meta($user_id, '_profile_limitationNotes', true) ?: '';
+            
+            // 🔧 NEW: Retrieve missing critical profile fields for enhanced personalization
+            $user_age = get_user_meta($user_id, '_profile_age', true) ?: null;
+            $user_weight = get_user_meta($user_id, '_profile_weight', true) ?: null;
+            $user_height = get_user_meta($user_id, '_profile_height', true) ?: null;
+            $user_gender = get_user_meta($user_id, '_profile_gender', true) ?: '';
+            $user_weight_unit = get_user_meta($user_id, '_profile_weightUnit', true) ?: 'lbs';
+            $user_height_unit = get_user_meta($user_id, '_profile_heightUnit', true) ?: 'ft';
+            $user_preferred_duration = get_user_meta($user_id, '_profile_preferredWorkoutDuration', true) ?: null;
+            $user_first_name = get_user_meta($user_id, '_profile_firstName', true) ?: '';
+            $user_last_name = get_user_meta($user_id, '_profile_lastName', true) ?: '';
+            
+            // 🔧 NEW: Additional profile fields for comprehensive AI personalization
+            $user_custom_goal = get_user_meta($user_id, '_profile_customGoal', true) ?: '';
+            $user_custom_equipment = get_user_meta($user_id, '_profile_customEquipment', true) ?: '';
+            $user_custom_frequency = get_user_meta($user_id, '_profile_customFrequency', true) ?: '';
+            $user_favorite_exercises = get_user_meta($user_id, '_profile_favoriteExercises', true) ?: [];
+            $user_disliked_exercises = get_user_meta($user_id, '_profile_dislikedExercises', true) ?: [];
+            $user_medical_conditions = get_user_meta($user_id, '_profile_medicalConditions', true) ?: '';
+            
+            // 🔧 ENHANCED: Comprehensive profile logging including physical data
+            $goals_summary = is_array($user_goals) && !empty($user_goals) ? implode(',', $user_goals) : 'not_specified';
+            $equipment_summary = is_array($user_equipment) && !empty($user_equipment) ? implode(',', $user_equipment) : 'not_specified';
+            $limitations_summary = 'none';
+            if (!empty($user_limitation_notes) || (is_array($user_limitations) && !empty($user_limitations) && !in_array('none', $user_limitations))) {
+                $limitation_details = [];
+                
+                // Add structured limitations
+                if (is_array($user_limitations) && !empty($user_limitations)) {
+                    $filtered_limitations = array_filter($user_limitations, function($limitation) {
+                        return $limitation !== 'none';
+                    });
+                    
+                    if (!empty($filtered_limitations)) {
+                        $limitation_labels = array_map(function($limitation) {
+                            return str_replace('_', ' ', ucwords($limitation, '_'));
+                        }, $filtered_limitations);
+                        $limitation_details[] = implode(', ', $limitation_labels);
+                    }
+                }
+                
+                // Add limitation notes
+                if (!empty($user_limitation_notes)) {
+                    $limitation_details[] = $user_limitation_notes;
+                }
+                
+                $limitations_summary = !empty($limitation_details) ? implode(' - ', $limitation_details) : 'specified';
+            }
+            
+            // Build physical stats summary for logging
+            $physical_stats = [];
+            if (!empty($user_age)) $physical_stats[] = "age={$user_age}";
+            if (!empty($user_weight)) $physical_stats[] = "weight={$user_weight}{$user_weight_unit}";
+            if (!empty($user_height)) {
+                if ($user_height_unit === 'ft') {
+                    // Convert total inches to feet'inches" format for logging
+                    $feet = floor($user_height / 12);
+                    $inches = round($user_height % 12);
+                    $physical_stats[] = "height={$feet}'{$inches}\"";
+                } else {
+                    $physical_stats[] = "height={$user_height}{$user_height_unit}";
+                }
+            }
+            if (!empty($user_gender)) $physical_stats[] = "gender={$user_gender}";
+            $physical_summary = !empty($physical_stats) ? implode(', ', $physical_stats) : 'not_specified';
+            
+            $name_summary = trim($user_first_name . ' ' . $user_last_name) ?: 'not_specified';
+            
+            // 🔧 NEW: Enhanced logging with additional profile fields
+            $custom_fields_summary = [];
+            if (!empty($user_custom_goal)) $custom_fields_summary[] = "custom_goal=specified";
+            if (!empty($user_custom_equipment)) $custom_fields_summary[] = "custom_equipment=specified";
+            if (!empty($user_custom_frequency)) $custom_fields_summary[] = "custom_frequency=specified";
+            if (!empty($user_favorite_exercises)) $custom_fields_summary[] = "favorite_exercises=" . count($user_favorite_exercises);
+            if (!empty($user_disliked_exercises)) $custom_fields_summary[] = "disliked_exercises=" . count($user_disliked_exercises);
+            if (!empty($user_medical_conditions)) $custom_fields_summary[] = "medical_conditions=specified";
+            $custom_summary = !empty($custom_fields_summary) ? implode(', ', $custom_fields_summary) : 'none';
+            
+            error_log("[GenerateEndpoint] ENHANCED Profile data retrieved for user {$user_id}: " .
+                     "name={$name_summary}, fitness_level={$user_fitness_level}, goals={$goals_summary}, " .
+                     "equipment={$equipment_summary}, limitations={$limitations_summary}, " .
+                     "physical_data=({$physical_summary}), preferred_duration={$user_preferred_duration}min, " .
+                     "custom_fields=({$custom_summary})");
+            
+            // 🔧 FIXED: Dynamic parameter preparation with proper fallback hierarchy
             $generation_params = [
-                'duration'        => $params['duration'] ?? 30,
-                // REFACTOR: Replace difficulty with fitness_level + intensity + complexity
-                'fitness_level'   => $params['fitness_level'] ?? $params['difficulty'] ?? 'intermediate', // Backward compatibility
-                'intensity_level' => $params['intensity_level'] ?? $params['intensity'] ?? 3,
-                'exercise_complexity' => $params['exercise_complexity'] ?? self::derive_exercise_complexity($params['fitness_level'] ?? $params['difficulty'] ?? 'intermediate'),
-                'equipment'       => $params['equipment'] ?? [],
-                'goals'           => $params['goals'] ?? 'general fitness',
-                'daily_focus'     => $params['daily_focus'] ?? $params['goals'] ?? 'general fitness',
-                'profile_goals'   => $params['profile_goals'] ?? [],
-                'restrictions'    => $params['restrictions'] ?? '',
+                'duration'        => $params['duration'] ?? apply_filters('wg_default_workout_duration', 30),
+                // Use parameter → profile → filtered default (no hardcoded 'intermediate')
+                'fitness_level'   => $params['fitness_level'] ?? $user_fitness_level,
+                'intensity_level' => $params['intensity_level'] ?? $params['intensity'] ?? 
+                                   apply_filters('wg_default_intensity_level', 3),
+                'exercise_complexity' => $params['exercise_complexity'] ?? 
+                                       self::derive_exercise_complexity($params['fitness_level'] ?? $user_fitness_level),
+                'equipment'       => $params['equipment'] ?? $user_equipment,
+                'goals'           => $params['goals'] ?? apply_filters('wg_default_workout_goals', 'general fitness'),
+                'daily_focus'     => $params['daily_focus'] ?? $params['goals'] ?? 
+                                   apply_filters('wg_default_workout_goals', 'general fitness'),
+                
+                // Profile integration - use actual profile data, not hardcoded assumptions
+                'profile_goals'   => $user_goals,
+                'profile_equipment' => $user_equipment,
+                'profile_fitness_level' => $user_fitness_level,
+                'profile_frequency' => $user_frequency,
+                'profile_location' => $user_location,
+                'profile_limitations' => $user_limitations,
+                'profile_limitation_notes' => $user_limitation_notes,
+                
+                // 🔧 NEW: Enhanced profile context with physical data for AI personalization
+                'profile_age' => $user_age,
+                'profile_weight' => $user_weight,
+                'profile_weight_unit' => $user_weight_unit,
+                'profile_height' => $user_height,
+                'profile_height_unit' => $user_height_unit,
+                'profile_gender' => $user_gender,
+                'profile_preferred_duration' => $user_preferred_duration,
+                'profile_first_name' => $user_first_name,
+                'profile_last_name' => $user_last_name,
+                
+                // 🔧 NEW: Additional profile context for enhanced AI personalization
+                'profile_custom_goal' => $user_custom_goal,
+                'profile_custom_equipment' => $user_custom_equipment,
+                'profile_custom_frequency' => $user_custom_frequency,
+                'profile_favorite_exercises' => $user_favorite_exercises,
+                'profile_disliked_exercises' => $user_disliked_exercises,
+                'profile_medical_conditions' => $user_medical_conditions,
+                'restrictions'    => $params['restrictions'] ?? $user_limitation_notes,
                 'specific_request' => $params['specific_request'],
                 
                 // SPRINT 1: NEW WorkoutGeneratorGrid parameters following fitness model
@@ -217,6 +347,13 @@ class GenerateEndpoint extends AbstractEndpoint {
                 // Include session inputs in the response
                 'sessionInputs' => $session_inputs,
             ];
+            
+            // 🔍 DEBUG: Log sessionInputs being included in response (one-time)
+            if (!empty($session_inputs)) {
+                error_log('[GenerateEndpoint] sessionInputs included in response: ' . count($session_inputs) . ' fields');
+            } else {
+                error_log('[GenerateEndpoint] ❌ NO sessionInputs in response');
+            }
             
             // Add post_id and version metadata to response
             $response_data = $standardized_workout;

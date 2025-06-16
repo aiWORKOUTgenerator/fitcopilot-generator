@@ -1,33 +1,38 @@
 /**
  * Workout Service
  * 
- * Provides functions for interacting with the workout API.
- * Uses the real WordPress REST API with proper error handling.
+ * Core API communication service for workout operations.
+ * Uses modular architecture with specialized services for data transformation,
+ * version management, and business logic.
  */
 import { GeneratedWorkout } from '../types/workout';
 import { apiFetch } from '../../../common/api/client';
 
-// API configuration
-const API_BASE = '';
+// Import specialized modules
+import { 
+  transformWorkoutResponse, 
+  transformWorkoutForSave 
+} from './transformers/workoutTransformer';
+import { 
+  transformForGeneration,
+  transformApiResponse 
+} from './transformers/apiTransformer';
+import {
+  extractVersionInfo,
+  checkVersionConflict, 
+  prepareVersionForSave
+} from './versioning/versionManager';
+import { isValidVersion, validateVersionInfo } from './versioning/versionValidator';
+import { 
+  resolveWorkoutId, 
+  normalizeWorkoutId,
+  idsEqual,
+  isValidWorkoutId 
+} from './utils/idResolver';
+import { logger } from './utils/logger';
 
-/**
- * Utility function to resolve and validate workout ID
- * Handles both id and post_id fields from different sources
- */
-function resolveWorkoutId(workout: GeneratedWorkout): { id: string | number | null; isValid: boolean } {
-  // Check for both id and post_id fields (backend compatibility)
-  const workoutId = workout.id || (workout as any).post_id;
-  
-  const isValid = !!(workoutId && 
-                    workoutId !== 'new' && 
-                    workoutId !== '' && 
-                    workoutId !== 'undefined' && 
-                    workoutId !== null &&
-                    (typeof workoutId === 'number' || 
-                     (typeof workoutId === 'string' && !isNaN(Number(workoutId)) && Number(workoutId) > 0)));
-  
-  return { id: workoutId, isValid };
-}
+// Configure logger for this service
+const serviceLogger = logger.scope('WorkoutService');
 
 /**
  * Get a single workout by ID
@@ -36,24 +41,28 @@ function resolveWorkoutId(workout: GeneratedWorkout): { id: string | number | nu
  */
 export async function getWorkout(id: string): Promise<GeneratedWorkout> {
   try {
-    console.log(`[WorkoutService] Loading workout ${id} for editing...`);
+    const normalizedId = normalizeWorkoutId(id);
+    if (!normalizedId) {
+      throw new Error(`Invalid workout ID: ${id}`);
+    }
+
+    serviceLogger.info(`Loading workout ${normalizedId} for editing`);
     
-    // apiFetch returns the data directly, not a wrapped response
-    const data = await apiFetch<any>(`/workouts/${id}`);
-    
-    console.log('[WorkoutService] Raw API response:', data);
-    console.log('[WorkoutService] Version data in response:', {
-      version: data?.version,
-      lastModified: data?.last_modified,
-      modifiedBy: data?.modified_by
-    });
+    const data = await apiFetch<any>(`/workouts/${normalizedId}`);
     
     if (!data) {
       throw new Error('Workout not found');
     }
+
+    serviceLogger.debug('Raw API response received', {
+      hasData: !!data,
+      hasVersion: !!data.version,
+      hasExercises: !!(data.exercises || data.workout_data?.exercises)
+    });
     
     const transformedWorkout = transformWorkoutResponse(data);
-    console.log('[WorkoutService] Transformed workout for editor:', {
+    
+    serviceLogger.info('Workout loaded successfully', {
       id: transformedWorkout.id,
       title: transformedWorkout.title,
       version: transformedWorkout.version,
@@ -62,13 +71,13 @@ export async function getWorkout(id: string): Promise<GeneratedWorkout> {
     
     return transformedWorkout;
   } catch (error) {
-    console.error('[WorkoutService] Failed to get workout:', error);
+    serviceLogger.error('Failed to get workout', error);
     throw error;
   }
 }
 
 /**
- * Get all workouts
+ * Get all workouts with pagination
  * @param page - Optional page number for pagination
  * @param perPage - Optional number of workouts per page
  * @returns Promise with the workouts data
@@ -80,7 +89,8 @@ export async function getWorkouts(page = 1, perPage = 10): Promise<GeneratedWork
       per_page: perPage.toString()
     });
     
-    // apiFetch returns the data directly, not a wrapped response
+    serviceLogger.debug('Fetching workouts', { page, perPage });
+    
     const data = await apiFetch<{
       workouts: any[];
       total?: number;
@@ -91,31 +101,43 @@ export async function getWorkouts(page = 1, perPage = 10): Promise<GeneratedWork
       throw new Error('Failed to fetch workouts');
     }
     
-    return data.workouts.map(transformWorkoutResponse);
+    const transformedWorkouts = data.workouts.map(transformWorkoutResponse);
+    
+    serviceLogger.info('Workouts fetched successfully', {
+      count: transformedWorkouts.length,
+      page,
+      total: data.total
+    });
+    
+    return transformedWorkouts;
   } catch (error) {
-    console.error('Failed to get workouts:', error);
+    serviceLogger.error('Failed to get workouts', error);
     throw error;
   }
 }
 
 /**
  * Generate a new workout
- * @param workoutRequest - The workout generation request data with muscle targeting support
+ * @param workoutRequest - The workout generation request data
  * @returns Promise with the generated workout data
  */
 export async function generateWorkout(workoutRequest: any): Promise<GeneratedWorkout> {
   try {
-    // Enhanced data transformation to include muscle targeting
-    const enhancedRequest = transformWorkoutRequestForAPI(workoutRequest);
-    
-    console.log('[WorkoutService] Generating workout with enhanced request:', {
-      hasMuscleTargeting: !!enhancedRequest.muscleTargeting,
-      muscleGroups: enhancedRequest.muscleTargeting?.targetMuscleGroups,
-      primaryFocus: enhancedRequest.muscleTargeting?.primaryFocus,
-      originalRequest: workoutRequest
+    serviceLogger.info('Starting workout generation', {
+      hasDuration: !!workoutRequest.duration,
+      hasDifficulty: !!workoutRequest.difficulty,
+      hasMuscleTargeting: !!workoutRequest.muscleTargeting
     });
     
-    // apiFetch returns the data directly, not a wrapped response
+    // Transform request using dedicated transformer
+    const enhancedRequest = transformForGeneration(workoutRequest);
+    
+    serviceLogger.debug('Request transformed for generation', {
+      hasMuscleTargeting: !!enhancedRequest.muscleTargeting,
+      hasSessionInputs: !!enhancedRequest.sessionInputs,
+      targetMuscleGroups: enhancedRequest.muscleTargeting?.targetMuscleGroups?.length || 0
+    });
+    
     const data = await apiFetch<any>(`/generate`, {
       method: 'POST',
       body: JSON.stringify(enhancedRequest)
@@ -125,105 +147,20 @@ export async function generateWorkout(workoutRequest: any): Promise<GeneratedWor
       throw new Error('Failed to generate workout');
     }
     
-    return transformWorkoutResponse(data);
+    const transformedWorkout = transformApiResponse(data);
+    
+    serviceLogger.info('Workout generated successfully', {
+      id: transformedWorkout.id,
+      title: transformedWorkout.title,
+      exerciseCount: transformedWorkout.exercises?.length || 0,
+      duration: transformedWorkout.duration
+    });
+    
+    return transformedWorkout;
   } catch (error) {
-    console.error('Failed to generate workout:', error);
+    serviceLogger.error('Failed to generate workout', error);
     throw error;
   }
-}
-
-/**
- * Transform workout request for API submission
- * Ensures muscle targeting data is properly formatted and included
- */
-function transformWorkoutRequestForAPI(workoutRequest: any): any {
-  // Base transformation with muscle targeting support
-  const apiRequest: any = {
-    duration: workoutRequest.duration,
-    difficulty: workoutRequest.difficulty,
-    equipment: workoutRequest.equipment || [],
-    goals: workoutRequest.goals,
-    restrictions: workoutRequest.restrictions,
-    preferences: workoutRequest.preferences,
-    intensity: workoutRequest.intensity,
-    sessionInputs: workoutRequest.sessionInputs || {}
-  };
-  
-  // Enhanced muscle targeting data handling - supports multiple data formats
-  const hasMuscleTargeting = workoutRequest.muscleTargeting;
-  const hasFocusArea = workoutRequest.focusArea && workoutRequest.focusArea.length > 0;
-  const hasDirectMuscleGroups = workoutRequest.targetMuscleGroups && workoutRequest.targetMuscleGroups.length > 0;
-  
-  if (hasMuscleTargeting || hasFocusArea || hasDirectMuscleGroups) {
-    console.log('[WorkoutService] Processing muscle targeting data:', {
-      hasMuscleTargeting,
-      hasFocusArea,
-      hasDirectMuscleGroups,
-      muscleTargeting: workoutRequest.muscleTargeting,
-      focusArea: workoutRequest.focusArea,
-      targetMuscleGroups: workoutRequest.targetMuscleGroups
-    });
-    
-    let targetGroups: string[] = [];
-    let primaryFocus: string | undefined;
-    let selectionSummary = 'No muscle targeting specified';
-    let specificMuscles = {};
-    
-    // Primary: Use structured muscleTargeting data
-    if (hasMuscleTargeting) {
-      const muscleTargeting = workoutRequest.muscleTargeting;
-      targetGroups = muscleTargeting.targetMuscleGroups?.map((group: any) => group.toString()) || [];
-      primaryFocus = muscleTargeting.primaryFocus;
-      selectionSummary = muscleTargeting.selectionSummary || `${targetGroups.length} muscle groups selected`;
-      specificMuscles = muscleTargeting.specificMuscles || {};
-    }
-    // Fallback: Use focusArea from sessionInputs
-    else if (hasFocusArea) {
-      targetGroups = workoutRequest.focusArea;
-      primaryFocus = targetGroups[0];
-      selectionSummary = `Focus areas: ${targetGroups.join(', ')}`;
-    }
-    // Fallback: Use direct targetMuscleGroups
-    else if (hasDirectMuscleGroups) {
-      targetGroups = workoutRequest.targetMuscleGroups;
-      primaryFocus = workoutRequest.primaryFocus || targetGroups[0];
-      selectionSummary = `Target muscle groups: ${targetGroups.join(', ')}`;
-      specificMuscles = workoutRequest.specificMuscles || {};
-    }
-    
-    // Add to session inputs for PHP compatibility
-    apiRequest.sessionInputs = {
-      ...apiRequest.sessionInputs,
-      focusArea: targetGroups,
-      targetMuscles: targetGroups,
-      primaryMuscleGroup: primaryFocus,
-      muscleSelectionSummary: selectionSummary,
-      // Include specific muscle data if available
-      specificMuscles: specificMuscles
-    };
-    
-    // Add dedicated muscle targeting section for OpenAI provider
-    apiRequest.muscleTargeting = {
-      targetMuscleGroups: targetGroups,
-      specificMuscles: specificMuscles,
-      primaryFocus: primaryFocus,
-      selectionSummary: selectionSummary
-    };
-    
-    // Include complete muscle selection data if available
-    if (workoutRequest.muscleSelection) {
-      apiRequest.muscleSelection = workoutRequest.muscleSelection;
-    }
-    
-    console.log('[WorkoutService] Muscle targeting data processed:', {
-      targetGroups,
-      primaryFocus,
-      selectionSummary,
-      hasSpecificMuscles: Object.keys(specificMuscles).length > 0
-    });
-  }
-  
-  return apiRequest;
 }
 
 /**
@@ -233,150 +170,73 @@ function transformWorkoutRequestForAPI(workoutRequest: any): any {
  */
 export async function saveWorkout(workout: GeneratedWorkout): Promise<GeneratedWorkout> {
   try {
-    // CRITICAL FIX: Track version throughout the entire save process
-    const inputVersion = workout.version;
-    const hasInputVersion = inputVersion !== undefined && inputVersion !== null;
-    
-    console.log('[WorkoutService] SAVE WORKFLOW START - Version Tracking:', {
-      'input_version': inputVersion,
-      'has_input_version': hasInputVersion,
-      'input_version_type': typeof inputVersion,
-      'workout_id': workout.id,
-      'workout_title': workout.title
-    });
-    
-    // CRITICAL FIX: Enhanced endpoint selection logic with better ID validation
-    // Check for both id and post_id fields (backend compatibility)
-    const { id: workoutId, isValid: hasValidId } = resolveWorkoutId(workout);
-    
+    const versionInfo = extractVersionInfo(workout);
+    const idResolution = resolveWorkoutId(workout);
+    const workoutId = idResolution.id;
+    const hasValidId = isValidWorkoutId(workoutId);
     const isUpdate = hasValidId;
-    const endpoint = isUpdate 
-      ? `/workouts/${workoutId}` 
-      : '/workouts';
     
-    const method = isUpdate ? 'PUT' : 'POST';
-    
-    console.log(`[WorkoutService] ENDPOINT SELECTION DECISION:`, {
-      'workout.id': workout.id,
-      'workout.post_id': (workout as any).post_id,
-      'resolved_workoutId': workoutId,
-      'typeof workoutId': typeof workoutId,
-      'hasValidId': hasValidId,
-      'isUpdate': isUpdate,
-      'method': method,
-      'endpoint': endpoint,
-      'exerciseCount': workout.exercises?.length || 0,
-      'hasVersion': !!workout.version,
-      'version': workout.version
+    serviceLogger.info('Starting workout save operation', {
+      workoutId,
+      isUpdate,
+      version: versionInfo.version,
+      title: workout.title
     });
 
-    // If this should be an update but we don't have a valid ID, that's a critical error
-    if (!isUpdate && workout.version && workout.version > 1) {
-      console.error('[WorkoutService] CRITICAL ERROR: Workout has version > 1 but no valid ID for update!', {
-        id: workout.id,
-        post_id: (workout as any).post_id,
-        resolved_id: workoutId,
-        version: workout.version,
-        title: workout.title
-      });
-      throw new Error(`Cannot update workout without valid ID. ID: ${workoutId}, Version: ${workout.version}`);
+    // Validate for update operations
+    if (isUpdate && !isValidVersion(workout.version)) {
+      throw new Error('Workout data is not valid for update operation - invalid version');
+    }
+
+    // Check for version conflicts on updates
+    if (isUpdate && workout.version) {
+      // Note: In a real implementation, you'd fetch current version first
+      // const currentWorkout = await getWorkout(workoutId.toString());
+      // const conflict = checkVersionConflict(currentWorkout, workout);
+      // if (conflict.hasConflict) {
+      //   throw new Error(conflict.message);
+      // }
+    }
+
+    const endpoint = isUpdate ? `/workouts/${workoutId}` : '/workouts';
+    const method = isUpdate ? 'PUT' : 'POST';
+    
+    // Transform workout for save with version handling
+    let saveData = transformWorkoutForSave(workout);
+    
+    if (isUpdate) {
+      const versionData = prepareVersionForSave(workout);
+      saveData = { ...saveData, ...versionData };
     }
     
-    // CRITICAL VERSION VALIDATION: For updates, ensure we have a version
-    if (isUpdate && !hasInputVersion) {
-      console.warn('[WorkoutService] WARNING: Update operation without version - potential data loss!', {
-        'workout_id': workoutId,
-        'has_version': hasInputVersion,
-        'version_value': inputVersion
-      });
-    }
-    
-    // CRITICAL FIX: Use DIRECT format like the working API test
-    // Transform the workout for saving with proper field names
-    const workoutData = transformWorkoutForSave(workout);
-    
-    // CRITICAL VERSION VALIDATION: Ensure version survived transformation
-    const transformedHasVersion = 'version' in workoutData;
-    const transformedVersion = workoutData.version;
-    
-    if (hasInputVersion && !transformedHasVersion) {
-      console.error('[WorkoutService] CRITICAL ERROR: Version lost during transformation!', {
-        'input_version': inputVersion,
-        'transformed_has_version': transformedHasVersion,
-        'transformed_version': transformedVersion
-      });
-      throw new Error(`Version lost during transformation: input=${inputVersion}, output=${transformedVersion}`);
-    }
-    
-    console.log(`[WorkoutService] Making ${method} request to ${endpoint}`, {
-      'format': 'DIRECT (like working test)',
-      'workoutData': {
-        title: workoutData.title,
-        exerciseCount: workoutData.exercises?.length || 0,
-        hasVersion: 'version' in workoutData,
-        version: workoutData.version,
-        hasDescription: 'description' in workoutData,
-        hasNotes: 'notes' in workoutData
-      },
-      'version_tracking': {
-        'input_version': inputVersion,
-        'transformed_version': transformedVersion,
-        'version_preserved': hasInputVersion ? (transformedVersion === inputVersion) : true
-      }
+    serviceLogger.debug('Making save request', {
+      method,
+      endpoint,
+      hasVersion: !!saveData.version,
+      exerciseCount: saveData.exercises?.length || 0
     });
     
-    // CRITICAL FIX: Send DIRECT format (not wrapped) like the working API test
     const data = await apiFetch<any>(endpoint, {
       method,
-      body: JSON.stringify(workoutData)  // ✅ DIRECT format (not wrapped)
+      body: JSON.stringify(saveData)
     });
     
-    // CRITICAL VERSION VALIDATION: Check API response version
-    const responseVersion = data?.version;
-    const responseHasVersion = responseVersion !== undefined && responseVersion !== null;
-    
-    console.log('[WorkoutService] Save response:', {
-      success: !!data,
-      id: data?.id,
-      version: responseVersion,
-      exerciseCount: data?.workout_data?.exercises?.length || data?.exercises?.length || 0,
-      method: method,
-      endpoint: endpoint,
-      format: 'DIRECT',
-      'version_tracking': {
-        'input_version': inputVersion,
-        'response_version': responseVersion,
-        'response_has_version': responseHasVersion,
-        'version_incremented': isUpdate && hasInputVersion && responseHasVersion ? (responseVersion > inputVersion) : 'N/A'
-      }
-    });
-    
-    // data is the workout object directly from the API
     if (!data) {
       throw new Error('No data returned from save operation');
     }
     
     const transformedResult = transformWorkoutResponse(data);
     
-    const finalVersion = transformedResult.version;
-    const finalHasVersion = finalVersion !== undefined && finalVersion !== null;
-    
-    console.log('[WorkoutService] Final transformed result:', {
+    serviceLogger.info('Workout saved successfully', {
       id: transformedResult.id,
-      version: finalVersion,
-      exerciseCount: transformedResult.exercises?.length || 0,
-      title: transformedResult.title,
-      'version_tracking_final': {
-        'input_version': inputVersion,
-        'final_version': finalVersion,
-        'final_has_version': finalHasVersion,
-        'version_chain_success': isUpdate ? (finalHasVersion && finalVersion !== inputVersion) : finalHasVersion
-      }
+      version: transformedResult.version,
+      method,
+      title: transformedResult.title
     });
     
     return transformedResult;
   } catch (error) {
-    console.error('Failed to save workout:', error);
+    serviceLogger.error('Failed to save workout', error);
     throw error;
   }
 }
@@ -388,14 +248,21 @@ export async function saveWorkout(workout: GeneratedWorkout): Promise<GeneratedW
  */
 export async function deleteWorkout(id: string): Promise<boolean> {
   try {
-    // apiFetch returns the data directly, not a wrapped response
-    await apiFetch<any>(`/workouts/${id}`, {
+    const normalizedId = normalizeWorkoutId(id);
+    if (!normalizedId) {
+      throw new Error(`Invalid workout ID for deletion: ${id}`);
+    }
+
+    serviceLogger.info(`Deleting workout ${normalizedId}`);
+    
+    await apiFetch<any>(`/workouts/${normalizedId}`, {
       method: 'DELETE'
     });
     
+    serviceLogger.info(`Workout ${normalizedId} deleted successfully`);
     return true;
   } catch (error) {
-    console.error('Failed to delete workout:', error);
+    serviceLogger.error('Failed to delete workout', error);
     throw error;
   }
 }
@@ -407,8 +274,14 @@ export async function deleteWorkout(id: string): Promise<boolean> {
  */
 export async function completeWorkout(id: string): Promise<GeneratedWorkout> {
   try {
-    // apiFetch returns the data directly, not a wrapped response
-    const data = await apiFetch<any>(`/workouts/${id}/complete`, {
+    const normalizedId = normalizeWorkoutId(id);
+    if (!normalizedId) {
+      throw new Error(`Invalid workout ID for completion: ${id}`);
+    }
+
+    serviceLogger.info(`Marking workout ${normalizedId} as completed`);
+    
+    const data = await apiFetch<any>(`/workouts/${normalizedId}/complete`, {
       method: 'POST'
     });
     
@@ -416,212 +289,13 @@ export async function completeWorkout(id: string): Promise<GeneratedWorkout> {
       throw new Error('Failed to complete workout');
     }
     
-    return transformWorkoutResponse(data);
+    const transformedResult = transformWorkoutResponse(data);
+    
+    serviceLogger.info(`Workout ${normalizedId} marked as completed`);
+    
+    return transformedResult;
   } catch (error) {
-    console.error('Failed to complete workout:', error);
+    serviceLogger.error('Failed to complete workout', error);
     throw error;
   }
-}
-
-/**
- * Transform workout response from API format to frontend format
- */
-function transformWorkoutResponse(apiData: any): GeneratedWorkout {
-  console.log('[WorkoutService] Raw API response structure:', Object.keys(apiData));
-  console.log('[WorkoutService] workout_data:', apiData.workout_data);
-  
-  // CRITICAL FIX: Extract sections from multiple possible locations
-  let sections = [];
-  
-  // Method 1: Direct sections field
-  if (apiData.sections && Array.isArray(apiData.sections)) {
-    sections = apiData.sections;
-    console.log('[WorkoutService] Found sections in direct field:', sections.length);
-  }
-  // Method 2: From workout_data field
-  else if (apiData.workout_data && apiData.workout_data.sections && Array.isArray(apiData.workout_data.sections)) {
-    sections = apiData.workout_data.sections;
-    console.log('[WorkoutService] Found sections in workout_data field:', sections.length);
-  }
-  // Method 3: Check if workout structure suggests sections (fallback)
-  else {
-    sections = [];
-    console.log('[WorkoutService] No sections found in API response');
-  }
-  
-  // CRITICAL FIX: Handle exercises from different possible locations
-  let exercises = [];
-  
-  // Method 1: Direct exercises field (old format)
-  if (apiData.exercises && Array.isArray(apiData.exercises)) {
-    exercises = apiData.exercises;
-    console.log('[WorkoutService] Found exercises in direct field:', exercises.length);
-  }
-  // Method 2: From workout_data field (new backend format)
-  else if (apiData.workout_data && apiData.workout_data.exercises && Array.isArray(apiData.workout_data.exercises)) {
-    exercises = apiData.workout_data.exercises;
-    console.log('[WorkoutService] Found exercises in workout_data field:', exercises.length);
-  }
-  // Method 3: Extract from sections (fallback)
-  else if (sections.length > 0) {
-    exercises = [];
-    sections.forEach((section: any) => {
-      if (section.exercises && Array.isArray(section.exercises)) {
-        exercises.push(...section.exercises);
-      }
-    });
-    console.log('[WorkoutService] Extracted exercises from sections:', exercises.length);
-  }
-  // Method 4: Try workout_data.sections if available
-  else if (apiData.workout_data && apiData.workout_data.sections && Array.isArray(apiData.workout_data.sections)) {
-    exercises = [];
-    apiData.workout_data.sections.forEach((section: any) => {
-      if (section.exercises && Array.isArray(section.exercises)) {
-        exercises.push(...section.exercises);
-      }
-    });
-    console.log('[WorkoutService] Extracted exercises from workout_data.sections:', exercises.length);
-  }
-  
-  console.log('[WorkoutService] Final exercise count:', exercises.length);
-  
-  // Transform exercises to ensure proper structure
-  const transformedExercises = exercises.map((exercise: any, index: number) => {
-    // Handle different exercise formats
-    const transformed: any = {
-      id: exercise.id || `exercise-${index}`,
-      name: exercise.name || 'Unnamed Exercise',
-      description: exercise.description || exercise.instructions || ''
-    };
-    
-    // Handle duration-based exercises (warm-up, cool-down)
-    if (exercise.duration) {
-      transformed.duration = exercise.duration;
-      transformed.type = exercise.section?.toLowerCase() || 'timed';
-    }
-    
-    // Handle sets/reps-based exercises
-    if (exercise.sets || exercise.reps) {
-      transformed.sets = exercise.sets || 1;
-      transformed.reps = exercise.reps || 10;
-      transformed.type = 'strength';
-    }
-    
-    // If neither duration nor sets/reps, default to sets/reps
-    if (!exercise.duration && !exercise.sets && !exercise.reps) {
-      transformed.sets = 1;
-      transformed.reps = 10;
-      transformed.type = 'strength';
-    }
-    
-    // Preserve original section information
-    if (exercise.section) {
-      transformed.section = exercise.section;
-    }
-    
-    return transformed;
-  });
-  
-  return {
-    id: apiData.id || apiData.post_id,
-    title: apiData.title || 'Untitled Workout',
-    description: apiData.description || apiData.content || apiData.notes || '',
-    duration: Number(apiData.duration),
-    difficulty: apiData.difficulty || 'intermediate',
-    exercises: transformedExercises,
-    sections: sections, // Preserve original sections structure
-    created_at: apiData.date || apiData.created_at || new Date().toISOString(),
-    updated_at: apiData.modified || apiData.updated_at || new Date().toISOString(),
-    // CRITICAL FIX: Enhanced version handling
-    version: apiData.version || apiData._workout_version || 1,
-    lastModified: apiData.last_modified || apiData._workout_last_modified,
-    modifiedBy: apiData.modified_by || apiData._workout_modified_by,
-    // CRITICAL FIX: Preserve post_id for backend compatibility
-    post_id: apiData.post_id || apiData.id
-  };
-}
-
-/**
- * Transform workout data for saving to API format
- */
-function transformWorkoutForSave(workout: GeneratedWorkout): any {
-  console.log('[WorkoutService] Transforming workout for save:', {
-    id: workout.id,
-    title: workout.title,
-    exerciseCount: workout.exercises?.length || 0,
-    hasVersion: workout.version !== undefined && workout.version !== null,
-    version: workout.version,
-    'version_type': typeof workout.version
-  });
-  
-  // CRITICAL FIX: Robust version handling with explicit logic
-  const hasValidVersion = workout.version !== undefined && workout.version !== null;
-  const versionValue = hasValidVersion ? workout.version : undefined;
-  
-  // CRITICAL FIX: Use DIRECT format with correct field names (like working API test)
-  const transformed: any = {
-    title: workout.title,
-    description: workout.description,  // ✅ Use 'description' (not 'notes') - matches backend
-    difficulty: workout.difficulty,
-    duration: workout.duration,
-    exercises: workout.exercises
-  };
-  
-  // CRITICAL FIX: Preserve sections structure if it exists
-  if (workout.sections && Array.isArray(workout.sections) && workout.sections.length > 0) {
-    transformed.sections = workout.sections;
-    console.log('[WorkoutService] PRESERVING SECTIONS:', {
-      'sections_count': workout.sections.length,
-      'section_names': workout.sections.map(s => s.name),
-      'total_exercises_in_sections': workout.sections.reduce((total, section) => total + (section.exercises?.length || 0), 0)
-    });
-  } else {
-    console.log('[WorkoutService] NO SECTIONS TO PRESERVE:', {
-      'has_sections_field': 'sections' in workout,
-      'sections_is_array': Array.isArray(workout.sections),
-      'sections_length': workout.sections?.length || 0
-    });
-  }
-  
-  // CRITICAL FIX: Explicit version handling - never use complex conditional spreading
-  if (hasValidVersion) {
-    transformed.version = versionValue;
-    console.log('[WorkoutService] VERSION PRESERVED:', {
-      'original_version': workout.version,
-      'transformed_version': transformed.version,
-      'version_type': typeof transformed.version,
-      'version_in_payload': true
-    });
-  } else {
-    console.log('[WorkoutService] NO VERSION TO PRESERVE:', {
-      'original_version': workout.version,
-      'version_undefined': workout.version === undefined,
-      'version_null': workout.version === null,
-      'version_in_payload': false
-    });
-  }
-  
-  // CRITICAL VALIDATION: Ensure version wasn't lost during transformation
-  if (hasValidVersion && !('version' in transformed)) {
-    console.error('[WorkoutService] CRITICAL ERROR: Version was lost during transformation!', {
-      'input_version': workout.version,
-      'output_has_version': 'version' in transformed,
-      'output_version': transformed.version
-    });
-    throw new Error(`Version preservation failed: input=${workout.version}, output=${transformed.version}`);
-  }
-  
-  console.log('[WorkoutService] Transformed data (DIRECT format):', {
-    title: transformed.title,
-    hasDescription: !!transformed.description,
-    difficulty: transformed.difficulty,
-    duration: transformed.duration,
-    exerciseCount: transformed.exercises?.length || 0,
-    hasVersion: 'version' in transformed,
-    version: transformed.version,
-    'version_preserved': hasValidVersion ? ('version' in transformed && transformed.version === workout.version) : true,
-    'matches_test_format': 'YES - direct fields like working test'
-  });
-  
-  return transformed;
 } 

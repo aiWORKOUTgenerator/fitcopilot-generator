@@ -27,6 +27,7 @@ import { useWorkoutContext } from '../../../features/workout-generator/context/W
 import { useNavigation } from '../../../features/workout-generator/navigation/NavigationContext';
 import { GeneratedWorkout, Exercise, TimedExercise, SetsExercise } from '../../../features/workout-generator/types/workout';
 import { WorkoutSelectionSummary } from './components/WorkoutSelectionSummary';
+import { WorkoutSelectionSummary as EnhancedSelectionSummary } from '../../../features/workout-generator/components/common/WorkoutSelectionSummary';
 import { getWorkout } from '../../../features/workout-generator/services/workoutService';
 import './UnifiedModal.scss';
 
@@ -454,6 +455,9 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
     
     const estimatedDuration = currentWorkout.duration || 30;
     const difficulty = currentWorkout.difficulty || 'intermediate';
+
+    // Debug: Log workout stats calculation
+    console.log('🎯 UnifiedWorkoutModal - Workout stats calculated');
 
     return {
       totalExercises,
@@ -924,14 +928,53 @@ export const UnifiedWorkoutModal: React.FC<UnifiedWorkoutModalProps> = ({
                     />
                   </>
                 ) : (
-                  <WorkoutSelectionSummary
-                    duration={workoutStats?.workout?.duration}
-                    difficulty={workoutStats?.workout?.difficulty}
-                    equipment={workoutStats?.workout?.equipment}
-                    goals={workoutStats?.workout?.goals}
-                    sessionInputs={(workoutStats?.workout as any)?.sessionInputs}
-                    workoutData={workoutStats?.workout}
-                  />
+                  <>
+                    <WorkoutSelectionSummary
+                      duration={workoutStats?.workout?.duration}
+                      difficulty={workoutStats?.workout?.difficulty}
+                      equipment={workoutStats?.workout?.equipment}
+                      goals={workoutStats?.workout?.goals}
+                      sessionInputs={(workoutStats?.workout as any)?.sessionInputs}
+                      workoutData={workoutStats?.workout}
+                    />
+                    
+                    {/* Enhanced Workout Selections Summary Box */}
+                    <div className="enhanced-workout-selections" style={{
+                      marginTop: '1.5rem',
+                      padding: '1.5rem',
+                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%)',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      borderRadius: '12px',
+                      backdropFilter: 'blur(10px)'
+                    }}>
+                      <h3 style={{
+                        margin: '0 0 1rem 0',
+                        fontSize: '1.125rem',
+                        fontWeight: '600',
+                        color: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}>
+                        🎯 Enhanced Workout Selections Summary
+                      </h3>
+                      <p style={{
+                        margin: '0 0 1rem 0',
+                        fontSize: '0.875rem',
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        lineHeight: '1.4'
+                      }}>
+                        Complete data from WorkoutGeneratorGrid and profile context
+                      </p>
+                      
+                      {workoutStats?.workout && (
+                        <EnhancedSelectionSummary 
+                          workout={workoutStats.workout}
+                          className="enhanced-selections-content"
+                        />
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
 

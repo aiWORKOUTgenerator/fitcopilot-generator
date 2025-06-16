@@ -6,9 +6,11 @@
 import React, { useMemo } from 'react';
 import { ProfileProvider, useProfile } from './context/ProfileContext';
 import { getTimeBasedPersonalization, getMotivationalMessage } from './utils/timePersonalization';
+import { GenerationProfileSection } from './components/GenerationProfileSection';
 
 // Import the enhanced styles
 import './styles/ProfileFeature.scss';
+import './components/GenerationProfileSection.scss';
 
 function ProfileContent() {
   const { state, getProfile, updateProfile, clearError } = useProfile();
@@ -136,6 +138,9 @@ function ProfileContent() {
           </div>
         </div>
       </div>
+
+      {/* Workout Generation Profile Section */}
+      <GenerationProfileSection profile={profile} />
 
       {/* Fitness Profile Section */}
       <div className="profile-display__section">

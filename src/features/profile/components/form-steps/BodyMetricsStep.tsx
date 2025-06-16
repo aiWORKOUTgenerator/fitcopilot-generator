@@ -31,12 +31,67 @@ const BodyMetricsStep: React.FC<BodyMetricsStepProps> = ({
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(e.target.name, e.target.value);
   };
+
+  // Handle height unit change - convert between formats
+  const handleHeightUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newUnit = e.target.value;
+    const currentHeight = formData.height;
+    const currentUnit = formData.heightUnit || 'cm';
+    
+    // Convert height when switching units
+    if (currentHeight && currentUnit !== newUnit) {
+      let convertedHeight: number;
+      
+      if (currentUnit === 'cm' && newUnit === 'ft') {
+        // Convert cm to total inches, then to feet (as decimal)
+        const totalInches = currentHeight / 2.54;
+        convertedHeight = Math.round(totalInches * 10) / 10; // Round to 1 decimal place
+      } else if (currentUnit === 'ft' && newUnit === 'cm') {
+        // Convert feet (as decimal) to cm
+        const totalInches = currentHeight * 12;
+        convertedHeight = Math.round(totalInches * 2.54);
+      } else {
+        convertedHeight = currentHeight;
+      }
+      
+      onChange('height', convertedHeight);
+    }
+    
+    onChange('heightUnit', newUnit);
+  };
+
+  // Handle feet and inches input for height
+  const handleFeetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const feet = parseInt(e.target.value) || 0;
+    const inches = getInchesFromHeight(formData.height || 0);
+    const totalInches = (feet * 12) + inches;
+    onChange('height', totalInches);
+  };
+
+  const handleInchesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inches = parseInt(e.target.value) || 0;
+    const feet = getFeetFromHeight(formData.height || 0);
+    const totalInches = (feet * 12) + inches;
+    onChange('height', totalInches);
+  };
+
+  // Helper functions for feet/inches conversion
+  const getFeetFromHeight = (totalInches: number): number => {
+    return Math.floor(totalInches / 12);
+  };
+
+  const getInchesFromHeight = (totalInches: number): number => {
+    return Math.round(totalInches % 12);
+  };
+
+  // Determine if we should show feet/inches inputs
+  const showFeetInches = formData.heightUnit === 'ft';
   
   return (
     <div className="form-step body-metrics-step">
       <h2>Body Metrics</h2>
       <p className="step-description">
-        These details are optional but help us customize your workout plans more effectively.
+        Help us understand your physical characteristics for more accurate workout recommendations.
       </p>
       
       <div className="form-section">
@@ -73,26 +128,68 @@ const BodyMetricsStep: React.FC<BodyMetricsStepProps> = ({
           
           <div className="form-field">
             <label htmlFor="height">Height</label>
-            <div className="input-with-unit">
-              <input
-                type="number"
-                id="height"
-                name="height"
-                value={formData.height || ''}
-                onChange={handleInputChange}
-                placeholder="Enter your height"
-                min="0"
-                step="0.1"
-              />
-              <select
-                name="heightUnit"
-                value={formData.heightUnit || 'cm'}
-                onChange={handleSelectChange}
-              >
-                <option value="cm">cm</option>
-                <option value="ft">ft</option>
-              </select>
-            </div>
+            {showFeetInches ? (
+              <div className="height-feet-inches">
+                <div className="feet-inches-inputs">
+                  <div className="feet-input">
+                    <input
+                      type="number"
+                      id="height-feet"
+                      name="height-feet"
+                      value={getFeetFromHeight(formData.height || 0)}
+                      onChange={handleFeetChange}
+                      placeholder="0"
+                      min="0"
+                      max="8"
+                    />
+                    <span className="input-label">ft</span>
+                  </div>
+                  <div className="inches-input">
+                    <input
+                      type="number"
+                      id="height-inches"
+                      name="height-inches"
+                      value={getInchesFromHeight(formData.height || 0)}
+                      onChange={handleInchesChange}
+                      placeholder="0"
+                      min="0"
+                      max="11"
+                    />
+                    <span className="input-label">in</span>
+                  </div>
+                </div>
+                <select
+                  name="heightUnit"
+                  value={formData.heightUnit || 'cm'}
+                  onChange={handleHeightUnitChange}
+                  className="height-unit-select"
+                >
+                  <option value="cm">cm</option>
+                  <option value="ft">ft</option>
+                </select>
+              </div>
+            ) : (
+              <div className="input-with-unit">
+                <input
+                  type="number"
+                  id="height"
+                  name="height"
+                  value={formData.height || ''}
+                  onChange={handleInputChange}
+                  placeholder="Enter your height"
+                  min="0"
+                  step="0.1"
+                />
+                <select
+                  name="heightUnit"
+                  value={formData.heightUnit || 'cm'}
+                  onChange={handleHeightUnitChange}
+                >
+                  <option value="cm">cm</option>
+                  <option value="ft">ft</option>
+                </select>
+              </div>
+            )}
             {errors.height && (
               <div className="error-message">{errors.height}</div>
             )}

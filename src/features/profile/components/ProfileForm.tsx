@@ -41,15 +41,35 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onComplete, className = '' })
     resetForm
   } = useProfileForm();
 
-  // Handle form submission
+  // Handle async navigation (for save on last step)
+  const handleNavigation = async (direction: 'next' | 'previous') => {
+    if (direction === 'next') {
+      const success = await goToNextStep();
+      // If we successfully saved on the last step, trigger completion
+      if (success && currentStep === totalSteps && onComplete) {
+        console.log('[ProfileForm] Triggering onComplete after successful save');
+        onComplete();
+      }
+    } else {
+      goToPreviousStep();
+    }
+  };
+
+  // Handle form submission (should not be called anymore since Save button is type="button")
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('[ProfileForm] 🚨 handleSubmit() called! This should not happen anymore.');
+    console.log('[ProfileForm] Event:', e);
+    console.log('[ProfileForm] Event type:', e.type);
+    console.log('[ProfileForm] Event target:', e.target);
+    console.log('[ProfileForm] Current step:', currentStep);
+    console.log('[ProfileForm] Total steps:', totalSteps);
+    console.log('[ProfileForm] Is last step:', currentStep === totalSteps);
+    console.log('[ProfileForm] Stack trace:', new Error().stack);
+    
     e.preventDefault();
     
-    const success = await submitForm();
-    
-    if (success && onComplete) {
-      onComplete();
-    }
+    // This should not be called anymore since Save button is type="button"
+    console.log('[ProfileForm] Form submission prevented - using button click handler instead');
   };
 
   // Render the current step
@@ -130,8 +150,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onComplete, className = '' })
           currentStep={currentStep} 
           totalSteps={totalSteps}
           isSubmitting={isSubmitting}
-          onPrevious={goToPreviousStep}
-          onNext={goToNextStep}
+          onPrevious={() => handleNavigation('previous')}
+          onNext={() => handleNavigation('next')}
           onReset={resetForm}
           isLastStep={currentStep === totalSteps}
         />

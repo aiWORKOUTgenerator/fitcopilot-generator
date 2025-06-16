@@ -138,7 +138,15 @@ export const FIELD_DISPLAY_CONFIG: Record<ProfileFieldKey, {
     formatter: (value: number, profile: UserProfile) => {
       if (!value) return 'Not set';
       const unit = profile.heightUnit || 'cm';
-      return `${value} ${unit}`;
+      
+      if (unit === 'ft') {
+        // Convert total inches to feet and inches display
+        const feet = Math.floor(value / 12);
+        const inches = Math.round(value % 12);
+        return `${feet}'${inches}"`;
+      } else {
+        return `${value} ${unit}`;
+      }
     },
     isRequired: true
   },

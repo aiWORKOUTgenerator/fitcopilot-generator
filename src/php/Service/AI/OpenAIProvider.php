@@ -5,6 +5,12 @@
 
 namespace FitCopilot\Service\AI;
 
+use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\FitnessLevelContexts;
+use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\IntensityContexts;
+use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\ComplexityContexts;
+use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\DailyStateContexts;
+use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\EnvironmentContexts;
+
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
@@ -81,7 +87,7 @@ class OpenAIProvider {
             $workoutgrid_params = ['stress_level', 'energy_level', 'sleep_quality', 'location', 'custom_notes', 'primary_muscle_focus']; // SPRINT 3: NEW
             $session_context_params = ['session_context']; // SPRINT 3: NEW structured context
             $muscle_params = ['muscleTargeting', 'focusArea', 'targetMuscleGroups', 'specificMuscles'];
-            $profile_params = ['profile_goals', 'profileContext'];
+            $profile_params = ['profile_goals', 'profileContext', 'profile_age', 'profile_weight', 'profile_height', 'profile_gender', 'profile_preferred_duration', 'profile_first_name', 'profile_last_name'];
             $restrictions_params = ['restrictions'];
             
             $used_fitness = array_intersect_key($params, array_flip($fitness_params));
@@ -202,198 +208,20 @@ class OpenAIProvider {
         $session_context = $params['session_context'] ?? null;
 
         // PHASE 6: Enhanced fitness-specific descriptions with detailed AI guidance
-        $fitness_level_contexts = [
-            'beginner' => [
-                'description' => 'beginner fitness level',
-                'characteristics' => 'new to exercise, building foundation and proper form',
-                'exercise_guidance' => 'Focus on basic movements, proper form instruction, and gradual progression. Avoid complex or high-impact exercises.',
-                'intensity_adjustment' => 'Keep intensity conservative, prioritize learning over challenge'
-            ],
-            'intermediate' => [
-                'description' => 'intermediate fitness level',
-                'characteristics' => 'established routine with 6+ months experience, comfortable with standard exercises',
-                'exercise_guidance' => 'Include standard exercises with variations, moderate complexity movements, and progressive challenges.',
-                'intensity_adjustment' => 'Can handle moderate to high intensity with proper recovery periods'
-            ],
-            'advanced' => [
-                'description' => 'advanced fitness level',
-                'characteristics' => 'experienced with 2+ years training, high fitness capacity and movement competency',
-                'exercise_guidance' => 'Include complex movements, advanced techniques, and challenging exercise combinations.',
-                'intensity_adjustment' => 'Can handle high intensity and complex movement patterns with minimal rest'
-            ]
-        ];
-        $fitness_context = $fitness_level_contexts[$fitness_level] ?? $fitness_level_contexts['intermediate'];
+        $fitness_context = FitnessLevelContexts::getContext($fitness_level);
         
-        $intensity_level_contexts = [
-            1 => [
-                'description' => 'very low intensity',
-                'characteristics' => 'gentle, recovery-focused effort',
-                'pacing_guidance' => 'Emphasize slow, controlled movements with extended rest periods. Focus on mobility and light activation.',
-                'heart_rate_zone' => 'Zone 1-2 (50-70% max HR)'
-            ],
-            2 => [
-                'description' => 'low intensity',
-                'characteristics' => 'light activity, easy conversational pace',
-                'pacing_guidance' => 'Comfortable effort that allows for easy conversation. Moderate rest periods between exercises.',
-                'heart_rate_zone' => 'Zone 2 (60-70% max HR)'
-            ],
-            3 => [
-                'description' => 'moderate intensity',
-                'characteristics' => 'comfortable challenge, sustainable effort',
-                'pacing_guidance' => 'Challenging but sustainable pace. Standard rest periods. Should feel worked but not exhausted.',
-                'heart_rate_zone' => 'Zone 3 (70-80% max HR)'
-            ],
-            4 => [
-                'description' => 'high intensity',
-                'characteristics' => 'vigorous, challenging effort',
-                'pacing_guidance' => 'High effort with shorter, more intense work periods. Adequate rest for quality maintenance.',
-                'heart_rate_zone' => 'Zone 4 (80-90% max HR)'
-            ],
-            5 => [
-                'description' => 'very high intensity',
-                'characteristics' => 'maximum effort, elite-level challenge',
-                'pacing_guidance' => 'All-out effort with work-to-rest ratios favoring recovery. Focus on power and peak performance.',
-                'heart_rate_zone' => 'Zone 5 (90-100% max HR)'
-            ]
-        ];
-        $intensity_context = $intensity_level_contexts[$intensity_level] ?? $intensity_level_contexts[3];
+        $intensity_context = IntensityContexts::getContext($intensity_level);
         
-        $complexity_contexts = [
-            'basic' => [
-                'description' => 'basic exercise complexity',
-                'characteristics' => 'simple, fundamental movements that are easy to learn and execute',
-                'movement_guidance' => 'Use single-joint movements, basic bodyweight exercises, and simple equipment usage. Prioritize form over complexity.',
-                'progression_strategy' => 'Progress through repetitions, duration, or simple resistance changes'
-            ],
-            'moderate' => [
-                'description' => 'moderate exercise complexity',
-                'characteristics' => 'standard exercises with some variation and multi-joint movements',
-                'movement_guidance' => 'Include compound movements, exercise combinations, and moderate coordination challenges.',
-                'progression_strategy' => 'Progress through movement variations, tempo changes, and moderate complexity increases'
-            ],
-            'advanced' => [
-                'description' => 'advanced exercise complexity',
-                'characteristics' => 'complex movements requiring high coordination, balance, and technical skill',
-                'movement_guidance' => 'Include plyometrics, complex movement patterns, advanced exercise combinations, and technical skills.',
-                'progression_strategy' => 'Progress through advanced variations, complex movement chains, and sport-specific skills'
-            ]
-        ];
-        $complexity_context = $complexity_contexts[$exercise_complexity] ?? $complexity_contexts['moderate'];
+        $complexity_context = ComplexityContexts::getContext($exercise_complexity);
 
         // SPRINT 3: Enhanced WorkoutGeneratorGrid context descriptions following fitness model
-        $stress_contexts = [
-            'low' => [
-                'description' => 'low stress (calm and relaxed)',
-                'workout_adaptation' => 'Can handle normal workout intensity and complexity',
-                'exercise_guidance' => 'Standard exercise selection with full range of movements',
-                'mental_state' => 'Clear focus, good mind-muscle connection potential'
-            ],
-            'moderate' => [
-                'description' => 'moderate stress (manageable tension)',
-                'workout_adaptation' => 'May benefit from stress-relieving exercises',
-                'exercise_guidance' => 'Include flow-based movements and mindful transitions',
-                'mental_state' => 'May need movement to help process stress'
-            ],
-            'high' => [
-                'description' => 'high stress (feeling overwhelmed)',
-                'workout_adaptation' => 'Focus on stress reduction and gentle movement',
-                'exercise_guidance' => 'Prioritize yoga-style movements, deep breathing, gentle cardio',
-                'mental_state' => 'Needs calming, centering activities'
-            ],
-            'very_high' => [
-                'description' => 'very high stress (significant tension)',
-                'workout_adaptation' => 'Prioritize calming, restorative exercises',
-                'exercise_guidance' => 'Focus on meditation, gentle stretching, walking, breathing exercises',
-                'mental_state' => 'Requires gentle, therapeutic movement'
-            ]
-        ];
+        // Context data now extracted to modular classes
 
-        $energy_contexts = [
-            'very_low' => [
-                'description' => 'very low energy (drained/exhausted)',
-                'workout_adaptation' => 'Use gentle, energizing movements',
-                'exercise_guidance' => 'Light stretching, easy walking, gentle yoga',
-                'intensity_adjustment' => 'Significantly reduce intensity, focus on restoration'
-            ],
-            'low' => [
-                'description' => 'low energy (sluggish but functional)',
-                'workout_adaptation' => 'Start slow, build gradually',
-                'exercise_guidance' => 'Extended warm-up, build energy through movement',
-                'intensity_adjustment' => 'Reduce planned intensity by 20-30%'
-            ],
-            'moderate' => [
-                'description' => 'moderate energy (balanced and steady)',
-                'workout_adaptation' => 'Standard workout approach',
-                'exercise_guidance' => 'Proceed with planned workout structure',
-                'intensity_adjustment' => 'Maintain planned intensity levels'
-            ],
-            'high' => [
-                'description' => 'high energy (energetic and motivated)',
-                'workout_adaptation' => 'Can handle challenging workouts',
-                'exercise_guidance' => 'Take advantage of motivation for harder exercises',
-                'intensity_adjustment' => 'Can increase intensity by 10-20%'
-            ],
-            'very_high' => [
-                'description' => 'very high energy (pumped and ready)',
-                'workout_adaptation' => 'Perfect for high-intensity training',
-                'exercise_guidance' => 'Include explosive movements, challenging variations',
-                'intensity_adjustment' => 'Can handle maximum planned intensity'
-            ]
-        ];
 
-        $sleep_contexts = [
-            'poor' => [
-                'description' => 'poor sleep (restless night, tired)',
-                'workout_adaptation' => 'Reduce intensity, focus on gentle movement',
-                'exercise_guidance' => 'Avoid high-impact, emphasize recovery movements',
-                'recovery_priority' => 'Prioritize movement quality over quantity'
-            ],
-            'fair' => [
-                'description' => 'fair sleep (some rest, not fully refreshed)',
-                'workout_adaptation' => 'Moderate intensity with extra warm-up',
-                'exercise_guidance' => 'Extended preparation, listen to body cues',
-                'recovery_priority' => 'Monitor fatigue levels throughout workout'
-            ],
-            'good' => [
-                'description' => 'good sleep (well-rested and refreshed)',
-                'workout_adaptation' => 'Normal workout intensity',
-                'exercise_guidance' => 'Proceed with standard workout plan',
-                'recovery_priority' => 'Normal recovery expectations'
-            ],
-            'excellent' => [
-                'description' => 'excellent sleep (fully recharged)',
-                'workout_adaptation' => 'Can handle high-intensity training',
-                'exercise_guidance' => 'Take advantage of peak recovery state',
-                'recovery_priority' => 'Optimal conditions for challenging workout'
-            ]
-        ];
 
-        $location_contexts = [
-            'home' => [
-                'description' => 'home environment (limited space, household items)',
-                'space_guidance' => 'Focus on bodyweight and compact exercises',
-                'equipment_adaptation' => 'Use furniture, books, water bottles as equipment',
-                'noise_consideration' => 'Avoid jumping or loud movements'
-            ],
-            'gym' => [
-                'description' => 'gym setting (full equipment access)',
-                'space_guidance' => 'Can utilize all available equipment and space',
-                'equipment_adaptation' => 'Take advantage of full range of gym equipment',
-                'environment_benefits' => 'Motivating atmosphere, professional equipment'
-            ],
-            'outdoors' => [
-                'description' => 'outdoor location (fresh air, natural terrain)',
-                'space_guidance' => 'Incorporate natural movement patterns',
-                'equipment_adaptation' => 'Use natural features (hills, logs, rocks)',
-                'environment_benefits' => 'Fresh air, vitamin D, connection with nature'
-            ],
-            'travel' => [
-                'description' => 'travel/hotel setting (minimal equipment, compact space)',
-                'space_guidance' => 'Focus on portable, quiet exercises',
-                'equipment_adaptation' => 'Bodyweight only or travel-friendly items',
-                'noise_consideration' => 'Respectful of neighbors, minimal impact'
-            ]
-        ];
+
+
+
 
         // SPRINT 3: Structured prompt with enhanced WorkoutGeneratorGrid sections
         $prompt = "ENHANCED WORKOUT GENERATION REQUEST\n\n";
@@ -418,28 +246,34 @@ class OpenAIProvider {
         // SPRINT 3: NEW Section 3 - Daily Physical & Mental State
         $daily_state_factors = [];
         
-        if (!empty($stress_level) && isset($stress_contexts[$stress_level])) {
-            $stress_context = $stress_contexts[$stress_level];
-            $daily_state_factors[] = "Stress Level: {$stress_context['description']}";
-            $daily_state_factors[] = "  → Workout Adaptation: {$stress_context['workout_adaptation']}";
-            $daily_state_factors[] = "  → Exercise Guidance: {$stress_context['exercise_guidance']}";
-            $daily_state_factors[] = "  → Mental State: {$stress_context['mental_state']}";
+        if (!empty($stress_level)) {
+            $stress_context = DailyStateContexts::getStressContext($stress_level);
+            if (!empty($stress_context)) {
+                $daily_state_factors[] = "Stress Level: {$stress_context['description']}";
+                $daily_state_factors[] = "  → Workout Adaptation: {$stress_context['workout_adaptation']}";
+                $daily_state_factors[] = "  → Exercise Guidance: {$stress_context['exercise_guidance']}";
+                $daily_state_factors[] = "  → Mental State: {$stress_context['mental_state']}";
+            }
         }
         
-        if (!empty($energy_level) && isset($energy_contexts[$energy_level])) {
-            $energy_context = $energy_contexts[$energy_level];
-            $daily_state_factors[] = "Energy Level: {$energy_context['description']}";
-            $daily_state_factors[] = "  → Workout Adaptation: {$energy_context['workout_adaptation']}";
-            $daily_state_factors[] = "  → Exercise Guidance: {$energy_context['exercise_guidance']}";
-            $daily_state_factors[] = "  → Intensity Adjustment: {$energy_context['intensity_adjustment']}";
+        if (!empty($energy_level)) {
+            $energy_context = DailyStateContexts::getEnergyContext($energy_level);
+            if (!empty($energy_context)) {
+                $daily_state_factors[] = "Energy Level: {$energy_context['description']}";
+                $daily_state_factors[] = "  → Workout Adaptation: {$energy_context['workout_adaptation']}";
+                $daily_state_factors[] = "  → Exercise Guidance: {$energy_context['exercise_guidance']}";
+                $daily_state_factors[] = "  → Intensity Adjustment: {$energy_context['intensity_adjustment']}";
+            }
         }
         
-        if (!empty($sleep_quality) && isset($sleep_contexts[$sleep_quality])) {
-            $sleep_context = $sleep_contexts[$sleep_quality];
-            $daily_state_factors[] = "Sleep Quality: {$sleep_context['description']}";
-            $daily_state_factors[] = "  → Workout Adaptation: {$sleep_context['workout_adaptation']}";
-            $daily_state_factors[] = "  → Exercise Guidance: {$sleep_context['exercise_guidance']}";
-            $daily_state_factors[] = "  → Recovery Priority: {$sleep_context['recovery_priority']}";
+        if (!empty($sleep_quality)) {
+            $sleep_context = DailyStateContexts::getSleepContext($sleep_quality);
+            if (!empty($sleep_context)) {
+                $daily_state_factors[] = "Sleep Quality: {$sleep_context['description']}";
+                $daily_state_factors[] = "  → Workout Adaptation: {$sleep_context['workout_adaptation']}";
+                $daily_state_factors[] = "  → Exercise Guidance: {$sleep_context['exercise_guidance']}";
+                $daily_state_factors[] = "  → Recovery Priority: {$sleep_context['recovery_priority']}";
+            }
         }
         
         if (!empty($daily_state_factors)) {
@@ -451,19 +285,21 @@ class OpenAIProvider {
         }
         
         // SPRINT 3: NEW Section 4 - Environment & Location Context
-        if (!empty($location) && $location !== 'any' && isset($location_contexts[$location])) {
-            $location_context = $location_contexts[$location];
-            $prompt .= "WORKOUT ENVIRONMENT:\n";
-            $prompt .= "- Location: {$location_context['description']}\n";
-            $prompt .= "- Space Considerations: {$location_context['space_guidance']}\n";
-            $prompt .= "- Equipment Access: {$location_context['equipment_adaptation']}\n";
-            if (isset($location_context['noise_consideration'])) {
-                $prompt .= "- Noise Considerations: {$location_context['noise_consideration']}\n";
+        if (!empty($location) && $location !== 'any') {
+            $location_context = EnvironmentContexts::getLocationContext($location);
+            if (!empty($location_context)) {
+                $prompt .= "WORKOUT ENVIRONMENT:\n";
+                $prompt .= "- Location: {$location_context['description']}\n";
+                $prompt .= "- Space Considerations: {$location_context['space_guidance']}\n";
+                $prompt .= "- Equipment Access: {$location_context['equipment_adaptation']}\n";
+                if (isset($location_context['noise_consideration'])) {
+                    $prompt .= "- Noise Considerations: {$location_context['noise_consideration']}\n";
+                }
+                if (isset($location_context['environment_benefits'])) {
+                    $prompt .= "- Environment Benefits: {$location_context['environment_benefits']}\n";
+                }
+                $prompt .= "\n";
             }
-            if (isset($location_context['environment_benefits'])) {
-                $prompt .= "- Environment Benefits: {$location_context['environment_benefits']}\n";
-            }
-            $prompt .= "\n";
         }
         
         // Section 3: Muscle Targeting (if specified) - EXISTING
@@ -481,12 +317,161 @@ class OpenAIProvider {
             $prompt .= "- Exercise Selection: Include multiple {$primary_muscle_focus}-focused movements throughout the workout\n\n";
         }
         
-        // Section 6: Long-term Goals & Profile Context - EXISTING
+        // Section 6: Enhanced Long-term Goals & Profile Context - 🔧 FIX #3
         if (!empty($profile_goals)) {
             $profile_goals_text = implode(', ', $profile_goals);
             $prompt .= "LONG-TERM FITNESS GOALS:\n";
             $prompt .= "- User's Goals: {$profile_goals_text}\n";
             $prompt .= "- Integration Strategy: Prioritize today's focus while supporting overall fitness progression\n\n";
+        }
+        
+        // 🔧 ENHANCED: Comprehensive profile context section with physical data
+        $profile_equipment = $params['profile_equipment'] ?? [];
+        $profile_fitness_level = $params['profile_fitness_level'] ?? '';
+        $profile_frequency = $params['profile_frequency'] ?? '';
+        $profile_location = $params['profile_location'] ?? '';
+        $profile_limitations = $params['profile_limitations'] ?? [];
+        $profile_limitation_notes = $params['profile_limitation_notes'] ?? '';
+        
+        // 🔧 NEW: Enhanced physical profile data
+        $profile_age = $params['profile_age'] ?? null;
+        $profile_weight = $params['profile_weight'] ?? null;
+        $profile_weight_unit = $params['profile_weight_unit'] ?? 'lbs';
+        $profile_height = $params['profile_height'] ?? null;
+        $profile_height_unit = $params['profile_height_unit'] ?? 'ft';
+        $profile_gender = $params['profile_gender'] ?? '';
+        $profile_preferred_duration = $params['profile_preferred_duration'] ?? null;
+        $profile_first_name = $params['profile_first_name'] ?? '';
+        $profile_last_name = $params['profile_last_name'] ?? '';
+        
+        // 🔧 NEW: Additional profile fields for comprehensive AI personalization
+        $profile_medical_conditions = $params['profile_medical_conditions'] ?? '';
+        $profile_favorite_exercises = $params['profile_favorite_exercises'] ?? [];
+        $profile_disliked_exercises = $params['profile_disliked_exercises'] ?? [];
+        
+        if (!empty($profile_equipment) || !empty($profile_fitness_level) || !empty($profile_limitation_notes) || 
+            !empty($profile_limitations) || !empty($profile_age) || !empty($profile_weight) || !empty($profile_gender)) {
+            $prompt .= "USER PROFILE CONTEXT:\n";
+            
+            // Personal identification for workout customization
+            $full_name = trim($profile_first_name . ' ' . $profile_last_name);
+            if (!empty($full_name)) {
+                $prompt .= "- User Name: {$full_name} (personalize workout communication)\n";
+            }
+            
+            if (!empty($profile_fitness_level)) {
+                $prompt .= "- Fitness Level: {$profile_fitness_level} (from user profile)\n";
+            }
+            
+            // 🔧 NEW: Enhanced physical characteristics section
+            $physical_stats = [];
+            if (!empty($profile_age)) {
+                $age_context = $this->getAgeBasedContext($profile_age);
+                $prompt .= "- Age: {$profile_age} years ({$age_context})\n";
+            }
+            
+            if (!empty($profile_weight) && !empty($profile_height)) {
+                // Format height properly for AI prompt
+                $height_display = $profile_height;
+                if ($profile_height_unit === 'ft') {
+                    // Convert total inches to feet'inches" format
+                    $feet = floor($profile_height / 12);
+                    $inches = round($profile_height % 12);
+                    $height_display = "{$feet}'{$inches}\"";
+                } else {
+                    $height_display = "{$profile_height} {$profile_height_unit}";
+                }
+                
+                $prompt .= "- Physical Stats: {$profile_weight} {$profile_weight_unit}, {$height_display}\n";
+                $prompt .= "- Body Considerations: Adjust exercise load and range of motion accordingly\n";
+            } elseif (!empty($profile_weight)) {
+                $prompt .= "- Weight: {$profile_weight} {$profile_weight_unit} (consider for bodyweight exercise modifications)\n";
+            } elseif (!empty($profile_height)) {
+                // Format height properly for AI prompt
+                $height_display = $profile_height;
+                if ($profile_height_unit === 'ft') {
+                    // Convert total inches to feet'inches" format
+                    $feet = floor($profile_height / 12);
+                    $inches = round($profile_height % 12);
+                    $height_display = "{$feet}'{$inches}\"";
+                } else {
+                    $height_display = "{$profile_height} {$profile_height_unit}";
+                }
+                
+                $prompt .= "- Height: {$height_display} (consider for range of motion and posture)\n";
+            }
+            
+            if (!empty($profile_gender)) {
+                $gender_context = $this->getGenderBasedContext($profile_gender);
+                $prompt .= "- Gender: {$profile_gender} ({$gender_context})\n";
+            }
+            
+            if (!empty($profile_preferred_duration)) {
+                $prompt .= "- Preferred Workout Duration: {$profile_preferred_duration} minutes (user's time preference)\n";
+            }
+            
+            if (!empty($profile_equipment)) {
+                $equipment_text = is_array($profile_equipment) ? implode(', ', $profile_equipment) : $profile_equipment;
+                $prompt .= "- Profile Equipment: {$equipment_text}\n";
+            }
+            
+            if (!empty($profile_frequency)) {
+                $prompt .= "- Typical Workout Frequency: {$profile_frequency} times per week\n";
+            }
+            
+            if (!empty($profile_location)) {
+                $prompt .= "- Preferred Location: {$profile_location}\n";
+            }
+            
+            // 🔧 ENHANCED: Comprehensive limitations display with both structured and notes
+            if (!empty($profile_limitations) || !empty($profile_limitation_notes)) {
+                $limitation_details = [];
+                
+                // Add structured limitations (body areas)
+                if (is_array($profile_limitations) && !empty($profile_limitations)) {
+                    $filtered_limitations = array_filter($profile_limitations, function($limitation) {
+                        return $limitation !== 'none';
+                    });
+                    
+                    if (!empty($filtered_limitations)) {
+                        $limitation_labels = array_map(function($limitation) {
+                            return str_replace('_', ' ', ucwords($limitation, '_'));
+                        }, $filtered_limitations);
+                        $limitation_details[] = "Body Areas: " . implode(', ', $limitation_labels);
+                    }
+                }
+                
+                // Add limitation notes (specific details)
+                if (!empty($profile_limitation_notes)) {
+                    $limitation_details[] = "Details: {$profile_limitation_notes}";
+                }
+                
+                if (!empty($limitation_details)) {
+                    $prompt .= "- Health Limitations: " . implode(' | ', $limitation_details) . "\n";
+                    $prompt .= "- Safety Priority: Pay special attention to these limitations when selecting exercises\n";
+                }
+            }
+            
+            // 🔧 NEW: Medical conditions and exercise preferences
+            if (!empty($profile_medical_conditions)) {
+                $prompt .= "- Medical Conditions: {$profile_medical_conditions}\n";
+                $prompt .= "- Medical Considerations: Ensure all exercises are appropriate for these conditions\n";
+            }
+            
+            if (!empty($profile_favorite_exercises)) {
+                $favorite_count = is_array($profile_favorite_exercises) ? count($profile_favorite_exercises) : 0;
+                if ($favorite_count > 0) {
+                    $favorites_text = is_array($profile_favorite_exercises) ? implode(', ', $profile_favorite_exercises) : $profile_favorite_exercises;
+                    $prompt .= "- Favorite Exercises: {$favorites_text} (try to include when appropriate)\n";
+                }
+            }
+            
+            if (!empty($profile_disliked_exercises)) {
+                $disliked_text = is_array($profile_disliked_exercises) ? implode(', ', $profile_disliked_exercises) : $profile_disliked_exercises;
+                $prompt .= "- Exercises to Avoid: {$disliked_text} (do not include these exercises)\n";
+            }
+            
+            $prompt .= "- Profile Integration: Consider the user's complete profile (physical stats, age, gender, preferences, limitations) throughout the workout design for maximum personalization\n\n";
         }
         
         // Section 7: Restrictions & Limitations - EXISTING
@@ -627,6 +612,50 @@ class OpenAIProvider {
     }
 
     /**
+     * Get age-based workout context for AI prompts
+     *
+     * @param int $age User's age
+     * @return string Age-appropriate workout context
+     */
+    private function getAgeBasedContext($age) {
+        if ($age < 20) {
+            return 'young adult - high energy capacity, focus on form and habit building';
+        } elseif ($age < 30) {
+            return 'young adult - peak physical capacity, can handle high intensity';
+        } elseif ($age < 40) {
+            return 'adult - excellent capacity with recovery awareness needed';
+        } elseif ($age < 50) {
+            return 'mature adult - focus on joint health and sustainable intensity';
+        } elseif ($age < 60) {
+            return 'middle-aged - emphasize mobility, joint protection, and progressive loading';
+        } else {
+            return 'senior - prioritize functional movement, balance, and gentle progression';
+        }
+    }
+
+    /**
+     * Get gender-based workout context for AI prompts
+     *
+     * @param string $gender User's gender
+     * @return string Gender-appropriate workout considerations
+     */
+    private function getGenderBasedContext($gender) {
+        switch (strtolower($gender)) {
+            case 'male':
+                return 'typically higher upper body strength, may prefer strength-focused training';
+            case 'female':
+                return 'often higher lower body strength ratio, may benefit from balanced strength training';
+            case 'other':
+            case 'non-binary':
+                return 'individualized approach based on personal preferences and goals';
+            case 'prefer_not_to_say':
+                return 'gender-neutral exercise selection and programming';
+            default:
+                return 'personalized approach regardless of gender identity';
+        }
+    }
+
+    /**
      * Make API request to OpenAI
      *
      * @param string $prompt The prompt to send to OpenAI
@@ -646,23 +675,29 @@ class OpenAIProvider {
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'You are an elite fitness coach and exercise physiologist specializing in highly personalized workout design. PHASE 6 ENHANCEMENT: You now receive comprehensive, structured workout requests with separated fitness parameters and detailed contextual guidance.
+                        'content' => "You are an elite fitness coach and exercise physiologist specializing in highly personalized workout design. ENHANCED PROFILE INTEGRATION: You now receive comprehensive user profile data including age, physical stats, gender, and personal preferences for maximum workout personalization.
 
 KEY EXPERTISE AREAS:
 - Exercise Prescription: Match exercises to fitness levels (beginner/intermediate/advanced) with appropriate progressions
-- Intensity Management: Design workouts using heart rate zones and perceived exertion scales (1-5 intensity levels)
+- Age-Specific Programming: Adapt intensity and exercise selection based on user age and life stage
+- Physical Adaptation: Consider height, weight, and gender for exercise modifications and load recommendations
+- Intensity Management: Design workouts using heart rate zones and perceived exertion scales (1-6 intensity levels)
 - Movement Complexity: Select exercises based on coordination requirements (basic/moderate/advanced complexity)
 - Contextual Adaptation: Modify workouts based on stress, energy, sleep quality, and environmental factors
 - Safety & Progression: Ensure proper warm-up, cool-down, and exercise modifications for restrictions
 
 WORKOUT DESIGN PRINCIPLES:
 1. FITNESS LEVEL ALIGNMENT: Beginners get foundational movements with form focus; Intermediates get standard exercises with variations; Advanced get complex, challenging movements
-2. INTENSITY PRECISION: Use the specified heart rate zones and pacing guidance to design appropriate work-to-rest ratios
-3. COMPLEXITY MATCHING: Basic = simple movements; Moderate = compound exercises; Advanced = complex patterns and skills
-4. STATE ADAPTATION: Adjust intensity and exercise selection based on current stress, energy, and sleep quality
-5. ENVIRONMENTAL OPTIMIZATION: Tailor exercises to available space, equipment, and location constraints
-6. PROGRESSIVE STRUCTURE: Include proper warm-up, main workout phases, and cool-down with logical exercise sequencing
-7. SAFETY FIRST: Always consider restrictions and provide modifications when needed
+2. AGE-APPROPRIATE PROGRAMMING: Adapt exercise selection, intensity, and recovery based on user's age and life stage considerations
+3. PHYSICAL ADAPTATION: Consider height, weight, and body composition for exercise load, range of motion, and movement modifications
+4. GENDER-INFORMED APPROACH: Respect individual preferences while considering typical strength patterns and training preferences
+5. INTENSITY PRECISION: Use the specified heart rate zones and pacing guidance to design appropriate work-to-rest ratios
+6. COMPLEXITY MATCHING: Basic = simple movements; Moderate = compound exercises; Advanced = complex patterns and skills
+7. STATE ADAPTATION: Adjust intensity and exercise selection based on current stress, energy, and sleep quality
+8. ENVIRONMENTAL OPTIMIZATION: Tailor exercises to available space, equipment, and location constraints
+9. PROGRESSIVE STRUCTURE: Include proper warm-up, main workout phases, and cool-down with logical exercise sequencing
+10. SAFETY FIRST: Always consider restrictions and provide modifications when needed
+11. PERSONAL PREFERENCES: Honor user's preferred workout duration and individual customization requests
 
 RESPONSE REQUIREMENTS:
 - Follow the exact JSON format specified in the request
@@ -672,7 +707,7 @@ RESPONSE REQUIREMENTS:
 - Include specific rep counts, durations, or time-based instructions for each exercise
 - Structure workouts with logical progression and appropriate rest periods
 
-Your goal is to create workouts that are perfectly matched to the user\'s current fitness level, today\'s physical/mental state, available resources, and long-term goals while maintaining the highest standards of safety and effectiveness.'
+Your goal is to create workouts that are perfectly matched to the user's current fitness level, today's physical/mental state, available resources, and long-term goals while maintaining the highest standards of safety and effectiveness."
                     ],
                     [
                         'role' => 'user',

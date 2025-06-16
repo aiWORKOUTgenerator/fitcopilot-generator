@@ -735,6 +735,14 @@ header('Content-Type: text/html; charset=utf-8');
         
         async function testUpdateProfileDirect() {
             try {
+                // WARNING: This test modifies the currently logged-in user's profile data
+                console.warn('⚠️  WARNING: This test will overwrite the current user\'s profile data!');
+                console.warn('⚠️  Only run this test with dedicated test user accounts.');
+                
+                if (!confirm('This test will overwrite your profile data with test values. Continue?')) {
+                    return { success: false, error: 'Test cancelled by user', response: null };
+                }
+                
                 const response = await fetch(`${baseUrl}/profile`, {
                     method: 'PUT',
                     headers: {
@@ -747,8 +755,8 @@ header('Content-Type: text/html; charset=utf-8');
                         availableEquipment: ['dumbbells', 'barbell', 'bench'],
                         workoutFrequency: '5+',
                         preferredWorkoutDuration: 45,
-                        firstName: 'Test',
-                        lastName: 'User',
+                        firstName: 'TestUser_Advanced',  // Clear test data markers
+                        lastName: 'TestUser_Strong',     // Clear test data markers
                         age: 30,
                         weight: 180,
                         weightUnit: 'lbs'
@@ -770,6 +778,15 @@ header('Content-Type: text/html; charset=utf-8');
         
         async function testUpdateProfileWrapped() {
             try {
+                // WARNING: This test modifies the currently logged-in user's profile data
+                // DO NOT RUN THIS TEST WITH REAL USER ACCOUNTS
+                console.warn('⚠️  WARNING: This test will overwrite the current user\'s profile data!');
+                console.warn('⚠️  Only run this test with dedicated test user accounts.');
+                
+                if (!confirm('This test will overwrite your profile data with test values. Continue?')) {
+                    return { success: false, error: 'Test cancelled by user', response: null };
+                }
+                
                 const response = await fetch(`${baseUrl}/profile`, {
                     method: 'PUT',
                     headers: {
@@ -783,8 +800,8 @@ header('Content-Type: text/html; charset=utf-8');
                             availableEquipment: ['resistance_bands', 'none'],
                             workoutFrequency: '3-4',
                             preferredWorkoutDuration: 30,
-                            firstName: 'Jane',
-                            lastName: 'Doe',
+                            firstName: 'TestUser_Jane',  // Clear test data markers
+                            lastName: 'TestUser_Doe',    // Clear test data markers
                             age: 25,
                             weight: 140,
                             weightUnit: 'lbs',

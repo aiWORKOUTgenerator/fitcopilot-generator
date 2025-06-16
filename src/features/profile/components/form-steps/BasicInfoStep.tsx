@@ -90,7 +90,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     <div className="form-step basic-info-step">
       <h2>Basic Information</h2>
       <p className="step-description">
-        Let's start with your personal information and fitness details.
+        Let's start with some basic information about you to personalize your fitness experience.
       </p>
       
       {/* Personal Information Section */}
@@ -151,15 +151,41 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         title="Fitness Level"
         description="Help us understand your current fitness experience"
       >
-        <RadioGroupEnhanced
-          title="What is your fitness level?"
-          description="This helps us recommend appropriate workout intensity and progression"
-          value={formData.fitnessLevel || ''}
-          onChange={handleFitnessLevelChange}
-          options={fitnessLevelOptions}
-          name="fitnessLevel"
-          error={errors.fitnessLevel}
-        />
+        <div className="form-field">
+          <label className="form-field__label">
+            What is your fitness level?
+          </label>
+          <p className="form-field__description">
+            This helps us recommend appropriate workout intensity and progression
+          </p>
+          
+          <div className="radio-group">
+            {fitnessLevelOptions.map((option) => (
+              <div key={option.value} className="radio-option">
+                <input
+                  type="radio"
+                  id={option.value}
+                  name="fitnessLevel"
+                  value={option.value}
+                  checked={formData.fitnessLevel === option.value}
+                  onChange={(e) => handleFitnessLevelChange(e.target.value)}
+                />
+                <label htmlFor={option.value}>
+                  <div className="option-content">
+                    <span className="option-title">{option.title}</span>
+                    <span className="option-description">{option.description}</span>
+                  </div>
+                </label>
+              </div>
+            ))}
+          </div>
+          
+          {errors.fitnessLevel && (
+            <div className="form-field__error">
+              {errors.fitnessLevel}
+            </div>
+          )}
+        </div>
       </FormSectionEnhanced>
 
       {/* Fitness Goals Section */}
@@ -167,17 +193,17 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         title="Fitness Goals"
         description="Select all goals that apply to you"
       >
-        <div className="checkbox-group-enhanced">
-          <div className="checkbox-group-enhanced__title">
+        <div className="form-field">
+          <label className="form-field__label">
             What are your fitness goals?
-          </div>
-          <div className="checkbox-group-enhanced__description">
+          </label>
+          <p className="form-field__description">
             Choose multiple goals to create a well-rounded fitness plan
-          </div>
+          </p>
           
-          <div className="checkbox-group-enhanced__options">
+          <div className="checkbox-group">
             {fitnessGoals.map((goal) => (
-              <div key={goal.id} className="checkbox-option-enhanced">
+              <div key={goal.id} className="checkbox-option">
                 <input
                   type="checkbox"
                   id={goal.id}
@@ -185,13 +211,11 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
                   value={goal.id}
                   checked={formData.goals?.includes(goal.id as FitnessGoal) || false}
                   onChange={(e) => handleGoalChange(goal.id, e.target.checked)}
-                  className="checkbox-option-enhanced__input"
                 />
-                <label htmlFor={goal.id} className="checkbox-option-enhanced__label">
-                  <div className="checkbox-option-enhanced__indicator" />
-                  <div className="checkbox-option-enhanced__content">
-                    <span className="checkbox-option-enhanced__title">{goal.label}</span>
-                    <span className="checkbox-option-enhanced__description">{goal.description}</span>
+                <label htmlFor={goal.id}>
+                  <div className="option-content">
+                    <span className="option-title">{goal.label}</span>
+                    <span className="option-description">{goal.description}</span>
                   </div>
                 </label>
               </div>
@@ -199,7 +223,7 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           </div>
           
           {errors.goals && (
-            <div className="form-field-enhanced__error">
+            <div className="form-field__error">
               {errors.goals}
             </div>
           )}

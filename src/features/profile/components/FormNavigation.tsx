@@ -54,8 +54,9 @@ const FormNavigation: React.FC<FormNavigationProps> = ({
           </button>
         ) : (
           <button
-            type="submit"
+            type="button"
             className="button button-success"
+            onClick={onNext}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : 'Save Profile'}

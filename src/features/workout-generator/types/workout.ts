@@ -220,6 +220,12 @@ export interface GeneratedWorkout {
    * User who last modified
    */
   modifiedBy?: string | number;
+  
+  /**
+   * Session-specific inputs from workout generation
+   * Contains all the user selections from WorkoutGeneratorGrid
+   */
+  sessionInputs?: SessionSpecificInputs;
 }
 
 /**

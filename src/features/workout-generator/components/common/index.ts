@@ -4,4 +4,5 @@
 
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as TipsCard } from './TipsCard/TipsCard';
-export { default as DebugControls } from './DebugControls'; 
+export { default as DebugControls } from './DebugControls';
+export { WorkoutSelectionSummary } from './WorkoutSelectionSummary'; 

@@ -8,6 +8,9 @@
 @import '../../../../styles/design-system/tokens/index.scss';
 @import '../../../../styles/design-system/mixins/index.scss';
 
+// Import profile form steps styling
+@import '../form-steps/ProfileFormSteps.scss';
+
 .profile-edit-modal {
   &__overlay {
     position: fixed;
