@@ -88,7 +88,7 @@ class OpenAIProvider {
      * @return array Generated workout data
      * @throws \Exception If API call fails
      */
-    public function generateWorkout($params) {
+    public function generateWorkout(array $params): array {
         // ✅ ENHANCED: Log parameter completeness for debugging
         $this->logParameterUsage($params);
         
@@ -506,7 +506,7 @@ class OpenAIProvider {
      * @param array $params Workout parameters
      * @return string Prompt for OpenAI
      */
-    public function buildPrompt($params) {
+    public function buildPrompt(array $params): string {
         // PHASE 6: Enhanced fitness-specific parameters with detailed context
         $fitness_level = $params['fitness_level'] ?? $params['difficulty'] ?? 'intermediate';
         $intensity_level = $params['intensity_level'] ?? $params['intensity'] ?? 3;
@@ -1130,5 +1130,109 @@ DO NOT include any text before or after the JSON. DO NOT wrap in markdown code b
         } catch (\Exception $e) {
             throw new \Exception('Failed to parse workout from OpenAI: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get provider information
+     *
+     * @return array Provider information
+     */
+    public function getProviderInfo(): array {
+        return [
+            'name' => 'OpenAI',
+            'model' => 'gpt-4.1',
+            'version' => '1.0.0',
+            'capabilities' => ['workout_generation', 'prompt_building'],
+            'max_tokens' => 2000,
+            'supports_streaming' => false,
+            'rate_limits' => [
+                'requests_per_minute' => 60,
+                'tokens_per_minute' => 150000
+            ]
+        ];
+    }
+
+    /**
+     * Estimate cost for a prompt
+     *
+     * @param string $prompt The prompt to estimate cost for
+     * @return float Estimated cost in USD
+     */
+    public function estimateCost(string $prompt): float {
+        // GPT-4 pricing (approximate)
+        $input_cost_per_token = 0.00003; // $0.03 per 1K tokens
+        $output_cost_per_token = 0.00006; // $0.06 per 1K tokens
+        
+        // Estimate tokens (rough approximation: 1 token ≈ 4 characters)
+        $input_tokens = strlen($prompt) / 4;
+        $estimated_output_tokens = 800; // Average workout response
+        
+        $input_cost = ($input_tokens / 1000) * $input_cost_per_token * 1000;
+        $output_cost = ($estimated_output_tokens / 1000) * $output_cost_per_token * 1000;
+        
+        return round($input_cost + $output_cost, 4);
+    }
+
+    /**
+     * Validate provider configuration
+     *
+     * @return bool True if configuration is valid
+     */
+    public function validateConfiguration(): bool {
+        return !empty($this->api_key) && !empty($this->api_endpoint);
+    }
+
+    /**
+     * Get provider health status
+     *
+     * @return array Health status information
+     */
+    public function getHealthStatus(): array {
+        $health = [
+            'status' => 'unknown',
+            'last_check' => time(),
+            'response_time' => null,
+            'error_message' => null
+        ];
+
+        try {
+            // Simple health check with minimal prompt
+            $start_time = microtime(true);
+            
+            $test_args = [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_key,
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => json_encode([
+                    'model' => 'gpt-4.1',
+                    'messages' => [
+                        ['role' => 'user', 'content' => 'Health check']
+                    ],
+                    'max_tokens' => 10,
+                ]),
+                'timeout' => 30,
+            ];
+
+            $response = wp_remote_post($this->api_endpoint, $test_args);
+            $response_time = (microtime(true) - $start_time) * 1000;
+
+            if (is_wp_error($response)) {
+                $health['status'] = 'error';
+                $health['error_message'] = $response->get_error_message();
+            } elseif (wp_remote_retrieve_response_code($response) === 200) {
+                $health['status'] = 'healthy';
+                $health['response_time'] = round($response_time, 2);
+            } else {
+                $health['status'] = 'error';
+                $health['error_message'] = 'HTTP ' . wp_remote_retrieve_response_code($response);
+            }
+
+        } catch (\Exception $e) {
+            $health['status'] = 'error';
+            $health['error_message'] = $e->getMessage();
+        }
+
+        return $health;
     }
 } 

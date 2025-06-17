@@ -12,6 +12,7 @@ use FitCopilot\Admin\Debug\Controllers\TestingLabController;
 use FitCopilot\Admin\Debug\Controllers\SystemLogsController;
 use FitCopilot\Admin\Debug\Controllers\PerformanceController;
 use FitCopilot\Admin\Debug\Controllers\ResponseAnalysisController;
+use FitCopilot\Admin\Debug\Controllers\PromptBuilderController;
 
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
@@ -49,6 +50,7 @@ class DebugManager {
      */
     private function initializeControllers(): void {
         $this->controllers = [
+            'prompt_builder' => new PromptBuilderController(),
             'testing_lab' => new TestingLabController(),
             'system_logs' => new SystemLogsController(),
             'performance' => new PerformanceController(),
@@ -87,6 +89,11 @@ class DebugManager {
      * @return void
      */
     private function registerAjaxHandlers(): void {
+        // Initialize PromptBuilderController AJAX handlers
+        if (isset($this->controllers['prompt_builder'])) {
+            $this->controllers['prompt_builder']->init();
+        }
+        
         // Register AJAX handlers through controllers
         foreach ($this->controllers as $controller) {
             if (method_exists($controller, 'registerAjaxHandlers')) {
@@ -173,11 +180,13 @@ class DebugManager {
         // Debug: Log when this method is called
         error_log("DebugManager::enqueueAdminAssets called with hook: {$hook_suffix}");
         
-        // More specific hook matching for Testing Lab page
+        // More specific hook matching for Debug pages
         $is_debug_page = (
             strpos($hook_suffix, 'fitcopilot-debug') !== false ||
             strpos($hook_suffix, 'testing-lab') !== false ||
-            strpos($hook_suffix, 'fitcopilot_page_fitcopilot-testing-lab') !== false
+            strpos($hook_suffix, 'prompt-builder') !== false ||
+            strpos($hook_suffix, 'fitcopilot_page_fitcopilot-testing-lab') !== false ||
+            strpos($hook_suffix, 'fitcopilot_page_fitcopilot-prompt-builder') !== false
         );
         
         if (!$is_debug_page) {

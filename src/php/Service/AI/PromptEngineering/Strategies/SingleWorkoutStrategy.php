@@ -47,39 +47,106 @@ class SingleWorkoutStrategy implements PromptStrategyInterface {
         // Build the modular prompt
         $prompt = "ENHANCED WORKOUT GENERATION REQUEST\n\n";
         
-        // Section 1: User Profile & Fitness Context
+        // Section 1: Comprehensive User Profile
         $prompt .= "USER PROFILE:\n";
+        
+        // Basic Profile Information
+        $profile_first_name = $contextManager->getContextValue('profile_first_name');
+        $profile_last_name = $contextManager->getContextValue('profile_last_name');
+        if (!empty($profile_first_name) || !empty($profile_last_name)) {
+            $full_name = trim(($profile_first_name ?? '') . ' ' . ($profile_last_name ?? ''));
+            $prompt .= "- Name: {$full_name}\n";
+        }
+        
+        // Physical Stats
+        $profile_age = $contextManager->getContextValue('profile_age');
+        $profile_weight = $contextManager->getContextValue('profile_weight');
+        $profile_weight_unit = $contextManager->getContextValue('profile_weight_unit', 'lbs');
+        $profile_height = $contextManager->getContextValue('profile_height');
+        $profile_height_unit = $contextManager->getContextValue('profile_height_unit', 'ft');
+        $profile_gender = $contextManager->getContextValue('profile_gender');
+        
+        if (!empty($profile_age)) {
+            $prompt .= "- Age: {$profile_age} years\n";
+        }
+        if (!empty($profile_gender)) {
+            $prompt .= "- Gender: {$profile_gender}\n";
+        }
+        if (!empty($profile_weight)) {
+            $prompt .= "- Weight: {$profile_weight} {$profile_weight_unit}\n";
+        }
+        if (!empty($profile_height)) {
+            if ($profile_height_unit === 'ft') {
+                $feet = floor($profile_height / 12);
+                $inches = $profile_height % 12;
+                $prompt .= "- Height: {$feet}'{$inches}\"\n";
+            } else {
+                $prompt .= "- Height: {$profile_height} {$profile_height_unit}\n";
+            }
+        }
+        
+        // Fitness & Goals
         $prompt .= "- Fitness Level: {$fitness_level}\n";
-        $prompt .= "- Primary Focus: {$daily_focus}\n\n";
+        
+        $profile_goals = $contextManager->getContextValue('profile_goals');
+        if (!empty($profile_goals)) {
+            $goals_text = is_array($profile_goals) ? implode(', ', $profile_goals) : $profile_goals;
+            $prompt .= "- Profile Goals: {$goals_text}\n";
+        }
+        $prompt .= "- Primary Focus: {$daily_focus}\n";
+        
+        // Equipment & Location Preferences
+        $profile_equipment = $contextManager->getContextValue('profile_equipment');
+        if (!empty($profile_equipment)) {
+            $profile_equipment_text = is_array($profile_equipment) ? implode(', ', $profile_equipment) : $profile_equipment;
+            $prompt .= "- Available Equipment: {$profile_equipment_text}\n";
+        }
+        
+        $profile_location = $contextManager->getContextValue('profile_location');
+        if (!empty($profile_location)) {
+            $prompt .= "- Preferred Location: {$profile_location}\n";
+        }
+        
+        $profile_frequency = $contextManager->getContextValue('profile_frequency');
+        if (!empty($profile_frequency)) {
+            $prompt .= "- Workout Frequency: {$profile_frequency}\n";
+        }
+        
+        // Exercise Preferences
+        $profile_favorite_exercises = $contextManager->getContextValue('profile_favorite_exercises');
+        if (!empty($profile_favorite_exercises)) {
+            $prompt .= "- Favorite Exercises: {$profile_favorite_exercises}\n";
+        }
+        
+        $profile_disliked_exercises = $contextManager->getContextValue('profile_disliked_exercises');
+        if (!empty($profile_disliked_exercises)) {
+            $prompt .= "- Disliked Exercises: {$profile_disliked_exercises}\n";
+        }
+        
+        // Health Considerations
+        $profile_limitations = $contextManager->getContextValue('profile_limitations');
+        $profile_limitation_notes = $contextManager->getContextValue('profile_limitation_notes');
+        $profile_medical_conditions = $contextManager->getContextValue('profile_medical_conditions');
+        
+        if (!empty($profile_limitations)) {
+            $limitations_text = is_array($profile_limitations) ? implode(', ', $profile_limitations) : $profile_limitations;
+            $prompt .= "- Physical Limitations: {$limitations_text}\n";
+        }
+        if (!empty($profile_limitation_notes)) {
+            $prompt .= "- Limitation Notes: {$profile_limitation_notes}\n";
+        }
+        if (!empty($profile_medical_conditions)) {
+            $prompt .= "- Medical Conditions: {$profile_medical_conditions}\n";
+        }
+        
+        $prompt .= "\n";
         
         // Section 2: Today's Workout Parameters
         $prompt .= "TODAY'S WORKOUT PARAMETERS:\n";
         $prompt .= "- Duration: {$duration} minutes\n";
         $prompt .= "- Equipment Available: {$equipment_text}\n\n";
         
-        // Section 3: Enhanced Profile Context (if available)
-        $profile_age = $contextManager->getContextValue('profile_age');
-        $profile_weight = $contextManager->getContextValue('profile_weight');
-        $profile_gender = $contextManager->getContextValue('profile_gender');
-        
-        if (!empty($profile_age) || !empty($profile_weight) || !empty($profile_gender)) {
-            $prompt .= "USER PROFILE CONTEXT:\n";
-            
-            if (!empty($profile_age)) {
-                $prompt .= "- Age: {$profile_age} years\n";
-            }
-            if (!empty($profile_weight)) {
-                $weight_unit = $contextManager->getContextValue('profile_weight_unit', 'lbs');
-                $prompt .= "- Weight: {$profile_weight} {$weight_unit}\n";
-            }
-            if (!empty($profile_gender)) {
-                $prompt .= "- Gender: {$profile_gender}\n";
-            }
-            
-            $prompt .= "\n";
-        }
-        
-        // Section 4: Daily State (if available)
+        // Section 3: Daily State (if available)
         $stress_level = $contextManager->getContextValue('stress_level');
         $energy_level = $contextManager->getContextValue('energy_level');
         $sleep_quality = $contextManager->getContextValue('sleep_quality');
@@ -100,30 +167,23 @@ class SingleWorkoutStrategy implements PromptStrategyInterface {
             $prompt .= "- Adaptation: Adjust workout intensity and exercise selection based on current state\n\n";
         }
         
-        // Section 5: Restrictions & Limitations
+        // Section 4: Additional Restrictions (if any beyond profile)
         $restrictions = $contextManager->getContextValue('restrictions');
-        $limitation_notes = $contextManager->getContextValue('profile_limitation_notes');
         
-        if (!empty($restrictions) || !empty($limitation_notes)) {
-            $prompt .= "RESTRICTIONS & LIMITATIONS:\n";
+        if (!empty($restrictions) && $restrictions !== 'none') {
+            $prompt .= "ADDITIONAL TODAY'S RESTRICTIONS:\n";
             
-            if (!empty($restrictions) && $restrictions !== 'none') {
-                if (is_array($restrictions)) {
-                    $restrictions_text = implode(', ', $restrictions);
-                    $prompt .= "- Body Areas to Avoid: {$restrictions_text}\n";
-                } else {
-                    $prompt .= "- Health Considerations: {$restrictions}\n";
-                }
+            if (is_array($restrictions)) {
+                $restrictions_text = implode(', ', $restrictions);
+                $prompt .= "- Body Areas to Avoid Today: {$restrictions_text}\n";
+            } else {
+                $prompt .= "- Today's Health Considerations: {$restrictions}\n";
             }
             
-            if (!empty($limitation_notes)) {
-                $prompt .= "- Important Note: {$limitation_notes}\n";
-            }
-            
-            $prompt .= "- Safety Priority: Ensure all exercises are safe and appropriate for these limitations\n\n";
+            $prompt .= "- Safety Priority: Ensure all exercises are safe and appropriate for all limitations (profile + today's)\n\n";
         }
         
-        // Section 6: Generation Instructions
+        // Section 5: Generation Instructions
         $prompt .= "GENERATION INSTRUCTIONS:\n";
         $prompt .= "1. Create a personalized workout based on the user's profile and current state\n";
         $prompt .= "2. Adapt intensity and exercise selection based on fitness level and daily state\n";
@@ -132,7 +192,7 @@ class SingleWorkoutStrategy implements PromptStrategyInterface {
         $prompt .= "5. Include proper warm-up and cool-down phases\n";
         $prompt .= "6. Provide clear exercise descriptions with form cues\n\n";
         
-        // Section 7: JSON Format Requirements
+        // Section 6: JSON Format Requirements
         $prompt .= "REQUIRED JSON FORMAT:\n";
         $prompt .= "{\n";
         $prompt .= "  \"title\": \"Descriptive workout title\",\n";

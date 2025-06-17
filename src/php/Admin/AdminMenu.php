@@ -117,11 +117,21 @@ class AdminMenu {
             [$this, 'render_fragment_library'] // Callback function
         );
         
-        // Add Testing Lab submenu
+        // Add PromptBuilder submenu (Phase 1: Core)
         add_submenu_page(
             'fitcopilot-ai-prompt-system', // Parent slug
-            __('Testing Lab', 'fitcopilot'), // Page title
-            __('Testing Lab', 'fitcopilot'), // Menu title
+            __('PromptBuilder', 'fitcopilot'), // Page title
+            __('PromptBuilder', 'fitcopilot'), // Menu title
+            'manage_options', // Capability
+            'fitcopilot-prompt-builder', // Menu slug
+            [$this, 'render_prompt_builder'] // Callback function
+        );
+        
+        // Add Testing Lab submenu (Legacy - will be migrated to PromptBuilder)
+        add_submenu_page(
+            'fitcopilot-ai-prompt-system', // Parent slug
+            __('Testing Lab (Legacy)', 'fitcopilot'), // Page title
+            __('Testing Lab (Legacy)', 'fitcopilot'), // Menu title
             'manage_options', // Capability
             'fitcopilot-testing-lab', // Menu slug
             [$this, 'render_testing_lab'] // Callback function
@@ -656,342 +666,36 @@ class AdminMenu {
     }
     
     /**
-     * Render Testing Lab
+     * Render PromptBuilder (Phase 1: Core)
+     */
+    public function render_prompt_builder() {
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.'));
+        }
+        
+        try {
+            // Create PromptBuilderController and render the page
+            $controller = new \FitCopilot\Admin\Debug\Controllers\PromptBuilderController();
+            $controller->renderPromptBuilder();
+        } catch (\Exception $e) {
+            error_log('[AdminMenu] Failed to render PromptBuilder page: ' . $e->getMessage());
+            
+            echo '<div class="wrap">';
+            echo '<h1>PromptBuilder - Error</h1>';
+            echo '<div class="notice notice-error"><p>Failed to load PromptBuilder: ' . esc_html($e->getMessage()) . '</p></div>';
+            echo '</div>';
+        }
+    }
+    
+    /**
+     * Render Testing Lab with Profile-Based Testing (Legacy)
      */
     public function render_testing_lab() {
-        // SPRINT 3: Enhanced Testing Lab with comprehensive debugging infrastructure
-        
-        $is_modular_enabled = apply_filters('fitcopilot_use_modular_prompts', false);
-        
-        // Enqueue Testing Lab specific assets
-        wp_enqueue_style(
-            'fitcopilot-testing-lab',
-            FITCOPILOT_URL . 'assets/css/admin-testing-lab.css',
-            ['fitcopilot-admin-prompt-system'],
-            FITCOPILOT_VERSION
-        );
-        
-        wp_enqueue_script(
-            'fitcopilot-testing-lab',
-            FITCOPILOT_URL . 'assets/js/admin-testing-lab.js',
-            ['jquery', 'wp-api-fetch'],
-            FITCOPILOT_VERSION,
-            true
-        );
-        
-        ?>
-        <div class="testing-lab-container">
-            <!-- Header -->
-            <div class="testing-lab-header">
-                <h1><?php esc_html_e('🧪 Testing Lab', 'fitcopilot'); ?></h1>
-                <p><?php esc_html_e('Comprehensive debugging and testing environment for workout generation system', 'fitcopilot'); ?></p>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="testing-lab-tabs">
-                <a href="#workout-tester" class="testing-lab-tab active" data-tab="workout-tester">
-                    <span class="testing-lab-tab-icon">🏋️</span>
-                    Workout Tester
-                </a>
-                <a href="#prompt-tester" class="testing-lab-tab" data-tab="prompt-tester">
-                    <span class="testing-lab-tab-icon">📝</span>
-                    Prompt Tester
-                </a>
-                <a href="#context-validator" class="testing-lab-tab" data-tab="context-validator">
-                    <span class="testing-lab-tab-icon">🔍</span>
-                    Context Validator
-                </a>
-                <a href="#performance-monitor" class="testing-lab-tab" data-tab="performance-monitor">
-                    <span class="testing-lab-tab-icon">⚡</span>
-                    Performance Monitor
-                </a>
-                <a href="#system-logs" class="testing-lab-tab" data-tab="system-logs">
-                    <span class="testing-lab-tab-icon">📊</span>
-                    System Logs
-                </a>
-            </div>
-
-            <!-- Tab Content -->
-            <div class="testing-lab-content">
-                
-                <!-- Workout Tester Tab -->
-                <div id="workout-tester" class="tab-panel active">
-                    <form id="workout-test-form" class="testing-lab-form">
-                        <div class="form-section">
-                            <h3>🎯 Test Configuration</h3>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="duration">Duration (minutes)</label>
-                                    <input type="number" id="duration" name="duration" value="30" min="10" max="120">
-                                </div>
-                                <div class="form-group">
-                                    <label for="fitness_level">Fitness Level</label>
-                                    <select id="fitness_level" name="fitness_level">
-                                        <option value="beginner">Beginner</option>
-                                        <option value="intermediate" selected>Intermediate</option>
-                                        <option value="advanced">Advanced</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="goals">Primary Goal</label>
-                                    <select id="goals" name="goals">
-                                        <option value="general_fitness">General Fitness</option>
-                                        <option value="strength" selected>Strength Training</option>
-                                        <option value="cardio">Cardiovascular</option>
-                                        <option value="weight_loss">Weight Loss</option>
-                                        <option value="muscle_building">Muscle Building</option>
-                                        <option value="flexibility">Flexibility</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h3>🏠 Environment & Equipment</h3>
-                            <div class="form-group">
-                                <label>Available Equipment</label>
-                                <div class="checkbox-group">
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="eq_dumbbells" name="equipment[]" value="dumbbells">
-                                        <label for="eq_dumbbells">Dumbbells</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="eq_resistance_bands" name="equipment[]" value="resistance_bands">
-                                        <label for="eq_resistance_bands">Resistance Bands</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="eq_yoga_mat" name="equipment[]" value="yoga_mat">
-                                        <label for="eq_yoga_mat">Yoga Mat</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="eq_kettlebell" name="equipment[]" value="kettlebell">
-                                        <label for="eq_kettlebell">Kettlebell</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="eq_barbell" name="equipment[]" value="barbell">
-                                        <label for="eq_barbell">Barbell</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="eq_bodyweight" name="equipment[]" value="bodyweight" checked>
-                                        <label for="eq_bodyweight">Bodyweight Only</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h3>⚠️ Health & Restrictions</h3>
-                            <div class="form-group">
-                                <label>Physical Restrictions</label>
-                                <div class="checkbox-group">
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="rest_knee" name="restrictions[]" value="knee_issues">
-                                        <label for="rest_knee">Knee Issues</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="rest_back" name="restrictions[]" value="back_issues">
-                                        <label for="rest_back">Back Issues</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="rest_shoulder" name="restrictions[]" value="shoulder_issues">
-                                        <label for="rest_shoulder">Shoulder Issues</label>
-                                    </div>
-                                    <div class="checkbox-item">
-                                        <input type="checkbox" id="rest_wrist" name="restrictions[]" value="wrist_issues">
-                                        <label for="rest_wrist">Wrist Issues</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h3>🌟 Daily State</h3>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="stress_level">Stress Level</label>
-                                    <select id="stress_level" name="stress_level">
-                                        <option value="low">Low</option>
-                                        <option value="moderate" selected>Moderate</option>
-                                        <option value="high">High</option>
-                                        <option value="very_high">Very High</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="energy_level">Energy Level</label>
-                                    <select id="energy_level" name="energy_level">
-                                        <option value="very_low">Very Low</option>
-                                        <option value="low">Low</option>
-                                        <option value="moderate" selected>Moderate</option>
-                                        <option value="high">High</option>
-                                        <option value="very_high">Very High</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="sleep_quality">Sleep Quality</label>
-                                    <select id="sleep_quality" name="sleep_quality">
-                                        <option value="poor">Poor</option>
-                                        <option value="fair">Fair</option>
-                                        <option value="good" selected>Good</option>
-                                        <option value="excellent">Excellent</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <button type="button" class="btn btn-primary" data-test-action="test-workout-generation">
-                                🚀 Test Workout Generation
-                            </button>
-                            <button type="button" class="btn btn-secondary" data-test-action="test-performance">
-                                ⚡ Performance Test
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Prompt Tester Tab -->
-                <div id="prompt-tester" class="tab-panel">
-                    <form id="prompt-test-form" class="testing-lab-form">
-                        <div class="form-section">
-                            <h3>📝 Prompt Configuration</h3>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="prompt_type">Prompt Type</label>
-                                    <select id="prompt_type" name="prompt_type">
-                                        <option value="workout_generation" selected>Workout Generation</option>
-                                        <option value="exercise_modification">Exercise Modification</option>
-                                        <option value="progression_planning">Progression Planning</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="strategy">Strategy</label>
-                                    <select id="strategy" name="strategy">
-                                        <option value="single_workout" selected>Single Workout</option>
-                                        <option value="progressive_plan">Progressive Plan</option>
-                                        <option value="adaptive_routine">Adaptive Routine</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h3>🔧 Context Data</h3>
-                            <div class="form-group">
-                                <label for="context_data">Context JSON</label>
-                                <textarea id="context_data" name="context_data" placeholder='{"duration": 30, "fitness_level": "intermediate", "goals": "strength"}'></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox" name="include_fragments" checked>
-                                    Include Fragment Analysis
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <button type="button" class="btn btn-primary" data-test-action="test-prompt-building">
-                                🔨 Test Prompt Building
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Context Validator Tab -->
-                <div id="context-validator" class="tab-panel">
-                    <form id="context-validation-form" class="testing-lab-form">
-                        <div class="form-section">
-                            <h3>🔍 Context Validation</h3>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="validation_type">Validation Type</label>
-                                    <select id="validation_type" name="validation_type">
-                                        <option value="workout_generation" selected>Workout Generation</option>
-                                        <option value="profile">Profile Data</option>
-                                        <option value="session">Session Data</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label for="context_data_validation">Context Data to Validate</label>
-                                <textarea id="context_data_validation" name="context_data" placeholder='{"duration": 30, "fitness_level": "intermediate", "equipment": ["dumbbells"]}'></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <button type="button" class="btn btn-primary" data-test-action="validate-context">
-                                ✅ Validate Context
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Performance Monitor Tab -->
-                <div id="performance-monitor" class="tab-panel">
-                    <div class="performance-monitor">
-                        <h3>⚡ Performance Metrics</h3>
-                        <div class="performance-chart">
-                            Performance visualization will be displayed here
-                        </div>
-                        <div class="performance-metrics" id="performance-metrics">
-                            <!-- Metrics will be populated by JavaScript -->
-                        </div>
-                        <button type="button" class="btn btn-primary" data-test-action="test-performance">
-                            🔄 Run Performance Test
-                        </button>
-                    </div>
-                </div>
-
-                <!-- System Logs Tab -->
-                <div id="system-logs" class="tab-panel">
-                    <div class="logs-container">
-                        <div class="logs-header">
-                            <div class="logs-controls">
-                                <label>
-                                    <input type="checkbox" id="auto-refresh-toggle" checked>
-                                    Auto Refresh
-                                </label>
-                                <label>
-                                    Log Level:
-                                    <select id="log-level-filter">
-                                        <option value="all">All Levels</option>
-                                        <option value="debug">Debug</option>
-                                        <option value="info">Info</option>
-                                        <option value="warning">Warning</option>
-                                        <option value="error">Error</option>
-                                        <option value="critical">Critical</option>
-                                    </select>
-                                </label>
-                            </div>
-                            <div class="logs-actions">
-                                <button type="button" class="btn btn-secondary" id="clear-logs-btn">
-                                    🗑️ Clear
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="export-logs-btn">
-                                    📥 Export
-                                </button>
-                            </div>
-                        </div>
-                        <div class="logs-content" id="logs-content">
-                            <!-- Logs will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Test Results Display -->
-            <div id="test-results" class="test-results-container" style="display: none;">
-                <!-- Results will be populated by JavaScript -->
-            </div>
-
-        </div>
-        <?php
+        // Use the dedicated TestingLabView with proper profile data
+        $testingLabView = new \FitCopilot\Admin\Debug\Views\TestingLabView();
+        $testingLabView->render();
+        return;
     }
     
     /**
@@ -1405,34 +1109,88 @@ class AdminMenu {
     }
 
     /**
-     * SPRINT 1: Register AJAX handlers
+     * Register AJAX handlers for admin functionality
      */
     public function register_ajax_handlers() {
-        add_action('wp_ajax_fitcopilot_toggle_modular_system', [$this, 'handle_toggle_modular_system']);
-        add_action('wp_ajax_fitcopilot_get_system_stats', [$this, 'handle_get_system_stats']);
-        add_action('wp_ajax_fitcopilot_test_prompt_generation', [$this, 'handle_test_prompt_generation']);
-        add_action('wp_ajax_fitcopilot_delete_strategy', [$this, 'handle_delete_strategy_ajax']);
-        add_action('wp_ajax_fitcopilot_test_strategy', [$this, 'handle_test_strategy_ajax']);
+        // Register AJAX handlers for admin functionality
+        add_action('wp_ajax_fitcopilot_debug_toggle_modular_system', [$this, 'handle_toggle_modular_system']);
+        add_action('wp_ajax_fitcopilot_debug_get_system_stats', [$this, 'handle_get_system_stats']);
+        add_action('wp_ajax_fitcopilot_debug_test_prompt_generation', [$this, 'handle_test_prompt_generation']);
         
-        // SPRINT 3: Enhanced Testing Lab AJAX handlers
-        // NOTE: These handlers have been migrated to the modular debug system
+        // Testing Lab user profile endpoint
+        add_action('wp_ajax_fitcopilot_get_user_profile', [$this, 'handle_get_user_profile']);
+        
+        // Delegate to modular debug system for specific debug endpoints
         // TestingLabController.php now handles workout/prompt testing
-        // SystemLogsController.php handles logs functionality
-        // PerformanceController.php handles performance testing
+        error_log('[FitCopilot Debug] AdminMenu: AJAX handlers registered');
+    }
+    
+    /**
+     * Handle get user profile AJAX request
+     */
+    public function handle_get_user_profile() {
+        // Verify nonce for security
+        if (!wp_verify_nonce($_POST['nonce'], 'fitcopilot_admin_ajax')) {
+            wp_send_json_error(['message' => 'Invalid nonce']);
+            return;
+        }
         
-        // Legacy fallback handlers for backward compatibility only
-        add_action('wp_ajax_fitcopilot_debug_get_system_stats', [$this, 'handle_debug_get_system_stats']);
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Insufficient permissions']);
+            return;
+        }
         
-        // SPRINT 3, WEEK 2: System Logs & Performance Monitoring
-        add_action('wp_ajax_fitcopilot_start_log_stream', [$this, 'handle_start_log_stream']);
-        add_action('wp_ajax_fitcopilot_get_log_stats', [$this, 'handle_get_log_stats']);
-        add_action('wp_ajax_fitcopilot_export_logs', [$this, 'handle_export_logs']);
-        add_action('wp_ajax_fitcopilot_get_performance_metrics', [$this, 'handle_get_performance_metrics']);
-        add_action('wp_ajax_fitcopilot_get_system_health', [$this, 'handle_get_system_health']);
-        add_action('wp_ajax_fitcopilot_clear_performance_data', [$this, 'handle_clear_performance_data']);
+        $user_id = intval($_POST['user_id']);
+        if (!$user_id) {
+            wp_send_json_error(['message' => 'Invalid user ID']);
+            return;
+        }
         
-        // Register settings for the settings page
-        add_action('admin_init', [$this, 'register_settings']);
+        // Get user profile data
+        $profile_data = [
+            // Basic Information
+            'firstName' => get_user_meta($user_id, '_profile_firstName', true) ?: '',
+            'lastName' => get_user_meta($user_id, '_profile_lastName', true) ?: '',
+            'fitnessLevel' => get_user_meta($user_id, '_profile_fitnessLevel', true) ?: 'intermediate',
+            'goals' => get_user_meta($user_id, '_profile_goals', true) ?: [],
+            
+            // Body Metrics
+            'age' => get_user_meta($user_id, '_profile_age', true) ?: '',
+            'gender' => get_user_meta($user_id, '_profile_gender', true) ?: '',
+            'weight' => get_user_meta($user_id, '_profile_weight', true) ?: '',
+            'weightUnit' => get_user_meta($user_id, '_profile_units', true) === 'metric' ? 'kg' : 'lbs',
+            'height' => get_user_meta($user_id, '_profile_height', true) ?: '',
+            'heightUnit' => get_user_meta($user_id, '_profile_units', true) === 'metric' ? 'cm' : 'ft',
+            
+            // Equipment & Location
+            'availableEquipment' => get_user_meta($user_id, '_profile_availableEquipment', true) ?: [],
+            'preferredLocation' => get_user_meta($user_id, '_profile_preferredLocation', true) ?: 'home',
+            
+            // Health Considerations
+            'limitations' => get_user_meta($user_id, '_profile_limitations', true) ?: [],
+            'limitationNotes' => get_user_meta($user_id, '_profile_limitationNotes', true) ?: '',
+            'medicalConditions' => get_user_meta($user_id, '_profile_medicalConditions', true) ?: '',
+            
+            // Workout Preferences
+            'workoutFrequency' => get_user_meta($user_id, '_profile_workoutFrequency', true) ?: '3-4',
+            'preferredWorkoutDuration' => get_user_meta($user_id, '_profile_preferredWorkoutDuration', true) ?: '30',
+            'favoriteExercises' => get_user_meta($user_id, '_profile_favoriteExercises', true) ?: '',
+            'dislikedExercises' => get_user_meta($user_id, '_profile_dislikedExercises', true) ?: ''
+        ];
+        
+        // Convert string values to arrays where needed
+        if (is_string($profile_data['goals'])) {
+            $profile_data['goals'] = explode(',', $profile_data['goals']);
+        }
+        if (is_string($profile_data['availableEquipment'])) {
+            $profile_data['availableEquipment'] = explode(',', $profile_data['availableEquipment']);
+        }
+        if (is_string($profile_data['limitations'])) {
+            $profile_data['limitations'] = explode(',', $profile_data['limitations']);
+        }
+        
+        wp_send_json_success($profile_data);
     }
 
     /**

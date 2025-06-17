@@ -52,6 +52,7 @@ class TestingLabController {
             add_action('wp_ajax_fitcopilot_debug_test_prompt', [$this, 'handlePromptTest']);
             add_action('wp_ajax_fitcopilot_debug_validate_context', [$this, 'handleContextValidation']);
             add_action('wp_ajax_fitcopilot_debug_performance_test', [$this, 'handlePerformanceTest']);
+            add_action('wp_ajax_fitcopilot_debug_test_profile_workout_generation', [$this, 'handle_test_profile_workout_generation']);
         }
     }
     
@@ -61,15 +62,8 @@ class TestingLabController {
      * @return void
      */
     public function registerMenuPages(): void {
-        // Register Testing Lab sub-menu page
-        add_submenu_page(
-            'fitcopilot-debug',
-            'Testing Lab',
-            'Testing Lab',
-            'manage_options',
-            'fitcopilot-testing-lab',
-            [$this, 'renderTestingLabPage']
-        );
+        // Menu registration handled by AdminMenu.php
+        // This controller provides the backend services for the Testing Lab
     }
     
     /**
@@ -345,6 +339,165 @@ class TestingLabController {
                 ]
             );
         }
+    }
+    
+    /**
+     * NEW: Handle profile-based workout generation test
+     * UPDATED: Enhanced error handling and modular system enforcement
+     */
+    public function handle_test_profile_workout_generation() {
+        // Start output buffering to prevent any stray output
+        ob_start();
+        
+        // Clear any existing output buffers to prevent conflicts
+        while (ob_get_level() > 1) {
+            ob_end_clean();
+        }
+        
+        $start_time = microtime(true);
+        
+        try {
+            error_log('[TestingLabController] Profile workout generation test started');
+            
+            // Verify nonce for security
+            if (!wp_verify_nonce($_POST['nonce'] ?? '', 'fitcopilot_admin_ajax')) {
+                error_log('[TestingLabController] Nonce verification failed');
+                ob_end_clean();
+                wp_send_json_error('Security check failed');
+                return;
+            }
+            
+            error_log('[TestingLabController] Nonce verification passed');
+            
+            // Get profile data from request
+            $profile_data = $_POST['profile_data'] ?? '';
+            
+            if (empty($profile_data)) {
+                error_log('[TestingLabController] No profile data provided');
+                ob_end_clean();
+                wp_send_json_error('No profile data provided');
+                return;
+            }
+            
+            // Decode JSON data
+            $profile_data = json_decode(stripslashes($profile_data), true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $error_msg = 'Invalid profile data format: ' . json_last_error_msg();
+                error_log('[TestingLabController] ' . $error_msg);
+                ob_end_clean();
+                wp_send_json_error($error_msg);
+                return;
+            }
+            
+            error_log('[TestingLabController] Profile data decoded successfully: ' . json_encode($profile_data));
+            
+            // FIXED: Use correct property name (camelCase)
+            if (!$this->testingService) {
+                error_log('[TestingLabController] TestingService not initialized');
+                ob_end_clean();
+                wp_send_json_error('Testing service not available');
+                return;
+            }
+            
+            // Force modular system check
+            $this->ensureModularSystemOnly();
+            
+            error_log('[TestingLabController] About to call testProfileBasedWorkoutGeneration');
+            
+            // Test the profile-based workflow (MODULAR SYSTEM ONLY)
+            $result = $this->testingService->testProfileBasedWorkoutGeneration($profile_data);
+            
+            error_log('[TestingLabController] testProfileBasedWorkoutGeneration completed');
+            
+            // Add debugging information
+            $result['debug'] = [
+                'execution_time' => round((microtime(true) - $start_time) * 1000, 2) . 'ms',
+                'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2) . 'MB',
+                'peak_memory' => round(memory_get_peak_usage(true) / 1024 / 1024, 2) . 'MB',
+                'modular_system_forced' => true,
+                'legacy_system_disabled' => true,
+                'timestamp' => current_time('mysql')
+            ];
+            
+            // Clear output buffer before sending response
+            ob_end_clean();
+            
+            if ($result['success'] ?? false) {
+                error_log('[TestingLabController] Sending success response');
+                wp_send_json_success($result);
+            } else {
+                error_log('[TestingLabController] Sending error response: ' . ($result['error'] ?? 'Unknown error'));
+                wp_send_json_error($result['error'] ?? 'Profile-based test failed');
+            }
+            
+        } catch (\Error $e) {
+            // Handle fatal errors
+            ob_end_clean();
+            $error_msg = 'Fatal error in profile workout test: ' . $e->getMessage();
+            error_log('[TestingLabController] FATAL ERROR: ' . $error_msg);
+            error_log('[TestingLabController] Fatal error trace: ' . $e->getTraceAsString());
+            error_log('[TestingLabController] Fatal error file: ' . $e->getFile() . ':' . $e->getLine());
+            
+            wp_send_json_error([
+                'message' => $error_msg,
+                'error_type' => 'fatal_error',
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'debug' => [
+                    'execution_time' => round((microtime(true) - $start_time) * 1000, 2) . 'ms',
+                    'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2) . 'MB',
+                    'modular_system_only' => true
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            ob_end_clean();
+            $error_msg = 'Exception in profile workout test: ' . $e->getMessage();
+            error_log('[TestingLabController] EXCEPTION: ' . $error_msg);
+            error_log('[TestingLabController] Exception trace: ' . $e->getTraceAsString());
+            error_log('[TestingLabController] Exception file: ' . $e->getFile() . ':' . $e->getLine());
+            
+            wp_send_json_error([
+                'message' => $error_msg,
+                'error_type' => 'exception',
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'debug' => [
+                    'execution_time' => round((microtime(true) - $start_time) * 1000, 2) . 'ms',
+                    'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2) . 'MB',
+                    'modular_system_only' => true
+                ]
+            ]);
+        }
+    }
+    
+    /**
+     * Ensure only modular system is used for testing
+     */
+    private function ensureModularSystemOnly() {
+        // Force modular system to be active
+        update_option('fitcopilot_modular_system_active', true);
+        
+        // Disable any legacy system flags
+        update_option('fitcopilot_use_legacy_prompts', false);
+        
+        error_log('[TestingLabController] Modular system enforced: modular=true, legacy=false');
+        
+        // Verify modular system classes are available
+        $required_classes = [
+            'FitCopilot\Service\AI\PromptEngineering\Core\ContextManager',
+            'FitCopilot\Service\AI\PromptEngineering\Core\PromptBuilder', 
+            'FitCopilot\Service\AI\PromptEngineering\Strategies\SingleWorkoutStrategy'
+        ];
+        
+        foreach ($required_classes as $class) {
+            if (!class_exists($class)) {
+                throw new \Exception("Required modular system class not found: {$class}");
+            }
+        }
+        
+        error_log('[TestingLabController] All modular system classes verified');
     }
     
     /**
