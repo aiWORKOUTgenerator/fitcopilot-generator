@@ -130,7 +130,7 @@ export const PERFORMANCE_CONSTANTS = {
   WORKOUT_CACHE_TTL_MS: 5 * 60 * 1000, // 5 minutes
   FILTER_CACHE_TTL_MS: 10 * 60 * 1000, // 10 minutes
   MAX_CONCURRENT_REQUESTS: 3,
-  REQUEST_TIMEOUT_MS: 30000, // 30 seconds
+  REQUEST_TIMEOUT_MS: 180000, // 3 minutes to match backend timeout
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY_MS: 1000
 } as const;

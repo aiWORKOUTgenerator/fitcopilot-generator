@@ -7,7 +7,11 @@
 interface WordPressWindow extends Window {
   fitcopilotData?: {
     nonce: string;
-    [key: string]: unknown;
+    apiBase: string;
+    restUrl: string;
+    isLoggedIn: boolean;
+    currentUserId: number;
+    debug: boolean;
   };
 }
 
@@ -31,7 +35,7 @@ const DEFAULT_OPTIONS: ApiRequestOptions = {
   credentials: 'same-origin',
   retries: 3,
   retryDelay: 1000,
-  timeout: 30000,
+  timeout: 180000, // 3 minutes to match backend timeout
 };
 
 /**
@@ -64,7 +68,7 @@ export async function apiFetch<T>(
     },
   };
   
-  const { retries = 3, retryDelay = 1000, timeout = 60000 } = mergedOptions;
+  const { retries = 3, retryDelay = 1000, timeout = 180000 } = mergedOptions; // 3 minutes to match backend timeout
   delete mergedOptions.retries;
   delete mergedOptions.retryDelay;
   delete mergedOptions.timeout;

@@ -377,7 +377,7 @@ Default configuration values:
 ```typescript
 export const API_CONFIG = {
   BASE_PATH: '/wp-json/fitcopilot/v1',
-  TIMEOUT: 30000,        // 30 seconds
+  TIMEOUT: 180000,       // 3 minutes to match backend timeout
   RETRY_ATTEMPTS: 3,     // 3 retry attempts
   RETRY_DELAY: 1000,     // 1 second base delay
 } as const;

@@ -11,6 +11,14 @@ use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\ComplexityContexts
 use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\DailyStateContexts;
 use FitCopilot\Service\AI\PromptEngineering\Fragments\Context\EnvironmentContexts;
 
+// SPRINT 1: Add modular prompt system imports
+use FitCopilot\Service\AI\PromptEngineering\Core\PromptBuilder;
+use FitCopilot\Service\AI\PromptEngineering\Core\ContextManager;
+use FitCopilot\Service\AI\PromptEngineering\Strategies\SingleWorkoutStrategy;
+
+// SPRINT 2: Add enhanced fragment system imports
+use FitCopilot\Service\AI\PromptEngineering\Core\FragmentManager;
+
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
@@ -36,6 +44,21 @@ class OpenAIProvider {
      */
     private $api_endpoint = 'https://api.openai.com/v1/chat/completions';
 
+    // SPRINT 1: Add modular prompt system properties
+    /**
+     * Use modular prompt system (configurable via filter)
+     *
+     * @var bool
+     */
+    private $use_modular_system;
+
+    /**
+     * Modular prompt builder instance
+     *
+     * @var PromptBuilder|null
+     */
+    private $prompt_builder;
+
     /**
      * Constructor
      *
@@ -43,6 +66,19 @@ class OpenAIProvider {
      */
     public function __construct($api_key) {
         $this->api_key = $api_key;
+        
+        // SPRINT 1: Initialize modular system configuration
+        // Check both WordPress option and filter for configuration
+        $option_enabled = get_option('fitcopilot_use_modular_prompts', false);
+        $filter_enabled = apply_filters('fitcopilot_use_modular_prompts', $option_enabled);
+        
+        $this->use_modular_system = $filter_enabled;
+        $this->prompt_builder = null;
+        
+        // Log modular system status for debugging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[OpenAI Provider] SPRINT 1: Modular system ' . ($this->use_modular_system ? 'enabled' : 'disabled'));
+        }
     }
 
     /**
@@ -56,8 +92,8 @@ class OpenAIProvider {
         // ✅ ENHANCED: Log parameter completeness for debugging
         $this->logParameterUsage($params);
         
-        // Build the npm based on params
-        $prompt = $this->buildPrompt($params);
+        // SPRINT 1: Use hybrid prompt generation (modular or legacy)
+        $prompt = $this->generatePrompt($params);
 
         try {
             // Make API request to OpenAI
@@ -69,6 +105,293 @@ class OpenAIProvider {
             return $workout;
         } catch (\Exception $e) {
             throw $e;
+        }
+    }
+
+    /**
+     * SPRINT 1: Hybrid prompt generation method
+     * Uses modular system if enabled, falls back to legacy system
+     *
+     * @param array $params Workout parameters
+     * @return string Generated prompt
+     */
+    private function generatePrompt($params) {
+        if ($this->use_modular_system) {
+            return $this->generateModularPrompt($params);
+        } else {
+            return $this->buildPrompt($params);
+        }
+    }
+
+    /**
+     * SPRINT 1: Generate prompt using modular system
+     * SPRINT 2: Enhanced with FragmentManager for intelligent personalization
+     *
+     * @param array $params Workout parameters
+     * @return string Generated prompt
+     */
+    private function generateModularPrompt($params) {
+        try {
+            // SPRINT 2: Use FragmentManager for enhanced fragment selection
+            $enhancedPrompt = $this->generateEnhancedFragmentPrompt($params);
+            
+            // If enhanced fragments are successful, use them
+            if (!empty($enhancedPrompt)) {
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[OpenAI Provider] SPRINT 2: Enhanced Fragment prompt generated successfully');
+                }
+                return $enhancedPrompt;
+            }
+
+            // Fall back to SPRINT 1 modular system
+            if (!$this->prompt_builder) {
+                $this->prompt_builder = PromptBuilder::create()
+                    ->useStrategy(new SingleWorkoutStrategy());
+            }
+
+            // Create context manager and populate with data
+            $contextManager = new ContextManager();
+
+            // Map parameters to context structure
+            $this->mapParamsToContext($params, $contextManager);
+
+            // Build and return the prompt
+            $prompt = $this->prompt_builder
+                ->withContext($contextManager)
+                ->build();
+
+            // Log modular system usage
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                $stats = $this->prompt_builder->getStats();
+                error_log('[OpenAI Provider] SPRINT 1: Modular prompt generated. Stats: ' . json_encode($stats));
+            }
+
+            return $prompt;
+
+        } catch (\Exception $e) {
+            // Log error and fall back to legacy system
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[OpenAI Provider] SPRINT 1: Modular prompt failed, falling back to legacy: ' . $e->getMessage());
+            }
+            return $this->buildPrompt($params);
+        }
+    }
+
+    /**
+     * SPRINT 2: Generate prompt using enhanced FragmentManager
+     *
+     * @param array $params Workout parameters
+     * @return string Generated prompt with intelligent fragment selection
+     */
+    private function generateEnhancedFragmentPrompt($params) {
+        try {
+            // Map parameters to context for FragmentManager
+            $context = $this->mapParamsToFragmentContext($params);
+            
+            // Get fragment statistics for debugging
+            $fragmentStats = FragmentManager::getFragmentStats($context);
+            
+            // Generate comprehensive fragments
+            $fragments = FragmentManager::getComprehensiveFragments($context);
+            
+            // Build the complete prompt with fragments
+            $systemMessage = $this->buildEnhancedSystemMessage($fragments, $context);
+            $userMessage = $this->buildEnhancedUserMessage($params, $context);
+            
+            // Combine into final prompt
+            $prompt = $systemMessage . "\n\n" . $userMessage;
+            
+            // Log enhanced fragment usage
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[OpenAI Provider] SPRINT 2: Enhanced fragments - ' . 
+                         'Personalization Score: ' . $fragmentStats['personalization_score'] . '%, ' .
+                         'Context Completeness: ' . $fragmentStats['context_completeness'] . '%, ' .
+                         'Fragment Count: ' . $fragmentStats['estimated_fragment_count']);
+            }
+            
+            return $prompt;
+            
+        } catch (\Exception $e) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[OpenAI Provider] SPRINT 2: Enhanced fragment generation failed: ' . $e->getMessage());
+            }
+            return '';
+        }
+    }
+
+    /**
+     * SPRINT 2: Map parameters to FragmentManager context structure
+     *
+     * @param array $params Workout parameters
+     * @return array Context array for FragmentManager
+     */
+    private function mapParamsToFragmentContext($params) {
+        $context = [];
+        
+        // Core workout parameters
+        $context['duration'] = $params['duration'] ?? 30;
+        $context['fitness_level'] = $params['profile_fitness_level'] ?? $params['difficulty'] ?? 'intermediate';
+        $context['daily_focus'] = $params['daily_focus'] ?? $params['goals'] ?? 'general fitness';
+        
+        // Equipment context
+        if (!empty($params['equipment'])) {
+            $context['equipment'] = is_array($params['equipment']) ? $params['equipment'] : [$params['equipment']];
+        }
+        
+        // Daily state context
+        if (!empty($params['stress_level'])) $context['stress_level'] = $params['stress_level'];
+        if (!empty($params['energy_level'])) $context['energy_level'] = $params['energy_level'];
+        if (!empty($params['sleep_quality'])) $context['sleep_quality'] = $params['sleep_quality'];
+        
+        // Environment context
+        if (!empty($params['location'])) $context['location'] = $params['location'];
+        
+        // Profile context
+        if (!empty($params['profile_age'])) $context['profile_age'] = $params['profile_age'];
+        if (!empty($params['profile_gender'])) $context['profile_gender'] = $params['profile_gender'];
+        if (!empty($params['profile_limitation_notes'])) $context['profile_limitation_notes'] = $params['profile_limitation_notes'];
+        
+        // Restrictions context
+        if (!empty($params['restrictions'])) $context['restrictions'] = $params['restrictions'];
+        
+        // Intensity context
+        if (!empty($params['intensity_level'])) $context['intensity_level'] = $params['intensity_level'];
+        if (!empty($params['intensity'])) $context['intensity_level'] = $params['intensity'];
+        
+        return $context;
+    }
+
+    /**
+     * SPRINT 2: Build enhanced system message with intelligent fragments
+     *
+     * @param string $fragments Generated fragments from FragmentManager
+     * @param array $context Context data for personalization
+     * @return string Enhanced system message
+     */
+    private function buildEnhancedSystemMessage($fragments, $context) {
+        $systemMessage = "You are an expert fitness trainer and workout designer. ";
+        $systemMessage .= "Create a personalized workout based on the user's specific context and needs.\n\n";
+        
+        // Add personalization context
+        $personalizationScore = FragmentManager::getFragmentStats($context)['personalization_score'];
+        if ($personalizationScore > 80) {
+            $systemMessage .= "PERSONALIZATION LEVEL: HIGH - Use the detailed context provided to create a highly customized workout.\n\n";
+        } elseif ($personalizationScore > 50) {
+            $systemMessage .= "PERSONALIZATION LEVEL: MODERATE - Adapt the workout based on available context.\n\n";
+        } else {
+            $systemMessage .= "PERSONALIZATION LEVEL: BASIC - Create a general workout with basic adaptations.\n\n";
+        }
+        
+        // Add the intelligent fragments
+        $systemMessage .= "INTELLIGENT TRAINING GUIDANCE:\n";
+        $systemMessage .= $fragments;
+        
+        // Add output format instructions
+        $systemMessage .= "\nWORKOUT OUTPUT FORMAT:\n";
+        $systemMessage .= "- Provide a complete workout with warm-up, main exercises, and cool-down\n";
+        $systemMessage .= "- Include exercise descriptions, sets, reps, and rest periods\n";
+        $systemMessage .= "- Add safety notes and form cues where appropriate\n";
+        $systemMessage .= "- Structure the workout logically for the specified duration\n";
+        $systemMessage .= "- Include motivational guidance and progression tips\n\n";
+        
+        return $systemMessage;
+    }
+
+    /**
+     * SPRINT 2: Build enhanced user message with context summary
+     *
+     * @param array $params Workout parameters
+     * @param array $context Mapped context data
+     * @return string Enhanced user message
+     */
+    private function buildEnhancedUserMessage($params, $context) {
+        $userMessage = "Please create a personalized workout with the following specifications:\n\n";
+        
+        // Core specifications
+        $userMessage .= "WORKOUT SPECIFICATIONS:\n";
+        $userMessage .= "- Duration: " . ($context['duration'] ?? 30) . " minutes\n";
+        $userMessage .= "- Fitness Level: " . ucfirst($context['fitness_level'] ?? 'intermediate') . "\n";
+        $userMessage .= "- Focus: " . ucwords(str_replace('_', ' ', $context['daily_focus'] ?? 'general fitness')) . "\n";
+        
+        // Equipment
+        if (!empty($context['equipment'])) {
+            $userMessage .= "- Available Equipment: " . implode(', ', $context['equipment']) . "\n";
+        }
+        
+        // Current state
+        $stateItems = [];
+        if (!empty($context['stress_level'])) $stateItems[] = "Stress: " . ucfirst($context['stress_level']);
+        if (!empty($context['energy_level'])) $stateItems[] = "Energy: " . ucfirst($context['energy_level']);
+        if (!empty($context['sleep_quality'])) $stateItems[] = "Sleep: " . ucfirst($context['sleep_quality']);
+        
+        if (!empty($stateItems)) {
+            $userMessage .= "- Current State: " . implode(', ', $stateItems) . "\n";
+        }
+        
+        // Location and restrictions
+        if (!empty($context['location'])) {
+            $userMessage .= "- Location: " . ucfirst($context['location']) . "\n";
+        }
+        
+        if (!empty($context['restrictions']) || !empty($context['profile_limitation_notes'])) {
+            $restrictions = $context['restrictions'] ?? $context['profile_limitation_notes'];
+            $userMessage .= "- Restrictions/Limitations: " . $restrictions . "\n";
+        }
+        
+        $userMessage .= "\nPlease design a workout that incorporates all the intelligent training guidance provided above.";
+        
+        return $userMessage;
+    }
+
+    /**
+     * SPRINT 1: Map parameters to modular context structure
+     *
+     * @param array $params Workout parameters
+     * @param ContextManager $contextManager Context manager to populate
+     */
+    private function mapParamsToContext($params, $contextManager) {
+        // Profile context
+        $profileContext = [];
+        if (!empty($params['profile_age'])) $profileContext['profile_age'] = $params['profile_age'];
+        if (!empty($params['profile_weight'])) $profileContext['profile_weight'] = $params['profile_weight'];
+        if (!empty($params['profile_weight_unit'])) $profileContext['profile_weight_unit'] = $params['profile_weight_unit'];
+        if (!empty($params['profile_height'])) $profileContext['profile_height'] = $params['profile_height'];
+        if (!empty($params['profile_height_unit'])) $profileContext['profile_height_unit'] = $params['profile_height_unit'];
+        if (!empty($params['profile_gender'])) $profileContext['profile_gender'] = $params['profile_gender'];
+        if (!empty($params['profile_first_name'])) $profileContext['profile_first_name'] = $params['profile_first_name'];
+        if (!empty($params['profile_last_name'])) $profileContext['profile_last_name'] = $params['profile_last_name'];
+        if (!empty($params['profile_fitness_level'])) $profileContext['fitness_level'] = $params['profile_fitness_level'];
+        if (!empty($params['difficulty'])) $profileContext['fitness_level'] = $params['difficulty'];
+        if (!empty($params['profile_limitation_notes'])) $profileContext['profile_limitation_notes'] = $params['profile_limitation_notes'];
+
+        if (!empty($profileContext)) {
+            $contextManager->addProfileContext($profileContext);
+        }
+
+        // Session context
+        $sessionContext = [];
+        $sessionContext['duration'] = $params['duration'] ?? 30;
+        if (!empty($params['equipment'])) $sessionContext['equipment'] = $params['equipment'];
+        if (!empty($params['daily_focus'])) $sessionContext['daily_focus'] = $params['daily_focus'];
+        if (!empty($params['goals'])) $sessionContext['daily_focus'] = $params['goals'];
+        if (!empty($params['intensity_level'])) $sessionContext['intensity_level'] = $params['intensity_level'];
+        if (!empty($params['intensity'])) $sessionContext['intensity_level'] = $params['intensity'];
+        if (!empty($params['stress_level'])) $sessionContext['stress_level'] = $params['stress_level'];
+        if (!empty($params['energy_level'])) $sessionContext['energy_level'] = $params['energy_level'];
+        if (!empty($params['sleep_quality'])) $sessionContext['sleep_quality'] = $params['sleep_quality'];
+        if (!empty($params['location'])) $sessionContext['location'] = $params['location'];
+        if (!empty($params['custom_notes'])) $sessionContext['custom_notes'] = $params['custom_notes'];
+        if (!empty($params['restrictions'])) $sessionContext['restrictions'] = $params['restrictions'];
+        if (!empty($params['primary_muscle_focus'])) $sessionContext['primary_muscle_focus'] = $params['primary_muscle_focus'];
+
+        $contextManager->addSessionContext($sessionContext);
+
+        // Environment context (if location specified)
+        if (!empty($params['location'])) {
+            $contextManager->addEnvironmentContext([
+                'location' => $params['location'],
+                'equipment' => $params['equipment'] ?? []
+            ]);
         }
     }
 
@@ -665,6 +988,9 @@ class OpenAIProvider {
     private function makeOpenAIRequest($prompt) {
         $start_time = microtime(true);
         
+        // CRITICAL FIX: Increase timeout and add configurable option
+        $timeout = apply_filters('fitcopilot_openai_timeout', 180); // 3 minutes default
+        
         $args = [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->api_key,
@@ -699,15 +1025,26 @@ WORKOUT DESIGN PRINCIPLES:
 10. SAFETY FIRST: Always consider restrictions and provide modifications when needed
 11. PERSONAL PREFERENCES: Honor user's preferred workout duration and individual customization requests
 
-RESPONSE REQUIREMENTS:
-- Follow the exact JSON format specified in the request
-- Provide detailed exercise descriptions with form cues and safety notes
-- Create engaging workout titles that reflect the focus and intensity
-- Ensure total workout duration matches the requested time
-- Include specific rep counts, durations, or time-based instructions for each exercise
-- Structure workouts with logical progression and appropriate rest periods
+CRITICAL FORMATTING REQUIREMENT:
+You MUST respond with valid JSON in the following exact format:
+{
+  \"title\": \"Descriptive workout title\",
+  \"sections\": [
+    {
+      \"name\": \"Section Name\",
+      \"duration\": 5,
+      \"exercises\": [
+        {
+          \"name\": \"Exercise Name\",
+          \"duration\": \"Duration or reps\",
+          \"description\": \"Detailed description with form cues\"
+        }
+      ]
+    }
+  ]
+}
 
-Your goal is to create workouts that are perfectly matched to the user's current fitness level, today's physical/mental state, available resources, and long-term goals while maintaining the highest standards of safety and effectiveness."
+DO NOT include any text before or after the JSON. DO NOT wrap in markdown code blocks."
                     ],
                     [
                         'role' => 'user',
@@ -717,16 +1054,24 @@ Your goal is to create workouts that are perfectly matched to the user's current
                 'temperature' => 0.7,
                 'max_tokens' => 2000,
             ]),
-            'timeout' => 60,
+            'timeout' => $timeout,
         ];
+
+        // Log timeout setting for debugging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("[OpenAI Provider] Using timeout: {$timeout} seconds");
+        }
 
         $response = wp_remote_post($this->api_endpoint, $args);
         
         $end_time = microtime(true);
         $duration_ms = round(($end_time - $start_time) * 1000, 2);
 
+        // Enhanced error logging for debugging
         if (is_wp_error($response)) {
-            throw new \Exception('OpenAI API request failed: ' . $response->get_error_message());
+            $error_message = $response->get_error_message();
+            error_log("[OpenAI Provider] API request failed: {$error_message}");
+            throw new \Exception('OpenAI API request failed: ' . $error_message);
         }
 
         $response_code = wp_remote_retrieve_response_code($response);
@@ -734,6 +1079,7 @@ Your goal is to create workouts that are perfectly matched to the user's current
             $body = wp_remote_retrieve_body($response);
             $error = json_decode($body, true);
             $error_message = isset($error['error']['message']) ? $error['error']['message'] : 'Unknown error';
+            error_log("[OpenAI Provider] API error ({$response_code}): {$error_message}");
             throw new \Exception('OpenAI API error (' . $response_code . '): ' . $error_message);
         }
 
@@ -741,6 +1087,7 @@ Your goal is to create workouts that are perfectly matched to the user's current
         $data = json_decode($body, true);
 
         if (!isset($data['choices'][0]['message']['content'])) {
+            error_log("[OpenAI Provider] Invalid response structure from OpenAI API");
             throw new \Exception('Invalid response from OpenAI API');
         }
         

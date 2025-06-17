@@ -60,7 +60,7 @@ export interface ApiCallResult<T> {
  */
 const DEFAULT_CLIENT_CONFIG: ApiClientConfig = {
   baseUrl: '/wp-json/fitcopilot/v1',
-  timeout: 30000,
+  timeout: 180000, // 3 minutes to match backend timeout
   retries: 3,
   validateByDefault: true,
   transformFieldNamesByDefault: true,

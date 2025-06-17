@@ -30,7 +30,7 @@ describe('API Client Integration', () => {
     test('should create client with custom configuration', () => {
       const customClient = new CompliantApiClient(CONFIG_PRESETS.DEVELOPMENT);
       expect(customClient).toBeDefined();
-      expect(customClient.getConfig().timeout).toBe(60000);
+      expect(customClient.getConfig().timeout).toBe(180000); // Updated to match new 3-minute timeout
     });
 
     test('should create client with performance preset', () => {

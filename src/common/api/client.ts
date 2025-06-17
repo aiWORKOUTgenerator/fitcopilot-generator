@@ -7,7 +7,7 @@ import { ApiResponse } from '../types/api';
 /**
  * Default fetch timeout in milliseconds
  */
-const DEFAULT_TIMEOUT = 30000;
+const DEFAULT_TIMEOUT = 180000; // 3 minutes to match backend timeout
 
 /**
  * API client utilities

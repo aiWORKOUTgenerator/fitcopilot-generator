@@ -1,0 +1,861 @@
+/**
+ * Admin Testing Lab - CSS Styles
+ * 
+ * Comprehensive styling for the Testing Lab interface including
+ * responsive design, interactive elements, log display, and monitoring visualizations.
+ */
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+
+.testing-lab-container {
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.testing-lab-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.testing-lab-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.testing-lab-header p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* ==========================================================================
+   Tab System
+   ========================================================================== */
+
+.testing-lab-tabs {
+    display: flex;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.testing-lab-tab {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+    background: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #64748b;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.testing-lab-tab:hover {
+    background: #f8fafc;
+    color: #475569;
+}
+
+.testing-lab-tab.active {
+    background: #667eea;
+    color: white;
+    box-shadow: inset 0 -4px 0 rgba(255, 255, 255, 0.3);
+}
+
+.testing-lab-tab-icon {
+    font-size: 1.2rem;
+}
+
+/* ==========================================================================
+   Tab Content
+   ========================================================================== */
+
+.testing-lab-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.tab-panel {
+    display: none;
+    padding: 30px;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+/* ==========================================================================
+   Forms and Controls
+   ========================================================================== */
+
+.testing-lab-form {
+    background: #f8fafc;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid #e2e8f0;
+}
+
+.form-section {
+    margin-bottom: 25px;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.form-section h3 {
+    margin: 0 0 15px 0;
+    color: #1e293b;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Checkbox Groups */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.checkbox-item:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-item label {
+    margin: 0;
+    font-weight: 500;
+    cursor: pointer;
+    flex: 1;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    min-width: 120px;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+/* Button States */
+.btn.running {
+    background: #f59e0b;
+    cursor: not-allowed;
+    animation: pulse 1.5s infinite;
+}
+
+.btn.success {
+    background: #10b981;
+    animation: success-flash 0.5s ease;
+}
+
+.btn.error {
+    background: #ef4444;
+    animation: error-shake 0.5s ease;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes success-flash {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes error-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Test Results
+   ========================================================================== */
+
+.test-results-container {
+    margin-top: 30px;
+}
+
+.test-result {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.test-result-header {
+    background: #f8fafc;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.test-result-header h4 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+.test-id {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: #e5e7eb;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #374151;
+}
+
+.test-timestamp {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.test-result-content {
+    padding: 20px;
+}
+
+.result-section {
+    margin-bottom: 20px;
+}
+
+.result-section:last-child {
+    margin-bottom: 0;
+}
+
+.result-section h5 {
+    margin: 0 0 10px 0;
+    color: #374151;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.result-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.result-section li {
+    margin-bottom: 5px;
+    color: #4b5563;
+}
+
+.response-data,
+.prompt-content {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.validation-errors li {
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.validation-recommendations li {
+    color: #059669;
+    font-weight: 500;
+}
+
+/* Performance Table */
+.performance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.performance-table th,
+.performance-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.performance-table th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+}
+
+.performance-table tr:hover {
+    background: #f9fafb;
+}
+
+/* ==========================================================================
+   System Logs
+   ========================================================================== */
+
+.logs-container {
+    background: #1f2937;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logs-header {
+    background: #374151;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logs-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.logs-controls label {
+    color: #f9fafb;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logs-controls input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.logs-controls select {
+    padding: 6px 10px;
+    border: 1px solid #4b5563;
+    border-radius: 4px;
+    background: #374151;
+    color: #f9fafb;
+}
+
+.logs-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.logs-actions .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    min-width: auto;
+}
+
+.logs-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.log-entry {
+    display: grid;
+    grid-template-columns: 140px 80px 100px 1fr;
+    gap: 15px;
+    padding: 8px 15px;
+    border-bottom: 1px solid #374151;
+    align-items: start;
+}
+
+.log-entry:hover {
+    background: #374151;
+}
+
+.log-timestamp {
+    color: #9ca3af;
+    font-size: 0.8rem;
+}
+
+.log-level {
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.log-level-debug {
+    background: #374151;
+    color: #9ca3af;
+}
+
+.log-level-info {
+    background: #1e40af;
+    color: #dbeafe;
+}
+
+.log-level-warning {
+    background: #d97706;
+    color: #fef3c7;
+}
+
+.log-level-error {
+    background: #dc2626;
+    color: #fecaca;
+}
+
+.log-level-critical {
+    background: #7c2d12;
+    color: #fed7aa;
+}
+
+.log-category {
+    color: #60a5fa;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.log-message {
+    color: #f9fafb;
+    word-break: break-word;
+}
+
+.log-context {
+    grid-column: 1 / -1;
+    background: #111827;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #d1d5db;
+    overflow-x: auto;
+}
+
+/* ==========================================================================
+   System Stats
+   ========================================================================== */
+
+.system-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+}
+
+.stat-card h4 {
+    margin: 0 0 10px 0;
+    color: #374151;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+.stat-trend.positive {
+    color: #059669;
+}
+
+.stat-trend.negative {
+    color: #dc2626;
+}
+
+.stat-trend.neutral {
+    color: #6b7280;
+}
+
+/* ==========================================================================
+   Performance Monitor
+   ========================================================================== */
+
+.performance-monitor {
+    background: white;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+}
+
+.performance-chart {
+    height: 300px;
+    background: #f8fafc;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 4px;
+}
+
+.metric-label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.metric-value {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .testing-lab-container {
+        padding: 0 15px;
+    }
+    
+    .testing-lab-header {
+        padding: 20px;
+    }
+    
+    .testing-lab-header h1 {
+        font-size: 2rem;
+    }
+    
+    .testing-lab-tabs {
+        flex-direction: column;
+    }
+    
+    .testing-lab-tab {
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .testing-lab-tab:last-child {
+        border-bottom: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .test-result-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .logs-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .logs-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .log-entry {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+    
+    .log-entry > div {
+        padding: 2px 0;
+    }
+    
+    .system-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .testing-lab-container {
+        padding: 0 10px;
+    }
+    
+    .testing-lab-header {
+        padding: 15px;
+    }
+    
+    .testing-lab-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .tab-panel {
+        padding: 20px;
+    }
+    
+    .testing-lab-form {
+        padding: 15px;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .logs-actions {
+        width: 100%;
+    }
+    
+    .logs-actions .btn {
+        flex: 1;
+    }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   Dark Mode Support
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+    .testing-lab-container {
+        background: #111827;
+        color: #f9fafb;
+    }
+    
+    .testing-lab-content,
+    .testing-lab-form,
+    .test-result,
+    .stat-card,
+    .performance-monitor {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+    
+    .checkbox-item {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .test-result-header {
+        background: #374151;
+        border-color: #4b5563;
+    }
+} 

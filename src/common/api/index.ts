@@ -201,7 +201,7 @@ export const CONFIG_PRESETS = {
       emptyStringToNull: true,
       arrayItemValidation: true
     },
-    timeout: 30000,
+    timeout: 180000, // 3 minutes to match backend timeout
     retries: 3
   },
   
@@ -233,7 +233,7 @@ export const CONFIG_PRESETS = {
       emptyStringToNull: true,
       arrayItemValidation: true
     },
-    timeout: 60000,
+    timeout: 180000, // 3 minutes to match backend timeout
     retries: 0 // Fail fast in development
   }
 } as const;

@@ -206,7 +206,7 @@ export function useWorkoutGenerator() {
             payload: 'The workout generation request timed out. Please try again.' 
           });
         }
-      }, 60000);
+      }, 180000); // 3 minutes to match backend timeout
       
       // ENHANCEMENT: Listen for timeout events from other abort sources
       const timeoutHandler = (event: Event) => {

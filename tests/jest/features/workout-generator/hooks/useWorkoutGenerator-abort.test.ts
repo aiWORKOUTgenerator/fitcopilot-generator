@@ -98,7 +98,7 @@ describe('useWorkoutGenerator with useAbortController', () => {
         goals: 'strength',
         difficulty: 'intermediate'
       }, {
-        timeoutMs: 30000 // 30 seconds
+        timeoutMs: 180000 // 3 minutes to match backend timeout
       });
       
       // Allow state updates to process
@@ -110,7 +110,7 @@ describe('useWorkoutGenerator with useAbortController', () => {
     
     // Fast-forward past the timeout
     await act(async () => {
-      jest.advanceTimersByTime(30001);
+      jest.advanceTimersByTime(180001); // 3 minutes + 1ms
       // Need to wait for the timeout handler to execute
       await Promise.resolve();
     });

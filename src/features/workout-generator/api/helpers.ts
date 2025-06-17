@@ -13,7 +13,7 @@ import { ApiRequestOptions, ApiResponse } from './client';
  */
 export const API_CONFIG = {
   BASE_PATH: '/wp-json/fitcopilot/v1',
-  TIMEOUT: 30000,
+  TIMEOUT: 180000, // 3 minutes to match backend timeout
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
 } as const;

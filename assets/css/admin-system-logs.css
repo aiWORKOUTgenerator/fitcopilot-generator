@@ -1,0 +1,722 @@
+/* Sprint 3, Week 2: System Logs & Performance Monitoring Dashboard */
+
+/* ==========================================================================
+   System Logs Dashboard Layout
+   ========================================================================== */
+
+.fitcopilot-system-logs {
+    padding: 20px;
+    background: #f1f1f1;
+    min-height: 100vh;
+}
+
+.system-logs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.system-logs-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0;
+}
+
+.system-health-indicator {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.health-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.health-status.healthy {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.health-status.warning {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+.health-status.critical {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.health-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.health-indicator.healthy {
+    background: #28a745;
+}
+
+.health-indicator.warning {
+    background: #ffc107;
+}
+
+.health-indicator.critical {
+    background: #dc3545;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* ==========================================================================
+   Dashboard Grid Layout
+   ========================================================================== */
+
+.system-logs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap: 20px;
+    height: calc(100vh - 200px);
+}
+
+.logs-panel {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.performance-panel {
+    grid-column: 2;
+    grid-row: 1;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.analytics-panel {
+    grid-column: 2;
+    grid-row: 2;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.controls-panel {
+    grid-column: 2;
+    grid-row: 3;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+/* ==========================================================================
+   Log Stream Interface
+   ========================================================================== */
+
+.logs-header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+}
+
+.logs-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.log-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.log-filter label {
+    font-weight: 500;
+    color: #495057;
+    white-space: nowrap;
+}
+
+.log-filter select {
+    padding: 6px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: white;
+    min-width: 120px;
+}
+
+.stream-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.stream-button {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.stream-button:hover {
+    background: #005a87;
+}
+
+.stream-button.active {
+    background: #dc3545;
+}
+
+.stream-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.stream-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6c757d;
+}
+
+.stream-indicator.connected {
+    background: #28a745;
+    animation: pulse 1.5s infinite;
+}
+
+/* ==========================================================================
+   Log Entries Display
+   ========================================================================== */
+
+.logs-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.log-entry {
+    display: flex;
+    padding: 12px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.log-entry:hover {
+    background: #f8f9fa;
+}
+
+.log-entry.new-entry {
+    animation: highlightNew 2s ease-out;
+}
+
+@keyframes highlightNew {
+    0% { background: #e7f3ff; }
+    100% { background: transparent; }
+}
+
+.log-timestamp {
+    width: 140px;
+    color: #6c757d;
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+.log-level {
+    width: 80px;
+    font-weight: 600;
+    text-align: center;
+    flex-shrink: 0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.log-level.debug { background: #e9ecef; color: #495057; }
+.log-level.info { background: #d1ecf1; color: #0c5460; }
+.log-level.notice { background: #d4edda; color: #155724; }
+.log-level.warning { background: #fff3cd; color: #856404; }
+.log-level.error { background: #f8d7da; color: #721c24; }
+.log-level.critical { background: #f5c6cb; color: #721c24; }
+.log-level.alert { background: #f1aeb5; color: #721c24; }
+.log-level.emergency { background: #dc3545; color: white; }
+
+.log-category {
+    width: 120px;
+    color: #495057;
+    flex-shrink: 0;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.log-message {
+    flex: 1;
+    color: #212529;
+    word-break: break-word;
+}
+
+.log-context {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   Performance Metrics Display
+   ========================================================================== */
+
+.performance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.performance-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0;
+}
+
+.performance-refresh {
+    background: #f0f0f1;
+    border: 1px solid #c3c4c7;
+    color: #1d2327;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.performance-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.metric-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #007cba;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.metric-unit {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: normal;
+}
+
+.metric-trend {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.trend-up { color: #dc3545; }
+.trend-down { color: #28a745; }
+.trend-stable { color: #6c757d; }
+
+/* ==========================================================================
+   Analytics Charts
+   ========================================================================== */
+
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.analytics-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.chart-button {
+    background: #f0f0f1;
+    border: 1px solid #c3c4c7;
+    color: #1d2327;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.chart-button.active {
+    background: #007cba;
+    color: white;
+    border-color: #007cba;
+}
+
+.chart-container {
+    height: 180px;
+    position: relative;
+    background: #f8f9fa;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   System Controls
+   ========================================================================== */
+
+.controls-section {
+    margin-bottom: 25px;
+}
+
+.controls-section:last-child {
+    margin-bottom: 0;
+}
+
+.controls-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.control-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.control-button {
+    background: #f0f0f1;
+    border: 1px solid #c3c4c7;
+    color: #1d2327;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.control-button:hover {
+    background: #e0e0e0;
+}
+
+.control-button.primary {
+    background: #007cba;
+    color: white;
+    border-color: #007cba;
+}
+
+.control-button.primary:hover {
+    background: #005a87;
+}
+
+.control-button.danger {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.control-button.danger:hover {
+    background: #c82333;
+}
+
+.export-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.export-button {
+    background: white;
+    border: 1px solid #ddd;
+    color: #495057;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.export-button:hover {
+    border-color: #007cba;
+    color: #007cba;
+}
+
+/* ==========================================================================
+   Loading States
+   ========================================================================== */
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007cba;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    margin-left: 15px;
+    color: #495057;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Notifications & Alerts
+   ========================================================================== */
+
+.system-alerts {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert.success {
+    background: #d1e7dd;
+    color: #0f5132;
+    border-left: 4px solid #28a745;
+}
+
+.alert.warning {
+    background: #fff3cd;
+    color: #664d03;
+    border-left: 4px solid #ffc107;
+}
+
+.alert.error {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-close {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+    .system-logs-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+    }
+    
+    .logs-panel {
+        grid-column: 1;
+        grid-row: 1;
+        height: 400px;
+    }
+    
+    .performance-panel {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    
+    .analytics-panel {
+        grid-column: 1;
+        grid-row: 3;
+    }
+    
+    .controls-panel {
+        grid-column: 1;
+        grid-row: 4;
+    }
+}
+
+@media (max-width: 768px) {
+    .fitcopilot-system-logs {
+        padding: 10px;
+    }
+    
+    .system-logs-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .logs-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .stream-toggle {
+        margin-left: 0;
+        justify-content: center;
+    }
+    
+    .performance-metrics {
+        grid-template-columns: 1fr;
+    }
+    
+    .log-entry {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .log-timestamp,
+    .log-level,
+    .log-category {
+        width: auto;
+    }
+}
+
+/* ==========================================================================
+   Dark Mode Support
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+    .fitcopilot-system-logs {
+        background: #1a1a1a;
+        color: #e0e0e0;
+    }
+    
+    .system-logs-header,
+    .logs-panel,
+    .performance-panel,
+    .analytics-panel,
+    .controls-panel {
+        background: #2d2d2d;
+        border-color: #404040;
+    }
+    
+    .logs-header {
+        background: #353535;
+        border-color: #404040;
+    }
+    
+    .log-entry {
+        border-color: #404040;
+    }
+    
+    .log-entry:hover {
+        background: #353535;
+    }
+    
+    .metric-card,
+    .chart-container {
+        background: #353535;
+    }
+    
+    .log-filter select,
+    .control-button {
+        background: #404040;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+} 

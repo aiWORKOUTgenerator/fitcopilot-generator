@@ -47,7 +47,7 @@ describe('WorkoutApiClient', () => {
       
       const options: ApiRequestOptions = {
         signal: controller.signal,
-        timeout: 30000,
+        timeout: 180000, // 3 minutes to match backend timeout
         retries: 1
       };
       

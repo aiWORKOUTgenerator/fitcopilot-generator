@@ -1,0 +1,1314 @@
+/**
+ * FitCopilot AI Prompt System - Admin Interface Styles
+ * 
+ * Comprehensive styling for the AI Prompt System admin pages
+ */
+
+/* ===================================
+   GLOBAL ADMIN PAGE STYLES
+   =================================== */
+
+.fitcopilot-admin-page {
+    background: #f1f1f1;
+    margin: 20px 0;
+}
+
+.fitcopilot-page-header {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border-left: 4px solid #2271b1;
+}
+
+.fitcopilot-page-header h1 {
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.fitcopilot-page-header .page-icon {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.fitcopilot-page-header .page-description {
+    margin: 0;
+    font-size: 16px;
+    color: #646970;
+    line-height: 1.5;
+}
+
+.fitcopilot-page-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+    position: relative;
+}
+
+/* ===================================
+   LOADING STATES
+   =================================== */
+
+.fitcopilot-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2271b1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+   TESTING LAB ENHANCEMENTS
+   ======================================== */
+
+.testing-lab .test-results,
+.testing-lab .performance-comparison {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.testing-lab .results-summary {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.testing-lab .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.testing-lab .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.testing-lab .summary-item .label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.testing-lab .summary-item .value {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.testing-lab .summary-item .value.positive {
+    color: #059669;
+}
+
+.testing-lab .summary-item .value.negative {
+    color: #dc2626;
+}
+
+.testing-lab .results-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 15px;
+}
+
+.testing-lab .tab-button {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.testing-lab .tab-button:hover {
+    color: #374151;
+}
+
+.testing-lab .tab-button.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+}
+
+.testing-lab .tab-content {
+    display: none;
+}
+
+.testing-lab .tab-content.active {
+    display: block;
+}
+
+.testing-lab .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.testing-lab .metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 4px;
+}
+
+.testing-lab .metric-label {
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.testing-lab .metric-value {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.testing-lab .error-message {
+    padding: 20px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    color: #dc2626;
+}
+
+.testing-lab .error-message h4 {
+    margin: 0 0 10px 0;
+    color: #dc2626;
+}
+
+.fitcopilot-loading p {
+    margin: 0;
+    color: #646970;
+    font-size: 16px;
+}
+
+/* ===================================
+   ERROR STATES
+   =================================== */
+
+.fitcopilot-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.fitcopilot-error .error-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.fitcopilot-error h3 {
+    margin: 0 0 12px 0;
+    color: #d63638;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.fitcopilot-error p {
+    margin: 0 0 20px 0;
+    color: #646970;
+    font-size: 16px;
+    line-height: 1.5;
+    max-width: 400px;
+}
+
+/* ===================================
+   COMING SOON STATES
+   =================================== */
+
+.fitcopilot-coming-soon {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.fitcopilot-coming-soon .coming-soon-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.fitcopilot-coming-soon h3 {
+    margin: 0 0 16px 0;
+    color: #1d2327;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.fitcopilot-coming-soon > p {
+    margin: 0 0 24px 0;
+    color: #646970;
+    font-size: 16px;
+    line-height: 1.5;
+    max-width: 500px;
+}
+
+.development-info {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 20px;
+    max-width: 400px;
+    text-align: left;
+}
+
+.development-info p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.development-info p:last-child {
+    margin-bottom: 0;
+}
+
+.development-info strong {
+    color: #1d2327;
+    font-weight: 600;
+}
+
+/* ===================================
+   DASHBOARD WIDGETS
+   =================================== */
+
+.dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.dashboard-widget {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-left: 4px solid #2271b1;
+    transition: all 0.2s ease;
+}
+
+.dashboard-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-widget h3 {
+    margin: 0 0 12px 0;
+    color: #1d2327;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dashboard-widget .widget-icon {
+    font-size: 20px;
+}
+
+.dashboard-widget .widget-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2271b1;
+    margin: 8px 0;
+    line-height: 1;
+}
+
+.dashboard-widget .widget-label {
+    color: #646970;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.dashboard-widget .widget-change {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.dashboard-widget .widget-change.positive {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.dashboard-widget .widget-change.negative {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.dashboard-widget .widget-change.neutral {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+/* ===================================
+   QUICK ACTIONS
+   =================================== */
+
+.fitcopilot-quick-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 8px 8px;
+}
+
+.fitcopilot-quick-actions .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.fitcopilot-quick-actions .button-primary {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: white;
+}
+
+.fitcopilot-quick-actions .button-primary:hover {
+    background: #135e96;
+    border-color: #135e96;
+}
+
+.fitcopilot-quick-actions .button-secondary {
+    background: white;
+    border: 1px solid #c3c4c7;
+    color: #2c3338;
+}
+
+.fitcopilot-quick-actions .button-secondary:hover {
+    background: #f6f7f7;
+    border-color: #8c8f94;
+}
+
+/* ===================================
+   DATA TABLES
+   =================================== */
+
+.fitcopilot-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.fitcopilot-data-table th,
+.fitcopilot-data-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.fitcopilot-data-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #1d2327;
+    font-size: 14px;
+}
+
+.fitcopilot-data-table td {
+    font-size: 14px;
+    color: #2c3338;
+}
+
+.fitcopilot-data-table tr:hover {
+    background: #f8f9fa;
+}
+
+.fitcopilot-data-table .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.fitcopilot-data-table .status-badge.active {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.fitcopilot-data-table .status-badge.beta {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.fitcopilot-data-table .status-badge.dev {
+    background: #cff4fc;
+    color: #055160;
+}
+
+.fitcopilot-data-table .status-badge.draft {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+.fitcopilot-data-table .action-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.fitcopilot-data-table .action-buttons .button {
+    padding: 4px 8px;
+    font-size: 12px;
+    line-height: 1;
+    min-height: auto;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 782px) {
+    .fitcopilot-page-header {
+        padding: 16px;
+    }
+    
+    .fitcopilot-page-header h1 {
+        font-size: 24px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .dashboard-widgets {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+    
+    .fitcopilot-quick-actions {
+        flex-direction: column;
+        padding: 16px;
+    }
+    
+    .fitcopilot-quick-actions .button {
+        justify-content: center;
+    }
+    
+    .fitcopilot-data-table {
+        font-size: 12px;
+    }
+    
+    .fitcopilot-data-table th,
+    .fitcopilot-data-table td {
+        padding: 8px 12px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 2px;
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+@media (prefers-color-scheme: dark) {
+    .fitcopilot-admin-page {
+        background: #1e1e1e;
+    }
+    
+    .fitcopilot-page-header,
+    .fitcopilot-page-content,
+    .dashboard-widget {
+        background: #2c2c2c;
+        color: #e0e0e0;
+    }
+    
+    .fitcopilot-page-header h1 {
+        color: #e0e0e0;
+    }
+    
+    .fitcopilot-page-header .page-description {
+        color: #b0b0b0;
+    }
+    
+    .development-info {
+        background: #3c3c3c;
+        border-color: #4c4c4c;
+    }
+    
+    .fitcopilot-data-table th {
+        background: #3c3c3c;
+        color: #e0e0e0;
+    }
+    
+    .fitcopilot-data-table td {
+        color: #d0d0d0;
+    }
+    
+    .fitcopilot-data-table tr:hover {
+        background: #3c3c3c;
+    }
+}
+
+/* SPRINT 2: Strategy Manager Styles */
+
+/* Strategy Manager Layout */
+.strategy-manager {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.strategy-list-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Strategy Actions Bar */
+.strategy-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.strategy-actions .button {
+    margin-left: 10px;
+}
+
+.strategy-actions .button:first-child {
+    margin-left: 0;
+}
+
+/* Strategy Grid */
+.strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.strategy-card {
+    background: #f9fafc;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.strategy-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #4f46e5;
+}
+
+/* Strategy Card Header */
+.strategy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.strategy-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.strategy-type {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.strategy-type.builtin {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.strategy-type.custom {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* Strategy Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.status-badge.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.status-draft {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-badge.status-disabled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Strategy Description */
+.strategy-description {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+/* Strategy Stats */
+.strategy-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* Strategy Actions */
+.strategy-actions-card {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.strategy-actions-card .button {
+    font-size: 12px;
+    padding: 6px 12px;
+    height: auto;
+    line-height: 1.2;
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+/* Strategy Form */
+.strategy-form-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.form-section h3 {
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-field label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-field textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-field textarea.large {
+    min-height: 300px;
+}
+
+.form-field small {
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Context Checkboxes */
+.context-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.context-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.context-checkbox:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.context-checkbox input[type="checkbox"] {
+    margin: 0;
+}
+
+.context-checkbox label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* Strategy Testing Interface */
+.strategy-test-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.test-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-content h2 {
+    color: #1f2937;
+    margin: 0 0 8px 0;
+    font-size: 24px;
+}
+
+.test-description {
+    color: #6b7280;
+    margin: 0;
+    font-size: 14px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Testing Interface Layout */
+.testing-interface {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.test-input-panel,
+.test-output-panel {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.test-input-panel h3,
+.test-output-panel h3 {
+    background: #f9fafb;
+    color: #1f2937;
+    margin: 0;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.test-input-panel .strategy-info,
+.test-input-panel .context-configuration {
+    padding: 20px;
+}
+
+.test-input-panel .test-actions {
+    padding: 15px 20px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Strategy Info Display */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.info-item {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.info-item strong {
+    color: #374151;
+}
+
+/* Context Configuration */
+.context-section {
+    margin-bottom: 25px;
+}
+
+.context-section h5 {
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.context-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.context-fields label {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    gap: 4px;
+}
+
+.context-fields input,
+.context-fields select {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+/* Test Output Panel */
+.test-output-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+}
+
+.test-status {
+    padding: 20px;
+    text-align: center;
+    background: #fef3c7;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.test-status.hidden {
+    display: none;
+}
+
+.status-message {
+    font-weight: 500;
+    color: #92400e;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #fde68a;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #f59e0b;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Test Results */
+.test-results {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.test-results.hidden {
+    display: none;
+}
+
+.result-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.result-stats .stat-item {
+    text-align: center;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.result-stats .stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.result-stats .stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Generated Prompt */
+.generated-prompt {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.generated-prompt h4 {
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.prompt-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.prompt-actions .button {
+    font-size: 12px;
+    padding: 4px 8px;
+    height: auto;
+    line-height: 1.2;
+}
+
+.prompt-content {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #374151;
+}
+
+/* Validation Results */
+.validation-results h4 {
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+}
+
+.validation-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.validation-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.validation-list li:last-child {
+    margin-bottom: 0;
+}
+
+.validation-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.validation-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.validation-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.validation-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+/* No Results Placeholder */
+.no-results {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.no-results.hidden {
+    display: none;
+}
+
+.placeholder-content {
+    text-align: center;
+    color: #6b7280;
+}
+
+.placeholder-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.placeholder-content h4 {
+    color: #374151;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+}
+
+.placeholder-content p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .testing-interface {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .test-input-panel {
+        order: 1;
+    }
+    
+    .test-output-panel {
+        order: 2;
+        min-height: 400px;
+    }
+    
+    .result-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .strategy-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .context-fields {
+        grid-template-columns: 1fr;
+    }
+    
+    .result-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .test-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* Form Validation Styles */
+.form-field.error input,
+.form-field.error select,
+.form-field.error textarea {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-field.error .error-message {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading .button {
+    position: relative;
+}
+
+.loading .button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+} 
