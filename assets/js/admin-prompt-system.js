@@ -1089,7 +1089,8 @@
             const nonceInput = document.createElement('input');
             nonceInput.type = 'hidden';
             nonceInput.name = 'delete_strategy_nonce';
-            nonceInput.value = wp_create_nonce('fitcopilot_delete_strategy');
+            // Use the nonce provided by WordPress via localized script data
+            nonceInput.value = window.fitcopilotData?.nonce || window.ajaxurl_nonce || '';
             document.body.appendChild(nonceInput);
         }
         

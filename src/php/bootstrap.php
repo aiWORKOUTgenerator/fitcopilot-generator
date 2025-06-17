@@ -48,6 +48,14 @@ require_once FITCOPILOT_DIR . 'src/php/Analytics/WorkoutFocusTracking.php';
 // Register Admin components
 require_once FITCOPILOT_DIR . 'src/php/Admin/Settings.php';
 
+// Register NEW modular debug system
+require_once FITCOPILOT_DIR . 'src/php/Admin/Debug/DebugBootstrap.php';
+
+// Initialize debug system on admin_init
+add_action('admin_init', function() {
+    \FitCopilot\Admin\Debug\DebugBootstrap::init();
+}, 15); // After other admin systems are loaded
+
 /**
  * Enqueue frontend assets
  */

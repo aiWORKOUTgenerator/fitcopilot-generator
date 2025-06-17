@@ -13,9 +13,9 @@ class AdminTestingLab {
         this.testResults = new Map();
         this.activeTests = new Set();
         
-        // Configuration
+        // Configuration - Updated for WordPress AJAX
         this.config = {
-            apiBase: window.fitcopilotData?.apiBase || '/wp-json/fitcopilot/v1',
+            ajaxUrl: window.ajaxurl || '/wp-admin/admin-ajax.php',
             nonce: window.fitcopilotData?.nonce || '',
             refreshInterval: 2000, // 2 seconds
             maxLogEntries: 1000,
@@ -234,13 +234,10 @@ class AdminTestingLab {
         
         const startTime = performance.now();
         
-        const response = await this.apiRequest('/debug/test-workout-generation', {
-            method: 'POST',
-            body: JSON.stringify({
-                test_id: testId,
-                test_data: testData,
-                include_debug: true
-            })
+        const response = await this.apiRequest('debug_test_workout', {
+            test_id: testId,
+            test_data: testData,
+            include_debug: true
         });
         
         const endTime = performance.now();
@@ -270,12 +267,9 @@ class AdminTestingLab {
             include_fragments: formData.get('include_fragments') === 'on'
         };
         
-        const response = await this.apiRequest('/debug/test-prompt-building', {
-            method: 'POST',
-            body: JSON.stringify({
-                test_id: testId,
-                test_data: testData
-            })
+        const response = await this.apiRequest('debug_test_prompt', {
+            test_id: testId,
+            test_data: testData
         });
         
         return {
@@ -297,13 +291,10 @@ class AdminTestingLab {
         const contextData = this.parseJsonSafely(formData.get('context_data')) || {};
         const validationType = formData.get('validation_type') || 'workout_generation';
         
-        const response = await this.apiRequest('/debug/validate-context', {
-            method: 'POST',
-            body: JSON.stringify({
-                test_id: testId,
-                context_data: contextData,
-                validation_type: validationType
-            })
+        const response = await this.apiRequest('debug_validate_context', {
+            test_id: testId,
+            context_data: contextData,
+            validation_type: validationType
         });
         
         return {
@@ -326,12 +317,9 @@ class AdminTestingLab {
         for (let i = 0; i < iterations; i++) {
             const startTime = performance.now();
             
-            const response = await this.apiRequest('/debug/performance-test', {
-                method: 'POST',
-                body: JSON.stringify({
-                    test_id: `${testId}_${i}`,
-                    iteration: i + 1
-                })
+            const response = await this.apiRequest('debug_performance_test', {
+                test_id: `${testId}_${i}`,
+                iteration: i + 1
             });
             
             const endTime = performance.now();
@@ -386,13 +374,11 @@ class AdminTestingLab {
      */
     async refreshLogs() {
         try {
-            const response = await this.apiRequest('/debug/logs', {
-                method: 'GET'
-            });
+            const response = await this.apiRequest('debug_get_logs', {});
             
             if (response.success) {
-                this.updateLogsDisplay(response.data.logs);
-                this.updateSystemStats(response.data.stats);
+                this.updateLogsDisplay(response.data.logs || []);
+                this.updateSystemStats(response.data.stats || {});
             }
         } catch (error) {
             console.error('Failed to refresh logs:', error);
@@ -652,22 +638,29 @@ class AdminTestingLab {
     }
     
     /**
-     * Make API request
+     * Make AJAX request to WordPress admin-ajax.php
      */
-    async apiRequest(endpoint, options = {}) {
-        const url = `${this.config.apiBase}${endpoint}`;
+    async apiRequest(action, data = {}) {
+        const url = this.config.ajaxUrl;
         
-        const defaultOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-WP-Nonce': this.config.nonce
+        // Create FormData for WordPress AJAX
+        const formData = new FormData();
+        formData.append('action', `fitcopilot_${action}`);
+        formData.append('nonce', this.config.nonce);
+        
+        // Add data fields
+        Object.keys(data).forEach(key => {
+            if (typeof data[key] === 'object' && data[key] !== null) {
+                formData.append(key, JSON.stringify(data[key]));
+            } else {
+                formData.append(key, data[key]);
             }
-        };
+        });
         
-        const mergedOptions = { ...defaultOptions, ...options };
-        
-        const response = await fetch(url, mergedOptions);
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
         
         if (!response.ok) {
             throw new Error(`API request failed: ${response.status} ${response.statusText}`);
@@ -742,12 +735,44 @@ class AdminTestingLab {
         // Implementation for log level controls
     }
     
-    loadSystemStats() {
-        // Implementation for loading system stats
+    async loadSystemStats() {
+        try {
+            const response = await this.apiRequest('debug_get_system_stats', {});
+            
+            if (response.success) {
+                this.updateSystemStats(response.data || {});
+            }
+        } catch (error) {
+            console.error('Failed to load system stats:', error);
+        }
     }
     
     updateSystemStats(stats) {
-        // Implementation for updating system stats display
+        // Update system stats display elements
+        const statsContainer = document.getElementById('system-stats');
+        if (statsContainer && stats) {
+            const statsHtml = `
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Requests:</span>
+                        <span class="stat-value">${stats.total_requests || 0}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Success Rate:</span>
+                        <span class="stat-value">${stats.success_rate || '0%'}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg Response Time:</span>
+                        <span class="stat-value">${stats.avg_response_time || 0}ms</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Active Tests:</span>
+                        <span class="stat-value">${this.activeTests.size}</span>
+                    </div>
+                </div>
+            `;
+            statsContainer.innerHTML = statsHtml;
+        }
     }
     
     switchTab(tabElement) {
@@ -762,12 +787,54 @@ class AdminTestingLab {
         // Implementation for displaying test errors
     }
     
-    clearLogs() {
-        // Implementation for clearing logs
+    async clearLogs() {
+        try {
+            const response = await this.apiRequest('debug_clear_logs', {});
+            
+            if (response.success) {
+                // Clear the logs display
+                const logsContainer = document.getElementById('logs-content');
+                if (logsContainer) {
+                    logsContainer.innerHTML = '';
+                }
+                
+                console.log('✅ Logs cleared successfully');
+            } else {
+                console.error('❌ Failed to clear logs:', response.data);
+            }
+        } catch (error) {
+            console.error('❌ Error clearing logs:', error);
+        }
     }
     
-    exportLogs() {
-        // Implementation for exporting logs
+    async exportLogs() {
+        try {
+            const format = 'json'; // Default format
+            const response = await this.apiRequest('export_logs', {
+                format: format
+            });
+            
+            if (response.success && response.data.export_data) {
+                // Create download link
+                const blob = new Blob([response.data.export_data], { 
+                    type: format === 'json' ? 'application/json' : 'text/plain'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `fitcopilot-logs-${new Date().toISOString().split('T')[0]}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                console.log('✅ Logs exported successfully');
+            } else {
+                console.error('❌ Failed to export logs:', response.data);
+            }
+        } catch (error) {
+            console.error('❌ Error exporting logs:', error);
+        }
     }
 }
 
