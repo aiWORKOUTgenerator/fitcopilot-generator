@@ -64,31 +64,52 @@ class DebugManager {
      * @return void
      */
     public function init(): void {
-        // Only register hooks after WordPress is fully loaded
+        error_log('[FitCopilot Debug] DebugManager::init() called');
+        error_log('[FitCopilot Debug] is_admin(): ' . (is_admin() ? 'true' : 'false'));
+        
+        // Always register AJAX handlers, only register admin hooks if in admin
+        $this->registerAjaxHandlers();
+        error_log('[FitCopilot Debug] AJAX handlers registered');
+        
         if (is_admin()) {
-            $this->registerHooks();
+            $this->registerAdminHooks();
+            error_log('[FitCopilot Debug] Admin hooks registered');
+        } else {
+            error_log('[FitCopilot Debug] Not in admin context, admin hooks skipped');
         }
     }
     
     /**
-     * Register WordPress hooks
+     * Register AJAX handlers
      * 
-     * Fixed: Only called after WordPress is fully initialized
+     * Always called to ensure AJAX works regardless of context
      *
      * @return void
      */
-    private function registerHooks(): void {
+    private function registerAjaxHandlers(): void {
+        // Register AJAX handlers through controllers
+        foreach ($this->controllers as $controller) {
+            if (method_exists($controller, 'registerAjaxHandlers')) {
+                $controller->registerAjaxHandlers();
+            }
+        }
+    }
+    
+    /**
+     * Register admin-only hooks
+     * 
+     * Only called in admin context
+     *
+     * @return void
+     */
+    private function registerAdminHooks(): void {
         // Register hooks only if WordPress functions are available
         if (function_exists('add_action')) {
             add_action('admin_menu', [$this, 'registerAdminMenus']);
             add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
-            
-            // Register AJAX handlers through controllers
-            foreach ($this->controllers as $controller) {
-                if (method_exists($controller, 'registerAjaxHandlers')) {
-                    $controller->registerAjaxHandlers();
-                }
-            }
+            error_log('[FitCopilot Debug] admin_menu and admin_enqueue_scripts hooks added');
+        } else {
+            error_log('[FitCopilot Debug] add_action function not available');
         }
     }
     
@@ -98,6 +119,12 @@ class DebugManager {
      * @return void
      */
     public function registerAdminMenus(): void {
+        // Skip menu registration - AdminMenu.php handles all menu registration
+        // This prevents conflicts and duplicate menu entries
+        error_log('[FitCopilot Debug] Skipping menu registration - handled by AdminMenu.php');
+        return;
+        
+        /*
         // Only register if we have proper permissions
         if (!current_user_can('manage_options')) {
             return;
@@ -122,6 +149,7 @@ class DebugManager {
                 $controller->registerMenuPages();
             }
         }
+        */
     }
     
     /**
@@ -142,15 +170,30 @@ class DebugManager {
      * @return void
      */
     public function enqueueAdminAssets(string $hook_suffix): void {
-        // Only load on debug pages
-        if (strpos($hook_suffix, 'fitcopilot-debug') === false) {
+        // Debug: Log when this method is called
+        error_log("DebugManager::enqueueAdminAssets called with hook: {$hook_suffix}");
+        
+        // More specific hook matching for Testing Lab page
+        $is_debug_page = (
+            strpos($hook_suffix, 'fitcopilot-debug') !== false ||
+            strpos($hook_suffix, 'testing-lab') !== false ||
+            strpos($hook_suffix, 'fitcopilot_page_fitcopilot-testing-lab') !== false
+        );
+        
+        if (!$is_debug_page) {
+            error_log("DebugManager: Hook condition NOT matched, skipping asset loading");
             return;
         }
         
+        error_log("DebugManager: Hook condition matched, proceeding with asset loading");
+        
         // Let each controller handle its own assets
-        foreach ($this->controllers as $controller) {
+        foreach ($this->controllers as $name => $controller) {
             if (method_exists($controller, 'enqueueAssets')) {
+                error_log("DebugManager: Calling enqueueAssets on controller: {$name}");
                 $controller->enqueueAssets($hook_suffix);
+            } else {
+                error_log("DebugManager: Controller {$name} does not have enqueueAssets method");
             }
         }
     }

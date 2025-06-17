@@ -506,7 +506,7 @@ class OpenAIProvider {
      * @param array $params Workout parameters
      * @return string Prompt for OpenAI
      */
-    private function buildPrompt($params) {
+    public function buildPrompt($params) {
         // PHASE 6: Enhanced fitness-specific parameters with detailed context
         $fitness_level = $params['fitness_level'] ?? $params['difficulty'] ?? 'intermediate';
         $intensity_level = $params['intensity_level'] ?? $params['intensity'] ?? 3;
@@ -516,6 +516,10 @@ class OpenAIProvider {
         $duration = $params['duration'] ?? 30;
         $equipment = isset($params['equipment']) ? implode(', ', $params['equipment']) : 'no equipment';
         $daily_focus = $params['daily_focus'] ?? $params['goals'] ?? 'general fitness';
+        // Fix array to string conversion warning
+        if (is_array($daily_focus)) {
+            $daily_focus = implode(', ', $daily_focus);
+        }
         $profile_goals = isset($params['profile_goals']) && is_array($params['profile_goals']) ? $params['profile_goals'] : [];
         $restrictions = $params['restrictions'] ?? 'none';
 

@@ -2,8 +2,19 @@
 /**
  * Debug Endpoints - WordPress Admin Integration for Debug Dashboard
  * 
- * Provides comprehensive admin dashboard interface for system debugging,
- * log streaming, performance monitoring, and development tools
+ * ⚠️  DEPRECATED: This class has been migrated to a modular architecture.
+ * 
+ * NEW SYSTEM LOCATION:
+ * - Main Coordinator: src/php/Admin/Debug/DebugManager.php
+ * - Controllers: src/php/Admin/Debug/Controllers/
+ * - Services: src/php/Admin/Debug/Services/
+ * - Views: src/php/Admin/Debug/Views/
+ * - Bootstrap: src/php/Admin/Debug/DebugBootstrap.php
+ * 
+ * This file is maintained for backward compatibility but most functionality
+ * has been commented out and redirected to the new modular system.
+ * 
+ * @deprecated Use the modular debug system instead
  */
 
 namespace FitCopilot\Admin;
@@ -116,10 +127,13 @@ class DebugEndpoints {
     
     /**
      * Register WordPress hooks
-     *
+     * 
+     * @deprecated Migrated to modular system (DebugBootstrap.php)
      * @return void
      */
     private function registerHooks(): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/DebugBootstrap.php
+        /*
         add_action('admin_menu', [$this, 'registerAdminMenus']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
         add_action('wp_ajax_fitcopilot_debug_logs', [$this, 'handleDebugLogsAjax']);
@@ -129,14 +143,18 @@ class DebugEndpoints {
         add_action('wp_ajax_fitcopilot_debug_clear_logs', [$this, 'handleClearLogsAjax']);
         add_action('wp_ajax_fitcopilot_debug_export_logs', [$this, 'handleExportLogsAjax']);
         add_action('wp_ajax_fitcopilot_debug_system_info', [$this, 'handleSystemInfoAjax']);
+        */
     }
     
     /**
      * Register admin menu pages
-     *
+     * 
+     * @deprecated Migrated to DebugManager.php
      * @return void
      */
     public function registerAdminMenus(): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/DebugManager.php
+        /*
         // Main Debug Dashboard
         add_menu_page(
             'FitCopilot Debug Dashboard',
@@ -184,15 +202,19 @@ class DebugEndpoints {
             'fitcopilot-debug-system',
             [$this, 'renderSystemInfoPage']
         );
+        */
     }
     
     /**
      * Enqueue admin assets
-     *
+     * 
+     * @deprecated Migrated to DebugManager.php
      * @param string $hook_suffix Current admin page
      * @return void
      */
     public function enqueueAdminAssets(string $hook_suffix): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/DebugManager.php
+        /*
         // Only load on debug pages
         if (strpos($hook_suffix, 'fitcopilot-debug') === false) {
             return;
@@ -223,14 +245,18 @@ class DebugEndpoints {
             'refreshInterval' => 5000,
             'maxLogEntries' => 1000
         ]);
+        */
     }
     
     /**
      * Render main debug dashboard
-     *
+     * 
+     * @deprecated Migrated to DebugDashboardView.php
      * @return void
      */
     public function renderDebugDashboard(): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/Views/DebugDashboardView.php
+        /*
         $this->initializeServices(); // Lazy load services
         $system_stats = $this->getSystemStats();
         $recent_logs = $this->services['log_manager']->getRecentLogs(50);
@@ -369,6 +395,7 @@ class DebugEndpoints {
         });
         </script>
         <?php
+        */
     }
     
     /**
@@ -558,10 +585,13 @@ class DebugEndpoints {
     
     /**
      * Handle debug logs AJAX request
-     *
+     * 
+     * @deprecated Migrated to SystemLogsController.php
      * @return void
      */
     public function handleDebugLogsAjax(): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/Controllers/SystemLogsController.php
+        /*
         check_ajax_referer('fitcopilot_debug_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
@@ -578,14 +608,18 @@ class DebugEndpoints {
         $logs = $this->services['log_manager']->getLogs($filters);
         
         wp_send_json_success($logs);
+        */
     }
     
     /**
      * Handle debug stream AJAX request
-     *
+     * 
+     * @deprecated Migrated to SystemLogsController.php
      * @return void
      */
     public function handleDebugStreamAjax(): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/Controllers/SystemLogsController.php
+        /*
         check_ajax_referer('fitcopilot_debug_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
@@ -613,14 +647,18 @@ class DebugEndpoints {
             default:
                 wp_send_json_error('Invalid stream action');
         }
+        */
     }
     
     /**
      * Handle performance AJAX request
-     *
+     * 
+     * @deprecated Migrated to PerformanceController.php
      * @return void
      */
     public function handlePerformanceAjax(): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/Controllers/PerformanceController.php
+        /*
         check_ajax_referer('fitcopilot_debug_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
@@ -629,14 +667,18 @@ class DebugEndpoints {
         
         $metrics = $this->services['performance_monitor']->getCurrentMetrics();
         wp_send_json_success($metrics);
+        */
     }
     
     /**
      * Handle response analysis AJAX request
-     *
+     * 
+     * @deprecated Migrated to ResponseAnalysisController.php
      * @return void
      */
     public function handleResponseAnalysisAjax(): void {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/Controllers/ResponseAnalysisController.php
+        /*
         check_ajax_referer('fitcopilot_debug_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
@@ -647,6 +689,7 @@ class DebugEndpoints {
         $analysis = $this->services['response_debugger']->analyzeResponse($response_json);
         
         wp_send_json_success($analysis);
+        */
     }
     
     /**
@@ -782,11 +825,14 @@ class DebugEndpoints {
     
     /**
      * Test workout generation (Testing Lab integration)
-     *
+     * 
+     * @deprecated Migrated to TestingLabController.php via TestingService.php
      * @param array $test_data Test parameters
      * @return array Test results
      */
     public function test_workout_generation(array $test_data): array {
+        // MIGRATED TO MODULAR SYSTEM - See src/php/Admin/Debug/Controllers/TestingLabController.php
+        /*
         $this->initializeServices(); // Lazy load services
         $start_time = microtime(true);
         
@@ -902,6 +948,14 @@ class DebugEndpoints {
                 'timestamp' => date('Y-m-d H:i:s')
             ];
         }
+        */
+        
+        // Return deprecated notice
+        return [
+            'success' => false,
+            'error' => 'This method has been deprecated. Use TestingLabController instead.',
+            'redirect' => 'src/php/Admin/Debug/Controllers/TestingLabController.php'
+        ];
     }
     
     /**

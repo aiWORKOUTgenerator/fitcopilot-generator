@@ -27,11 +27,27 @@ trait AjaxHandlerTrait {
      * @return bool True if valid, dies with error if invalid
      */
     protected function validateAjaxRequest(string $nonce_action = 'fitcopilot_admin_ajax', string $capability = 'manage_options'): bool {
-        // Check permissions first
+        // Check if user is logged in first
+        if (!is_user_logged_in()) {
+            wp_send_json_error([
+                'message' => 'You must be logged in to access this feature',
+                'code' => 'not_logged_in',
+                'redirect_url' => wp_login_url(admin_url('admin.php?page=fitcopilot-testing-lab'))
+            ]);
+            return false;
+        }
+        
+        // Check permissions
         if (!current_user_can($capability)) {
             wp_send_json_error([
-                'message' => 'Insufficient permissions',
-                'code' => 'insufficient_permissions'
+                'message' => 'You do not have sufficient permissions to access this feature. Administrator access required.',
+                'code' => 'insufficient_permissions',
+                'debug_info' => [
+                    'user_id' => get_current_user_id(),
+                    'capability_required' => $capability,
+                    'user_roles' => wp_get_current_user()->roles ?? [],
+                    'is_admin' => current_user_can('administrator')
+                ]
             ]);
             return false;
         }

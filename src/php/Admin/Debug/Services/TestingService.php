@@ -33,13 +33,29 @@ class TestingService {
         try {
             $workout_params = $test_data['test_data'] ?? $test_data;
             
+            // Enhanced error logging for debugging
+            error_log('[TestingService] Starting workout generation test with ID: ' . $test_id);
+            error_log('[TestingService] Workout params: ' . json_encode($workout_params));
+            
             $api_key = get_option('fitcopilot_openai_api_key', '');
             if (empty($api_key)) {
+                error_log('[TestingService] API key not configured');
                 throw new \Exception('OpenAI API key not configured');
             }
             
+            // Check if OpenAI provider class exists before instantiation
+            if (!class_exists('FitCopilot\\Service\\AI\\OpenAIProvider')) {
+                error_log('[TestingService] OpenAIProvider class not found');
+                throw new \Exception('OpenAIProvider class not available');
+            }
+            
+            error_log('[TestingService] Creating OpenAI provider instance');
             $provider = new \FitCopilot\Service\AI\OpenAIProvider($api_key);
+            
+            error_log('[TestingService] Building prompt');
             $prompt = $provider->buildPrompt($workout_params);
+            
+            error_log('[TestingService] Prompt generated successfully, length: ' . strlen($prompt));
             
             // Simulate response for testing
             $raw_response = json_encode([
@@ -52,20 +68,29 @@ class TestingService {
                 ]
             ]);
             
-            return [
+            $result = [
                 'success' => true,
                 'test_id' => $test_id,
                 'prompt' => $prompt,
                 'raw_response' => $raw_response,
-                'timestamp' => date('Y-m-d H:i:s')
+                'timestamp' => date('Y-m-d H:i:s'),
+                'processing_time' => round((microtime(true) - $start_time) * 1000, 2) . 'ms'
             ];
             
+            error_log('[TestingService] Test completed successfully');
+            return $result;
+            
         } catch (\Exception $e) {
+            error_log('[TestingService] Test failed: ' . $e->getMessage());
+            error_log('[TestingService] Stack trace: ' . $e->getTraceAsString());
+            
             return [
                 'success' => false,
                 'test_id' => $test_id,
                 'error' => $e->getMessage(),
-                'timestamp' => date('Y-m-d H:i:s')
+                'error_trace' => $e->getTraceAsString(),
+                'timestamp' => date('Y-m-d H:i:s'),
+                'processing_time' => round((microtime(true) - $start_time) * 1000, 2) . 'ms'
             ];
         }
     }
@@ -79,8 +104,18 @@ class TestingService {
      */
     public function testPromptBuilding(array $test_data, string $test_id): array {
         try {
-            $provider = new \FitCopilot\Service\AI\OpenAIProvider('');
+            error_log('[TestingService] Starting prompt building test with ID: ' . $test_id);
+            
+            // Check if OpenAI provider class exists before instantiation
+            if (!class_exists('FitCopilot\\Service\\AI\\OpenAIProvider')) {
+                error_log('[TestingService] OpenAIProvider class not found for prompt building');
+                throw new \Exception('OpenAIProvider class not available');
+            }
+            
+            $provider = new \FitCopilot\Service\AI\OpenAIProvider('test_key');
             $prompt = $provider->buildPrompt($test_data);
+            
+            error_log('[TestingService] Prompt building completed successfully');
             
             return [
                 'success' => true,
@@ -89,10 +124,14 @@ class TestingService {
                 'timestamp' => date('Y-m-d H:i:s')
             ];
         } catch (\Exception $e) {
+            error_log('[TestingService] Prompt building failed: ' . $e->getMessage());
+            error_log('[TestingService] Stack trace: ' . $e->getTraceAsString());
+            
             return [
                 'success' => false,
                 'test_id' => $test_id,
                 'error' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString(),
                 'timestamp' => date('Y-m-d H:i:s')
             ];
         }

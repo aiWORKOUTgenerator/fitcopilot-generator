@@ -38,23 +38,26 @@ class DebugBootstrap {
             return;
         }
         
-        // Only initialize in admin context
-        if (!is_admin()) {
-            return;
-        }
+        // Always initialize to ensure AJAX handlers are registered
+        // Context checks will be handled by individual controllers
         
         try {
+            // Debug logging
+            error_log('[FitCopilot Debug] DebugBootstrap::init() called');
+            error_log('[FitCopilot Debug] is_admin(): ' . (is_admin() ? 'true' : 'false'));
+            
             // Create debug manager
             self::$debug_manager = new DebugManager();
+            error_log('[FitCopilot Debug] DebugManager created successfully');
             
             // Initialize the manager (this will register hooks)
             self::$debug_manager->init();
+            error_log('[FitCopilot Debug] DebugManager::init() called successfully');
             
         } catch (\Exception $e) {
             // Log error but don't break the site
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[FitCopilot Debug] Failed to initialize debug system: ' . $e->getMessage());
-            }
+            error_log('[FitCopilot Debug] Failed to initialize debug system: ' . $e->getMessage());
+            error_log('[FitCopilot Debug] Exception trace: ' . $e->getTraceAsString());
         }
     }
     

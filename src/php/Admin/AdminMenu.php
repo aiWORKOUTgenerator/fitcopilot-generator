@@ -21,11 +21,14 @@ class AdminMenu {
      * Constructor
      */
     public function __construct() {
+        error_log('[FitCopilot Debug] AdminMenu constructor called');
+        
         // Register main admin menu
         add_action('admin_menu', [$this, 'register_admin_menu']);
         
         // Enqueue admin assets
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
+        error_log('[FitCopilot Debug] AdminMenu: admin_enqueue_scripts hook registered');
         
         // SPRINT 1: Add AJAX handlers for modular system management
         add_action('admin_init', [$this, 'register_ajax_handlers']);
@@ -39,6 +42,8 @@ class AdminMenu {
      * Register the main admin menu and parent page
      */
     public function register_admin_menu() {
+        error_log('[FitCopilot Debug] AdminMenu::register_admin_menu called');
+        
         // Add the main menu item with a dashboard page
         add_menu_page(
             __('FitCopilot', 'fitcopilot'), // Page title
@@ -169,10 +174,15 @@ class AdminMenu {
      * Enqueue admin assets for AI Prompt System pages
      */
     public function enqueue_admin_assets($hook_suffix) {
+        error_log('[FitCopilot Debug] AdminMenu::enqueue_admin_assets called with hook: ' . $hook_suffix);
+        
         // Only enqueue on our admin pages
         if (strpos($hook_suffix, 'fitcopilot') === false) {
+            error_log('[FitCopilot Debug] AdminMenu: Hook condition NOT matched, skipping');
             return;
         }
+        
+        error_log('[FitCopilot Debug] AdminMenu: Hook condition matched, proceeding');
         
         // Enqueue common admin styles
         wp_enqueue_style(
@@ -222,6 +232,14 @@ class AdminMenu {
                 'debug' => defined('WP_DEBUG') && WP_DEBUG,
             ]
         );
+        
+        // Delegate to modular debug system for debug pages
+        if (strpos($hook_suffix, 'testing-lab') !== false || strpos($hook_suffix, 'system-logs') !== false) {
+            $debug_manager = \FitCopilot\Admin\Debug\DebugBootstrap::getDebugManager();
+            if ($debug_manager) {
+                $debug_manager->enqueueAdminAssets($hook_suffix);
+            }
+        }
     }
     
     // ========================================
@@ -1397,12 +1415,12 @@ class AdminMenu {
         add_action('wp_ajax_fitcopilot_test_strategy', [$this, 'handle_test_strategy_ajax']);
         
         // SPRINT 3: Enhanced Testing Lab AJAX handlers
-        add_action('wp_ajax_fitcopilot_debug_test_workout', [$this, 'handle_debug_test_workout']);
-        add_action('wp_ajax_fitcopilot_debug_test_prompt', [$this, 'handle_debug_test_prompt']);
-        add_action('wp_ajax_fitcopilot_debug_validate_context', [$this, 'handle_debug_validate_context']);
-        add_action('wp_ajax_fitcopilot_debug_get_logs', [$this, 'handle_debug_get_logs']);
-        add_action('wp_ajax_fitcopilot_debug_clear_logs', [$this, 'handle_debug_clear_logs']);
-        add_action('wp_ajax_fitcopilot_debug_performance_test', [$this, 'handle_debug_performance_test']);
+        // NOTE: These handlers have been migrated to the modular debug system
+        // TestingLabController.php now handles workout/prompt testing
+        // SystemLogsController.php handles logs functionality
+        // PerformanceController.php handles performance testing
+        
+        // Legacy fallback handlers for backward compatibility only
         add_action('wp_ajax_fitcopilot_debug_get_system_stats', [$this, 'handle_debug_get_system_stats']);
         
         // SPRINT 3, WEEK 2: System Logs & Performance Monitoring
@@ -2818,53 +2836,26 @@ class AdminMenu {
     }
     
     /**
-     * SPRINT 3: Handle debug workout test AJAX request
-     * FIXED: Now uses modular debug system instead of problematic DebugEndpoints
+     * LEGACY COMPATIBILITY: Redirect to modular debug system
+     * This method is deprecated - use TestingLabController instead
      */
     public function handle_debug_test_workout() {
-        // Check permissions first
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error('Insufficient permissions');
-            return;
-        }
-
-        // Check nonce if provided (using general admin ajax nonce for initial build)
-        if (isset($_POST['nonce']) && !empty($_POST['nonce'])) {
-            $nonce_actions = ['fitcopilot_admin_ajax', 'fitcopilot_debug_test', 'wp_rest'];
-            $nonce_valid = false;
-            foreach ($nonce_actions as $action) {
-                if (wp_verify_nonce($_POST['nonce'], $action)) {
-                    $nonce_valid = true;
-                    break;
-                }
-            }
-            if (!$nonce_valid) {
-                wp_send_json_error([
-                    'message' => 'Security check failed',
-                    'debug' => 'Invalid nonce for debug test workout. Expected: fitcopilot_admin_ajax'
-                ]);
-                return;
+        // Delegate to modular system if available
+        $debug_manager = \FitCopilot\Admin\Debug\DebugBootstrap::getDebugManager();
+        
+        if ($debug_manager && $debug_manager->isHealthy()) {
+            $controller = $debug_manager->getController('testing_lab');
+            if ($controller && method_exists($controller, 'handleWorkoutTest')) {
+                return $controller->handleWorkoutTest();
             }
         }
         
-        try {
-            $test_data = json_decode(file_get_contents('php://input'), true);
-            
-            // Use modular debug system instead of problematic DebugEndpoints
-            $testing_service = new \FitCopilot\Admin\Debug\Services\TestingService();
-            $test_id = 'workout_' . time() . '_' . wp_generate_password(8, false);
-            
-            // Run workout generation test
-            $result = $testing_service->testWorkoutGeneration($test_data, $test_id);
-            
-            wp_send_json_success($result);
-            
-        } catch (\Exception $e) {
-            wp_send_json_error([
-                'message' => $e->getMessage(),
-                'type' => 'workout_test_error'
-            ]);
-        }
+        // Fallback error response
+        wp_send_json_error([
+            'message' => 'Debug system not available. Please check if the modular debug system is properly initialized.',
+            'code' => 'debug_system_unavailable',
+            'migration_note' => 'This endpoint has been migrated to TestingLabController.php'
+        ]);
     }
     
     /**

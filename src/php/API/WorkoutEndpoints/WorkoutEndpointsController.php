@@ -50,8 +50,8 @@ class WorkoutEndpointsController {
             'WorkoutUpdateEndpoint',
             'WorkoutCompletionEndpoint',
             'VersionHistoryEndpoint',
-            'CompareVersionsEndpoint',
-            'DebugEndpoints'
+            'CompareVersionsEndpoint'
+            // DISABLED: 'DebugEndpoints' - Causing class name collision with Admin\DebugEndpoints
         ];
         
         // Initialize each endpoint class

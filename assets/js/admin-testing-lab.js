@@ -15,8 +15,8 @@ class AdminTestingLab {
         
         // Configuration - Updated for WordPress AJAX
         this.config = {
-            ajaxUrl: window.ajaxurl || '/wp-admin/admin-ajax.php',
-            nonce: window.fitcopilotData?.nonce || '',
+            ajaxUrl: window.ajaxurl || window.fitcopilotTestingLab?.ajaxUrl || '/wp-admin/admin-ajax.php',
+            nonce: window.fitcopilotTestingLab?.nonce || window.fitcopilotData?.nonce || '',
             refreshInterval: 2000, // 2 seconds
             maxLogEntries: 1000,
             autoRefresh: true
@@ -666,7 +666,23 @@ class AdminTestingLab {
             throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        
+        // Handle specific error cases
+        if (!result.success && result.data) {
+            if (result.data.code === 'not_logged_in') {
+                alert('You must be logged in to use this feature. Redirecting to login...');
+                if (result.data.redirect_url) {
+                    window.location.href = result.data.redirect_url;
+                }
+                throw new Error('Not logged in');
+            } else if (result.data.code === 'insufficient_permissions') {
+                alert('You need administrator privileges to use this feature. Please contact your site administrator.');
+                throw new Error('Insufficient permissions');
+            }
+        }
+        
+        return result;
     }
     
     /**

@@ -51,10 +51,10 @@ require_once FITCOPILOT_DIR . 'src/php/Admin/Settings.php';
 // Register NEW modular debug system
 require_once FITCOPILOT_DIR . 'src/php/Admin/Debug/DebugBootstrap.php';
 
-// Initialize debug system on admin_init
-add_action('admin_init', function() {
+// Initialize debug system immediately for AJAX handlers
+add_action('init', function() {
     \FitCopilot\Admin\Debug\DebugBootstrap::init();
-}, 15); // After other admin systems are loaded
+}, 5); // Early priority to ensure AJAX handlers are registered
 
 /**
  * Enqueue frontend assets
@@ -266,7 +266,8 @@ require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/GenerateEndpoint.php
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutRetrievalEndpoint.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutUpdateEndpoint.php';
 require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutCompletionEndpoint.php';
-require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/DebugEndpoints.php';
+// DISABLED: Causing class name collision with Admin\DebugEndpoints
+// require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/DebugEndpoints.php';
 
 // Load Profile endpoints
 require_once FITCOPILOT_DIR . 'src/php/API/ProfileEndpoints.php';
