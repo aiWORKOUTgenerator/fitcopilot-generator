@@ -16,8 +16,8 @@
      */
     class PromptBuilderApp {
         constructor() {
-            this.config = window.PromptBuilderConfig || {};
-            this.utils = window.PromptBuilderUtils || {};
+            this.config = window.promptBuilderConfig || new (window.PromptBuilderConfig || function(){})();
+            this.utils = window.promptBuilderUtils || new (window.PromptBuilderUtils || function(){})();
             this.isInitialized = false;
             
             // Form and UI elements
@@ -254,7 +254,7 @@
                     this.displayPrompt(response.data);
                     this.showMessage('Live prompt generated successfully', 'success');
                 } else {
-                    throw new Error(response.data?.message || 'Failed to generate prompt');
+                    throw new Error(this.getResponseMessage(response, 'Failed to generate prompt'));
                 }
                 
             } catch (error) {
@@ -397,7 +397,7 @@
                     this.displayContextData(response.data);
                     this.showMessage('Context data loaded successfully', 'success');
                 } else {
-                    throw new Error(response.data?.message || 'Failed to get context data');
+                    throw new Error(this.getResponseMessage(response, 'Failed to get context data'));
                 }
                 
             } catch (error) {
@@ -452,7 +452,7 @@
                     this.displayTestResults(response.data);
                     this.showMessage('Workout test completed successfully', 'success');
                 } else {
-                    throw new Error(response.data?.message || 'Workout test failed');
+                    throw new Error(this.getResponseMessage(response, 'Workout test failed'));
                 }
                 
             } catch (error) {
@@ -528,7 +528,7 @@
                     this.populateFormWithProfile(response.data.profile_data);
                     this.showMessage('User profile loaded successfully', 'success');
                 } else {
-                    throw new Error(response.data?.message || 'Failed to load profile');
+                    throw new Error(this.getResponseMessage(response, 'Failed to load profile'));
                 }
                 
             } catch (error) {
@@ -610,7 +610,7 @@
             try {
                 button.prop('disabled', true).html('<span class="dashicons dashicons-update spin"></span> Loading...');
                 
-                const response = await this.makeAjaxRequest('fitcopilot_prompt_builder_get_strategy', {
+                const response = await this.makeAjaxRequest('fitcopilot_prompt_builder_view_code', {
                     strategy_name: strategyName
                 });
                 
@@ -618,7 +618,7 @@
                     this.displayStrategyCode(response.data);
                     this.showMessage('Strategy code loaded successfully', 'success');
                 } else {
-                    throw new Error(response.data?.message || 'Failed to load strategy code');
+                    throw new Error(this.getResponseMessage(response, 'Failed to load strategy code'));
                 }
                 
             } catch (error) {
@@ -733,7 +733,7 @@
                     this.hideSaveTemplateModal();
                     this.showMessage('Template saved successfully', 'success');
                 } else {
-                    throw new Error(response.data?.message || 'Failed to save template');
+                    throw new Error(this.getResponseMessage(response, 'Failed to save template'));
                 }
                 
             } catch (error) {
@@ -828,10 +828,48 @@
                     data: requestData,
                     timeout: 30000,
                     success: function(response) {
+                        // Ensure response is properly formatted
+                        if (typeof response === 'string') {
+                            try {
+                                response = JSON.parse(response);
+                            } catch (e) {
+                                console.error('[PromptBuilder] Invalid JSON response:', response);
+                                reject(new Error('Invalid server response format'));
+                                return;
+                            }
+                        }
+                        
+                        // Validate response structure
+                        if (!response || typeof response !== 'object') {
+                            reject(new Error('Invalid response structure'));
+                            return;
+                        }
+                        
                         resolve(response);
                     },
                     error: function(xhr, status, error) {
-                        reject(new Error(`AJAX error: ${error}`));
+                        console.error('[PromptBuilder] AJAX Error:', {
+                            status: xhr.status,
+                            statusText: xhr.statusText,
+                            responseText: xhr.responseText,
+                            error: error
+                        });
+                        
+                        let errorMessage = `AJAX error: ${error}`;
+                        
+                        if (xhr.responseText) {
+                            try {
+                                const errorResponse = JSON.parse(xhr.responseText);
+                                if (errorResponse && errorResponse.data && errorResponse.data.message) {
+                                    errorMessage = errorResponse.data.message;
+                                }
+                            } catch (e) {
+                                // Response is not JSON, use as is
+                                errorMessage = `Server error: ${xhr.status} ${xhr.statusText}`;
+                            }
+                        }
+                        
+                        reject(new Error(errorMessage));
                     }
                 });
             });
@@ -842,9 +880,21 @@
          */
         showMessage(message, type = 'info') {
             const messageContainer = $('#prompt-builder-messages');
+            
+            // Fallback escapeHtml if utils not available
+            const escapeHtml = (text) => {
+                if (this.utils && this.utils.escapeHtml) {
+                    return this.utils.escapeHtml(text);
+                }
+                // Fallback HTML escaping
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            };
+            
             const messageHtml = `
                 <div class="notice notice-${type} is-dismissible">
-                    <p>${this.utils.escapeHtml(message)}</p>
+                    <p>${escapeHtml(message)}</p>
                     <button type="button" class="notice-dismiss">
                         <span class="screen-reader-text">Dismiss this notice.</span>
                     </button>
@@ -862,6 +912,28 @@
             messageContainer.find('.notice-dismiss').on('click', function() {
                 $(this).parent().fadeOut();
             });
+        }
+        
+        /**
+         * Safe access to response message with fallbacks
+         */
+        getResponseMessage(response, fallback = 'Unknown error occurred') {
+            if (!response) return fallback;
+            
+            // Try different response structures WordPress might return
+            if (response.data && response.data.message) {
+                return response.data.message;
+            }
+            
+            if (response.message) {
+                return response.message;
+            }
+            
+            if (typeof response === 'string') {
+                return response;
+            }
+            
+            return fallback;
         }
         
         /**

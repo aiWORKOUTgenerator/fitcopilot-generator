@@ -168,6 +168,34 @@ class PromptAnalyticsService {
         $table_name = $wpdb->prefix . self::TABLE_ANALYTICS;
         $date_range = $filters['date_range'] ?? '7 days';
         
+        // Check if analytics table exists, if not return default data
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'");
+        if (!$table_exists) {
+            return [
+                'performance_metrics' => [
+                    'total_generations' => 0,
+                    'avg_generation_time' => 0,
+                    'avg_prompt_length' => 0,
+                    'avg_tokens' => 0,
+                    'avg_completeness' => 0,
+                    'avg_personalization' => 0,
+                    'avg_clarity' => 0,
+                    'avg_efficiency' => 0
+                ],
+                'quality_trends' => [],
+                'strategy_comparison' => [],
+                'active_ab_tests' => [],
+                'summary' => [
+                    'total_generations' => 0,
+                    'avg_generation_time' => 0,
+                    'avg_quality_score' => 0,
+                    'quality_grade' => 'N/A',
+                    'performance_grade' => 'N/A'
+                ],
+                'recommendations' => []
+            ];
+        }
+        
         // Build WHERE clause
         $where_clause = "WHERE created_at >= DATE_SUB(NOW(), INTERVAL {$date_range})";
         
@@ -198,6 +226,20 @@ class PromptAnalyticsService {
         
         $performance_data = $wpdb->get_row($performance_query, ARRAY_A);
         
+        // Ensure performance_data is always an array with default values
+        if (empty($performance_data)) {
+            $performance_data = [
+                'total_generations' => 0,
+                'avg_generation_time' => 0,
+                'avg_prompt_length' => 0,
+                'avg_tokens' => 0,
+                'avg_completeness' => 0,
+                'avg_personalization' => 0,
+                'avg_clarity' => 0,
+                'avg_efficiency' => 0
+            ];
+        }
+        
         // Quality trends (daily aggregation)
         $trends_query = "
             SELECT 
@@ -215,6 +257,9 @@ class PromptAnalyticsService {
         ";
         
         $trends_data = $wpdb->get_results($trends_query, ARRAY_A);
+        if (empty($trends_data)) {
+            $trends_data = [];
+        }
         
         // Strategy performance comparison
         $strategy_query = "
@@ -231,9 +276,15 @@ class PromptAnalyticsService {
         ";
         
         $strategy_data = $wpdb->get_results($strategy_query, ARRAY_A);
+        if (empty($strategy_data)) {
+            $strategy_data = [];
+        }
         
         // Active A/B tests
         $ab_tests = $this->getActiveABTests();
+        if (empty($ab_tests)) {
+            $ab_tests = [];
+        }
         
         return [
             'performance_metrics' => $performance_data,
@@ -439,16 +490,33 @@ class PromptAnalyticsService {
         
         $table_name = $wpdb->prefix . self::TABLE_AB_TESTS;
         
-        return $wpdb->get_results(
+        // Check if table exists before querying
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_name}'");
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $results = $wpdb->get_results(
             "SELECT * FROM {$table_name} WHERE status = 'active' ORDER BY created_at DESC",
             ARRAY_A
         );
+        
+        return $results ?: [];
     }
     
     /**
      * Generate performance summary
      */
     private function generateSummary(array $performance_data): array {
+        // Defensive programming: ensure we have valid data
+        if (empty($performance_data) || !is_array($performance_data)) {
+            $performance_data = [
+                'total_generations' => 0,
+                'avg_generation_time' => 0,
+                'avg_personalization' => 0
+            ];
+        }
+        
         $total = intval($performance_data['total_generations'] ?? 0);
         $avg_time = floatval($performance_data['avg_generation_time'] ?? 0);
         $avg_quality = floatval($performance_data['avg_personalization'] ?? 0);
@@ -467,6 +535,18 @@ class PromptAnalyticsService {
      */
     private function generateRecommendations(array $performance_data, array $strategy_data): array {
         $recommendations = [];
+        
+        // Defensive programming: ensure we have valid data
+        if (empty($performance_data) || !is_array($performance_data)) {
+            $performance_data = [
+                'avg_generation_time' => 0,
+                'avg_personalization' => 0
+            ];
+        }
+        
+        if (empty($strategy_data) || !is_array($strategy_data)) {
+            $strategy_data = [];
+        }
         
         $avg_time = floatval($performance_data['avg_generation_time'] ?? 0);
         $avg_quality = floatval($performance_data['avg_personalization'] ?? 0);

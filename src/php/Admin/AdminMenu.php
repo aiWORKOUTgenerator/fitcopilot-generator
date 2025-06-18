@@ -117,11 +117,11 @@ class AdminMenu {
             [$this, 'render_fragment_library'] // Callback function
         );
         
-        // Add PromptBuilder submenu (Phase 1: Core)
+        // Add PromptBuilder submenu (Phase 1: Core) - Direct under main menu
         add_submenu_page(
-            'fitcopilot-ai-prompt-system', // Parent slug
-            __('PromptBuilder', 'fitcopilot'), // Page title
-            __('PromptBuilder', 'fitcopilot'), // Menu title
+            'fitcopilot', // Parent slug - moved to main menu
+            __('Prompt Builder', 'fitcopilot'), // Page title
+            __('Prompt Builder', 'fitcopilot'), // Menu title
             'manage_options', // Capability
             'fitcopilot-prompt-builder', // Menu slug
             [$this, 'render_prompt_builder'] // Callback function
@@ -148,6 +148,16 @@ class AdminMenu {
         );
         
         // === END: AI PROMPT SYSTEM MENU STRUCTURE ===
+        
+        // Add Testing Lab as direct submenu (more accessible than buried in AI Prompt System)
+        add_submenu_page(
+            'fitcopilot', // Parent slug
+            __('Testing Lab', 'fitcopilot'), // Page title
+            __('Testing Lab', 'fitcopilot'), // Menu title
+            'manage_options', // Capability
+            'fitcopilot-testing-lab-direct', // Menu slug (different from the one in AI Prompt System)
+            [$this, 'render_testing_lab'] // Callback function
+        );
         
         // Add Settings submenu (existing)
         add_submenu_page(

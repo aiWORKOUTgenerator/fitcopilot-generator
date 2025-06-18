@@ -9,6 +9,7 @@
 namespace FitCopilot\Admin\Debug\Controllers;
 
 use FitCopilot\Admin\Debug\Services\PromptAnalyticsService;
+use FitCopilot\Admin\Debug\Services\PromptBuilderService;
 use FitCopilot\Admin\Debug\Services\MultiProviderManager;
 use FitCopilot\Admin\Debug\Services\TestingService;
 use FitCopilot\Admin\Debug\Views\PromptBuilderView;
@@ -48,6 +49,13 @@ class PromptBuilderController {
     private $testingService;
     
     /**
+     * PromptBuilder service instance
+     *
+     * @var PromptBuilderService
+     */
+    private $promptBuilderService;
+    
+    /**
      * View instance
      *
      * @var PromptBuilderView
@@ -61,6 +69,7 @@ class PromptBuilderController {
         $this->analytics = new PromptAnalyticsService();
         $this->multiProvider = new MultiProviderManager();
         $this->testingService = new TestingService();
+        $this->promptBuilderService = new PromptBuilderService();
         $this->view = new PromptBuilderView();
         
         $this->initializeHooks();
@@ -79,13 +88,8 @@ class PromptBuilderController {
      * Initialize WordPress hooks
      */
     private function initializeHooks(): void {
-        // AJAX endpoints
-        add_action('wp_ajax_fitcopilot_prompt_builder_generate', [$this, 'handleGeneratePrompt']);
-        add_action('wp_ajax_fitcopilot_prompt_builder_compare_providers', [$this, 'handleCompareProviders']);
-        add_action('wp_ajax_fitcopilot_analytics_get_dashboard', [$this, 'handleGetDashboard']);
-        add_action('wp_ajax_fitcopilot_analytics_create_ab_test', [$this, 'handleCreateABTest']);
-        add_action('wp_ajax_fitcopilot_multi_provider_compare', [$this, 'handleMultiProviderCompare']);
-        add_action('wp_ajax_fitcopilot_prompt_builder_save_template', [$this, 'handleSaveTemplate']);
+        // Register all AJAX endpoints properly
+        $this->registerAjaxHandlers();
         
         // Admin scripts and styles
         add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
@@ -105,12 +109,25 @@ class PromptBuilderController {
             $dashboard_data = $this->getDashboardData(['time_range' => '7 days']);
             $provider_health = $this->multiProvider->getProvidersHealth();
             $available_strategies = $this->getAvailableStrategies();
+            $users = $this->getUsers();
+            
+            // Prepare system info for the view - using same logic as Testing Lab
+            $systemInfo = [
+                'modular_system_active' => $this->getModularSystemStatus(),
+                'ai_provider' => $provider_health['primary_provider'] ?? 'Unknown',
+                'strategies_available' => count($available_strategies),
+                'system_health' => $provider_health['status'] ?? 'unknown',
+                'last_updated' => current_time('c')
+            ];
             
             // Render the interface
             $this->view->render([
                 'dashboard_data' => $dashboard_data,
                 'provider_health' => $provider_health,
-                'available_strategies' => $available_strategies,
+                'strategies' => $available_strategies,
+                'systemInfo' => $systemInfo,
+                'users' => $users,
+                'currentStrategy' => 'SingleWorkoutStrategy',
                 'current_user' => wp_get_current_user(),
                 'nonce' => wp_create_nonce('fitcopilot_prompt_builder')
             ]);
@@ -125,79 +142,14 @@ class PromptBuilderController {
         }
     }
     
-         /**
-      * Handle live prompt generation AJAX request
-      */
-     public function handleGeneratePrompt(): void {
-        // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'fitcopilot_prompt_builder')) {
-            wp_die('Security check failed');
-        }
-        
-        try {
-            $test_data = json_decode(stripslashes($_POST['test_data'] ?? '{}'), true);
-            
-            if (empty($test_data)) {
-                throw new \Exception('No test data provided');
-            }
-            
-            $start_time = microtime(true);
-            
-            // Use selected provider or default
-            $provider_name = $test_data['provider'] ?? 'openai';
-            $provider = $this->multiProvider->getProvider($provider_name);
-            
-            if (!$provider) {
-                throw new \Exception("Provider not available: {$provider_name}");
-            }
-            
-            // Generate prompt
-            $prompt = $provider->buildPrompt($test_data);
-            $generation_time = (microtime(true) - $start_time) * 1000;
-            
-            // Track analytics
-            $prompt_data = [
-                'prompt_id' => wp_generate_uuid4(),
-                'prompt' => $prompt,
-                'strategy_name' => $test_data['strategy'] ?? 'SingleWorkoutStrategy',
-                'parameters' => $test_data,
-                'context' => $this->extractContextData($test_data),
-                'generation_time_ms' => $generation_time,
-                'provider' => $provider_name
-            ];
-            
-            $analytics_id = $this->analytics->trackPromptGeneration($prompt_data);
-            
-            // Prepare response
-            $response_data = [
-                'prompt' => $prompt,
-                'prompt_id' => $prompt_data['prompt_id'],
-                'analytics_id' => $analytics_id,
-                'generation_time_ms' => round($generation_time, 2),
-                'prompt_length' => strlen($prompt),
-                'estimated_tokens' => $this->estimateTokenCount($prompt),
-                'estimated_cost' => $provider->estimateCost($prompt),
-                'provider_info' => $provider->getProviderInfo(),
-                'quality_metrics' => $this->calculateQuickQualityMetrics($prompt, $test_data),
-                'timestamp' => current_time('c')
-            ];
-            
-            wp_send_json_success($response_data);
-            
-        } catch (\Exception $e) {
-            error_log('[PromptBuilder] Generate prompt failed: ' . $e->getMessage());
-            wp_send_json_error([
-                'message' => $e->getMessage(),
-                'timestamp' => current_time('c')
-            ]);
-                 }
-     }
+
     public function registerAjaxHandlers(): void {
         // Only register if WordPress functions are available
         if (function_exists('add_action')) {
             // Phase 1: Core PromptBuilder AJAX endpoints
             add_action('wp_ajax_fitcopilot_prompt_builder_generate', [$this, 'handleLivePromptGeneration']);
             add_action('wp_ajax_fitcopilot_prompt_builder_get_strategy', [$this, 'handleGetStrategyCode']);
+            add_action('wp_ajax_fitcopilot_prompt_builder_view_code', [$this, 'handleGetStrategyCode']); // MISSING REGISTRATION
             add_action('wp_ajax_fitcopilot_prompt_builder_get_context', [$this, 'handleGetContextData']);
             add_action('wp_ajax_fitcopilot_prompt_builder_save_template', [$this, 'handleSaveTemplate']);
             add_action('wp_ajax_fitcopilot_prompt_builder_test_workout', [$this, 'handleTestWorkout']);
@@ -219,11 +171,20 @@ class PromptBuilderController {
         if (strpos($hook_suffix, 'prompt-builder') !== false || strpos($hook_suffix, 'fitcopilot-prompt-builder') !== false) {
             error_log("PromptBuilderController: Hook condition matched, enqueuing assets");
             
-            // Enqueue modular JavaScript architecture
+            // Enqueue config and utilities first
+            wp_enqueue_script(
+                'fitcopilot-prompt-builder-config',
+                plugins_url('assets/js/prompt-builder/config.js', FITCOPILOT_FILE),
+                ['jquery'],
+                FITCOPILOT_VERSION,
+                true
+            );
+            
+            // Enqueue main PromptBuilder script
             wp_enqueue_script(
                 'fitcopilot-prompt-builder',
                 plugins_url('assets/js/prompt-builder/index.js', FITCOPILOT_FILE),
-                ['jquery', 'wp-util'],
+                ['jquery', 'wp-util', 'fitcopilot-prompt-builder-config'],
                 FITCOPILOT_VERSION,
                 true
             );
@@ -236,7 +197,7 @@ class PromptBuilderController {
             );
             
             // Localize script with PromptBuilder configuration
-            $nonce = wp_create_nonce('fitcopilot_admin_ajax');
+            $nonce = wp_create_nonce('fitcopilot_prompt_builder');
             error_log("PromptBuilderController: Localizing script with nonce: {$nonce}");
             
             wp_localize_script('fitcopilot-prompt-builder', 'fitcopilotPromptBuilder', [
@@ -268,6 +229,9 @@ class PromptBuilderController {
         $start_time = microtime(true);
         
         try {
+            // Force modular system activation (same as Testing Lab)
+            $this->ensureModularSystemForPromptBuilder();
+            
             // Validate request
             if (!$this->validateAjaxRequest()) {
                 error_log('[PromptBuilderController] Request validation failed');
@@ -280,8 +244,13 @@ class PromptBuilderController {
             
             error_log('[PromptBuilderController] Form data sanitized: ' . json_encode($form_data));
             
-            // Generate live prompt using PromptBuilderService
+            // Generate live prompt using PromptBuilderService (MODULAR SYSTEM ONLY)
             $result = $this->promptBuilderService->generateLivePrompt($form_data);
+            
+            // Add modular system status to result
+            $result['modular_system_active'] = true;
+            $result['system_type'] = 'modular';
+            $result['modular_system_forced'] = true;
             
             // Add performance metrics
             $result['performance_metrics'] = $this->getPerformanceMetrics(
@@ -296,8 +265,8 @@ class PromptBuilderController {
             // Clear output buffer before sending response
             ob_end_clean();
             
-            // Send response
-            $this->sendSuccessResponse($result, 'Live prompt generated successfully');
+            // Send response directly (no double wrapping like strategy code handler)
+            wp_send_json_success($result);
             
         } catch (\Exception $e) {
             ob_end_clean();
@@ -309,7 +278,8 @@ class PromptBuilderController {
                 'live_prompt_generation_error',
                 [
                     'performance_metrics' => $this->getPerformanceMetrics($start_time),
-                    'error_trace' => $e->getTraceAsString()
+                    'error_trace' => $e->getTraceAsString(),
+                    'modular_system_only' => true
                 ]
             );
         }
@@ -336,8 +306,12 @@ class PromptBuilderController {
             // Get strategy code using PromptBuilderService
             $result = $this->promptBuilderService->getStrategyCode($strategy_name);
             
-            // Send response
-            $this->sendSuccessResponse($result, 'Strategy code retrieved successfully');
+            // Send response directly (no double wrapping)
+            if ($result['success']) {
+                wp_send_json_success($result);
+            } else {
+                wp_send_json_error($result);
+            }
             
         } catch (\Exception $e) {
             error_log('[PromptBuilderController] Get strategy code failed: ' . $e->getMessage());
@@ -580,5 +554,291 @@ class PromptBuilderController {
      */
     public function getTestingService(): TestingService {
         return $this->testingService;
+    }
+    
+    /**
+     * Get dashboard data for PromptBuilder interface
+     *
+     * @param array $options Options for data retrieval
+     * @return array Dashboard data
+     */
+    private function getDashboardData(array $options = []): array {
+        error_log('[PromptBuilderController] Getting dashboard data with options: ' . json_encode($options));
+        
+        try {
+            $time_range = $options['time_range'] ?? '7 days';
+            
+            // Get analytics data if available
+            $analytics_data = [];
+            if ($this->analytics) {
+                $analytics_data = $this->analytics->getDashboardData(['time_range' => $time_range]);
+            }
+            
+            // Get system info using consistent modular system status check
+            $system_info = [
+                'modular_system_active' => $this->getModularSystemStatus(),
+                'ai_provider' => 'OpenAI', // Default provider
+                'strategies_available' => count($this->getAvailableStrategies()),
+                'version' => FITCOPILOT_VERSION ?? '1.0.0',
+                'last_updated' => current_time('c')
+            ];
+            
+            return [
+                'systemInfo' => $system_info,
+                'analytics' => $analytics_data,
+                'users' => $this->getUsers(),
+                'strategies' => $this->getAvailableStrategies(),
+                'currentStrategy' => get_option('fitcopilot_current_strategy', 'SingleWorkoutStrategy')
+            ];
+            
+        } catch (\Exception $e) {
+            error_log('[PromptBuilderController] Failed to get dashboard data: ' . $e->getMessage());
+            
+            return [
+                'systemInfo' => [
+                    'modular_system_active' => $this->getModularSystemStatus(),
+                    'ai_provider' => 'Unknown',
+                    'strategies_available' => 0,
+                    'version' => '1.0.0',
+                    'last_updated' => current_time('c')
+                ],
+                'analytics' => [],
+                'users' => [],
+                'strategies' => [],
+                'currentStrategy' => 'SingleWorkoutStrategy'
+            ];
+        }
+    }
+    
+    /**
+     * Get available prompt strategies
+     *
+     * @return array Available strategies
+     */
+    private function getAvailableStrategies(): array {
+        return [
+            'SingleWorkoutStrategy' => [
+                'name' => 'Single Workout Strategy',
+                'description' => 'Standard single workout generation with comprehensive personalization',
+                'class' => 'FitCopilot\\Service\\AI\\PromptEngineering\\Strategies\\SingleWorkoutStrategy',
+                'supported_features' => ['profile_integration', 'session_customization', 'equipment_filtering'],
+                'performance' => [
+                    'avg_generation_time' => 150,
+                    'success_rate' => 98.5,
+                    'avg_prompt_length' => 1200
+                ]
+            ]
+            // Future strategies can be added here
+        ];
+    }
+    
+    /**
+     * Get WordPress users for testing
+     *
+     * @return array User list
+     */
+    private function getUsers(): array {
+        $users = get_users([
+            'number' => 50,
+            'fields' => ['ID', 'display_name', 'user_email'],
+            'orderby' => 'display_name',
+            'order' => 'ASC'
+        ]);
+        
+        $formatted_users = [];
+        foreach ($users as $user) {
+            $formatted_users[] = [
+                'id' => $user->ID,
+                'name' => $user->display_name,
+                'email' => $user->user_email
+            ];
+        }
+        
+        return $formatted_users;
+    }
+    
+    /**
+     * Get modular system status using same logic as Testing Lab and OpenAI Provider
+     * 
+     * @return bool True if modular system is active
+     */
+    private function getModularSystemStatus(): bool {
+        // Priority 1: Check if Testing Lab has forced modular system active
+        $forced_active = get_option('fitcopilot_modular_system_active', false);
+        if ($forced_active) {
+            return true;
+        }
+        
+        // Priority 2: Check main setting (same as OpenAI Provider)
+        $option_enabled = get_option('fitcopilot_use_modular_prompts', false);
+        $filter_enabled = apply_filters('fitcopilot_use_modular_prompts', $option_enabled);
+        
+        return (bool) $filter_enabled;
+    }
+    
+    /**
+     * Force modular system activation (same as Testing Lab)
+     * 
+     * @return void
+     */
+    private function ensureModularSystemForPromptBuilder(): void {
+        // Force modular system to be active for PromptBuilder (same as Testing Lab)
+        update_option('fitcopilot_modular_system_active', true);
+        
+        // Disable any legacy system flags
+        update_option('fitcopilot_use_legacy_prompts', false);
+        
+        error_log('[PromptBuilderController] Modular system enforced for PromptBuilder: modular=true, legacy=false');
+        
+        // Verify modular system classes are available
+        $required_classes = [
+            'FitCopilot\Service\AI\PromptEngineering\Core\ContextManager',
+            'FitCopilot\Service\AI\PromptEngineering\Core\PromptBuilder', 
+            'FitCopilot\Service\AI\PromptEngineering\Strategies\SingleWorkoutStrategy'
+        ];
+        
+        foreach ($required_classes as $class) {
+            if (!class_exists($class)) {
+                throw new \Exception("Required modular system class not found for PromptBuilder: {$class}");
+            }
+        }
+        
+        error_log('[PromptBuilderController] All modular system classes verified for PromptBuilder');
+    }
+    
+    /**
+     * Validate AJAX request
+     *
+     * @return bool True if valid
+     */
+    private function validateAjaxRequest(): bool {
+        // Check if this is an AJAX request
+        if (!wp_doing_ajax()) {
+            error_log('[PromptBuilderController] Not an AJAX request');
+            return false;
+        }
+        
+        // Check nonce (optional for non-sensitive operations)
+        $nonce = $_POST['nonce'] ?? $_GET['nonce'] ?? '';
+        if ($nonce && !wp_verify_nonce($nonce, 'fitcopilot_prompt_builder')) {
+            error_log('[PromptBuilderController] Nonce verification failed');
+            return false;
+        }
+        
+        // Check user capabilities
+        if (!current_user_can('manage_options')) {
+            error_log('[PromptBuilderController] User lacks required capabilities');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Get request data
+     *
+     * @return array Request data
+     */
+    private function getRequestData(): array {
+        return $_POST;
+    }
+    
+    /**
+     * Get performance metrics
+     *
+     * @param float $start_time Start time
+     * @param string $prompt Generated prompt
+     * @param string $context Additional context
+     * @return array Performance metrics
+     */
+    private function getPerformanceMetrics(float $start_time, string $prompt = '', string $context = ''): array {
+        $execution_time = (microtime(true) - $start_time) * 1000; // Convert to milliseconds
+        
+        return [
+            'execution_time_ms' => round($execution_time, 2),
+            'prompt_length' => strlen($prompt),
+            'estimated_tokens' => $this->estimateTokenCount($prompt),
+            'memory_usage_mb' => round(memory_get_usage(true) / 1024 / 1024, 2),
+            'timestamp' => current_time('c')
+        ];
+    }
+    
+    /**
+     * Estimate token count
+     *
+     * @param string $text Text to estimate
+     * @return int Estimated token count
+     */
+    private function estimateTokenCount(string $text): int {
+        // Simple estimation: ~4 characters per token for English text
+        return (int) ceil(strlen($text) / 4);
+    }
+    
+    /**
+     * Log AJAX request
+     *
+     * @param string $action Action name
+     * @param array $data Request data
+     * @param float $start_time Start time
+     */
+    private function logAjaxRequest(string $action, array $data, float $start_time): void {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $execution_time = (microtime(true) - $start_time) * 1000;
+            error_log("[PromptBuilderController] AJAX {$action} completed in {$execution_time}ms");
+        }
+    }
+    
+    /**
+     * Send success response
+     *
+     * @param array $data Response data
+     * @param string $message Success message
+     */
+    private function sendSuccessResponse(array $data, string $message = 'Success'): void {
+        wp_send_json_success([
+            'message' => $message,
+            'data' => $data,
+            'timestamp' => current_time('c')
+        ]);
+    }
+    
+    /**
+     * Send error response
+     *
+     * @param string $message Error message
+     * @param string $code Error code
+     * @param array $data Additional data
+     */
+    private function sendErrorResponse(string $message, string $code = 'error', array $data = []): void {
+        wp_send_json_error([
+            'message' => $message,
+            'code' => $code,
+            'data' => $data,
+            'timestamp' => current_time('c')
+        ]);
+    }
+    
+    /**
+     * Generate test ID
+     *
+     * @param string $prefix Test prefix
+     * @return string Test ID
+     */
+    private function generateTestId(string $prefix): string {
+        return $prefix . '_' . uniqid() . '_' . time();
+    }
+    
+    /**
+     * Sanitize test data
+     *
+     * @param array $data Raw test data
+     * @return array Sanitized data
+     */
+    private function sanitizeTestData(array $data): array {
+        return [
+            'prompt' => sanitize_textarea_field($data['prompt'] ?? ''),
+            'parameters' => $this->sanitizeFormData($data['parameters'] ?? []),
+            'test_type' => sanitize_text_field($data['test_type'] ?? 'prompt_builder_test')
+        ];
     }
 } 

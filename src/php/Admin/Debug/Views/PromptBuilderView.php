@@ -235,6 +235,17 @@ class PromptBuilderView {
                 <!-- Right Panel: Results & Analysis -->
                 <div class="prompt-builder-right">
                     
+                    <!-- Strategy Code Viewer -->
+                    <div class="builder-section">
+                        <h3>📋 Strategy Code</h3>
+                        <div id="strategy-code-viewer" class="strategy-code-viewer">
+                            <div class="code-placeholder">
+                                <p>📋 Strategy code will appear here</p>
+                                <p>Click "View Code" to see the actual PHP code that generates prompts.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Live Prompt Preview -->
                     <div class="builder-section">
                         <h3>📝 Live Prompt Preview</h3>
@@ -253,17 +264,6 @@ class PromptBuilderView {
                             <div class="context-placeholder">
                                 <p>🔍 Context data will appear here</p>
                                 <p>Click "Inspect Context" to see how your form data is processed and structured for AI generation.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Strategy Code Viewer -->
-                    <div class="builder-section">
-                        <h3>📋 Strategy Code</h3>
-                        <div id="strategy-code-viewer" class="strategy-code-viewer">
-                            <div class="code-placeholder">
-                                <p>📋 Strategy code will appear here</p>
-                                <p>Click "View Code" to see the actual PHP code that generates prompts.</p>
                             </div>
                         </div>
                     </div>
@@ -507,13 +507,15 @@ class PromptBuilderView {
                     this.showLoading('Loading user profile...');
                     
                     $.post(ajaxurl, {
-                        action: 'fitcopilot_prompt_builder_get_user_profile',
-                        nonce: '<?php echo wp_create_nonce('fitcopilot_admin_nonce'); ?>',
+                        action: 'fitcopilot_prompt_builder_load_profile',
+                        nonce: '<?php echo wp_create_nonce('fitcopilot_prompt_builder'); ?>',
                         user_id: userId
                     })
                     .done(response => {
                         if (response.success) {
-                            this.populateForm(response.data);
+                            // Extract the actual profile data from the nested response
+                            const profileData = response.data.data.profile_data;
+                            this.populateForm(profileData);
                             this.showMessage('Profile loaded successfully', 'success');
                         } else {
                             this.showMessage('Failed to load profile: ' + response.data.message, 'error');
@@ -535,7 +537,7 @@ class PromptBuilderView {
                     
                     $.post(ajaxurl, {
                         action: 'fitcopilot_prompt_builder_generate',
-                        nonce: '<?php echo wp_create_nonce('fitcopilot_admin_nonce'); ?>',
+                        nonce: '<?php echo wp_create_nonce('fitcopilot_prompt_builder'); ?>',
                         form_data: JSON.stringify(formData),
                         strategy: strategy
                     })
@@ -562,7 +564,7 @@ class PromptBuilderView {
                     
                     $.post(ajaxurl, {
                         action: 'fitcopilot_prompt_builder_get_context',
-                        nonce: '<?php echo wp_create_nonce('fitcopilot_admin_nonce'); ?>',
+                        nonce: '<?php echo wp_create_nonce('fitcopilot_prompt_builder'); ?>',
                         form_data: JSON.stringify(formData)
                     })
                     .done(response => {
@@ -582,25 +584,28 @@ class PromptBuilderView {
                 },
                 
                 viewStrategyCode() {
-                    const strategy = $('#strategy-selector').val();
+                    const strategy = $('#strategy-selector').val() || 'single_workout';
                     
                     this.showLoading('Loading strategy code...');
                     
                     $.post(ajaxurl, {
-                        action: 'fitcopilot_prompt_builder_get_strategy',
-                        nonce: '<?php echo wp_create_nonce('fitcopilot_admin_nonce'); ?>',
-                        strategy: strategy
+                        action: 'fitcopilot_prompt_builder_view_code',
+                        nonce: '<?php echo wp_create_nonce('fitcopilot_prompt_builder'); ?>',
+                        strategy_name: strategy
                     })
                     .done(response => {
+                        console.log('Strategy code response:', response);
                         if (response.success) {
                             this.displayStrategyCode(response.data);
                             this.showMessage('Strategy code loaded', 'success');
                         } else {
-                            this.showMessage('Failed to load strategy code: ' + response.data.message, 'error');
+                            console.error('Strategy code error:', response);
+                            this.showMessage('Failed to load strategy code: ' + (response.data?.message || response.message || 'Unknown error'), 'error');
                         }
                     })
-                    .fail(() => {
-                        this.showMessage('Error loading strategy code', 'error');
+                    .fail((xhr, status, error) => {
+                        console.error('AJAX fail:', xhr.responseText, status, error);
+                        this.showMessage('Error loading strategy code: ' + error, 'error');
                     })
                     .always(() => {
                         this.hideLoading();
@@ -614,7 +619,7 @@ class PromptBuilderView {
                     
                     $.post(ajaxurl, {
                         action: 'fitcopilot_prompt_builder_test_workout',
-                        nonce: '<?php echo wp_create_nonce('fitcopilot_admin_nonce'); ?>',
+                        nonce: '<?php echo wp_create_nonce('fitcopilot_prompt_builder'); ?>',
                         profile_data: JSON.stringify(formData)
                     })
                     .done(response => {
@@ -634,31 +639,128 @@ class PromptBuilderView {
                 },
                 
                 collectFormData() {
-                    const formData = {};
+                    console.log('[PromptBuilder] Collecting form data...');
+                    
+                    // Collect flat form data first
+                    const flatData = {};
                     $('#prompt-builder-form').serializeArray().forEach(item => {
-                        if (formData[item.name]) {
-                            if (!Array.isArray(formData[item.name])) {
-                                formData[item.name] = [formData[item.name]];
+                        if (flatData[item.name]) {
+                            if (!Array.isArray(flatData[item.name])) {
+                                flatData[item.name] = [flatData[item.name]];
                             }
-                            formData[item.name].push(item.value);
+                            flatData[item.name].push(item.value);
                         } else {
-                            formData[item.name] = item.value;
+                            flatData[item.name] = item.value;
                         }
                     });
-                    return formData;
+                    
+                    console.log('[PromptBuilder] Flat form data:', flatData);
+                    
+                    // Structure the data as expected by backend
+                    const structuredData = {
+                        basic_info: {
+                            name: (flatData.firstName || '') + ' ' + (flatData.lastName || ''),
+                            age: parseInt(flatData.age) || 0,
+                            gender: flatData.gender || undefined,
+                            fitness_level: flatData.fitnessLevel || undefined,
+                            weight: parseInt(flatData.weight) || 0,
+                            height: parseInt(flatData.height) || 0
+                        },
+                        goals: {
+                            primary_goal: flatData['goals[]'] || undefined,
+                            secondary_goals: [],
+                            target_areas: []
+                        },
+                        equipment: flatData['availableEquipment[]'] || [],
+                        session_params: {
+                            duration: parseInt(flatData.testDuration) || 30,
+                            focus: flatData.testFocus || undefined,
+                            energy_level: parseInt(flatData.energyLevel) || 3,
+                            stress_level: parseInt(flatData.stressLevel) || 3,
+                            sleep_quality: parseInt(flatData.sleepQuality) || 3
+                        },
+                        limitations: {
+                            injuries: flatData.injuries || undefined,
+                            restrictions: flatData.restrictions || undefined,
+                            preferences: flatData['limitations[]'] || undefined
+                        },
+                        custom_instructions: flatData.customInstructions || undefined
+                    };
+                    
+                    console.log('[PromptBuilder] Structured form data:', structuredData);
+                    return structuredData;
                 },
                 
-                populateForm(data) {
-                    Object.keys(data).forEach(key => {
-                        const field = $('#' + key);
-                        if (field.length) {
-                            if (field.is(':checkbox') || field.is(':radio')) {
-                                field.prop('checked', data[key]);
-                            } else {
-                                field.val(data[key]);
-                            }
+                populateForm(profileData) {
+                    console.log('Populating form with profile data:', profileData);
+                    
+                    // Map nested profile data to form fields
+                    if (profileData.basic_info) {
+                        const basic = profileData.basic_info;
+                        
+                        // Split name into first/last if it's combined
+                        if (basic.name) {
+                            const nameParts = basic.name.split(' ');
+                            $('#firstName').val(nameParts[0] || '');
+                            $('#lastName').val(nameParts.slice(1).join(' ') || '');
                         }
-                    });
+                        
+                        // Basic info fields
+                        $('#age').val(basic.age || '');
+                        $('#gender').val(basic.gender || '');
+                        $('#fitnessLevel').val(basic.fitness_level || '');
+                        $('#weight').val(basic.weight || '');
+                        // Convert height from inches to display format if needed
+                        if (basic.height) {
+                            $('#height').val(basic.height);
+                        }
+                    }
+                    
+                    // Handle goals (checkboxes)
+                    if (profileData.goals && profileData.goals.primary_goal) {
+                        // Clear all goal checkboxes first
+                        $('input[name="goals[]"]').prop('checked', false);
+                        
+                        // Check the goals from profile
+                        profileData.goals.primary_goal.forEach(goal => {
+                            $(`input[name="goals[]"][value="${goal}"]`).prop('checked', true);
+                        });
+                    }
+                    
+                    // Handle equipment (checkboxes)
+                    if (profileData.equipment && Array.isArray(profileData.equipment)) {
+                        // Clear all equipment checkboxes first
+                        $('input[name="availableEquipment[]"]').prop('checked', false);
+                        
+                        // Check the equipment from profile
+                        profileData.equipment.forEach(equip => {
+                            $(`input[name="availableEquipment[]"][value="${equip}"]`).prop('checked', true);
+                        });
+                    }
+                    
+                    // Handle session parameters
+                    if (profileData.session_params) {
+                        const session = profileData.session_params;
+                        $('#testDuration').val(session.duration || '');
+                        $('#testFocus').val(session.focus || '');
+                        $('#energyLevel').val(session.energy_level || '');
+                        $('#stressLevel').val(session.stress_level || '');
+                    }
+                    
+                    // Handle limitations (checkboxes)
+                    if (profileData.limitations) {
+                        // Clear all limitation checkboxes first
+                        $('input[name="limitations[]"]').prop('checked', false);
+                        
+                        // Check limitations if they exist
+                        if (profileData.limitations.preferences && Array.isArray(profileData.limitations.preferences)) {
+                            profileData.limitations.preferences.forEach(pref => {
+                                $(`input[name="limitations[]"][value="${pref}"]`).prop('checked', true);
+                            });
+                        }
+                    }
+                    
+                    console.log('Form population completed');
                 },
                 
                 displayPromptPreview(data) {
@@ -697,14 +799,15 @@ class PromptBuilderView {
                 displayStrategyCode(data) {
                     const html = `
                         <div class="code-info">
-                            <h4>${data.strategy} Strategy</h4>
+                            <h4>${data.strategy_name || 'Unknown'} Strategy</h4>
                             <div>File: ${data.file_path}</div>
                             <div>Lines: ${data.class_info.lines}</div>
                             <div>Size: ${data.class_info.file_size} bytes</div>
                         </div>
                         <div class="code-content">
                             <h4>buildPrompt() Method</h4>
-                            <pre>${this.escapeHtml(data.build_prompt_method)}</pre>
+                            <div>Full code shown below</div>
+                            <pre>${this.escapeHtml(data.code_content)}</pre>
                         </div>
                     `;
                     $('#strategy-code-viewer').html(html);
