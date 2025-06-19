@@ -193,8 +193,15 @@ class SleepQualityModule implements ModuleInterface {
     private function shouldLoadAssets(): bool {
         global $pagenow, $post;
         
-        // Load on admin pages
+        // Load on admin pages - but exclude PromptBuilder page since it uses fallback HTML
         if (is_admin()) {
+            // Don't load assets on PromptBuilder page (it has fallback HTML)
+            if ($pagenow === 'admin.php' && 
+                isset($_GET['page']) && 
+                $_GET['page'] === 'fitcopilot-prompt-builder') {
+                return false;
+            }
+            
             return in_array($pagenow, ['admin.php']) && 
                    isset($_GET['page']) && 
                    strpos($_GET['page'], 'fitcopilot') !== false;

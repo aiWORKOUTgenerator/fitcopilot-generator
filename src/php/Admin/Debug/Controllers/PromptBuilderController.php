@@ -196,6 +196,34 @@ class PromptBuilderController {
                 FITCOPILOT_VERSION
             );
             
+            // Enqueue MuscleModule assets
+            wp_enqueue_script(
+                'muscle-targeting-module',
+                plugins_url('src/php/Modules/MuscleTargeting/assets/muscle-targeting.js', FITCOPILOT_FILE),
+                ['jquery', 'fitcopilot-prompt-builder'],
+                FITCOPILOT_VERSION,
+                true
+            );
+            
+            wp_enqueue_style(
+                'muscle-targeting-module',
+                plugins_url('src/php/Modules/MuscleTargeting/assets/muscle-targeting.css', FITCOPILOT_FILE),
+                ['fitcopilot-prompt-builder'],
+                FITCOPILOT_VERSION
+            );
+            
+            // Localize MuscleModule script
+            wp_localize_script('muscle-targeting-module', 'muscleModule', [
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('muscle_module_nonce'),
+                'endpoints' => [
+                    'groups' => rest_url('fitcopilot/v1/muscle-groups'),
+                    'selection' => rest_url('fitcopilot/v1/muscle-selection'),
+                    'suggestions' => rest_url('fitcopilot/v1/muscle-suggestions')
+                ],
+                'maxSelections' => 3
+            ]);
+            
             // Localize script with PromptBuilder configuration
             $nonce = wp_create_nonce('fitcopilot_prompt_builder');
             error_log("PromptBuilderController: Localizing script with nonce: {$nonce}");

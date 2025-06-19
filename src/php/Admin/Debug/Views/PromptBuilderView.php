@@ -363,116 +363,25 @@ class PromptBuilderView {
                             <!-- Target Muscles -->
                             <div class="form-group">
                                 <h4>Target Muscles</h4>
-                                <div class="muscle-selection-container">
-                                    <div class="muscle-groups-section">
-                                        <label class="muscle-section-label">Primary Muscle Groups (select up to 3):</label>
-                                        <div class="muscle-groups-grid">
-                                            <div class="muscle-group-item" id="muscle-group-back">
-                                                <label class="muscle-group-label">
-                                                    <input type="checkbox" name="targetMuscleGroups[]" value="back" onchange="toggleMuscleGroup('back')"> 
-                                                    <span class="muscle-icon">🏋️</span> Back
-                                                    <span class="expand-indicator">▼</span>
-                                                </label>
-                                                <div class="muscle-detail-grid" id="muscle-detail-back" style="display: none;">
-                                                    <div class="muscle-options-grid">
-                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Lats"> Lats</label>
-                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Rhomboids"> Rhomboids</label>
-                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Middle Traps"> Middle Traps</label>
-                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Lower Traps"> Lower Traps</label>
-                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Rear Delts"> Rear Delts</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="muscle-group-item" id="muscle-group-chest">
-                                                <label class="muscle-group-label">
-                                                    <input type="checkbox" name="targetMuscleGroups[]" value="chest" onchange="toggleMuscleGroup('chest')"> 
-                                                    <span class="muscle-icon">💪</span> Chest
-                                                    <span class="expand-indicator">▼</span>
-                                                </label>
-                                                <div class="muscle-detail-grid" id="muscle-detail-chest" style="display: none;">
-                                                    <div class="muscle-options-grid">
-                                                        <label><input type="checkbox" name="specificMuscles[chest][]" value="Upper Chest"> Upper Chest</label>
-                                                        <label><input type="checkbox" name="specificMuscles[chest][]" value="Middle Chest"> Middle Chest</label>
-                                                        <label><input type="checkbox" name="specificMuscles[chest][]" value="Lower Chest"> Lower Chest</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="muscle-group-item" id="muscle-group-arms">
-                                                <label class="muscle-group-label">
-                                                    <input type="checkbox" name="targetMuscleGroups[]" value="arms" onchange="toggleMuscleGroup('arms')"> 
-                                                    <span class="muscle-icon">💪</span> Arms
-                                                    <span class="expand-indicator">▼</span>
-                                                </label>
-                                                <div class="muscle-detail-grid" id="muscle-detail-arms" style="display: none;">
-                                                    <div class="muscle-options-grid">
-                                                        <label><input type="checkbox" name="specificMuscles[arms][]" value="Biceps"> Biceps</label>
-                                                        <label><input type="checkbox" name="specificMuscles[arms][]" value="Triceps"> Triceps</label>
-                                                        <label><input type="checkbox" name="specificMuscles[arms][]" value="Forearms"> Forearms</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="muscle-group-item" id="muscle-group-shoulders">
-                                                <label class="muscle-group-label">
-                                                    <input type="checkbox" name="targetMuscleGroups[]" value="shoulders" onchange="toggleMuscleGroup('shoulders')"> 
-                                                    <span class="muscle-icon">🤸</span> Shoulders
-                                                    <span class="expand-indicator">▼</span>
-                                                </label>
-                                                <div class="muscle-detail-grid" id="muscle-detail-shoulders" style="display: none;">
-                                                    <div class="muscle-options-grid">
-                                                        <label><input type="checkbox" name="specificMuscles[shoulders][]" value="Front Delts"> Front Delts</label>
-                                                        <label><input type="checkbox" name="specificMuscles[shoulders][]" value="Side Delts"> Side Delts</label>
-                                                        <label><input type="checkbox" name="specificMuscles[shoulders][]" value="Rear Delts"> Rear Delts</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="muscle-group-item" id="muscle-group-core">
-                                                <label class="muscle-group-label">
-                                                    <input type="checkbox" name="targetMuscleGroups[]" value="core" onchange="toggleMuscleGroup('core')"> 
-                                                    <span class="muscle-icon">🧘</span> Core
-                                                    <span class="expand-indicator">▼</span>
-                                                </label>
-                                                <div class="muscle-detail-grid" id="muscle-detail-core" style="display: none;">
-                                                    <div class="muscle-options-grid">
-                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Upper Abs"> Upper Abs</label>
-                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Lower Abs"> Lower Abs</label>
-                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Obliques"> Obliques</label>
-                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Transverse Abdominis"> Transverse Abdominis</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="muscle-group-item" id="muscle-group-legs">
-                                                <label class="muscle-group-label">
-                                                    <input type="checkbox" name="targetMuscleGroups[]" value="legs" onchange="toggleMuscleGroup('legs')"> 
-                                                    <span class="muscle-icon">🦵</span> Legs
-                                                    <span class="expand-indicator">▼</span>
-                                                </label>
-                                                <div class="muscle-detail-grid" id="muscle-detail-legs" style="display: none;">
-                                                    <div class="muscle-options-grid">
-                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Quadriceps"> Quadriceps</label>
-                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Hamstrings"> Hamstrings</label>
-                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Glutes"> Glutes</label>
-                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Calves"> Calves</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="muscle-actions-section">
-                                        <div class="muscle-actions">
-                                            <button type="button" id="load-saved-muscles" class="button button-secondary">📥 Load Saved</button>
-                                            <button type="button" id="load-muscle-suggestions" class="button button-secondary">🎯 Get AI Suggestions</button>
-                                            <button type="button" id="clear-muscle-selection" class="button button-secondary">🧹 Clear All</button>
-                                        </div>
-                                        <div class="muscle-selection-summary" id="muscle-selection-summary"></div>
-                                        <textarea id="target-muscle-groups" name="target-muscle-groups" placeholder="Selected muscle groups..." class="form-textarea" rows="2" readonly></textarea>
-                                        <textarea id="specific-muscles" name="specific-muscles" placeholder="Specific muscles selected..." class="form-textarea" rows="2" readonly></textarea>
-                                    </div>
-                                </div>
+                                <?php
+                                // Delegate to MuscleModule if available, otherwise show basic fallback
+                                if ($this->moduleManager->hasCapability('muscle_group_selection')) {
+                                    try {
+                                        $muscleModule = $this->moduleManager->getModuleForCapability('muscle_group_selection');
+                                        echo $muscleModule->renderMuscleForm([
+                                            'form_id' => 'prompt-builder-muscles',
+                                            'current_selection' => $data['muscleSelection'] ?? null
+                                        ]);
+                                    } catch (\Exception $e) {
+                                        error_log('[PromptBuilderView] Muscle module delegation failed: ' . $e->getMessage());
+                                        // Fallback to basic muscle group selection
+                                        echo $this->renderBasicMuscleSelection();
+                                    }
+                                } else {
+                                    // Basic fallback if module not available
+                                    echo $this->renderBasicMuscleSelection();
+                                }
+                                ?>
                             </div>
                             
                             <!-- Exercise Preferences -->
@@ -1821,248 +1730,33 @@ class PromptBuilderView {
             return Math.round(cm / 2.54);
         }
         
-        // Nested Muscle Selection Functions
-        function toggleMuscleGroup(group) {
-            const checkbox = document.querySelector(`input[name="targetMuscleGroups[]"][value="${group}"]`);
-            const detailGrid = document.getElementById(`muscle-detail-${group}`);
-            const groupItem = checkbox.closest('.muscle-group-item');
-            
-            if (checkbox.checked) {
-                // Show nested muscle options
-                detailGrid.style.display = 'block';
-                groupItem.classList.add('expanded');
-            } else {
-                // Hide nested muscle options and uncheck all specific muscles
-                detailGrid.style.display = 'none';
-                groupItem.classList.remove('expanded');
-                
-                // Uncheck all specific muscles in this group
-                const specificMuscles = detailGrid.querySelectorAll('input[type="checkbox"]');
-                specificMuscles.forEach(muscle => muscle.checked = false);
-            }
-            
-            updateMuscleSelectionSummary();
-        }
+        // Muscle selection functions now handled by MuscleModule
         
-        function updateMuscleSelectionSummary() {
-            const selectedGroups = [];
-            const selectedMuscles = {};
-            let totalSpecificMuscles = 0;
-            
-            // Collect selected groups
-            document.querySelectorAll('input[name="targetMuscleGroups[]"]:checked').forEach(checkbox => {
-                const group = checkbox.value;
-                selectedGroups.push(group);
-                
-                // Collect specific muscles for this group
-                const specificMuscleInputs = document.querySelectorAll(`input[name="specificMuscles[${group}][]"]:checked`);
-                if (specificMuscleInputs.length > 0) {
-                    selectedMuscles[group] = [];
-                    specificMuscleInputs.forEach(muscle => {
-                        selectedMuscles[group].push(muscle.value);
-                        totalSpecificMuscles++;
-                    });
-                }
-            });
-            
-            // Update summary display
-            const summaryEl = document.getElementById('muscle-selection-summary');
-            if (selectedGroups.length === 0) {
-                summaryEl.innerHTML = '<span class="empty">No muscle groups selected</span>';
-                summaryEl.className = 'muscle-selection-summary empty';
-            } else {
-                let summaryText = `${selectedGroups.length} muscle group${selectedGroups.length > 1 ? 's' : ''} selected: `;
-                summaryText += selectedGroups.map(group => {
-                    const count = selectedMuscles[group] ? selectedMuscles[group].length : 0;
-                    const badge = count > 0 ? `<span class="muscle-count-badge">${count}</span>` : '';
-                    return `${group.charAt(0).toUpperCase() + group.slice(1)}${badge}`;
-                }).join(', ');
-                
-                if (totalSpecificMuscles > 0) {
-                    summaryText += ` (${totalSpecificMuscles} specific muscles)`;
-                }
-                
-                summaryEl.innerHTML = summaryText;
-                summaryEl.className = 'muscle-selection-summary';
-            }
-        }
-        
-        function clearMuscleSelection() {
-            // Uncheck all muscle group checkboxes
-            document.querySelectorAll('input[name="targetMuscleGroups[]"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            
-            // Hide all detail grids
-            document.querySelectorAll('.muscle-detail-grid').forEach(grid => {
-                grid.style.display = 'none';
-            });
-            
-            // Remove expanded class from all groups
-            document.querySelectorAll('.muscle-group-item').forEach(item => {
-                item.classList.remove('expanded');
-            });
-            
-            // Uncheck all specific muscle checkboxes
-            document.querySelectorAll('input[name^="specificMuscles"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            
-            updateMuscleSelectionSummary();
-        }
-        
-        // Enhanced muscle selection API integration
-        async function loadMuscleSelections() {
-            try {
-                const response = await fetch('/wp-json/fitcopilot/v1/muscle-selection', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-WP-Nonce': fitcopilotPromptBuilder?.nonce || ''
-                    }
-                });
-                
-                const result = await response.json();
-                
-                if (result.success && result.data) {
-                    populateNestedMuscleFields(result.data);
-                    console.log('[PromptBuilder] Muscle selections loaded:', result.data);
-                } else {
-                    console.log('[PromptBuilder] No saved muscle selections found');
-                }
-                
-            } catch (error) {
-                console.error('[PromptBuilder] Failed to load muscle selections:', error);
-            }
-        }
-        
-        async function loadMuscleSuggestions() {
-            try {
-                const response = await fetch('/wp-json/fitcopilot/v1/muscle-suggestions', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-WP-Nonce': fitcopilotPromptBuilder?.nonce || ''
-                    }
-                });
-                
-                const result = await response.json();
-                
-                if (result.success && result.data && result.data.length > 0) {
-                    applyNestedSuggestions(result.data[0]);
-                    console.log('[PromptBuilder] Muscle suggestions loaded:', result.data);
-                } else {
-                    console.log('[PromptBuilder] No muscle suggestions available');
-                }
-                
-            } catch (error) {
-                console.error('[PromptBuilder] Failed to load muscle suggestions:', error);
-            }
-        }
-        
-        function populateNestedMuscleFields(muscleData) {
-            // Clear existing selections
-            clearMuscleSelection();
-            
-            // Populate muscle groups and show their detail grids
-            if (muscleData.selectedGroups && Array.isArray(muscleData.selectedGroups)) {
-                muscleData.selectedGroups.forEach(group => {
-                    const checkbox = document.querySelector(`input[name="targetMuscleGroups[]"][value="${group}"]`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        toggleMuscleGroup(group); // This will show the detail grid
-                    }
-                });
-            }
-            
-            // Populate specific muscles
-            if (muscleData.selectedMuscles) {
-                Object.entries(muscleData.selectedMuscles).forEach(([group, muscles]) => {
-                    if (Array.isArray(muscles)) {
-                        muscles.forEach(muscle => {
-                            const checkbox = document.querySelector(`input[name="specificMuscles[${group}][]"][value="${muscle}"]`);
-                            if (checkbox) {
-                                checkbox.checked = true;
-                            }
-                        });
-                    }
-                });
-            }
-            
-            updateMuscleSelectionSummary();
-        }
-        
-        function applyNestedSuggestions(suggestion) {
-            if (suggestion.groups && Array.isArray(suggestion.groups)) {
-                // Clear existing selections
-                clearMuscleSelection();
-                
-                // Apply suggested groups
-                suggestion.groups.forEach(group => {
-                    const checkbox = document.querySelector(`input[name="targetMuscleGroups[]"][value="${group}"]`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        toggleMuscleGroup(group);
-                    }
-                });
-                
-                updateMuscleSelectionSummary();
-                
-                // Show suggestion reason
-                if (suggestion.reason) {
-                    alert(`Muscle Suggestion Applied: ${suggestion.reason}`);
-                }
-            }
-        }
-        
-        function collectNestedMuscleSelectionData() {
-            const selectedGroups = [];
-            const selectedMuscles = {};
-            
-            // Collect selected muscle groups
-            document.querySelectorAll('input[name="targetMuscleGroups[]"]:checked').forEach(checkbox => {
-                const group = checkbox.value;
-                selectedGroups.push(group);
-                
-                // Collect specific muscles for this group
-                const specificMuscleInputs = document.querySelectorAll(`input[name="specificMuscles[${group}][]"]:checked`);
-                if (specificMuscleInputs.length > 0) {
-                    selectedMuscles[group] = [];
-                    specificMuscleInputs.forEach(muscle => {
-                        selectedMuscles[group].push(muscle.value);
-                    });
-                }
-            });
-            
-            return {
-                selectedGroups: selectedGroups,
-                selectedMuscles: selectedMuscles,
-                preferences: {}
-            };
-        }
-        
-        // Event listeners for enhanced muscle selection
-        document.addEventListener('DOMContentLoaded', function() {
-            const loadSavedButton = document.getElementById('load-saved-muscles');
-            const loadSuggestionsButton = document.getElementById('load-muscle-suggestions');
-            const clearButton = document.getElementById('clear-muscle-selection');
-            
-            if (loadSavedButton) {
-                loadSavedButton.addEventListener('click', loadMuscleSelections);
-            }
-            
-            if (loadSuggestionsButton) {
-                loadSuggestionsButton.addEventListener('click', loadMuscleSuggestions);
-            }
-            
-            if (clearButton) {
-                clearButton.addEventListener('click', clearMuscleSelection);
-            }
-            
-            // Initialize muscle selection summary
-            updateMuscleSelectionSummary();
         });
+
+        // Muscle selection functionality now handled by MuscleModule
         </script>
         <?php
+    }
+    
+    /**
+     * Basic muscle selection fallback (when module not available)
+     */
+    private function renderBasicMuscleSelection(): string {
+        return '
+        <div class="basic-muscle-selection">
+            <div class="form-row">
+                <select id="targetMuscleGroups" name="targetMuscleGroups" class="form-select">
+                    <option value="">Select Primary Muscle Group</option>
+                    <option value="back">🏋️ Back</option>
+                    <option value="chest">💪 Chest</option>
+                    <option value="arms">💪 Arms</option>
+                    <option value="shoulders">🤸 Shoulders</option>
+                    <option value="core">🧘 Core</option>
+                    <option value="legs">🦵 Legs</option>
+                </select>
+            </div>
+            <textarea id="specificMuscles" name="specificMuscles" placeholder="Specific muscles (optional)..." class="form-textarea" rows="2"></textarea>
+        </div>';
     }
 }
