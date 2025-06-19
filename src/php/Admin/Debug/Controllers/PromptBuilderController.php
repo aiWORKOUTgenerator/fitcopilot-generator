@@ -431,7 +431,7 @@ class PromptBuilderController {
     
     /**
      * Handle user profile loading
-     * Phase 1: Load current user's profile data for form population
+     * Phase 1: Load user's profile data for form population
      *
      * @return void
      */
@@ -444,8 +444,19 @@ class PromptBuilderController {
                 return;
             }
             
+            // Get request data
+            $request_data = $this->getRequestData();
+            $user_id = intval($request_data['user_id'] ?? 0);
+            
+            // If no user_id provided, use current user
+            if (!$user_id) {
+                $user_id = get_current_user_id();
+            }
+            
+            error_log('[PromptBuilderController] Loading profile for user ID: ' . $user_id);
+            
             // Get user profile data using PromptBuilderService
-            $result = $this->promptBuilderService->getUserProfileData();
+            $result = $this->promptBuilderService->getUserProfileData($user_id);
             
             // Send response
             $this->sendSuccessResponse($result, 'User profile loaded successfully');
@@ -725,9 +736,21 @@ class PromptBuilderController {
             return false;
         }
         
-        // Check user capabilities
+        // Get current action to apply appropriate permission checks
+        $action = $_POST['action'] ?? $_GET['action'] ?? '';
+        
+        // Profile loading should be available to all authenticated users
+        if ($action === 'fitcopilot_prompt_builder_load_profile') {
+            if (!is_user_logged_in()) {
+                error_log('[PromptBuilderController] User not logged in for profile loading');
+                return false;
+            }
+            return true; // Allow authenticated users to load their own profiles
+        }
+        
+        // Other admin functions require manage_options capability
         if (!current_user_can('manage_options')) {
-            error_log('[PromptBuilderController] User lacks required capabilities');
+            error_log('[PromptBuilderController] User lacks required capabilities for action: ' . $action);
             return false;
         }
         

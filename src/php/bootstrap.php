@@ -48,6 +48,16 @@ require_once FITCOPILOT_DIR . 'src/php/Analytics/WorkoutFocusTracking.php';
 // Register Admin components
 require_once FITCOPILOT_DIR . 'src/php/Admin/Settings.php';
 
+// Register Module System
+require_once FITCOPILOT_DIR . 'src/php/Modules/Core/ModuleInterface.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/Core/ModuleManager.php';
+
+// Initialize Module System immediately
+add_action('init', function() {
+    $moduleManager = \FitCopilot\Modules\Core\ModuleManager::getInstance();
+    $moduleManager->init();
+}, 3); // Very early priority to ensure modules are available
+
 // Register NEW modular debug system
 require_once FITCOPILOT_DIR . 'src/php/Admin/Debug/DebugBootstrap.php';
 
@@ -271,6 +281,59 @@ require_once FITCOPILOT_DIR . 'src/php/API/WorkoutEndpoints/WorkoutCompletionEnd
 
 // Load Profile endpoints
 require_once FITCOPILOT_DIR . 'src/php/API/ProfileEndpoints.php';
+
+// Load Modular System (Sprint 2 Implementation)
+require_once FITCOPILOT_DIR . 'src/php/Modules/Core/ModuleInterface.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/Core/ModuleManager.php';
+
+// Load ProfileManagement Module
+require_once FITCOPILOT_DIR . 'src/php/Modules/ProfileManagement/ProfileModule.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/ProfileManagement/ProfileRepository.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/ProfileManagement/ProfileValidator.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/ProfileManagement/ProfileView.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/ProfileManagement/ProfileService.php';
+
+// Load MuscleTargeting Module
+require_once FITCOPILOT_DIR . 'src/php/Modules/MuscleTargeting/MuscleModule.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/MuscleTargeting/MuscleRepository.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/MuscleTargeting/MuscleService.php';
+require_once FITCOPILOT_DIR . 'src/php/Modules/MuscleTargeting/MuscleView.php';
+
+// Initialize ModuleManager System (Sprint 2 - Modularization First Strategy)
+add_action('init', function() {
+    try {
+        error_log('[Bootstrap] Initializing ModuleManager system...');
+        
+        // Get ModuleManager singleton instance
+        $moduleManager = \FitCopilot\Modules\Core\ModuleManager::getInstance();
+        
+        // Initialize the module system
+        $moduleManager->init();
+        
+        error_log('[Bootstrap] ModuleManager system initialized successfully');
+        
+    } catch (\Exception $e) {
+        error_log('[Bootstrap] Failed to initialize ModuleManager: ' . $e->getMessage());
+        error_log('[Bootstrap] Exception trace: ' . $e->getTraceAsString());
+        
+        // Fallback to legacy module initialization
+        error_log('[Bootstrap] Falling back to legacy module initialization...');
+        
+        // Initialize ProfileModule
+        $profile_module = new \FitCopilot\Modules\ProfileManagement\ProfileModule();
+        $profile_module->boot();
+        $profile_module->registerRoutes();
+        $profile_module->registerAssets();
+        
+        // Initialize MuscleModule  
+        $muscle_module = new \FitCopilot\Modules\MuscleTargeting\MuscleModule();
+        $muscle_module->boot();
+        $muscle_module->registerRoutes();
+        $muscle_module->registerAssets();
+        
+        error_log('[Bootstrap] Legacy module initialization completed');
+    }
+}, 10);
 
 // Load API Tracker
 require_once FITCOPILOT_DIR . 'src/php/API/APITracker.php';

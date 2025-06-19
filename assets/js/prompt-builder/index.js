@@ -69,6 +69,10 @@
                 this.isInitialized = true;
                 console.log('[PromptBuilder] Initialization completed successfully');
                 
+                // Expose functions globally for validation testing
+                window.loadUserProfile = this.loadUserProfile.bind(this);
+                window.populateFormWithProfile = this.populateFormWithProfile.bind(this);
+                
                 // Show welcome message
                 this.showMessage('PromptBuilder Phase 1 initialized successfully', 'success');
                 
@@ -93,35 +97,47 @@
         }
         
         /**
-         * Setup event listeners
+         * Setup event listeners (Enhanced for Dual Preview System)
          */
         setupEventListeners() {
             // Form change events for live updates
             this.form.on('change input', this.handleFormChange);
             
             // Action buttons
-            $('#generate-prompt-btn').on('click', this.generateLivePrompt);
-            $('#view-context-btn').on('click', this.viewContextData);
-            $('#test-workout-btn').on('click', this.testWorkoutGeneration);
-            $('#load-profile-btn').on('click', this.loadUserProfile);
+            $('#generate-prompt').on('click', this.generateLivePrompt);
+            $('#inspect-context').on('click', this.viewContextData);
+            $('#test-workout').on('click', this.testWorkoutGeneration);
+            $('#load-profile').on('click', this.loadUserProfile);
             $('#reset-form-btn').on('click', () => this.resetForm());
             
-            // Strategy inspector
-            $('#view-strategy-btn').on('click', () => this.viewStrategyCode());
+            // Strategy code viewer controls
+            $('#view-strategy-code').on('click', () => this.viewStrategyCode());
+            $('#copy-strategy-code').on('click', () => this.copyStrategyCode());
+            $('#toggle-line-numbers').on('click', () => this.toggleLineNumbers());
             $('#strategy-selector').on('change', () => this.onStrategyChange());
             
-            // Prompt actions
-            $('#copy-prompt-btn').on('click', () => this.copyPromptToClipboard());
-            $('#save-template-btn').on('click', () => this.showSaveTemplateModal());
+            // Live prompt preview controls
+            $('#export-prompt').on('click', () => this.exportPrompt());
+            $('#copy-prompt').on('click', () => this.copyPromptToClipboard());
+            $('#clear-prompt').on('click', () => this.clearPrompt());
             
-            // Template saving
+            // Workout test controls
+            $('#export-workout').on('click', () => this.exportWorkout());
+            $('#save-workout').on('click', () => this.saveWorkout());
+            
+            // Context inspector controls
+            $('#context-search').on('input', () => this.searchContext());
+            $('#toggle-compact-view').on('click', () => this.toggleCompactView());
+            $('#expand-all-context').on('click', () => this.expandAllContext());
+            
+            // Template saving (if modal exists)
             $('#confirm-save-template').on('click', () => this.saveTemplate());
             $('#cancel-save-template, #close-save-modal').on('click', () => this.hideSaveTemplateModal());
             
-            // Context tabs
+            // Context tabs (if tabs exist)
             $('.context-tab').on('click', (e) => this.switchContextTab(e));
             
-            // Test result tabs
+            // Test result tabs (if tabs exist)
             $('.test-tab').on('click', (e) => this.switchTestTab(e));
         }
         
@@ -267,39 +283,49 @@
         }
         
         /**
-         * Display generated prompt
+         * Display generated prompt (Enhanced for Dual Preview System)
          */
         displayPrompt(data) {
             const { prompt, prompt_stats, quality_analysis } = data;
             
-            // Update prompt display
-            this.promptDisplay.html(`<pre class="prompt-content">${this.utils.escapeHtml(prompt)}</pre>`);
+            // Update prompt preview container
+            const promptPreview = $('#prompt-preview');
+            promptPreview.html(`
+                <div class="prompt-content-wrapper">
+                    <pre class="prompt-content syntax-highlighted">${this.utils.escapeHtml(prompt)}</pre>
+                </div>
+            `);
             
-            // Update prompt statistics
+            // Update prompt statistics with enhanced formatting
             this.updatePromptStats(prompt_stats);
             
-            // Update quality analysis
-            this.updateQualityAnalysis(quality_analysis);
+            // Show controls and statistics
+            $('.prompt-controls button').show();
+            $('#prompt-stats').show();
             
-            // Enable action buttons
-            $('#copy-prompt-btn, #save-template-btn').prop('disabled', false);
+            // Enable action buttons with proper styling
+            $('#export-prompt, #copy-prompt, #clear-prompt').prop('disabled', false).show();
             
             // Store current prompt
             this.currentPrompt = prompt;
+            
+            console.log('[PromptBuilder] Enhanced prompt display updated');
         }
         
         /**
-         * Update prompt statistics
+         * Update prompt statistics (Enhanced with proper containers)
          */
         updatePromptStats(stats) {
-            $('#stat-characters').text(stats.characters || 0);
-            $('#stat-words').text(stats.words || 0);
-            $('#stat-lines').text(stats.lines || 0);
-            $('#stat-tokens').text(stats.estimated_tokens || 0);
-            $('#stat-sections').text(stats.sections || 0);
-            $('#stat-readability').text(stats.readability_score || 0);
+            // Update statistics using the new UI structure
+            $('#prompt-characters').text(stats.characters || 0);
+            $('#prompt-words').text(stats.words || 0);
+            $('#prompt-tokens').text(stats.estimated_tokens || 0);
+            $('#prompt-lines').text(stats.lines || 0);
             
+            // Show the statistics container
             $('#prompt-stats').show();
+            
+            console.log('[PromptBuilder] Prompt statistics updated:', stats);
         }
         
         /**
@@ -409,22 +435,116 @@
         }
         
         /**
-         * Display context data
+         * Display context data (Enhanced with hierarchical tree structure)
          */
         displayContextData(data) {
             const { generation_params, context_sections, mapped_profile } = data;
             
-            // Update context panels
-            $('#generation-params-data').text(JSON.stringify(generation_params, null, 2));
-            $('#profile-context-data').text(JSON.stringify(context_sections.profile_context, null, 2));
-            $('#session-context-data').text(JSON.stringify(context_sections.session_context, null, 2));
-            $('#mapped-profile-data').text(JSON.stringify(mapped_profile, null, 2));
+            // Update context inspector with hierarchical structure
+            const contextInspector = $('#context-inspector');
+            contextInspector.html(this.buildContextTree(data));
             
-            // Show context display
-            this.contextDisplay.show();
+            // Show context controls
+            $('.context-controls input, .context-controls button').show();
             
             // Store current context
             this.currentContext = data;
+            
+            console.log('[PromptBuilder] Enhanced context inspector updated');
+        }
+        
+        /**
+         * Build hierarchical context tree structure
+         */
+        buildContextTree(data) {
+            let html = '<div class="context-tree">';
+            
+            // Generation Parameters
+            html += this.buildContextSection('Generation Parameters', data.generation_params, 'gen-params');
+            
+            // Context Sections
+            if (data.context_sections) {
+                html += this.buildContextSection('Profile Context', data.context_sections.profile_context, 'profile-ctx');
+                html += this.buildContextSection('Session Context', data.context_sections.session_context, 'session-ctx');
+            }
+            
+            // Mapped Profile
+            html += this.buildContextSection('Mapped Profile', data.mapped_profile, 'mapped-profile');
+            
+            html += '</div>';
+            return html;
+        }
+        
+        /**
+         * Build individual context section
+         */
+        buildContextSection(title, data, id) {
+            let html = `<div class="context-section" id="${id}">`;
+            html += `<div class="context-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">`;
+            html += `<span class="context-toggle">▼</span>`;
+            html += `<strong>${title}</strong>`;
+            html += `<span class="context-count">(${this.getDataCount(data)} items)</span>`;
+            html += '</div>';
+            
+            html += '<div class="context-content">';
+            if (data && typeof data === 'object') {
+                html += this.buildDataTree(data, 0);
+            } else {
+                html += `<div class="context-value">${this.utils.escapeHtml(String(data || 'No data'))}</div>`;
+            }
+            html += '</div>';
+            html += '</div>';
+            
+            return html;
+        }
+        
+        /**
+         * Build recursive data tree
+         */
+        buildDataTree(obj, level) {
+            let html = '';
+            
+            for (const [key, value] of Object.entries(obj)) {
+                const indent = '  '.repeat(level);
+                html += `<div class="context-item" style="margin-left: ${level * 20}px;">`;
+                
+                if (value && typeof value === 'object' && !Array.isArray(value)) {
+                    html += `<div class="context-key expandable" onclick="this.nextElementSibling.classList.toggle('collapsed')">`;
+                    html += `<span class="expand-icon">▼</span> <strong>${key}:</strong>`;
+                    html += '</div>';
+                    html += `<div class="context-nested">`;
+                    html += this.buildDataTree(value, level + 1);
+                    html += '</div>';
+                } else if (Array.isArray(value)) {
+                    html += `<div class="context-key"><strong>${key}:</strong> <span class="context-array">[${value.length} items]</span></div>`;
+                    html += `<div class="context-array-items">`;
+                    value.forEach((item, index) => {
+                        html += `<div class="array-item" style="margin-left: ${(level + 1) * 20}px;">`;
+                        html += `<span class="array-index">[${index}]</span> ${this.utils.escapeHtml(String(item))}`;
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                } else {
+                    const valueClass = value ? 'has-value' : 'no-value';
+                    html += `<div class="context-key"><strong>${key}:</strong> `;
+                    html += `<span class="context-value ${valueClass}">${this.utils.escapeHtml(String(value || 'No data'))}</span></div>`;
+                }
+                
+                html += '</div>';
+            }
+            
+            return html;
+        }
+        
+        /**
+         * Get data count for context section
+         */
+        getDataCount(data) {
+            if (!data) return 0;
+            if (typeof data === 'object') {
+                return Object.keys(data).length;
+            }
+            return 1;
         }
         
         /**
@@ -464,23 +584,39 @@
         }
         
         /**
-         * Display test results
+         * Display test results (Enhanced with performance metrics)
          */
         displayTestResults(data) {
-            const { test_id, prompt, raw_response, timestamp, processing_time } = data;
+            const { test_id, prompt, raw_response, timestamp, processing_time, performance_metrics, match_score, estimated_cost } = data;
             
-            // Update test header
-            $('#test-title').text(`Test ${test_id}`);
-            $('#test-timestamp').text(timestamp);
-            $('#test-duration').text(processing_time);
+            // Update workout test preview with formatted results
+            const workoutPreview = $('#workout-test-preview');
+            workoutPreview.html(this.formatWorkoutResult(raw_response));
             
-            // Update test content
-            $('#workout-result-content').html(this.formatWorkoutResult(raw_response));
-            $('#raw-response-content').text(raw_response);
-            $('#test-prompt-content').text(prompt);
+            // Update performance metrics
+            this.updateWorkoutPerformance({
+                processing_time: processing_time || 0,
+                match_score: match_score || 0,
+                estimated_cost: estimated_cost || 0
+            });
             
-            // Show test results
-            this.testResults.show();
+            // Show controls and performance metrics
+            $('.workout-controls #export-workout, .workout-controls #save-workout').show();
+            $('#workout-performance').show();
+            
+            // Store test data for export/save functionality
+            this.currentTestData = data;
+            
+            console.log('[PromptBuilder] Enhanced workout test results displayed');
+        }
+        
+        /**
+         * Update workout performance metrics
+         */
+        updateWorkoutPerformance(metrics) {
+            $('#workout-time').text(metrics.processing_time + 'ms');
+            $('#workout-match').text(Math.round(metrics.match_score) + '%');
+            $('#workout-cost').text('$' + (metrics.estimated_cost || 0).toFixed(4));
         }
         
         /**
@@ -513,10 +649,10 @@
         }
         
         /**
-         * Load user profile
+         * Load user profile (Enhanced with better error handling)
          */
         async loadUserProfile() {
-            const button = $('#load-profile-btn');
+            const button = $('#load-profile');
             const originalText = button.html();
             
             try {
@@ -524,15 +660,38 @@
                 
                 const response = await this.makeAjaxRequest('fitcopilot_prompt_builder_load_profile');
                 
+                console.log('[PromptBuilder] Profile load response:', response);
+                
                 if (response.success) {
-                    this.populateFormWithProfile(response.data.profile_data);
-                    this.showMessage('User profile loaded successfully', 'success');
+                    // Extract profile data from nested response structure
+                    let profileData = null;
+                    
+                    // The actual data is at response.data.data.profile_data
+                    if (response.data && response.data.data && response.data.data.profile_data) {
+                        profileData = response.data.data.profile_data;
+                        console.log('[PromptBuilder] Found profile data at response.data.data.profile_data');
+                    } else if (response.data && response.data.profile_data) {
+                        profileData = response.data.profile_data;
+                        console.log('[PromptBuilder] Found profile data at response.data.profile_data');
+                    } else if (response.data) {
+                        profileData = response.data;
+                        console.log('[PromptBuilder] Using response.data directly');
+                    }
+                    
+                    if (profileData) {
+                        this.populateFormWithProfile(profileData);
+                        this.showMessage('User profile loaded successfully', 'success');
+                    } else {
+                        console.warn('[PromptBuilder] No profile data found in response:', response);
+                        this.showMessage('Profile loaded but no data found', 'warning');
+                    }
                 } else {
                     throw new Error(this.getResponseMessage(response, 'Failed to load profile'));
                 }
                 
             } catch (error) {
                 console.error('[PromptBuilder] Load profile failed:', error);
+                console.error('[PromptBuilder] Error stack:', error.stack);
                 this.showMessage('Failed to load profile: ' + error.message, 'error');
             } finally {
                 button.prop('disabled', false).html(originalText);
@@ -540,50 +699,216 @@
         }
         
         /**
-         * Populate form with profile data
+         * Populate form with profile data (Fixed field mapping)
          */
         populateFormWithProfile(profileData) {
-            // Basic info
-            if (profileData.basic_info) {
-                $('#basic_name').val(profileData.basic_info.name);
-                $('#basic_age').val(profileData.basic_info.age);
-                $('#basic_gender').val(profileData.basic_info.gender);
-                $('#basic_fitness_level').val(profileData.basic_info.fitness_level);
-                $('#basic_weight').val(profileData.basic_info.weight);
-                $('#basic_height').val(profileData.basic_info.height);
-            }
+            console.log('[PromptBuilder] Populating form with profile data:', profileData);
             
-            // Goals
-            if (profileData.goals) {
-                $('#goals_primary').val(profileData.goals.primary_goal);
-                this.setCheckboxValues('goals[secondary_goals][]', profileData.goals.secondary_goals);
-                this.setCheckboxValues('goals[target_areas][]', profileData.goals.target_areas);
-            }
-            
-            // Equipment
-            if (profileData.equipment) {
-                this.setCheckboxValues('equipment[]', profileData.equipment);
-            }
-            
-            // Session params
-            if (profileData.session_params) {
-                $('#session_duration').val(profileData.session_params.duration);
-                $('#session_focus').val(profileData.session_params.focus);
-                $('#session_energy').val(profileData.session_params.energy_level).trigger('input');
-                $('#session_stress').val(profileData.session_params.stress_level).trigger('input');
-                $('#session_sleep').val(profileData.session_params.sleep_quality).trigger('input');
-            }
-            
-            // Limitations
-            if (profileData.limitations) {
-                $('#limitations_injuries').val(profileData.limitations.injuries);
-                $('#limitations_restrictions').val(profileData.limitations.restrictions);
-                $('#limitations_preferences').val(profileData.limitations.preferences);
-            }
-            
-            // Custom instructions
-            if (profileData.custom_instructions) {
-                $('#custom_instructions').val(profileData.custom_instructions);
+            try {
+                // Handle different possible data structures
+                let userData = profileData;
+                
+                // If profileData has a nested structure, extract the user data
+                if (profileData.profile_data) {
+                    userData = profileData.profile_data;
+                } else if (profileData.user_data) {
+                    userData = profileData.user_data;
+                }
+                
+                // Basic info - comprehensive field mapping
+                if (userData.basic_info) {
+                    const basicInfo = userData.basic_info;
+                    
+                    // Name fields
+                    if (basicInfo.first_name) $('#firstName').val(basicInfo.first_name);
+                    if (basicInfo.last_name) $('#lastName').val(basicInfo.last_name);
+                    
+                    // Physical attributes
+                    if (basicInfo.age) $('#age').val(basicInfo.age);
+                    if (basicInfo.gender) $('#gender').val(basicInfo.gender);
+                    if (basicInfo.fitness_level) $('#fitnessLevel').val(basicInfo.fitness_level);
+                    if (basicInfo.weight) $('#weight').val(basicInfo.weight);
+                    if (basicInfo.weight_unit) $('#weightUnit').val(basicInfo.weight_unit);
+                    // Handle height with proper conversion
+                    if (basicInfo.height && basicInfo.height_unit) {
+                        $('#heightUnit').val(basicInfo.height_unit);
+                        
+                        if (basicInfo.height_unit === 'ft') {
+                            // Convert total inches to feet and inches
+                            const totalInches = parseInt(basicInfo.height);
+                            const feet = Math.floor(totalInches / 12);
+                            const inches = totalInches % 12;
+                            $('#heightFeet').val(feet);
+                            $('#heightInches').val(inches);
+                            $('#height-imperial').show();
+                            $('#height-metric').hide();
+                        } else {
+                            // Use cm directly
+                            $('#heightCm').val(basicInfo.height);
+                            $('#height-imperial').hide();
+                            $('#height-metric').show();
+                        }
+                    }
+                }
+                
+                // Handle flat structure (user fields directly in userData)
+                if (!userData.basic_info) {
+                    // Basic fields
+                    if (userData.first_name) $('#firstName').val(userData.first_name);
+                    if (userData.last_name) $('#lastName').val(userData.last_name);
+                    if (userData.age) $('#age').val(userData.age);
+                    if (userData.gender) $('#gender').val(userData.gender);
+                    if (userData.fitness_level) $('#fitnessLevel').val(userData.fitness_level);
+                    if (userData.weight) $('#weight').val(userData.weight);
+                    if (userData.weight_unit) $('#weightUnit').val(userData.weight_unit);
+                    // Handle height with proper conversion (flat structure)
+                    if (userData.height && userData.height_unit) {
+                        $('#heightUnit').val(userData.height_unit);
+                        
+                        if (userData.height_unit === 'ft') {
+                            // Convert total inches to feet and inches
+                            const totalInches = parseInt(userData.height);
+                            const feet = Math.floor(totalInches / 12);
+                            const inches = totalInches % 12;
+                            $('#heightFeet').val(feet);
+                            $('#heightInches').val(inches);
+                            $('#height-imperial').show();
+                            $('#height-metric').hide();
+                        } else {
+                            // Use cm directly
+                            $('#heightCm').val(userData.height);
+                            $('#height-imperial').hide();
+                            $('#height-metric').show();
+                        }
+                    }
+                    
+                    // Additional flat structure fields
+                    if (userData.preferred_location) $('#preferredLocation').val(userData.preferred_location);
+                    if (userData.workout_frequency) $('#workoutFrequency').val(userData.workout_frequency);
+                    if (userData.preferred_workout_duration) $('#testDuration').val(userData.preferred_workout_duration);
+                    if (userData.limitation_notes) $('#limitationNotes').val(userData.limitation_notes);
+                    if (userData.medical_conditions) $('#medicalConditions').val(userData.medical_conditions);
+                    if (userData.favorite_exercises) $('#favoriteExercises').val(userData.favorite_exercises);
+                    if (userData.disliked_exercises) $('#dislikedExercises').val(userData.disliked_exercises);
+                }
+                
+                // Goals - map to correct checkbox names
+                if (userData.goals) {
+                    this.setCheckboxValues('goals[]', userData.goals);
+                }
+                
+                // Equipment - map to correct checkbox names  
+                if (userData.equipment || userData.availableEquipment) {
+                    const equipment = userData.equipment || userData.availableEquipment;
+                    this.setCheckboxValues('availableEquipment[]', equipment);
+                }
+                
+                // Location preferences
+                if (userData.location && userData.location.preferred_location) {
+                    $('#preferredLocation').val(userData.location.preferred_location);
+                }
+                
+                // Session params - comprehensive mapping
+                if (userData.session_params) {
+                    const sessionParams = userData.session_params;
+                    if (sessionParams.duration) $('#testDuration').val(sessionParams.duration);
+                    if (sessionParams.frequency) $('#workoutFrequency').val(sessionParams.frequency);
+                    if (sessionParams.focus) $('#testFocus').val(sessionParams.focus);
+                    if (sessionParams.energy_level) $('#energyLevel').val(sessionParams.energy_level);
+                    if (sessionParams.stress_level) $('#stressLevel').val(sessionParams.stress_level);
+                }
+                
+                // Physical limitations - comprehensive mapping
+                if (userData.limitations) {
+                    // Handle array of physical limitations
+                    if (userData.limitations.physical_limitations) {
+                        this.setCheckboxValues('limitations[]', userData.limitations.physical_limitations);
+                    }
+                    // Handle limitation notes
+                    if (userData.limitations.limitation_notes) {
+                        $('#limitationNotes').val(userData.limitations.limitation_notes);
+                    }
+                    // Handle medical conditions
+                    if (userData.limitations.medical_conditions) {
+                        $('#medicalConditions').val(userData.limitations.medical_conditions);
+                    }
+                    // Handle injuries (if separate field exists)
+                    if (userData.limitations.injuries) {
+                        $('#injuries').val(userData.limitations.injuries);
+                    }
+                }
+                
+                // Exercise preferences - new section
+                if (userData.exercise_preferences) {
+                    if (userData.exercise_preferences.favorite_exercises) {
+                        $('#favoriteExercises').val(userData.exercise_preferences.favorite_exercises);
+                    }
+                    if (userData.exercise_preferences.disliked_exercises) {
+                        $('#dislikedExercises').val(userData.exercise_preferences.disliked_exercises);
+                    }
+                }
+                
+                // Custom instructions - map to correct field ID
+                if (userData.custom_notes || userData.custom_instructions) {
+                    $('#customNotes').val(userData.custom_notes || userData.custom_instructions);
+                }
+                
+                // Target muscle groups - handle muscle selection data
+                if (userData.muscle_selection || userData.target_muscles) {
+                    const muscleData = userData.muscle_selection || userData.target_muscles;
+                    
+                    // Clear existing muscle group selections
+                    $('input[name="targetMuscleGroups[]"]').prop('checked', false);
+                    
+                    // Hide all detail grids and remove expanded classes
+                    $('.muscle-detail-grid').hide();
+                    $('.muscle-group-item').removeClass('expanded');
+                    
+                    // Uncheck all specific muscle checkboxes
+                    $('input[name^="specificMuscles"]').prop('checked', false);
+                    
+                    // Populate muscle groups and show their detail grids
+                    if (muscleData.selectedGroups && Array.isArray(muscleData.selectedGroups)) {
+                        muscleData.selectedGroups.forEach(group => {
+                            const checkbox = $(`input[name="targetMuscleGroups[]"][value="${group}"]`);
+                            if (checkbox.length) {
+                                checkbox.prop('checked', true);
+                                
+                                // Show the detail grid for this group
+                                const detailGrid = $(`#muscle-detail-${group}`);
+                                const groupItem = checkbox.closest('.muscle-group-item');
+                                
+                                detailGrid.show();
+                                groupItem.addClass('expanded');
+                            }
+                        });
+                    }
+                    
+                    // Populate specific muscles
+                    if (muscleData.selectedMuscles) {
+                        Object.entries(muscleData.selectedMuscles).forEach(([group, muscles]) => {
+                            if (Array.isArray(muscles)) {
+                                muscles.forEach(muscle => {
+                                    const checkbox = $(`input[name="specificMuscles[${group}][]"][value="${muscle}"]`);
+                                    if (checkbox.length) {
+                                        checkbox.prop('checked', true);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    // Update the muscle selection summary if the function exists
+                    if (typeof updateMuscleSelectionSummary === 'function') {
+                        updateMuscleSelectionSummary();
+                    }
+                }
+                
+                console.log('[PromptBuilder] Form populated successfully');
+                
+            } catch (error) {
+                console.error('[PromptBuilder] Error populating form:', error);
+                this.showMessage('Error populating form fields: ' + error.message, 'warning');
             }
         }
         
@@ -630,22 +955,221 @@
         }
         
         /**
-         * Display strategy code
+         * Display strategy code (Enhanced with syntax highlighting and line numbers)
          */
         displayStrategyCode(data) {
             const { strategy_name, file_path, code_content, code_analysis, line_count, file_size } = data;
             
-            // Update header
-            $('#strategy-file-path').text(file_path);
-            $('#code-lines').text(line_count);
-            $('#code-size').text(file_size);
-            $('#code-methods').text(code_analysis.methods?.length || 0);
+            // Update strategy code viewer with syntax highlighting
+            const codeViewer = $('#strategy-code-viewer');
+            codeViewer.html(this.formatStrategyCode(code_content, strategy_name));
             
-            // Update code content
-            $('#strategy-code-content').text(code_content);
+            // Show code controls
+            $('.code-controls button').show();
             
-            // Show code display
-            $('#strategy-code-display').show();
+            // Store code data for copy/export functionality
+            this.currentStrategyCode = code_content;
+            this.currentStrategyName = strategy_name;
+            
+            console.log('[PromptBuilder] Enhanced strategy code viewer updated');
+        }
+        
+        /**
+         * Format strategy code with syntax highlighting and line numbers
+         */
+        formatStrategyCode(code, strategyName) {
+            const lines = code.split('\n');
+            let html = '<div class="code-display-wrapper">';
+            
+            // Code header
+            html += `<div class="code-header">`;
+            html += `<div class="code-title">📋 ${strategyName}.php</div>`;
+            html += `<div class="code-info">${lines.length} lines</div>`;
+            html += `</div>`;
+            
+            // Code content with line numbers
+            html += '<div class="code-content-container">';
+            html += '<div class="code-line-numbers">';
+            for (let i = 1; i <= lines.length; i++) {
+                html += `<div class="line-number">${i}</div>`;
+            }
+            html += '</div>';
+            
+            html += '<div class="code-content">';
+            html += `<pre class="php-code">${this.utils.escapeHtml(code)}</pre>`;
+            html += '</div>';
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
+        }
+        
+        /**
+         * Copy strategy code to clipboard
+         */
+        async copyStrategyCode() {
+            if (!this.currentStrategyCode) {
+                this.showMessage('No strategy code to copy', 'warning');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(this.currentStrategyCode);
+                this.showMessage('Strategy code copied to clipboard', 'success');
+            } catch (error) {
+                this.fallbackCopyToClipboard(this.currentStrategyCode);
+            }
+        }
+        
+        /**
+         * Toggle line numbers in code viewer
+         */
+        toggleLineNumbers() {
+            const codeViewer = $('#strategy-code-viewer');
+            const lineNumbers = codeViewer.find('.code-line-numbers');
+            
+            if (lineNumbers.is(':visible')) {
+                lineNumbers.hide();
+                $('#toggle-line-numbers').text('🔢 Show Lines');
+            } else {
+                lineNumbers.show();
+                $('#toggle-line-numbers').text('🔢 Hide Lines');
+            }
+        }
+        
+        /**
+         * Export prompt to file
+         */
+        exportPrompt() {
+            if (!this.currentPrompt) {
+                this.showMessage('No prompt to export', 'warning');
+                return;
+            }
+            
+            const blob = new Blob([this.currentPrompt], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `prompt_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            this.showMessage('Prompt exported successfully', 'success');
+        }
+        
+        /**
+         * Clear prompt display
+         */
+        clearPrompt() {
+            $('#prompt-preview').html(`
+                <div class="prompt-placeholder">
+                    <p>🎯 Ready to generate live prompts</p>
+                    <p>Fill in the profile data and click "Generate Live Prompt" to see the AI prompt in real-time.</p>
+                </div>
+            `);
+            
+            $('#prompt-stats').hide();
+            $('.prompt-controls button').hide();
+            this.currentPrompt = '';
+            
+            this.showMessage('Prompt display cleared', 'success');
+        }
+        
+        /**
+         * Export workout to file
+         */
+        exportWorkout() {
+            if (!this.currentTestData) {
+                this.showMessage('No workout data to export', 'warning');
+                return;
+            }
+            
+            const workoutData = JSON.stringify(this.currentTestData, null, 2);
+            const blob = new Blob([workoutData], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `workout_test_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            this.showMessage('Workout test data exported successfully', 'success');
+        }
+        
+        /**
+         * Save workout to database
+         */
+        async saveWorkout() {
+            if (!this.currentTestData) {
+                this.showMessage('No workout data to save', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await this.makeAjaxRequest('fitcopilot_prompt_builder_save_workout', {
+                    workout_data: this.currentTestData
+                });
+                
+                if (response.success) {
+                    this.showMessage('Workout saved successfully', 'success');
+                } else {
+                    throw new Error(this.getResponseMessage(response, 'Failed to save workout'));
+                }
+                
+            } catch (error) {
+                console.error('[PromptBuilder] Save workout failed:', error);
+                this.showMessage('Failed to save workout: ' + error.message, 'error');
+            }
+        }
+        
+        /**
+         * Search context data
+         */
+        searchContext() {
+            const searchTerm = $('#context-search').val().toLowerCase();
+            const contextItems = $('.context-item');
+            
+            if (!searchTerm) {
+                contextItems.show();
+                return;
+            }
+            
+            contextItems.each(function() {
+                const text = $(this).text().toLowerCase();
+                if (text.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+        
+        /**
+         * Toggle compact view for context
+         */
+        toggleCompactView() {
+            const contextTree = $('.context-tree');
+            
+            if (contextTree.hasClass('compact-view')) {
+                contextTree.removeClass('compact-view');
+                $('#toggle-compact-view').text('📦 Compact');
+            } else {
+                contextTree.addClass('compact-view');
+                $('#toggle-compact-view').text('📦 Expanded');
+            }
+        }
+        
+        /**
+         * Expand all context sections
+         */
+        expandAllContext() {
+            $('.context-content').removeClass('collapsed');
+            $('.context-nested').removeClass('collapsed');
+            $('.expand-icon').text('▼');
         }
         
         /**

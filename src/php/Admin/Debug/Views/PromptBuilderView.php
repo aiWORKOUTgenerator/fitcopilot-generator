@@ -2,12 +2,52 @@
 
 namespace FitCopilot\Admin\Debug\Views;
 
+use FitCopilot\Modules\Core\ModuleManager;
+
 /**
  * PromptBuilder View
  * 
  * Renders the PromptBuilder admin interface
+ * 
+ * Implements Strangler Fig pattern - gradually delegates functionality to modules
+ * while maintaining backward compatibility with legacy code.
  */
 class PromptBuilderView {
+    
+    private ModuleManager $moduleManager;
+    
+    public function __construct() {
+        $this->moduleManager = ModuleManager::getInstance();
+    }
+    
+    /**
+     * Render profile form section using Strangler Fig pattern
+     * 
+     * If ProfileModule is available, delegate to it. Otherwise use legacy code.
+     */
+    private function renderProfileFormSection(array $data = []): string {
+        // Strangler Fig: Try module first
+        if ($this->moduleManager->hasCapability('profile_form_rendering')) {
+            try {
+                $profileModule = $this->moduleManager->getModuleForCapability('profile_form_rendering');
+                return $profileModule->renderProfileForm($data);
+            } catch (\Exception $e) {
+                error_log('[PromptBuilderView] Module delegation failed, falling back to legacy: ' . $e->getMessage());
+            }
+        }
+        
+        // Fallback to legacy implementation
+        return $this->renderLegacyProfileForm($data);
+    }
+    
+    /**
+     * Legacy profile form rendering (will be gradually replaced)
+     */
+    private function renderLegacyProfileForm(array $data = []): string {
+        // This is where the current form HTML would go
+        // For now, we'll keep using the existing inline approach
+        return '';
+    }
     
     /**
      * Render the main PromptBuilder interface
@@ -123,18 +163,55 @@ class PromptBuilderView {
                                         <option value="kg">kg</option>
                                     </select>
                                 </div>
+                                <div class="form-row">
+                                    <!-- Height fields that change based on unit selection -->
+                                    <div id="height-imperial" class="height-input-group" style="display: flex; gap: 5px; flex: 1;">
+                                        <input type="number" id="heightFeet" name="heightFeet" placeholder="Feet" class="form-input" min="3" max="8" style="flex: 1;">
+                                        <span class="height-separator">ft</span>
+                                        <input type="number" id="heightInches" name="heightInches" placeholder="Inches" class="form-input" min="0" max="11" style="flex: 1;">
+                                        <span class="height-separator">in</span>
+                                    </div>
+                                    <div id="height-metric" class="height-input-group" style="display: none; flex: 1;">
+                                        <input type="number" id="heightCm" name="heightCm" placeholder="Height in cm" class="form-input" min="90" max="250">
+                                    </div>
+                                    <select id="heightUnit" name="heightUnit" class="form-select" onchange="toggleHeightFields(this.value)">
+                                        <option value="ft">ft/in</option>
+                                        <option value="cm">cm</option>
+                                    </select>
+                                </div>
                             </div>
                             
-                            <!-- Goals -->
+                            <!-- Goals & Focus -->
                             <div class="form-group">
-                                <h4>Goals</h4>
-                                <div class="checkbox-grid">
-                                    <label><input type="checkbox" name="goals[]" value="weight_loss"> Weight Loss</label>
-                                    <label><input type="checkbox" name="goals[]" value="muscle_building"> Muscle Building</label>
-                                    <label><input type="checkbox" name="goals[]" value="strength"> Strength</label>
-                                    <label><input type="checkbox" name="goals[]" value="endurance"> Endurance</label>
-                                    <label><input type="checkbox" name="goals[]" value="flexibility"> Flexibility</label>
-                                    <label><input type="checkbox" name="goals[]" value="general_fitness"> General Fitness</label>
+                                <h4>Goals & Focus</h4>
+                                <div class="form-row">
+                                    <select id="primary-goal" name="primary-goal" class="form-select">
+                                        <option value="">Primary Goal</option>
+                                        <option value="weight_loss">Weight Loss</option>
+                                        <option value="muscle_building">Muscle Building</option>
+                                        <option value="strength">Strength Training</option>
+                                        <option value="endurance">Endurance & Cardio</option>
+                                        <option value="flexibility">Flexibility & Mobility</option>
+                                        <option value="general_fitness">General Fitness</option>
+                                        <option value="sport_specific">Sport-Specific</option>
+                                    </select>
+                                    <select id="workout-focus" name="workout-focus" class="form-select">
+                                        <option value="">Today's Focus</option>
+                                        <option value="upper_body">Upper Body</option>
+                                        <option value="lower_body">Lower Body</option>
+                                        <option value="full_body">Full Body</option>
+                                        <option value="core">Core</option>
+                                        <option value="cardio">Cardio</option>
+                                        <option value="flexibility">Flexibility</option>
+                                    </select>
+                                </div>
+                                <div class="checkbox-grid" id="secondary-goals">
+                                    <label><input type="checkbox" name="secondary-goals[]" value="weight_loss"> Weight Loss</label>
+                                    <label><input type="checkbox" name="secondary-goals[]" value="muscle_building"> Muscle Building</label>
+                                    <label><input type="checkbox" name="secondary-goals[]" value="strength"> Strength</label>
+                                    <label><input type="checkbox" name="secondary-goals[]" value="endurance"> Endurance</label>
+                                    <label><input type="checkbox" name="secondary-goals[]" value="flexibility"> Flexibility</label>
+                                    <label><input type="checkbox" name="secondary-goals[]" value="general_fitness"> General Fitness</label>
                                 </div>
                             </div>
                             
@@ -148,6 +225,27 @@ class PromptBuilderView {
                                     <label><input type="checkbox" name="availableEquipment[]" value="resistance_bands"> Resistance Bands</label>
                                     <label><input type="checkbox" name="availableEquipment[]" value="pull_up_bar"> Pull-up Bar</label>
                                     <label><input type="checkbox" name="availableEquipment[]" value="kettlebells"> Kettlebells</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Location & Preferences -->
+                            <div class="form-group">
+                                <h4>Location & Preferences</h4>
+                                <div class="form-row">
+                                    <select id="preferredLocation" name="preferredLocation" class="form-select">
+                                        <option value="">Preferred Location</option>
+                                        <option value="home">Home</option>
+                                        <option value="gym">Gym</option>
+                                        <option value="outdoor">Outdoor</option>
+                                        <option value="travel">Travel/Hotel</option>
+                                    </select>
+                                    <select id="workoutFrequency" name="workoutFrequency" class="form-select">
+                                        <option value="">Workout Frequency</option>
+                                        <option value="1-2">1-2 times/week</option>
+                                        <option value="3-4">3-4 times/week</option>
+                                        <option value="5-6">5-6 times/week</option>
+                                        <option value="daily">Daily</option>
+                                    </select>
                                 </div>
                             </div>
                             
@@ -171,6 +269,17 @@ class PromptBuilderView {
                                     </select>
                                 </div>
                                 <div class="form-row">
+                                    <select id="intensity-preference" name="intensity-preference" class="form-select">
+                                        <option value="">Intensity Preference</option>
+                                        <option value="1">Light (1/6)</option>
+                                        <option value="2">Easy (2/6)</option>
+                                        <option value="3">Moderate (3/6)</option>
+                                        <option value="4">Hard (4/6)</option>
+                                        <option value="5">Very Hard (5/6)</option>
+                                        <option value="6">Extreme (6/6)</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
                                     <select id="energyLevel" name="energyLevel" class="form-select">
                                         <option value="">Energy Level</option>
                                         <option value="1">Very Low (1/6)</option>
@@ -190,9 +299,52 @@ class PromptBuilderView {
                                         <option value="6">Extreme (6/6)</option>
                                     </select>
                                 </div>
+                                
+                                <!-- Sleep Quality Module Integration -->
+                                <?php
+                                try {
+                                    // Initialize Sleep Quality Module
+                                    $moduleManager = \FitCopilot\Modules\Core\ModuleManager::getInstance();
+                                    if ($moduleManager->hasModule('sleep_quality')) {
+                                        $sleepModule = $moduleManager->getModule('sleep_quality');
+                                        $sleepView = $sleepModule->getView();
+                                        
+                                        // Render sleep quality selection
+                                        echo $sleepView->renderSleepQualitySelection([
+                                            'current_quality' => $data['sleepQuality'] ?? null,
+                                            'form_id' => 'prompt-builder-sleep'
+                                        ]);
+                                    } else {
+                                        // Fallback if module not available
+                                        echo '<div class="form-row">';
+                                        echo '<select id="sleepQuality" name="sleepQuality" class="form-select">';
+                                        echo '<option value="">Sleep Quality</option>';
+                                        echo '<option value="1">Poor (1/5)</option>';
+                                        echo '<option value="2">Below Average (2/5)</option>';
+                                        echo '<option value="3">Average (3/5)</option>';
+                                        echo '<option value="4">Good (4/5)</option>';
+                                        echo '<option value="5">Excellent (5/5)</option>';
+                                        echo '</select>';
+                                        echo '</div>';
+                                    }
+                                } catch (\Exception $e) {
+                                    error_log('[PromptBuilderView] Sleep Quality module integration error: ' . $e->getMessage());
+                                    // Fallback dropdown
+                                    echo '<div class="form-row">';
+                                    echo '<select id="sleepQuality" name="sleepQuality" class="form-select">';
+                                    echo '<option value="">Sleep Quality</option>';
+                                    echo '<option value="1">Poor (1/5)</option>';
+                                    echo '<option value="2">Below Average (2/5)</option>';
+                                    echo '<option value="3">Average (3/5)</option>';
+                                    echo '<option value="4">Good (4/5)</option>';
+                                    echo '<option value="5">Excellent (5/5)</option>';
+                                    echo '</select>';
+                                    echo '</div>';
+                                }
+                                ?>
                             </div>
                             
-                            <!-- Limitations -->
+                            <!-- Health Considerations -->
                             <div class="form-group">
                                 <h4>Health Considerations</h4>
                                 <div class="checkbox-grid">
@@ -204,6 +356,130 @@ class PromptBuilderView {
                                     <label><input type="checkbox" name="limitations[]" value="neck"> Neck</label>
                                 </div>
                                 <textarea id="limitationNotes" name="limitationNotes" placeholder="Additional limitation notes..." class="form-textarea" rows="2"></textarea>
+                                <textarea id="medicalConditions" name="medicalConditions" placeholder="Medical conditions to consider..." class="form-textarea" rows="2"></textarea>
+                                <textarea id="injuries" name="injuries" placeholder="Previous or current injuries..." class="form-textarea" rows="2"></textarea>
+                            </div>
+                            
+                            <!-- Target Muscles -->
+                            <div class="form-group">
+                                <h4>Target Muscles</h4>
+                                <div class="muscle-selection-container">
+                                    <div class="muscle-groups-section">
+                                        <label class="muscle-section-label">Primary Muscle Groups (select up to 3):</label>
+                                        <div class="muscle-groups-grid">
+                                            <div class="muscle-group-item" id="muscle-group-back">
+                                                <label class="muscle-group-label">
+                                                    <input type="checkbox" name="targetMuscleGroups[]" value="back" onchange="toggleMuscleGroup('back')"> 
+                                                    <span class="muscle-icon">🏋️</span> Back
+                                                    <span class="expand-indicator">▼</span>
+                                                </label>
+                                                <div class="muscle-detail-grid" id="muscle-detail-back" style="display: none;">
+                                                    <div class="muscle-options-grid">
+                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Lats"> Lats</label>
+                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Rhomboids"> Rhomboids</label>
+                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Middle Traps"> Middle Traps</label>
+                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Lower Traps"> Lower Traps</label>
+                                                        <label><input type="checkbox" name="specificMuscles[back][]" value="Rear Delts"> Rear Delts</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="muscle-group-item" id="muscle-group-chest">
+                                                <label class="muscle-group-label">
+                                                    <input type="checkbox" name="targetMuscleGroups[]" value="chest" onchange="toggleMuscleGroup('chest')"> 
+                                                    <span class="muscle-icon">💪</span> Chest
+                                                    <span class="expand-indicator">▼</span>
+                                                </label>
+                                                <div class="muscle-detail-grid" id="muscle-detail-chest" style="display: none;">
+                                                    <div class="muscle-options-grid">
+                                                        <label><input type="checkbox" name="specificMuscles[chest][]" value="Upper Chest"> Upper Chest</label>
+                                                        <label><input type="checkbox" name="specificMuscles[chest][]" value="Middle Chest"> Middle Chest</label>
+                                                        <label><input type="checkbox" name="specificMuscles[chest][]" value="Lower Chest"> Lower Chest</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="muscle-group-item" id="muscle-group-arms">
+                                                <label class="muscle-group-label">
+                                                    <input type="checkbox" name="targetMuscleGroups[]" value="arms" onchange="toggleMuscleGroup('arms')"> 
+                                                    <span class="muscle-icon">💪</span> Arms
+                                                    <span class="expand-indicator">▼</span>
+                                                </label>
+                                                <div class="muscle-detail-grid" id="muscle-detail-arms" style="display: none;">
+                                                    <div class="muscle-options-grid">
+                                                        <label><input type="checkbox" name="specificMuscles[arms][]" value="Biceps"> Biceps</label>
+                                                        <label><input type="checkbox" name="specificMuscles[arms][]" value="Triceps"> Triceps</label>
+                                                        <label><input type="checkbox" name="specificMuscles[arms][]" value="Forearms"> Forearms</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="muscle-group-item" id="muscle-group-shoulders">
+                                                <label class="muscle-group-label">
+                                                    <input type="checkbox" name="targetMuscleGroups[]" value="shoulders" onchange="toggleMuscleGroup('shoulders')"> 
+                                                    <span class="muscle-icon">🤸</span> Shoulders
+                                                    <span class="expand-indicator">▼</span>
+                                                </label>
+                                                <div class="muscle-detail-grid" id="muscle-detail-shoulders" style="display: none;">
+                                                    <div class="muscle-options-grid">
+                                                        <label><input type="checkbox" name="specificMuscles[shoulders][]" value="Front Delts"> Front Delts</label>
+                                                        <label><input type="checkbox" name="specificMuscles[shoulders][]" value="Side Delts"> Side Delts</label>
+                                                        <label><input type="checkbox" name="specificMuscles[shoulders][]" value="Rear Delts"> Rear Delts</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="muscle-group-item" id="muscle-group-core">
+                                                <label class="muscle-group-label">
+                                                    <input type="checkbox" name="targetMuscleGroups[]" value="core" onchange="toggleMuscleGroup('core')"> 
+                                                    <span class="muscle-icon">🧘</span> Core
+                                                    <span class="expand-indicator">▼</span>
+                                                </label>
+                                                <div class="muscle-detail-grid" id="muscle-detail-core" style="display: none;">
+                                                    <div class="muscle-options-grid">
+                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Upper Abs"> Upper Abs</label>
+                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Lower Abs"> Lower Abs</label>
+                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Obliques"> Obliques</label>
+                                                        <label><input type="checkbox" name="specificMuscles[core][]" value="Transverse Abdominis"> Transverse Abdominis</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="muscle-group-item" id="muscle-group-legs">
+                                                <label class="muscle-group-label">
+                                                    <input type="checkbox" name="targetMuscleGroups[]" value="legs" onchange="toggleMuscleGroup('legs')"> 
+                                                    <span class="muscle-icon">🦵</span> Legs
+                                                    <span class="expand-indicator">▼</span>
+                                                </label>
+                                                <div class="muscle-detail-grid" id="muscle-detail-legs" style="display: none;">
+                                                    <div class="muscle-options-grid">
+                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Quadriceps"> Quadriceps</label>
+                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Hamstrings"> Hamstrings</label>
+                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Glutes"> Glutes</label>
+                                                        <label><input type="checkbox" name="specificMuscles[legs][]" value="Calves"> Calves</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="muscle-actions-section">
+                                        <div class="muscle-actions">
+                                            <button type="button" id="load-saved-muscles" class="button button-secondary">📥 Load Saved</button>
+                                            <button type="button" id="load-muscle-suggestions" class="button button-secondary">🎯 Get AI Suggestions</button>
+                                            <button type="button" id="clear-muscle-selection" class="button button-secondary">🧹 Clear All</button>
+                                        </div>
+                                        <div class="muscle-selection-summary" id="muscle-selection-summary"></div>
+                                        <textarea id="target-muscle-groups" name="target-muscle-groups" placeholder="Selected muscle groups..." class="form-textarea" rows="2" readonly></textarea>
+                                        <textarea id="specific-muscles" name="specific-muscles" placeholder="Specific muscles selected..." class="form-textarea" rows="2" readonly></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Exercise Preferences -->
+                            <div class="form-group">
+                                <h4>Exercise Preferences</h4>
+                                <textarea id="favoriteExercises" name="favoriteExercises" placeholder="Exercises you enjoy or prefer..." class="form-textarea" rows="2"></textarea>
+                                <textarea id="dislikedExercises" name="dislikedExercises" placeholder="Exercises to avoid or dislike..." class="form-textarea" rows="2"></textarea>
                             </div>
                             
                             <!-- Custom Notes -->
@@ -237,7 +513,20 @@ class PromptBuilderView {
                     
                     <!-- Strategy Code Viewer -->
                     <div class="builder-section">
-                        <h3>📋 Strategy Code</h3>
+                        <div class="section-header-controls">
+                            <h3>📋 Strategy Code</h3>
+                            <div class="code-controls">
+                                <button id="view-strategy-code" class="button button-secondary">
+                                    📋 View Code
+                                </button>
+                                <button id="copy-strategy-code" class="button button-small" style="display: none;">
+                                    📋 Copy
+                                </button>
+                                <button id="toggle-line-numbers" class="button button-small" style="display: none;">
+                                    #️⃣ Lines
+                                </button>
+                            </div>
+                        </div>
                         <div id="strategy-code-viewer" class="strategy-code-viewer">
                             <div class="code-placeholder">
                                 <p>📋 Strategy code will appear here</p>
@@ -248,22 +537,140 @@ class PromptBuilderView {
                     
                     <!-- Live Prompt Preview -->
                     <div class="builder-section">
-                        <h3>📝 Live Prompt Preview</h3>
+                        <div class="section-header-controls">
+                            <h3>📝 Live Prompt Preview</h3>
+                            <div class="prompt-controls">
+                                <button id="export-prompt" class="button button-small" style="display: none;">
+                                    💾 Export
+                                </button>
+                                <button id="copy-prompt" class="button button-small" style="display: none;">
+                                    📋 Copy
+                                </button>
+                                <button id="clear-prompt" class="button button-small" style="display: none;">
+                                    🧹 Clear
+                                </button>
+                            </div>
+                        </div>
                         <div id="prompt-preview" class="prompt-preview">
                             <div class="prompt-placeholder">
                                 <p>🎯 Ready to generate live prompts</p>
                                 <p>Fill in the profile data and click "Generate Live Prompt" to see the AI prompt in real-time.</p>
                             </div>
                         </div>
+                        <div id="prompt-stats" class="prompt-stats" style="display: none;">
+                            <div class="stat-item">
+                                <span class="stat-value" id="prompt-characters">0</span>
+                                <span class="stat-label">chars</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="prompt-words">0</span>
+                                <span class="stat-label">words</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="prompt-tokens">0</span>
+                                <span class="stat-label">~tokens</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="prompt-lines">0</span>
+                                <span class="stat-label">lines</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Test Workout Generation -->
+                    <div class="builder-section">
+                        <div class="section-header-controls">
+                            <h3>🧪 Test Workout Generation</h3>
+                            <div class="workout-controls">
+                                <button id="test-workout" class="button button-secondary">
+                                    🏋️ Test Workout Generation
+                                </button>
+                                <button id="export-workout" class="button button-small" style="display: none;">
+                                    💾 Export Workout
+                                </button>
+                                <button id="save-workout" class="button button-small" style="display: none;">
+                                    💾 Save
+                                </button>
+                            </div>
+                        </div>
+                        <div id="workout-test-preview" class="workout-test-preview">
+                            <div class="workout-placeholder">
+                                <p>🏋️ Workout generation test results will appear here</p>
+                                <p>Click "Test Workout Generation" to see the full workout generation flow with performance metrics.</p>
+                            </div>
+                        </div>
+                        <div id="workout-performance" class="workout-performance" style="display: none;">
+                            <div class="perf-item">
+                                <span class="perf-label">⏱️ Generated in:</span>
+                                <span class="perf-value" id="workout-time">0ms</span>
+                            </div>
+                            <div class="perf-item">
+                                <span class="perf-label">🎯 Match Score:</span>
+                                <span class="perf-value" id="workout-match">0%</span>
+                            </div>
+                            <div class="perf-item">
+                                <span class="perf-label">💰 Est. Cost:</span>
+                                <span class="perf-value" id="workout-cost">$0.00</span>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Context Inspector -->
                     <div class="builder-section">
-                        <h3>🔍 Context Inspector</h3>
+                        <div class="section-header-controls">
+                            <h3>🔍 Context Inspector</h3>
+                            <div class="context-controls">
+                                <input type="text" id="context-search" placeholder="Search fields..." class="context-search" style="display: none;">
+                                <button id="toggle-compact-view" class="button button-small" style="display: none;">
+                                    📦 Compact
+                                </button>
+                                <button id="expand-all-context" class="button button-small" style="display: none;">
+                                    📂 Expand All
+                                </button>
+                            </div>
+                        </div>
                         <div id="context-inspector" class="context-inspector">
                             <div class="context-placeholder">
                                 <p>🔍 Context data will appear here</p>
                                 <p>Click "Inspect Context" to see how your form data is processed and structured for AI generation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dual Preview System -->
+                    <div class="builder-section">
+                        <div class="section-header-controls">
+                            <h3>🔄 Dual Preview System</h3>
+                            <div class="preview-controls">
+                                <button id="refresh-previews" class="button button-secondary">
+                                    🔄 Refresh Both
+                                </button>
+                                <button id="toggle-preview-layout" class="button button-small">
+                                    📱 Layout
+                                </button>
+                            </div>
+                        </div>
+                        <div class="dual-preview-container">
+                            <!-- Workout Preview -->
+                            <div class="preview-panel">
+                                <h4>🏋️ Workout Preview</h4>
+                                <div id="workout-preview" class="preview-content">
+                                    <div class="preview-placeholder">
+                                        <p>🏋️ Workout preview will appear here</p>
+                                        <p>Real-time workout generation preview based on current form data.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Strategy Preview -->
+                            <div class="preview-panel">
+                                <h4>🎯 Strategy Preview</h4>
+                                <div id="strategy-preview" class="preview-content">
+                                    <div class="preview-placeholder">
+                                        <p>🎯 Strategy preview will appear here</p>
+                                        <p>Real-time strategy analysis and prompt structure preview.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -388,30 +795,179 @@ class PromptBuilderView {
             resize: vertical;
         }
         
-        .checkbox-grid {
+        .height-input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .height-separator {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+        
+        .muscle-selection-container {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+        
+        .muscle-groups-section, .specific-muscles-section {
+            margin-bottom: 15px;
+        }
+        
+        .muscle-section-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .muscle-groups-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .muscle-group-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .muscle-group-item:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .muscle-group-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .muscle-group-label:hover {
+            background-color: #f8fafc;
+        }
+        
+        .muscle-group-label input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+        
+        .expand-indicator {
+            font-size: 12px;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+            margin-left: auto;
+        }
+        
+        .muscle-group-item.expanded .expand-indicator {
+            transform: rotate(180deg);
+        }
+        
+        .muscle-detail-grid {
+            border-top: 1px solid #e5e7eb;
+            padding: 16px;
+            background: #f9fafb;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+        }
+        
+        .muscle-options-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 8px;
         }
         
-        .checkbox-grid label {
+        .muscle-options-grid label {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .muscle-options-grid label:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .muscle-options-grid label input[type="checkbox"]:checked + span {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        
+        .muscle-options-grid label:has(input[type="checkbox"]:checked) {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+        }
+        
+        .muscle-actions-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .muscle-selection-summary {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
             font-size: 14px;
+            color: #0c4a6e;
         }
         
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
+        .muscle-selection-summary.empty {
+            background: #f9fafb;
+            border-color: #e5e7eb;
+            color: #6b7280;
         }
         
-        .prompt-preview, .context-inspector, .strategy-code-viewer {
-            min-height: 300px;
-            max-height: 600px;
+        .muscle-count-badge {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+        
+        .prompt-preview, .context-inspector, .strategy-code-viewer, .workout-test-preview {
+            min-height: 250px;
+            max-height: 400px;
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -420,12 +976,171 @@ class PromptBuilderView {
             font-family: 'Courier New', monospace;
             font-size: 13px;
             line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
-        .prompt-placeholder, .context-placeholder, .code-placeholder {
+        .strategy-code-viewer {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        
+        .strategy-code-viewer.with-line-numbers {
+            padding-left: 45px;
+            position: relative;
+        }
+        
+        .code-line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: #252526;
+            border-right: 1px solid #3e3e42;
+            color: #858585;
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 15px 5px;
+            text-align: right;
+        }
+        
+        .workout-test-preview {
+            background: #fff;
+            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .workout-section {
+            margin-bottom: 20px;
+            border-left: 3px solid #3b82f6;
+            padding-left: 15px;
+        }
+        
+        .workout-section h4 {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+            font-weight: 600;
+        }
+        
+        .exercise-item {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 4px;
+            border-left: 2px solid #10b981;
+        }
+        
+        .prompt-placeholder, .context-placeholder, .code-placeholder, .workout-placeholder {
             text-align: center;
             color: #666;
             padding: 40px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .prompt-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            background: #f0f9ff;
+            border: 1px solid #e0f2fe;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e40af;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        
+        .workout-performance {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .perf-item {
+            text-align: center;
+        }
+        
+        .perf-label {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+        
+        .perf-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #16a34a;
+        }
+        
+        .context-search {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 150px;
+        }
+        
+        .context-tree {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        
+        .context-branch {
+            margin-left: 20px;
+            border-left: 1px dashed #ddd;
+            padding-left: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .context-field {
+            padding: 4px 8px;
+            margin-bottom: 4px;
+            border-radius: 3px;
+            background: #f8fafc;
+        }
+        
+        .context-field.missing {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+        }
+        
+        .context-field-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .context-field-type {
+            font-size: 10px;
+            color: #6b7280;
+            background: #e5e7eb;
+            padding: 1px 4px;
+            border-radius: 2px;
+            margin-left: 5px;
+        }
+        
+        .context-field-value {
+            color: #059669;
+            margin-left: 8px;
         }
         
         .prompt-builder-messages {
@@ -461,10 +1176,59 @@ class PromptBuilderView {
             color: #0c5460;
         }
         
+        .section-header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .code-controls, .prompt-controls, .workout-controls, .context-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .code-controls button, .prompt-controls button, .workout-controls button, .context-controls button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
         @media (max-width: 1200px) {
             .prompt-builder-container {
                 grid-template-columns: 1fr;
             }
+        }
+        
+        .muscle-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .muscle-icon {
+            font-size: 16px;
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+        }
+        
+        .checkbox-grid label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
         }
         </style>
         
@@ -477,6 +1241,7 @@ class PromptBuilderView {
                 },
                 
                 bindEvents() {
+                    // Original events
                     $('#strategy-selector').on('change', this.onStrategyChange.bind(this));
                     $('#user-selector').on('change', this.onUserSelectionChange.bind(this));
                     $('#load-profile').on('click', this.loadUserProfile.bind(this));
@@ -484,6 +1249,18 @@ class PromptBuilderView {
                     $('#inspect-context').on('click', this.inspectContext.bind(this));
                     $('#view-strategy-code').on('click', this.viewStrategyCode.bind(this));
                     $('#test-workout').on('click', this.testWorkoutGeneration.bind(this));
+                    
+                    // New dual preview system events
+                    $('#copy-strategy-code').on('click', this.copyStrategyCode.bind(this));
+                    $('#toggle-line-numbers').on('click', this.toggleLineNumbers.bind(this));
+                    $('#export-prompt').on('click', this.exportPrompt.bind(this));
+                    $('#copy-prompt').on('click', this.copyPrompt.bind(this));
+                    $('#clear-prompt').on('click', this.clearPrompt.bind(this));
+                    $('#export-workout').on('click', this.exportWorkout.bind(this));
+                    $('#save-workout').on('click', this.saveWorkout.bind(this));
+                    $('#context-search').on('input', this.searchContext.bind(this));
+                    $('#toggle-compact-view').on('click', this.toggleCompactView.bind(this));
+                    $('#expand-all-context').on('click', this.expandAllContext.bind(this));
                 },
                 
                 setupFormValidation() {
@@ -636,6 +1413,152 @@ class PromptBuilderView {
                     .always(() => {
                         this.hideLoading();
                     });
+                },
+                
+                // NEW DUAL PREVIEW SYSTEM FUNCTIONS
+                
+                copyStrategyCode() {
+                    const codeContent = $('#strategy-code-viewer').text();
+                    if (!codeContent || codeContent.includes('Strategy code will appear here')) {
+                        this.showMessage('No code to copy', 'info');
+                        return;
+                    }
+                    
+                    this.copyToClipboard(codeContent).then(() => {
+                        this.showMessage('Strategy code copied to clipboard', 'success');
+                    }).catch(() => {
+                        this.showMessage('Failed to copy strategy code', 'error');
+                    });
+                },
+                
+                toggleLineNumbers() {
+                    const viewer = $('#strategy-code-viewer');
+                    const button = $('#toggle-line-numbers');
+                    
+                    if (viewer.hasClass('with-line-numbers')) {
+                        viewer.removeClass('with-line-numbers');
+                        viewer.find('.code-line-numbers').remove();
+                        button.text('#️⃣ Lines');
+                    } else {
+                        viewer.addClass('with-line-numbers');
+                        this.addLineNumbers();
+                        button.text('🔧 Hide Lines');
+                    }
+                },
+                
+                addLineNumbers() {
+                    const viewer = $('#strategy-code-viewer');
+                    const content = viewer.html();
+                    const lines = content.split('\n');
+                    let lineNumbers = '<div class="code-line-numbers">';
+                    
+                    for (let i = 1; i <= lines.length; i++) {
+                        lineNumbers += i + '\n';
+                    }
+                    lineNumbers += '</div>';
+                    
+                    viewer.prepend(lineNumbers);
+                },
+                
+                exportPrompt() {
+                    const promptContent = $('#prompt-preview').text();
+                    if (!promptContent || promptContent.includes('Ready to generate live prompts')) {
+                        this.showMessage('No prompt to export', 'info');
+                        return;
+                    }
+                    
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '_');
+                    const filename = `prompt_${timestamp}.txt`;
+                    this.downloadAsFile(promptContent, filename);
+                    this.showMessage('Prompt exported successfully', 'success');
+                },
+                
+                copyPrompt() {
+                    const promptContent = $('#prompt-preview').text();
+                    if (!promptContent || promptContent.includes('Ready to generate live prompts')) {
+                        this.showMessage('No prompt to copy', 'info');
+                        return;
+                    }
+                    
+                    this.copyToClipboard(promptContent).then(() => {
+                        this.showMessage('Prompt copied to clipboard', 'success');
+                    }).catch(() => {
+                        this.showMessage('Failed to copy prompt', 'error');
+                    });
+                },
+                
+                clearPrompt() {
+                    $('#prompt-preview').html(`
+                        <div class="prompt-placeholder">
+                            <p>🎯 Ready to generate live prompts</p>
+                            <p>Fill in the profile data and click "Generate Live Prompt" to see the AI prompt in real-time.</p>
+                        </div>
+                    `);
+                    $('#prompt-stats').hide();
+                    $('.prompt-controls button').hide();
+                    this.showMessage('Prompt cleared', 'info');
+                },
+                
+                exportWorkout() {
+                    const workoutContent = $('#workout-test-preview').text();
+                    if (!workoutContent || workoutContent.includes('Workout generation test results will appear here')) {
+                        this.showMessage('No workout to export', 'info');
+                        return;
+                    }
+                    
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '_');
+                    const filename = `workout_${timestamp}.txt`;
+                    this.downloadAsFile(workoutContent, filename);
+                    this.showMessage('Workout exported successfully', 'success');
+                },
+                
+                saveWorkout() {
+                    const workoutContent = $('#workout-test-preview').html();
+                    if (!workoutContent || workoutContent.includes('Workout generation test results will appear here')) {
+                        this.showMessage('No workout to save', 'info');
+                        return;
+                    }
+                    
+                    // Here you would normally save to WordPress database
+                    // For now, just show a message
+                    this.showMessage('Workout save functionality coming soon!', 'info');
+                },
+                
+                searchContext() {
+                    const searchTerm = $('#context-search').val().toLowerCase();
+                    const contextViewer = $('#context-inspector');
+                    
+                    if (!searchTerm) {
+                        contextViewer.find('.context-field').show();
+                        return;
+                    }
+                    
+                    contextViewer.find('.context-field').each(function() {
+                        const text = $(this).text().toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                },
+                
+                toggleCompactView() {
+                    const contextViewer = $('#context-inspector');
+                    const button = $('#toggle-compact-view');
+                    
+                    if (contextViewer.hasClass('compact-view')) {
+                        contextViewer.removeClass('compact-view');
+                        button.text('📦 Compact');
+                    } else {
+                        contextViewer.addClass('compact-view');
+                        button.text('📋 Expanded');
+                    }
+                },
+                
+                expandAllContext() {
+                    $('#context-inspector .context-branch').removeClass('collapsed');
+                    $('#expand-all-context').text('📁 Collapse All');
                 },
                 
                 collectFormData() {
@@ -864,7 +1787,282 @@ class PromptBuilderView {
             
             PromptBuilder.init();
         });
+        
+        // Height field toggle function
+        function toggleHeightFields(unit) {
+            const imperialFields = document.getElementById('height-imperial');
+            const metricFields = document.getElementById('height-metric');
+            
+            if (unit === 'ft') {
+                imperialFields.style.display = 'flex';
+                metricFields.style.display = 'none';
+            } else {
+                imperialFields.style.display = 'none';
+                metricFields.style.display = 'flex';
+            }
+        }
+        
+        // Height conversion utilities
+        function convertHeightToInches(feet, inches) {
+            return (parseInt(feet) || 0) * 12 + (parseInt(inches) || 0);
+        }
+        
+        function convertInchesToFeetInches(totalInches) {
+            const feet = Math.floor(totalInches / 12);
+            const inches = totalInches % 12;
+            return { feet, inches };
+        }
+        
+        function convertInchesToCm(inches) {
+            return Math.round(inches * 2.54);
+        }
+        
+        function convertCmToInches(cm) {
+            return Math.round(cm / 2.54);
+        }
+        
+        // Nested Muscle Selection Functions
+        function toggleMuscleGroup(group) {
+            const checkbox = document.querySelector(`input[name="targetMuscleGroups[]"][value="${group}"]`);
+            const detailGrid = document.getElementById(`muscle-detail-${group}`);
+            const groupItem = checkbox.closest('.muscle-group-item');
+            
+            if (checkbox.checked) {
+                // Show nested muscle options
+                detailGrid.style.display = 'block';
+                groupItem.classList.add('expanded');
+            } else {
+                // Hide nested muscle options and uncheck all specific muscles
+                detailGrid.style.display = 'none';
+                groupItem.classList.remove('expanded');
+                
+                // Uncheck all specific muscles in this group
+                const specificMuscles = detailGrid.querySelectorAll('input[type="checkbox"]');
+                specificMuscles.forEach(muscle => muscle.checked = false);
+            }
+            
+            updateMuscleSelectionSummary();
+        }
+        
+        function updateMuscleSelectionSummary() {
+            const selectedGroups = [];
+            const selectedMuscles = {};
+            let totalSpecificMuscles = 0;
+            
+            // Collect selected groups
+            document.querySelectorAll('input[name="targetMuscleGroups[]"]:checked').forEach(checkbox => {
+                const group = checkbox.value;
+                selectedGroups.push(group);
+                
+                // Collect specific muscles for this group
+                const specificMuscleInputs = document.querySelectorAll(`input[name="specificMuscles[${group}][]"]:checked`);
+                if (specificMuscleInputs.length > 0) {
+                    selectedMuscles[group] = [];
+                    specificMuscleInputs.forEach(muscle => {
+                        selectedMuscles[group].push(muscle.value);
+                        totalSpecificMuscles++;
+                    });
+                }
+            });
+            
+            // Update summary display
+            const summaryEl = document.getElementById('muscle-selection-summary');
+            if (selectedGroups.length === 0) {
+                summaryEl.innerHTML = '<span class="empty">No muscle groups selected</span>';
+                summaryEl.className = 'muscle-selection-summary empty';
+            } else {
+                let summaryText = `${selectedGroups.length} muscle group${selectedGroups.length > 1 ? 's' : ''} selected: `;
+                summaryText += selectedGroups.map(group => {
+                    const count = selectedMuscles[group] ? selectedMuscles[group].length : 0;
+                    const badge = count > 0 ? `<span class="muscle-count-badge">${count}</span>` : '';
+                    return `${group.charAt(0).toUpperCase() + group.slice(1)}${badge}`;
+                }).join(', ');
+                
+                if (totalSpecificMuscles > 0) {
+                    summaryText += ` (${totalSpecificMuscles} specific muscles)`;
+                }
+                
+                summaryEl.innerHTML = summaryText;
+                summaryEl.className = 'muscle-selection-summary';
+            }
+        }
+        
+        function clearMuscleSelection() {
+            // Uncheck all muscle group checkboxes
+            document.querySelectorAll('input[name="targetMuscleGroups[]"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Hide all detail grids
+            document.querySelectorAll('.muscle-detail-grid').forEach(grid => {
+                grid.style.display = 'none';
+            });
+            
+            // Remove expanded class from all groups
+            document.querySelectorAll('.muscle-group-item').forEach(item => {
+                item.classList.remove('expanded');
+            });
+            
+            // Uncheck all specific muscle checkboxes
+            document.querySelectorAll('input[name^="specificMuscles"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            updateMuscleSelectionSummary();
+        }
+        
+        // Enhanced muscle selection API integration
+        async function loadMuscleSelections() {
+            try {
+                const response = await fetch('/wp-json/fitcopilot/v1/muscle-selection', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': fitcopilotPromptBuilder?.nonce || ''
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    populateNestedMuscleFields(result.data);
+                    console.log('[PromptBuilder] Muscle selections loaded:', result.data);
+                } else {
+                    console.log('[PromptBuilder] No saved muscle selections found');
+                }
+                
+            } catch (error) {
+                console.error('[PromptBuilder] Failed to load muscle selections:', error);
+            }
+        }
+        
+        async function loadMuscleSuggestions() {
+            try {
+                const response = await fetch('/wp-json/fitcopilot/v1/muscle-suggestions', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': fitcopilotPromptBuilder?.nonce || ''
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    applyNestedSuggestions(result.data[0]);
+                    console.log('[PromptBuilder] Muscle suggestions loaded:', result.data);
+                } else {
+                    console.log('[PromptBuilder] No muscle suggestions available');
+                }
+                
+            } catch (error) {
+                console.error('[PromptBuilder] Failed to load muscle suggestions:', error);
+            }
+        }
+        
+        function populateNestedMuscleFields(muscleData) {
+            // Clear existing selections
+            clearMuscleSelection();
+            
+            // Populate muscle groups and show their detail grids
+            if (muscleData.selectedGroups && Array.isArray(muscleData.selectedGroups)) {
+                muscleData.selectedGroups.forEach(group => {
+                    const checkbox = document.querySelector(`input[name="targetMuscleGroups[]"][value="${group}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        toggleMuscleGroup(group); // This will show the detail grid
+                    }
+                });
+            }
+            
+            // Populate specific muscles
+            if (muscleData.selectedMuscles) {
+                Object.entries(muscleData.selectedMuscles).forEach(([group, muscles]) => {
+                    if (Array.isArray(muscles)) {
+                        muscles.forEach(muscle => {
+                            const checkbox = document.querySelector(`input[name="specificMuscles[${group}][]"][value="${muscle}"]`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                            }
+                        });
+                    }
+                });
+            }
+            
+            updateMuscleSelectionSummary();
+        }
+        
+        function applyNestedSuggestions(suggestion) {
+            if (suggestion.groups && Array.isArray(suggestion.groups)) {
+                // Clear existing selections
+                clearMuscleSelection();
+                
+                // Apply suggested groups
+                suggestion.groups.forEach(group => {
+                    const checkbox = document.querySelector(`input[name="targetMuscleGroups[]"][value="${group}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        toggleMuscleGroup(group);
+                    }
+                });
+                
+                updateMuscleSelectionSummary();
+                
+                // Show suggestion reason
+                if (suggestion.reason) {
+                    alert(`Muscle Suggestion Applied: ${suggestion.reason}`);
+                }
+            }
+        }
+        
+        function collectNestedMuscleSelectionData() {
+            const selectedGroups = [];
+            const selectedMuscles = {};
+            
+            // Collect selected muscle groups
+            document.querySelectorAll('input[name="targetMuscleGroups[]"]:checked').forEach(checkbox => {
+                const group = checkbox.value;
+                selectedGroups.push(group);
+                
+                // Collect specific muscles for this group
+                const specificMuscleInputs = document.querySelectorAll(`input[name="specificMuscles[${group}][]"]:checked`);
+                if (specificMuscleInputs.length > 0) {
+                    selectedMuscles[group] = [];
+                    specificMuscleInputs.forEach(muscle => {
+                        selectedMuscles[group].push(muscle.value);
+                    });
+                }
+            });
+            
+            return {
+                selectedGroups: selectedGroups,
+                selectedMuscles: selectedMuscles,
+                preferences: {}
+            };
+        }
+        
+        // Event listeners for enhanced muscle selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadSavedButton = document.getElementById('load-saved-muscles');
+            const loadSuggestionsButton = document.getElementById('load-muscle-suggestions');
+            const clearButton = document.getElementById('clear-muscle-selection');
+            
+            if (loadSavedButton) {
+                loadSavedButton.addEventListener('click', loadMuscleSelections);
+            }
+            
+            if (loadSuggestionsButton) {
+                loadSuggestionsButton.addEventListener('click', loadMuscleSuggestions);
+            }
+            
+            if (clearButton) {
+                clearButton.addEventListener('click', clearMuscleSelection);
+            }
+            
+            // Initialize muscle selection summary
+            updateMuscleSelectionSummary();
+        });
         </script>
         <?php
     }
-} 
+}

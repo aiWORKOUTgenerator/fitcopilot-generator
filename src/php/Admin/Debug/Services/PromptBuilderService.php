@@ -239,17 +239,28 @@ class PromptBuilderService {
     
     /**
      * Get user profile data for form population
-     * Phase 1: Load current user's WordPress profile data
+     * Phase 1: Load user's WordPress profile data
      *
+     * @param int|null $user_id Optional user ID, defaults to current user
      * @return array User profile data
      */
-    public function getUserProfileData(): array {
+    public function getUserProfileData($user_id = null): array {
         try {
-            $user_id = get_current_user_id();
+            // Use provided user_id or default to current user
+            if ($user_id === null) {
+                $user_id = get_current_user_id();
+            }
+            
             error_log('[PromptBuilderService] Getting user profile data for user ID: ' . $user_id);
             
             if (!$user_id) {
                 throw new \Exception('User not logged in');
+            }
+            
+            // Security check: ensure user can access this profile data
+            $current_user_id = get_current_user_id();
+            if ($user_id != $current_user_id && !current_user_can('manage_options')) {
+                throw new \Exception('Insufficient permissions to access user profile');
             }
             
             // Get WordPress user data
@@ -258,15 +269,21 @@ class PromptBuilderService {
                 throw new \Exception('User data not found');
             }
             
-            // Get FitCopilot profile data from user meta
+            // Get FitCopilot profile data from user meta with WordPress fallbacks
+            $profile_first_name = get_user_meta($user_id, '_profile_firstName', true) ?: $user->first_name ?: '';
+            $profile_last_name = get_user_meta($user_id, '_profile_lastName', true) ?: $user->last_name ?: '';
+            
             $profile_data = [
                 'basic_info' => [
-                    'name' => $user->display_name ?: $user->user_login,
+                    'first_name' => $profile_first_name,
+                    'last_name' => $profile_last_name,
                     'age' => absint(get_user_meta($user_id, '_profile_age', true) ?: 0),
                     'gender' => get_user_meta($user_id, '_profile_gender', true) ?: '',
                     'fitness_level' => get_user_meta($user_id, '_profile_fitnessLevel', true) ?: '',
                     'weight' => floatval(get_user_meta($user_id, '_profile_weight', true) ?: 0),
-                    'height' => floatval(get_user_meta($user_id, '_profile_height', true) ?: 0)
+                    'weight_unit' => get_user_meta($user_id, '_profile_units', true) === 'metric' ? 'kg' : 'lbs',
+                    'height' => floatval(get_user_meta($user_id, '_profile_height', true) ?: 0),
+                    'height_unit' => get_user_meta($user_id, '_profile_units', true) === 'metric' ? 'cm' : 'ft'
                 ],
                 'goals' => [
                     'primary_goal' => get_user_meta($user_id, '_profile_goals', true) ?: '',
@@ -274,17 +291,26 @@ class PromptBuilderService {
                     'target_areas' => get_user_meta($user_id, '_profile_targetAreas', true) ?: []
                 ],
                 'equipment' => get_user_meta($user_id, '_profile_availableEquipment', true) ?: [],
+                'location' => [
+                    'preferred_location' => get_user_meta($user_id, '_profile_preferredLocation', true) ?: 'home'
+                ],
                 'session_params' => [
                     'duration' => absint(get_user_meta($user_id, '_profile_preferredWorkoutDuration', true) ?: 30),
+                    'frequency' => get_user_meta($user_id, '_profile_workoutFrequency', true) ?: '3-4',
                     'focus' => get_user_meta($user_id, '_profile_workoutFocus', true) ?: '',
                     'energy_level' => 3, // Default values for session-specific params
                     'stress_level' => 3,
                     'sleep_quality' => 3
                 ],
                 'limitations' => [
-                    'injuries' => get_user_meta($user_id, '_profile_injuries', true) ?: '',
-                    'restrictions' => get_user_meta($user_id, '_profile_medicalConditions', true) ?: '',
-                    'preferences' => get_user_meta($user_id, '_profile_favoriteExercises', true) ?: ''
+                    'physical_limitations' => get_user_meta($user_id, '_profile_limitations', true) ?: [],
+                    'limitation_notes' => get_user_meta($user_id, '_profile_limitationNotes', true) ?: '',
+                    'medical_conditions' => get_user_meta($user_id, '_profile_medicalConditions', true) ?: '',
+                    'injuries' => get_user_meta($user_id, '_profile_injuries', true) ?: ''
+                ],
+                'exercise_preferences' => [
+                    'favorite_exercises' => get_user_meta($user_id, '_profile_favoriteExercises', true) ?: '',
+                    'disliked_exercises' => get_user_meta($user_id, '_profile_dislikedExercises', true) ?: ''
                 ],
                 'custom_instructions' => get_user_meta($user_id, '_profile_customInstructions', true) ?: ''
             ];
