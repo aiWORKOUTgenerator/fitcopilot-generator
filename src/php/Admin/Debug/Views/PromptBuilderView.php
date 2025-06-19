@@ -1542,21 +1542,33 @@ class PromptBuilderView {
                         $('#gender').val(basic.gender || '');
                         $('#fitnessLevel').val(basic.fitness_level || '');
                         $('#weight').val(basic.weight || '');
-                        // Convert height from inches to display format if needed
+                        // Convert height from inches to feet/inches format if needed
                         if (basic.height) {
-                            $('#height').val(basic.height);
+                            const totalInches = parseInt(basic.height);
+                            const feet = Math.floor(totalInches / 12);
+                            const inches = totalInches % 12;
+                            $('#heightFeet').val(feet);
+                            $('#heightInches').val(inches);
                         }
                     }
                     
-                    // Handle goals (checkboxes)
-                    if (profileData.goals && profileData.goals.primary_goal) {
-                        // Clear all goal checkboxes first
-                        $('input[name="goals[]"]').prop('checked', false);
+                    // Handle goals
+                    if (profileData.goals) {
+                        // Set primary goal dropdown
+                        if (profileData.goals.primary_goal && Array.isArray(profileData.goals.primary_goal) && profileData.goals.primary_goal.length > 0) {
+                            $('#primary-goal').val(profileData.goals.primary_goal[0]);
+                        }
                         
-                        // Check the goals from profile
-                        profileData.goals.primary_goal.forEach(goal => {
-                            $(`input[name="goals[]"][value="${goal}"]`).prop('checked', true);
-                        });
+                        // Handle secondary goals (checkboxes)
+                        if (profileData.goals.primary_goal) {
+                            // Clear all goal checkboxes first
+                            $('input[name="secondary-goals[]"]').prop('checked', false);
+                            
+                            // Check the goals from profile
+                            profileData.goals.primary_goal.forEach(goal => {
+                                $(`input[name="secondary-goals[]"][value="${goal}"]`).prop('checked', true);
+                            });
+                        }
                     }
                     
                     // Handle equipment (checkboxes)
@@ -1691,6 +1703,40 @@ class PromptBuilderView {
                     const div = document.createElement('div');
                     div.textContent = text;
                     return div.innerHTML;
+                },
+                
+                copyToClipboard(text) {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        return navigator.clipboard.writeText(text);
+                    } else {
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            return Promise.resolve();
+                        } catch (err) {
+                            document.body.removeChild(textArea);
+                            return Promise.reject(err);
+                        }
+                    }
+                },
+                
+                downloadAsFile(content, filename) {
+                    const blob = new Blob([content], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
                 }
             };
             
@@ -1731,10 +1777,6 @@ class PromptBuilderView {
         }
         
         // Muscle selection functions now handled by MuscleModule
-        
-        });
-
-        // Muscle selection functionality now handled by MuscleModule
         </script>
         <?php
     }
