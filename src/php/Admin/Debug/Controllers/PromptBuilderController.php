@@ -169,7 +169,7 @@ class PromptBuilderController {
         
         // Only load on PromptBuilder page
         if (strpos($hook_suffix, 'prompt-builder') !== false || strpos($hook_suffix, 'fitcopilot-prompt-builder') !== false) {
-            error_log("PromptBuilderController: Hook condition matched, enqueuing assets");
+            error_log("PromptBuilderController: Hook condition matched, enqueuing MODULAR SYSTEM assets");
             
             // Enqueue config and utilities first
             wp_enqueue_script(
@@ -180,11 +180,43 @@ class PromptBuilderController {
                 true
             );
             
-            // Enqueue main PromptBuilder script
+            // MODULAR SYSTEM ACTIVATION - Load modular components
+            wp_enqueue_script(
+                'fitcopilot-prompt-builder-form-handler',
+                plugins_url('assets/js/prompt-builder/modules/FormHandler.js', FITCOPILOT_FILE),
+                ['jquery', 'fitcopilot-prompt-builder-config'],
+                FITCOPILOT_VERSION,
+                true
+            );
+            
+            wp_enqueue_script(
+                'fitcopilot-prompt-builder-ajax-manager',
+                plugins_url('assets/js/prompt-builder/modules/AjaxManager.js', FITCOPILOT_FILE),
+                ['jquery', 'fitcopilot-prompt-builder-config'],
+                FITCOPILOT_VERSION,
+                true
+            );
+            
+            wp_enqueue_script(
+                'fitcopilot-prompt-builder-ui-controller',
+                plugins_url('assets/js/prompt-builder/modules/UIController.js', FITCOPILOT_FILE),
+                ['jquery', 'fitcopilot-prompt-builder-config'],
+                FITCOPILOT_VERSION,
+                true
+            );
+            
+            // Enqueue modular coordinator (replaces monolithic index.js)
             wp_enqueue_script(
                 'fitcopilot-prompt-builder',
-                plugins_url('assets/js/prompt-builder/index.js', FITCOPILOT_FILE),
-                ['jquery', 'wp-util', 'fitcopilot-prompt-builder-config'],
+                plugins_url('assets/js/prompt-builder/index-modular.js', FITCOPILOT_FILE),
+                [
+                    'jquery', 
+                    'wp-util', 
+                    'fitcopilot-prompt-builder-config',
+                    'fitcopilot-prompt-builder-form-handler',
+                    'fitcopilot-prompt-builder-ajax-manager',
+                    'fitcopilot-prompt-builder-ui-controller'
+                ],
                 FITCOPILOT_VERSION,
                 true
             );
@@ -196,7 +228,7 @@ class PromptBuilderController {
                 FITCOPILOT_VERSION
             );
             
-            // Enqueue MuscleModule assets
+            // Enqueue MuscleModule assets (depends on modular coordinator)
             wp_enqueue_script(
                 'muscle-targeting-module',
                 plugins_url('src/php/Modules/MuscleTargeting/assets/muscle-targeting.js', FITCOPILOT_FILE),

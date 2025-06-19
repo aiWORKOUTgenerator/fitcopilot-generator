@@ -921,6 +921,42 @@ class PromptBuilderView {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
+        .workout-test-results .workout-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            border-left: 3px solid #2196f3;
+        }
+        
+        .workout-test-results .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .workout-test-results .meta-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        
+        .workout-test-results .meta-value {
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .workout-test-results .workout-content {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
         .workout-section {
             margin-bottom: 20px;
             border-left: 3px solid #3b82f6;
@@ -1561,13 +1597,13 @@ class PromptBuilderView {
                         
                         // Handle secondary goals (checkboxes)
                         if (profileData.goals.primary_goal) {
-                            // Clear all goal checkboxes first
+                        // Clear all goal checkboxes first
                             $('input[name="secondary-goals[]"]').prop('checked', false);
-                            
-                            // Check the goals from profile
-                            profileData.goals.primary_goal.forEach(goal => {
+                        
+                        // Check the goals from profile
+                        profileData.goals.primary_goal.forEach(goal => {
                                 $(`input[name="secondary-goals[]"][value="${goal}"]`).prop('checked', true);
-                            });
+                        });
                         }
                     }
                     
@@ -1658,15 +1694,30 @@ class PromptBuilderView {
                 },
                 
                 displayWorkoutTest(data) {
-                    // This would display workout test results
-                    // For now, just show in prompt preview
+                    // Display workout test results in the correct container
                     const html = `
                         <div class="workout-test-results">
                             <h4>Workout Test Results</h4>
-                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                            <div class="workout-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">Generated:</span>
+                                    <span class="meta-value">${new Date().toLocaleTimeString()}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Test ID:</span>
+                                    <span class="meta-value">${data.test_id || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div class="workout-content">
+                                <pre>${JSON.stringify(data, null, 2)}</pre>
+                            </div>
                         </div>
                     `;
-                    $('#prompt-preview').html(html);
+                    $('#workout-test-preview').html(html);
+                    
+                    // Show workout controls and performance metrics
+                    $('.workout-controls #export-workout, .workout-controls #save-workout').show();
+                    $('#workout-performance').show();
                 },
                 
                 clearResults() {

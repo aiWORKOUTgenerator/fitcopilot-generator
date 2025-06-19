@@ -248,7 +248,7 @@ class PromptBuilderService {
         try {
             // Use provided user_id or default to current user
             if ($user_id === null) {
-                $user_id = get_current_user_id();
+            $user_id = get_current_user_id();
             }
             
             error_log('[PromptBuilderService] Getting user profile data for user ID: ' . $user_id);
