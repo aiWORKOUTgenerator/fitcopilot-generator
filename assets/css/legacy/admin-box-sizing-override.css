@@ -1,0 +1,141 @@
+/**
+ * Box Sizing Override - Remove Size Constraints
+ * 
+ * This file removes all width/height constraints from test lab and prompt builder
+ * to allow natural box sizing without the massive CSS files controlling dimensions.
+ */
+
+/* ===================================
+   PROMPT BUILDER BOX SIZING REMOVAL
+   =================================== */
+
+.prompt-builder-container,
+.prompt-builder-form,
+.prompt-builder-left,
+.prompt-builder-right,
+.builder-section,
+.form-section,
+.preview-panel,
+.preview-content,
+.workout-test-preview,
+.workout-content,
+.prompt-preview,
+.context-inspector,
+.strategy-code-viewer,
+.code-content-container,
+.analytics-dashboard,
+.metrics-grid,
+.metric-card {
+    width: auto !important;
+    height: auto !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    max-width: unset !important;
+    max-height: unset !important;
+}
+
+/* ===================================
+   TESTING LAB BOX SIZING REMOVAL
+   =================================== */
+
+.testing-lab-container,
+.testing-lab-content,
+.testing-lab-form,
+.test-result,
+.test-result-content,
+.test-results-container,
+.test-results,
+.logs-container,
+.logs-content,
+.system-stats,
+.stat-card,
+.performance-monitor,
+.performance-chart,
+.testing-interface,
+.test-input-panel,
+.test-output-panel {
+    width: auto !important;
+    height: auto !important;
+    min-width: unset !important;
+    min-height: unset !important;
+    max-width: unset !important;
+    max-height: unset !important;
+}
+
+/* ===================================
+   JSON VIEWER BOX SIZING REMOVAL
+   =================================== */
+
+.json-viewer-container,
+.json-viewer-content,
+.json-formatted,
+.workout-content pre {
+    /* Keep the horizontal scroll fix but remove height constraints */
+    max-height: unset !important;
+    min-height: unset !important;
+    height: auto !important;
+}
+
+/* ===================================
+   RESPONSIVE OVERRIDES
+   =================================== */
+
+@media (max-width: 1024px) {
+    .prompt-builder-container,
+    .testing-lab-container,
+    .workout-test-preview,
+    .logs-container {
+        width: auto !important;
+        height: auto !important;
+        min-width: unset !important;
+        min-height: unset !important;
+        max-width: unset !important;
+        max-height: unset !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .prompt-builder-container,
+    .testing-lab-container,
+    .workout-test-preview,
+    .logs-container,
+    .test-result,
+    .preview-content {
+        width: auto !important;
+        height: auto !important;
+        min-width: unset !important;
+        min-height: unset !important;
+        max-width: unset !important;
+        max-height: unset !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .prompt-builder-container,
+    .testing-lab-container,
+    .workout-test-preview,
+    .logs-container {
+        width: auto !important;
+        height: auto !important;
+        min-width: unset !important;
+        min-height: unset !important;
+        max-width: unset !important;
+        max-height: unset !important;
+    }
+}
+
+/* ===================================
+   GRID LAYOUT OVERRIDES
+   =================================== */
+
+.dual-preview-container,
+.testing-interface,
+.system-logs-grid,
+.metrics-grid,
+.charts-grid {
+    grid-template-columns: unset !important;
+    grid-template-rows: unset !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: unset !important;
+} 

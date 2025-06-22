@@ -60,8 +60,16 @@ class PromptBuilderView {
         
         ?>
         <div class="wrap">
-            <h1>🧠 PromptBuilder - AI Prompt Engineering</h1>
-            <p class="description">Engineer and test AI prompts with live preview, strategy inspection, and data flow analysis.</p>
+            <!-- Dashboard Header with Controls -->
+            <div class="dashboard-header">
+                <div class="dashboard-header-content">
+                    <h1>🧠 PromptBuilder - AI Prompt Engineering</h1>
+                    <p class="description">Engineer and test AI prompts with live preview, strategy inspection, and data flow analysis.</p>
+                </div>
+                <div class="dashboard-controls">
+                    <!-- Dark mode toggle will be inserted here by JavaScript -->
+                </div>
+            </div>
             
             <!-- System Status -->
             <div class="prompt-builder-status">

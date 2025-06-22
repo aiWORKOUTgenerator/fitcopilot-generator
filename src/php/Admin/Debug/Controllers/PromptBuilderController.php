@@ -169,7 +169,33 @@ class PromptBuilderController {
         
         // Only load on PromptBuilder page
         if (strpos($hook_suffix, 'prompt-builder') !== false || strpos($hook_suffix, 'fitcopilot-prompt-builder') !== false) {
-            error_log("PromptBuilderController: Hook condition matched, enqueuing MODULAR SYSTEM assets");
+            error_log("PromptBuilderController: Hook condition matched, enqueuing OPTIMIZED SYSTEM assets");
+            
+            // CSS Performance Optimization Sprint - Load optimized CSS
+            wp_enqueue_style(
+                'fitcopilot-prompt-builder-optimized',
+                plugins_url('assets/css/admin-prompt-builder-optimized.css', FITCOPILOT_FILE),
+                [],
+                FITCOPILOT_VERSION . '-optimized'
+            );
+            
+            // Dark Mode Toggle Support
+            wp_enqueue_script(
+                'fitcopilot-dark-mode-toggle',
+                plugins_url('assets/js/admin-dark-mode-toggle.js', FITCOPILOT_FILE),
+                [],
+                FITCOPILOT_VERSION,
+                true
+            );
+            
+            // CSS Performance Monitor
+            wp_enqueue_script(
+                'fitcopilot-css-performance-monitor',
+                plugins_url('assets/js/css-performance-monitor.js', FITCOPILOT_FILE),
+                [],
+                FITCOPILOT_VERSION,
+                true
+            );
             
             // Enqueue config and utilities first
             wp_enqueue_script(
@@ -221,12 +247,8 @@ class PromptBuilderController {
                 true
             );
             
-            wp_enqueue_style(
-                'fitcopilot-prompt-builder',
-                plugins_url('assets/css/admin-prompt-builder.css', FITCOPILOT_FILE),
-                [],
-                FITCOPILOT_VERSION
-            );
+            // Note: Using optimized CSS only (admin-prompt-builder-optimized.css)
+            // Original admin-prompt-builder.css is disabled to prevent conflicts
             
             // Enqueue MuscleModule assets (depends on modular coordinator)
             wp_enqueue_script(
@@ -240,7 +262,7 @@ class PromptBuilderController {
             wp_enqueue_style(
                 'muscle-targeting-module',
                 plugins_url('src/php/Modules/MuscleTargeting/assets/muscle-targeting.css', FITCOPILOT_FILE),
-                ['fitcopilot-prompt-builder'],
+                ['fitcopilot-prompt-builder-optimized'],
                 FITCOPILOT_VERSION
             );
             
