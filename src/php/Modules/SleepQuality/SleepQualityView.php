@@ -204,76 +204,7 @@ class SleepQualityView {
             <?php endif; ?>
         </div>
         
-        <style>
-        .sleep-quality-summary {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 16px;
-        }
-        
-        .summary-header h4 {
-            margin: 0 0 16px 0;
-            color: #2c3e50;
-            font-size: 16px;
-        }
-        
-        .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            color: #3498db;
-            margin-bottom: 4px;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #6c757d;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        
-        .summary-recommendations h5 {
-            margin: 0 0 8px 0;
-            color: #2c3e50;
-            font-size: 14px;
-        }
-        
-        .summary-recommendations ul {
-            margin: 0;
-            padding-left: 16px;
-        }
-        
-        .summary-recommendations li {
-            font-size: 14px;
-            color: #495057;
-            margin-bottom: 4px;
-        }
-        
-        .sleep-summary-error {
-            padding: 16px;
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-        }
-        
-        @media (max-width: 768px) {
-            .summary-stats {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-        }
-        </style>
+        <!-- Sleep Quality styles now in assets/css/prompt-builder/components/sleep-quality.css -->
         <?php
         
         return ob_get_clean();

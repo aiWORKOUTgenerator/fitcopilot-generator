@@ -1,0 +1,100 @@
+/**
+ * FitCopilot PromptBuilder - Form Sections Component
+ * Component layer - Form layout and sectioning
+ * 
+ * This file contains form container and sectioning styles extracted from the monolithic
+ * admin-prompt-builder-optimized.css for better maintainability and modularity.
+ */
+
+/* ===================================
+   FORM CONTAINER
+   =================================== */
+
+.prompt-builder-form {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-2xl);
+    margin-bottom: var(--space-2xl);
+    border: 1px solid var(--border-primary);
+}
+
+/* ===================================
+   FORM SECTIONS
+   =================================== */
+
+.form-section {
+    margin-bottom: var(--space-2xl);
+    padding: var(--space-lg);
+    background: var(--bg-accent);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+}
+
+.form-section h4 {
+    margin: 0 0 var(--space-md) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-primary);
+    padding-bottom: var(--space-sm);
+}
+
+/* ===================================
+   FORM ROWS
+   =================================== */
+
+.form-row {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+    .prompt-builder-form {
+        padding: var(--space-lg);
+    }
+    
+    .form-section {
+        padding: var(--space-md);
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .prompt-builder-form {
+        padding: var(--space-lg);
+    }
+    
+    .form-section {
+        padding: var(--space-md);
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+[data-theme="dark"] .prompt-builder-form {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .form-section {
+    background: var(--bg-primary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-section h4 {
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+} 

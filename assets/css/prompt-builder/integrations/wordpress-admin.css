@@ -1,0 +1,111 @@
+/**
+ * FitCopilot PromptBuilder - WordPress Admin Integration
+ * Integration layer - WordPress admin overrides
+ * 
+ * This file contains WordPress-specific styling overrides that ensure
+ * the PromptBuilder integrates seamlessly with WordPress admin interface.
+ */
+
+/* ===================================
+   WORDPRESS ADMIN BODY OVERRIDES
+   =================================== */
+
+body,
+body.wp-admin,
+#wpwrap,
+#wpcontent,
+#wpbody,
+#wpbody-content {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ===================================
+   WORDPRESS ADMIN WRAPPER
+   =================================== */
+
+.wrap {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.wrap h1 {
+    color: var(--text-primary);
+}
+
+.wrap .description {
+    color: var(--text-secondary);
+}
+
+/* ===================================
+   WORDPRESS ADMIN MENU INTEGRATION
+   =================================== */
+
+#adminmenumain,
+#adminmenuback {
+    background-color: var(--bg-secondary) !important;
+}
+
+#adminmenu a {
+    color: var(--text-primary) !important;
+}
+
+#adminmenu .wp-submenu {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* ===================================
+   WORDPRESS CORE UI BUTTON OVERRIDES
+   =================================== */
+
+.wp-core-ui .button {
+    background: var(--bg-accent) !important;
+    border-color: var(--border-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.wp-core-ui .button:hover {
+    background: var(--bg-tertiary) !important;
+}
+
+/* ===================================
+   PROMPT BUILDER STATUS INTEGRATION
+   =================================== */
+
+.prompt-builder-status {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--bg-accent);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-primary);
+    flex-wrap: wrap;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    min-width: 120px;
+}
+
+.status-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+}
+
+.status-value {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.status-value.active {
+    color: var(--color-success);
+}
+
+.status-value.inactive {
+    color: var(--color-warning);
+} 

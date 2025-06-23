@@ -1,0 +1,122 @@
+/**
+ * FitCopilot PromptBuilder - Base Styles & Reset
+ * Foundation layer - Normalize and base styling
+ * 
+ * This file contains the CSS reset and base styles that provide
+ * a consistent foundation across all components.
+ */
+
+/* ===================================
+   CSS RESET & NORMALIZATION
+   =================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Performance: Reduce paint operations */
+*::before,
+*::after {
+    content: none;
+}
+
+/* Remove default margins and padding */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* ===================================
+   BASE TYPOGRAPHY
+   =================================== */
+
+html {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+}
+
+body {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    background-color: inherit;
+}
+
+/* ===================================
+   BASE INTERACTIVE ELEMENTS
+   =================================== */
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+/* ===================================
+   BASE ACCESSIBILITY
+   =================================== */
+
+/* Ensure interactive elements are keyboard focusable */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Remove default button focus styles */
+button:focus {
+    outline: none;
+}
+
+/* ===================================
+   BASE LAYOUT HELPERS
+   =================================== */
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ===================================
+   REDUCED MOTION SUPPORT
+   =================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+} 

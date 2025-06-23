@@ -1,0 +1,127 @@
+/**
+ * Profile Management Module - CSS Styles
+ * Styles for user profile management and forms
+ */
+
+/* ===================================
+   PROFILE MANAGEMENT MODULE STYLES
+   =================================== */
+
+.profile-management-module {
+    /* Module container styles */
+    padding: var(--fc-spacing-unit, 1rem);
+    border-radius: var(--fc-border-radius, 4px);
+    background: var(--fc-bg-primary, #ffffff);
+    border: 1px solid var(--fc-border-color, #e0e0e0);
+}
+
+.profile-form {
+    /* Profile form container */
+    display: flex;
+    flex-direction: column;
+    gap: var(--fc-spacing-unit, 1rem);
+}
+
+.profile-form-section {
+    /* Individual profile form section */
+    padding: 1rem;
+    border: 1px solid var(--fc-border-color, #e0e0e0);
+    border-radius: var(--fc-border-radius, 4px);
+    background: var(--fc-bg-secondary, #f9f9f9);
+}
+
+.profile-form-section h3 {
+    margin: 0 0 1rem 0;
+    color: var(--fc-text-primary, #333333);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.profile-field-group {
+    /* Group of related profile fields */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.profile-field-label {
+    /* Profile field labels */
+    font-weight: 500;
+    color: var(--fc-text-primary, #333333);
+    margin-bottom: 0.25rem;
+}
+
+.profile-field-input {
+    /* Profile input fields */
+    padding: 0.75rem;
+    border: 1px solid var(--fc-border-color, #e0e0e0);
+    border-radius: var(--fc-border-radius, 4px);
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.profile-field-input:focus {
+    outline: none;
+    border-color: var(--fc-primary, #007cba);
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+}
+
+.profile-actions {
+    /* Profile action buttons container */
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--fc-border-color, #e0e0e0);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+    .profile-form-section {
+        padding: 0.75rem;
+    }
+    
+    .profile-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+.dark-mode .profile-management-module {
+    background: var(--fc-bg-primary-dark, #2d3748);
+    border-color: var(--fc-border-color-dark, #4a5568);
+}
+
+.dark-mode .profile-form-section {
+    background: var(--fc-bg-secondary-dark, #374151);
+    border-color: var(--fc-border-color-dark, #4a5568);
+}
+
+.dark-mode .profile-form-section h3 {
+    color: var(--fc-text-primary-dark, #e2e8f0);
+}
+
+.dark-mode .profile-field-label {
+    color: var(--fc-text-primary-dark, #e2e8f0);
+}
+
+.dark-mode .profile-field-input {
+    background: var(--fc-bg-primary-dark, #2d3748);
+    border-color: var(--fc-border-color-dark, #4a5568);
+    color: var(--fc-text-primary-dark, #e2e8f0);
+}
+
+.dark-mode .profile-field-input:focus {
+    border-color: var(--fc-primary, #007cba);
+}
+
+.dark-mode .profile-actions {
+    border-color: var(--fc-border-color-dark, #4a5568);
+}

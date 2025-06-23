@@ -180,61 +180,8 @@ class MuscleView {
      * Get muscle targeting CSS for styling
      */
     public function getMuscleTargetingCSS(): string {
-        return '
-        .muscle-selection-container {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 10px 0;
-        }
-        
-        .muscle-groups-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .muscle-group-item {
-            background: white;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
-            padding: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .muscle-group-item:hover {
-            border-color: #0073aa;
-            box-shadow: 0 2px 8px rgba(0,115,170,0.1);
-        }
-        
-        .muscle-group-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            margin: 0;
-            font-size: 16px;
-        }
-        
-        .muscle-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
-        
-        .muscle-selection-summary {
-            background: #f0f8ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 6px;
-            padding: 12px;
-            font-size: 14px;
-            color: #333;
-        }';
+        // Muscle targeting styles now in assets/css/prompt-builder/components/muscle-targeting.css
+        return '';
     }
     
     /**

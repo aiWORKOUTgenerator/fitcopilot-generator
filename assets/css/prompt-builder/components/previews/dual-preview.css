@@ -1,0 +1,116 @@
+/**
+ * FitCopilot PromptBuilder - Dual Preview System Component
+ * Component layer - Split-panel preview functionality
+ * 
+ * This file contains dual preview system styles extracted from the monolithic
+ * admin-prompt-builder-optimized.css for better maintainability and modularity.
+ */
+
+/* ===================================
+   DUAL PREVIEW CONTAINER
+   =================================== */
+
+.dual-preview-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-top: var(--space-md);
+}
+
+/* ===================================
+   PREVIEW PANELS
+   =================================== */
+
+.preview-panel {
+    background: var(--bg-accent);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+}
+
+.preview-panel h4 {
+    margin: 0 0 var(--space-sm) 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    padding-bottom: var(--space-sm);
+}
+
+/* ===================================
+   PREVIEW CONTENT
+   =================================== */
+
+.preview-content {
+    overflow-y: auto;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-md);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-relaxed);
+    color: var(--text-primary);
+}
+
+.preview-placeholder {
+    text-align: center;
+    color: var(--text-tertiary);
+    padding: var(--space-2xl) var(--space-lg);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+}
+
+/* ===================================
+   PREVIEW CONTROLS
+   =================================== */
+
+.preview-controls {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    margin-top: var(--space-sm);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+    .dual-preview-container {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+}
+
+/* ===================================
+   PERFORMANCE OPTIMIZATION
+   =================================== */
+
+.preview-content {
+    contain: layout style paint;
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+[data-theme="dark"] .preview-panel {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .preview-panel h4 {
+    color: var(--text-secondary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .preview-content {
+    background: var(--bg-primary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .preview-placeholder {
+    color: var(--text-tertiary);
+} 

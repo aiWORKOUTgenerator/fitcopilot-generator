@@ -1,0 +1,313 @@
+/**
+ * FitCopilot PromptBuilder - Button Component
+ * Component layer - Reusable button styles
+ * 
+ * This file contains all button styles and variants used throughout
+ * the PromptBuilder interface. Extracted from the monolithic CSS file
+ * for better component isolation and maintainability.
+ */
+
+/* ===================================
+   BASE BUTTON STYLES
+   =================================== */
+
+.button {
+    /* Layout */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    
+    /* Spacing */
+    padding: var(--space-sm) var(--space-lg);
+    
+    /* Visual */
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    
+    /* Typography */
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    font-family: var(--font-family-base);
+    text-decoration: none;
+    
+    /* Interaction */
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    
+    /* Accessibility */
+    user-select: none;
+}
+
+/* ===================================
+   BUTTON STATES
+   =================================== */
+
+.button:hover {
+    background: var(--bg-tertiary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.button:disabled:hover {
+    background: var(--bg-primary);
+    transform: none;
+}
+
+/* ===================================
+   BUTTON VARIANTS
+   =================================== */
+
+/* Primary Button */
+.button.button-primary {
+    background: var(--color-primary);
+    color: var(--text-inverse);
+    border-color: var(--color-primary);
+}
+
+.button.button-primary:hover {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+}
+
+.button.button-primary:disabled {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* Secondary Button */
+.button.button-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-color: var(--border-secondary);
+}
+
+.button.button-secondary:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-primary);
+}
+
+/* Success Button */
+.button.button-success {
+    background: var(--color-success);
+    color: var(--text-inverse);
+    border-color: var(--color-success);
+}
+
+.button.button-success:hover {
+    background: var(--color-success);
+    opacity: 0.9;
+}
+
+/* Warning Button */
+.button.button-warning {
+    background: var(--color-warning);
+    color: var(--text-inverse);
+    border-color: var(--color-warning);
+}
+
+.button.button-warning:hover {
+    background: var(--color-warning);
+    opacity: 0.9;
+}
+
+/* Error/Danger Button */
+.button.button-error,
+.button.button-danger {
+    background: var(--color-error);
+    color: var(--text-inverse);
+    border-color: var(--color-error);
+}
+
+.button.button-error:hover,
+.button.button-danger:hover {
+    background: var(--color-error);
+    opacity: 0.9;
+}
+
+/* ===================================
+   BUTTON SIZES
+   =================================== */
+
+/* Small Button */
+.button.button-small {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-xs);
+    gap: var(--space-xs);
+}
+
+/* Large Button */
+.button.button-large {
+    padding: var(--space-md) var(--space-xl);
+    font-size: var(--font-size-lg);
+    gap: var(--space-md);
+}
+
+/* ===================================
+   BUTTON GROUPS
+   =================================== */
+
+.button-group {
+    display: inline-flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.button-group.button-group-vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.button-group.button-group-connected .button {
+    border-radius: 0;
+}
+
+.button-group.button-group-connected .button:first-child {
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.button-group.button-group-connected .button:last-child {
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.button-group.button-group-connected .button:only-child {
+    border-radius: var(--radius-md);
+}
+
+/* ===================================
+   ICON BUTTONS
+   =================================== */
+
+.button.button-icon {
+    padding: var(--space-sm);
+    min-width: auto;
+    gap: 0;
+}
+
+.button.button-icon.button-small {
+    padding: var(--space-xs);
+}
+
+.button.button-icon.button-large {
+    padding: var(--space-md);
+}
+
+/* ===================================
+   LOADING BUTTONS
+   =================================== */
+
+.button.button-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.button.button-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: button-spin 0.8s linear infinite;
+}
+
+@keyframes button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+    .button {
+        padding: var(--space-md) var(--space-lg);
+        font-size: var(--font-size-base);
+        min-height: 44px; /* Touch target size */
+    }
+    
+    .button.button-small {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-size-sm);
+        min-height: 36px;
+    }
+    
+    .button-group {
+        flex-wrap: wrap;
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+[data-theme="dark"] .button {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .button:hover {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .button.button-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .button.button-secondary:hover {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/**
+ * Usage Examples:
+ * 
+ * <!-- Basic button -->
+ * <button class="button">Click me</button>
+ * 
+ * <!-- Primary action -->
+ * <button class="button button-primary">Save</button>
+ * 
+ * <!-- Small secondary button -->
+ * <button class="button button-secondary button-small">Cancel</button>
+ * 
+ * <!-- Icon button -->
+ * <button class="button button-icon">
+ *     <svg>...</svg>
+ * </button>
+ * 
+ * <!-- Button group -->
+ * <div class="button-group">
+ *     <button class="button">Option 1</button>
+ *     <button class="button button-primary">Option 2</button>
+ * </div>
+ */ 

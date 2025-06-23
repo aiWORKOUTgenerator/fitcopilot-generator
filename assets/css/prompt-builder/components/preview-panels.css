@@ -1,0 +1,440 @@
+/**
+ * Preview Panels Component - Multi-format Content Display System
+ * Component layer - Prompt, context, code, and workout preview displays
+ */
+
+/* ===================================
+   BASE PREVIEW PANELS
+   =================================== */
+
+.prompt-preview, 
+.context-inspector, 
+.strategy-code-viewer, 
+.workout-test-preview {
+    min-height: 250px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-md);
+    background: var(--bg-tertiary);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ===================================
+   PRE ELEMENT TEXT WRAPPING FIX
+   =================================== */
+
+.prompt-preview pre,
+.prompt-content,
+.context-inspector pre,
+.workout-test-preview pre {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+/* ===================================
+   STRATEGY CODE VIEWER
+   =================================== */
+
+.strategy-code-viewer {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.strategy-code-viewer.with-line-numbers {
+    padding-left: 45px;
+    position: relative;
+}
+
+.code-line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    background: #252526;
+    border-right: 1px solid #3e3e42;
+    color: #858585;
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-relaxed);
+    padding: var(--space-md) var(--space-xs);
+    text-align: right;
+}
+
+/* ===================================
+   WORKOUT TEST PREVIEW
+   =================================== */
+
+.workout-test-preview {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-family-base);
+}
+
+.workout-test-results .workout-meta {
+    display: flex;
+    gap: var(--space-xl);
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm);
+    background: var(--color-info-light);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-info);
+}
+
+.workout-test-results .meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.workout-test-results .meta-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: var(--space-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+.workout-test-results .meta-value {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-info-dark);
+}
+
+.workout-test-results .workout-content {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-md);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* ===================================
+   WORKOUT SECTIONS
+   =================================== */
+
+.workout-section {
+    margin-bottom: var(--space-xl);
+    border-left: 3px solid var(--color-primary);
+    padding-left: var(--space-md);
+}
+
+.workout-section h4 {
+    margin: 0 0 var(--space-sm) 0;
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+}
+
+.exercise-item {
+    margin-bottom: var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid var(--color-success);
+}
+
+/* ===================================
+   PLACEHOLDER STATES
+   =================================== */
+
+.prompt-placeholder, 
+.context-placeholder, 
+.code-placeholder, 
+.workout-placeholder {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: var(--space-2xl) var(--space-xl);
+    font-family: var(--font-family-base);
+    font-style: italic;
+}
+
+/* ===================================
+   STATISTICS DISPLAYS
+   =================================== */
+
+.prompt-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: var(--space-md);
+    background: var(--color-info-light);
+    border: 1px solid var(--color-info);
+    border-radius: var(--radius-sm);
+    margin-top: var(--space-sm);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-info-dark);
+}
+
+.stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-medium);
+}
+
+.workout-performance {
+    display: flex;
+    justify-content: space-around;
+    padding: var(--space-md);
+    background: var(--color-success-light);
+    border: 1px solid var(--color-success);
+    border-radius: var(--radius-sm);
+    margin-top: var(--space-sm);
+}
+
+.perf-item {
+    text-align: center;
+}
+
+.perf-label {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+.perf-value {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-success-dark);
+}
+
+/* ===================================
+   CONTEXT INSPECTOR
+   =================================== */
+
+.context-search {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    width: 150px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.context-tree {
+    font-family: var(--font-family-mono);
+}
+
+.context-branch {
+    margin-left: var(--space-xl);
+    border-left: 1px dashed var(--border-secondary);
+    padding-left: var(--space-md);
+    margin-bottom: var(--space-sm);
+}
+
+.context-field {
+    padding: var(--space-xs) var(--space-sm);
+    margin-bottom: var(--space-xs);
+    border-radius: var(--radius-xs);
+    background: var(--bg-tertiary);
+}
+
+.context-field.missing {
+    background: var(--color-error-light);
+    border-left: 3px solid var(--color-error);
+}
+
+.context-field-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.context-field-type {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    padding: 1px var(--space-xs);
+    border-radius: var(--radius-xs);
+    margin-left: var(--space-xs);
+}
+
+.context-field-value {
+    color: var(--color-success-dark);
+    margin-left: var(--space-sm);
+}
+
+/* ===================================
+   NOTIFICATION MESSAGES
+   =================================== */
+
+.prompt-builder-messages {
+    position: fixed;
+    top: 32px;
+    right: var(--space-xl);
+    z-index: 999999;
+    max-width: 400px;
+}
+
+.prompt-message {
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-sm);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+}
+
+.prompt-message.success {
+    background: var(--color-success-light);
+    border: 1px solid var(--color-success);
+    color: var(--color-success-dark);
+}
+
+.prompt-message.error {
+    background: var(--color-error-light);
+    border: 1px solid var(--color-error);
+    color: var(--color-error-dark);
+}
+
+.prompt-message.info {
+    background: var(--color-info-light);
+    border: 1px solid var(--color-info);
+    color: var(--color-info-dark);
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 768px) {
+    .prompt-preview, 
+    .context-inspector, 
+    .strategy-code-viewer, 
+    .workout-test-preview {
+        min-height: 200px;
+        max-height: 300px;
+        padding: var(--space-sm);
+    }
+    
+    .workout-test-results .workout-meta {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .prompt-stats,
+    .workout-performance {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .prompt-builder-messages {
+        right: var(--space-sm);
+        left: var(--space-sm);
+        max-width: none;
+    }
+    
+    .context-search {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .prompt-placeholder, 
+    .context-placeholder, 
+    .code-placeholder, 
+    .workout-placeholder {
+        padding: var(--space-lg) var(--space-sm);
+    }
+    
+    .strategy-code-viewer.with-line-numbers {
+        padding-left: 35px;
+    }
+    
+    .code-line-numbers {
+        width: 30px;
+        font-size: 10px;
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+[data-theme="dark"] .prompt-preview,
+[data-theme="dark"] .context-inspector,
+[data-theme="dark"] .workout-test-preview {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .workout-test-results .workout-content {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .exercise-item {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .context-search {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .context-field {
+    background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .context-field.missing {
+    background: var(--color-error-light);
+}
+
+/**
+ * Usage Examples:
+ * 
+ * <!-- Prompt Preview -->
+ * <div class="prompt-preview">
+ *   <div class="prompt-placeholder">Click "Generate Live Prompt" to see the AI prompt</div>
+ * </div>
+ * 
+ * <!-- Strategy Code Viewer -->
+ * <div class="strategy-code-viewer with-line-numbers">
+ *   <div class="code-line-numbers">1\n2\n3</div>
+ *   <pre>// Strategy code here</pre>
+ * </div>
+ * 
+ * <!-- Workout Test Preview -->
+ * <div class="workout-test-preview">
+ *   <div class="workout-test-results">
+ *     <div class="workout-meta">
+ *       <div class="meta-item">
+ *         <span class="meta-label">Duration</span>
+ *         <span class="meta-value">30 min</span>
+ *       </div>
+ *     </div>
+ *     <div class="workout-content">
+ *       <div class="workout-section">
+ *         <h4>Warm-up</h4>
+ *         <div class="exercise-item">5 min light cardio</div>
+ *       </div>
+ *     </div>
+ *   </div>
+ * </div>
+ */ 

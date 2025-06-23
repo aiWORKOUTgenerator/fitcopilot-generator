@@ -354,79 +354,7 @@ class AdminMenu {
             </div>
         </div>
         
-        <style>
-        .fitcopilot-quick-actions {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .fitcopilot-quick-actions .button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-        .fitcopilot-quick-actions .button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .system-status-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .status-item:last-child {
-            border-bottom: none;
-        }
-        .status-enabled {
-            color: #46b450;
-            font-weight: bold;
-        }
-        .status-disabled {
-            color: #dc3232;
-            font-weight: bold;
-        }
-        .status-active {
-            color: #0073aa;
-            font-weight: bold;
-        }
-        .activity-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .activity-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-        .activity-time {
-            color: #666;
-            font-size: 12px;
-            white-space: nowrap;
-            margin-right: 15px;
-        }
-        .activity-message {
-            flex: 1;
-            font-size: 13px;
-        }
-        </style>
+        <!-- Admin Dashboard styles now in assets/css/prompt-builder/components/admin-dashboard.css -->
         <?php
     }
 
@@ -1045,14 +973,7 @@ class AdminMenu {
             </div>
         </div>
         
-        <style>
-        .settings-container .postbox {
-            margin-bottom: 20px;
-        }
-        .settings-container .form-table th {
-            width: 200px;
-        }
-        </style>
+        <!-- Settings styles now in assets/css/prompt-builder/components/admin-dashboard.css -->
         <?php
     }
     

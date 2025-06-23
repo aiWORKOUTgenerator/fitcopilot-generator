@@ -1,0 +1,354 @@
+/**
+ * FitCopilot PromptBuilder - JSON Viewer Component
+ * Component layer - Enhanced JSON display with syntax highlighting
+ * 
+ * This file contains comprehensive JSON viewer component styles extracted from 
+ * the monolithic admin-prompt-builder-optimized.css for better maintainability.
+ */
+
+/* ===================================
+   JSON VIEWER CONTAINER
+   =================================== */
+
+.json-viewer-container {
+    position: relative;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+/* ===================================
+   JSON VIEWER HEADER
+   =================================== */
+
+.json-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-primary);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* ===================================
+   JSON VIEWER CONTROLS
+   =================================== */
+
+.json-viewer-controls {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.json-viewer-controls button {
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--border-secondary);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.json-viewer-controls button:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.json-viewer-controls button.active {
+    background: var(--color-primary);
+    color: var(--text-inverse);
+    border-color: var(--color-primary);
+}
+
+/* ===================================
+   JSON VIEWER CONTENT
+   =================================== */
+
+.json-viewer-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-md);
+}
+
+.json-viewer-content.compact-view {
+    /* Compact styling without height constraints */
+}
+
+/* ===================================
+   JSON SYNTAX HIGHLIGHTING
+   =================================== */
+
+.json-formatted {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--text-primary);
+}
+
+.json-formatted .json-key {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+}
+
+.json-formatted .json-string {
+    color: var(--color-success);
+}
+
+.json-formatted .json-number {
+    color: var(--color-warning);
+}
+
+.json-formatted .json-boolean {
+    color: var(--color-info);
+}
+
+.json-formatted .json-null {
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+/* ===================================
+   COLLAPSIBLE JSON SECTIONS
+   =================================== */
+
+.json-section {
+    margin-bottom: var(--space-sm);
+}
+
+.json-section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-accent);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-primary);
+    transition: all var(--transition-fast);
+}
+
+.json-section-header:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.json-section-toggle {
+    font-size: 10px;
+    transition: transform var(--transition-fast);
+}
+
+.json-section-toggle.collapsed {
+    transform: rotate(-90deg);
+}
+
+.json-section-content {
+    margin-top: var(--space-sm);
+    padding-left: var(--space-lg);
+    transition: all var(--transition-normal);
+}
+
+.json-section-content.collapsed {
+    display: none;
+}
+
+/* ===================================
+   JSON UTILITIES
+   =================================== */
+
+.json-size-indicator {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    background: var(--bg-accent);
+    color: var(--text-tertiary);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    border: 1px solid var(--border-primary);
+}
+
+.json-string-long {
+    position: relative;
+}
+
+.json-string-long.truncated::after {
+    content: '... (click to expand)';
+    color: var(--color-primary);
+    cursor: pointer;
+    font-style: italic;
+}
+
+/* ===================================
+   COPY SUCCESS FEEDBACK
+   =================================== */
+
+.copy-success {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    background: var(--color-success);
+    color: var(--text-inverse);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    animation: fadeInOut 2s ease-in-out;
+    z-index: 10;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    20%, 80% { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+/* Desktop - Full Feature Set */
+@media (min-width: 1024px) {
+    .workout-content pre {
+        font-size: var(--font-size-sm);
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
+    }
+}
+
+/* Tablet - Optimized Display */
+@media (max-width: 1024px) {
+    .json-viewer-header {
+        flex-direction: column;
+        gap: var(--space-sm);
+        align-items: flex-start;
+    }
+    
+    .json-viewer-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .workout-content pre {
+        font-size: var(--font-size-xs);
+        line-height: 1.6;
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
+    }
+}
+
+/* Mobile - Compact View */
+@media (max-width: 768px) {
+    .workout-test-preview {
+        padding: var(--space-md);
+    }
+    
+    .json-viewer-content {
+        padding: var(--space-sm);
+    }
+    
+    .json-viewer-controls button {
+        padding: var(--space-xs);
+        font-size: 10px;
+    }
+    
+    .workout-content pre {
+        font-size: 11px;
+        line-height: 1.5;
+        padding: var(--space-sm);
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
+    }
+    
+    .json-section-content {
+        padding-left: var(--space-md);
+    }
+}
+
+/* Small Mobile - Ultra Compact */
+@media (max-width: 480px) {
+    .json-viewer-header {
+        padding: var(--space-sm);
+    }
+    
+    .json-viewer-controls {
+        flex-wrap: wrap;
+    }
+    
+    .workout-content pre {
+        font-size: 10px;
+        line-height: 1.4;
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
+    }
+    
+    .json-formatted {
+        font-size: 10px;
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+[data-theme="dark"] .json-viewer-container {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-primary) !important;
+}
+
+[data-theme="dark"] .json-viewer-header {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--border-primary) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .json-viewer-controls button {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-primary) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .json-viewer-controls button:hover {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .json-viewer-controls button.active {
+    background-color: var(--color-primary) !important;
+    color: var(--text-inverse) !important;
+}
+
+[data-theme="dark"] .json-formatted .json-key {
+    color: var(--color-primary) !important;
+}
+
+[data-theme="dark"] .json-formatted .json-string {
+    color: var(--color-success) !important;
+}
+
+[data-theme="dark"] .json-formatted .json-number {
+    color: var(--color-warning) !important;
+}
+
+[data-theme="dark"] .json-section-header {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-primary) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .json-section-header:hover {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+} 

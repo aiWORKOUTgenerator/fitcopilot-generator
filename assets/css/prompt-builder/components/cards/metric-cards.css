@@ -1,0 +1,159 @@
+/**
+ * FitCopilot PromptBuilder - Metric Cards Component
+ * Component layer - Metrics grid and individual metric cards
+ * 
+ * This file contains metrics grid and metric card component styles extracted from 
+ * the monolithic admin-prompt-builder-optimized.css for better maintainability.
+ */
+
+/* ===================================
+   METRICS GRID LAYOUT
+   =================================== */
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+    padding: var(--space-2xl);
+}
+
+/* ===================================
+   METRIC CARD BASE
+   =================================== */
+
+.metric-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    border: 1px solid var(--border-primary);
+    transition: transform var(--transition-fast);
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===================================
+   METRIC CARD CONTENT
+   =================================== */
+
+.metric-content {
+    text-align: center;
+}
+
+.metric-value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+    display: block;
+}
+
+.metric-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+}
+
+/* ===================================
+   METRIC STATUS COLORS
+   =================================== */
+
+.metric-card.quality-excellent .metric-value { 
+    color: var(--color-success); 
+}
+
+.metric-card.quality-good .metric-value { 
+    color: var(--color-info); 
+}
+
+.metric-card.quality-fair .metric-value { 
+    color: var(--color-warning); 
+}
+
+.metric-card.quality-poor .metric-value { 
+    color: var(--color-error); 
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .metrics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: var(--space-md);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        padding: var(--space-lg);
+    }
+}
+
+/* ===================================
+   PERFORMANCE OPTIMIZATION
+   =================================== */
+
+.metric-card:hover {
+    will-change: transform;
+}
+
+/* Remove will-change after animations */
+@media (prefers-reduced-motion: reduce) {
+    .metric-card:hover {
+        transform: none;
+        will-change: auto !important;
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+[data-theme="dark"] .metrics-grid {
+    /* Inherits container styling */
+}
+
+[data-theme="dark"] .metric-card {
+    background: var(--bg-primary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .metric-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .metric-content {
+    /* Inherits text styling */
+}
+
+[data-theme="dark"] .metric-value {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .metric-label {
+    color: var(--text-secondary);
+}
+
+/* Status colors remain the same in dark mode for consistency */
+[data-theme="dark"] .metric-card.quality-excellent .metric-value { 
+    color: var(--color-success); 
+}
+
+[data-theme="dark"] .metric-card.quality-good .metric-value { 
+    color: var(--color-info); 
+}
+
+[data-theme="dark"] .metric-card.quality-fair .metric-value { 
+    color: var(--color-warning); 
+}
+
+[data-theme="dark"] .metric-card.quality-poor .metric-value { 
+    color: var(--color-error); 
+} 

@@ -1,0 +1,672 @@
+/**
+ * Layout Component - PromptBuilder Layout System
+ * Component layer - Single column layout structure and responsive design
+ */
+
+/* ===================================
+   MAIN LAYOUT CONTAINER
+   =================================== */
+
+.prompt-builder-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+    margin-top: var(--space-xl);
+}
+
+.prompt-builder-left {
+    flex: 1;
+}
+
+.prompt-builder-right {
+    flex: 1;
+}
+
+/* ===================================
+   STATUS DISPLAY
+   =================================== */
+
+.prompt-builder-status {
+    display: flex;
+    gap: var(--space-xl);
+    margin-bottom: var(--space-xl);
+    padding: var(--space-md);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.status-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-medium);
+}
+
+.status-value {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.status-value.active {
+    color: var(--color-success);
+}
+
+.status-value.inactive {
+    color: var(--color-error);
+}
+
+/* ===================================
+   BUILDER SECTIONS
+   =================================== */
+
+.builder-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.builder-section h3 {
+    margin: 0 0 var(--space-md) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-secondary);
+    padding-bottom: var(--space-sm);
+}
+
+/* ===================================
+   CONTROL SECTIONS
+   =================================== */
+
+.strategy-controls {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.strategy-select, 
+.user-select {
+    flex: 1;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+}
+
+.strategy-description {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: var(--space-xs);
+}
+
+.profile-controls {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* ===================================
+   FORM LAYOUT
+   =================================== */
+
+.form-group {
+    margin-bottom: var(--space-xl);
+}
+
+.form-group h4 {
+    margin: 0 0 var(--space-sm) 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.form-row {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border-secondary);
+    margin-top: var(--space-lg);
+}
+
+/* ===================================
+   HEIGHT INPUT LAYOUT
+   =================================== */
+
+.height-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.height-separator {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 var(--space-xs);
+}
+
+/* ===================================
+   SECTION HEADER CONTROLS
+   =================================== */
+
+.section-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.code-controls, 
+.prompt-controls, 
+.workout-controls, 
+.context-controls {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.code-controls button, 
+.prompt-controls button, 
+.workout-controls button, 
+.context-controls button {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.code-controls button:hover, 
+.prompt-controls button:hover, 
+.workout-controls button:hover, 
+.context-controls button:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-focus);
+}
+
+/* ===================================
+   THREE-COLUMN SECTION LAYOUT
+   =================================== */
+
+.three-column-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+}
+
+.three-column-sections .form-group {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.three-column-sections .form-group h4 {
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    border-bottom: 2px solid var(--accent-primary);
+    padding-bottom: var(--space-xs);
+}
+
+.three-column-sections .form-select {
+    width: 100%;
+    margin-bottom: var(--space-sm);
+}
+
+.three-column-sections .sleep-quality-selection {
+    width: 100%;
+}
+
+.three-column-sections .sleep-quality-selection .sleep-option {
+    margin-bottom: var(--space-xs);
+    padding: var(--space-sm);
+    border: 1px solid var(--border-tertiary);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.three-column-sections .sleep-quality-selection .sleep-option:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-primary);
+}
+
+.three-column-sections .sleep-quality-selection .sleep-option.selected {
+    border-color: var(--accent-primary);
+    background: var(--accent-primary-light);
+    color: var(--accent-primary-dark);
+}
+
+/* ===================================
+   ENHANCED HEALTH CONSIDERATIONS LAYOUT
+   =================================== */
+
+.health-considerations-enhanced {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    text-align: center;
+}
+
+.health-considerations-enhanced h4 {
+    margin: 0 0 var(--space-lg) 0;
+    color: var(--text-primary);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.health-limitations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.health-limitation-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-sm);
+    border: 1px solid var(--border-tertiary);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-height: 44px;
+}
+
+.health-limitation-item:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.health-limitation-item input[type="checkbox"] {
+    margin-right: var(--space-xs);
+    transform: scale(1.1);
+}
+
+.health-limitation-item.selected {
+    border-color: var(--accent-primary);
+    background: var(--accent-primary-light);
+    color: var(--accent-primary-dark);
+    font-weight: 500;
+}
+
+.health-text-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.health-text-field {
+    width: 100%;
+    min-height: 80px;
+    padding: var(--space-md);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+    font-family: inherit;
+    resize: vertical;
+    transition: all var(--transition-base);
+}
+
+.health-text-field:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-light);
+}
+
+.health-text-field::placeholder {
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+/* ===================================
+   ENHANCED EXERCISE PREFERENCES & CUSTOM INSTRUCTIONS LAYOUT
+   =================================== */
+
+.exercise-preferences-enhanced {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    text-align: center;
+}
+
+.exercise-preferences-enhanced h4 {
+    margin: 0 0 var(--space-lg) 0;
+    color: var(--text-primary);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.custom-instructions-enhanced {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    text-align: center;
+}
+
+.custom-instructions-enhanced h4 {
+    margin: 0 0 var(--space-lg) 0;
+    color: var(--text-primary);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.exercise-text-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.exercise-text-field {
+    width: 100%;
+    min-height: 80px;
+    padding: var(--space-md);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+    font-family: inherit;
+    resize: vertical;
+    transition: all var(--transition-base);
+}
+
+.exercise-text-field:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-light);
+}
+
+.exercise-text-field::placeholder {
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+.custom-instructions-field {
+    width: 100%;
+    min-height: 100px;
+    padding: var(--space-md);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+    font-family: inherit;
+    resize: vertical;
+    transition: all var(--transition-base);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.custom-instructions-field:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-light);
+}
+
+.custom-instructions-field::placeholder {
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 1200px) {
+    .prompt-builder-container {
+        gap: var(--space-lg);
+    }
+    
+    /* Three columns become two columns on smaller desktops */
+    .three-column-sections {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-md);
+    }
+}
+
+@media (max-width: 768px) {
+    .prompt-builder-container {
+        gap: var(--space-md);
+        margin-top: var(--space-lg);
+    }
+    
+    .builder-section {
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .strategy-controls,
+    .profile-controls {
+        flex-direction: column;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .section-header-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+    
+    .code-controls, 
+    .prompt-controls, 
+    .workout-controls, 
+    .context-controls {
+        flex-wrap: wrap;
+    }
+    
+    /* Three-column sections become single column on tablet and mobile */
+    .three-column-sections {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    /* Health considerations responsive adjustments */
+    .health-considerations-enhanced {
+        padding: var(--space-lg);
+    }
+    
+    .health-limitations-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: var(--space-sm);
+    }
+    
+    .health-text-fields {
+        max-width: 100%;
+    }
+    
+    /* Exercise preferences and custom instructions responsive adjustments */
+    .exercise-preferences-enhanced,
+    .custom-instructions-enhanced {
+        padding: var(--space-lg);
+    }
+    
+    .exercise-text-fields {
+        max-width: 100%;
+    }
+    
+    .custom-instructions-field {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .prompt-builder-status {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .builder-section {
+        padding: var(--space-md);
+    }
+    
+    .height-input-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+[data-theme="dark"] .prompt-builder-status {
+    background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .builder-section {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .strategy-select,
+[data-theme="dark"] .user-select {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .code-controls button,
+[data-theme="dark"] .prompt-controls button,
+[data-theme="dark"] .workout-controls button,
+[data-theme="dark"] .context-controls button {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .code-controls button:hover,
+[data-theme="dark"] .prompt-controls button:hover,
+[data-theme="dark"] .workout-controls button:hover,
+[data-theme="dark"] .context-controls button:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-focus);
+}
+
+[data-theme="dark"] .health-considerations-enhanced {
+    background: var(--bg-tertiary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .health-limitation-item {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .health-limitation-item:hover {
+    background: var(--bg-primary);
+    border-color: var(--accent-primary);
+}
+
+[data-theme="dark"] .health-text-field {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .health-text-field:focus {
+    border-color: var(--accent-primary);
+}
+
+[data-theme="dark"] .health-text-field::placeholder {
+    color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .exercise-preferences-enhanced,
+[data-theme="dark"] .custom-instructions-enhanced {
+    background: var(--bg-tertiary);
+    border-color: var(--border-primary);
+}
+
+[data-theme="dark"] .exercise-text-field,
+[data-theme="dark"] .custom-instructions-field {
+    background: var(--bg-secondary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .exercise-text-field:focus,
+[data-theme="dark"] .custom-instructions-field:focus {
+    border-color: var(--accent-primary);
+}
+
+[data-theme="dark"] .exercise-text-field::placeholder,
+[data-theme="dark"] .custom-instructions-field::placeholder {
+    color: var(--text-tertiary);
+}
+
+/**
+ * Usage Examples:
+ * 
+ * <div class="prompt-builder-container">
+ *   <div class="prompt-builder-left">
+ *     <div class="builder-section">
+ *       <h3>Form Section</h3>
+ *       <div class="form-group">
+ *         <div class="form-row">
+ *           <!-- Form content -->
+ *         </div>
+ *       </div>
+ *     </div>
+ *   </div>
+ *   <div class="prompt-builder-right">
+ *     <div class="builder-section">
+ *       <h3>Preview Section</h3>
+ *       <!-- Preview content stacked below form -->
+ *     </div>
+ *   </div>
+ * </div>
+ */ 

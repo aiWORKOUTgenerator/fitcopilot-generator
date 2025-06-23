@@ -1,0 +1,77 @@
+/**
+ * Muscle Targeting Component CSS
+ * Migrated from MuscleView.php getMuscleTargetingCSS() method
+ * Features: Grid layouts, muscle selection, interactive states
+ */
+
+/* ===================================
+   MUSCLE SELECTION CONTAINER
+   =================================== */
+
+.muscle-selection-container {
+    background: var(--color-background-light, #f9f9f9);
+    border: 1px solid var(--color-border-light, #ddd);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px 0;
+}
+
+/* Muscle Groups Grid - CRITICAL MIGRATION */
+.muscle-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* ===================================
+   MUSCLE GROUP ITEMS
+   =================================== */
+
+.muscle-group-item {
+    background: var(--color-background-card, white);
+    border: 2px solid var(--color-border-light, #e1e1e1);
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.muscle-group-item:hover {
+    border-color: var(--color-primary, #0073aa);
+    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.1);
+}
+
+.muscle-group-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+    font-size: 16px;
+}
+
+/* ===================================
+   MUSCLE ACTIONS
+   =================================== */
+
+.muscle-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+/* ===================================
+   MUSCLE SELECTION SUMMARY
+   =================================== */
+
+.muscle-selection-summary {
+    background: var(--bg-accent, #f0f8ff);
+    border: 1px solid var(--color-info, #b3d9ff);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    color: var(--text-primary, #333);
+}

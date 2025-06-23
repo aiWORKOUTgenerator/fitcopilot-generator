@@ -1,0 +1,60 @@
+/**
+ * Sleep Quality Module - CSS Styles
+ * Styles for sleep quality tracking and integration
+ */
+
+/* ===================================
+   SLEEP QUALITY MODULE STYLES
+   =================================== */
+
+.sleep-quality-module {
+    /* Module container styles */
+    padding: var(--fc-spacing-unit, 1rem);
+    border-radius: var(--fc-border-radius, 4px);
+    background: var(--fc-bg-primary, #ffffff);
+    border: 1px solid var(--fc-border-color, #e0e0e0);
+}
+
+.sleep-quality-selector {
+    /* Sleep quality selection component */
+    display: flex;
+    gap: var(--fc-spacing-unit, 1rem);
+    align-items: center;
+}
+
+.sleep-quality-option {
+    /* Individual sleep quality option */
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--fc-border-color, #e0e0e0);
+    border-radius: var(--fc-border-radius, 4px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sleep-quality-option:hover {
+    background: var(--fc-bg-secondary, #f5f5f5);
+}
+
+.sleep-quality-option.selected {
+    background: var(--fc-primary, #007cba);
+    color: white;
+    border-color: var(--fc-primary, #007cba);
+}
+
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+.dark-mode .sleep-quality-module {
+    background: var(--fc-bg-primary-dark, #2d3748);
+    border-color: var(--fc-border-color-dark, #4a5568);
+}
+
+.dark-mode .sleep-quality-option {
+    border-color: var(--fc-border-color-dark, #4a5568);
+    color: var(--fc-text-primary-dark, #e2e8f0);
+}
+
+.dark-mode .sleep-quality-option:hover {
+    background: var(--fc-bg-secondary-dark, #4a5568);
+}
